@@ -238,11 +238,17 @@ Ripple is a prototype. It is not a medical device and has not had a clinical rev
 
 - **First:** a pharmacist and a doctor sign the decision table's 61 rows and label the test sets; the questions for HSA in [`docs/safety/intended-use.md`](docs/safety/intended-use.md); a test with older adults ([`docs/safety/elder-test-protocol.md`](docs/safety/elder-test-protocol.md))
 
-1. The iOS app with the Challenge 2 features (being submitted to App Store review)
+Then:
+
+1. The iOS app with the Challenge 2 features (in App Store review)
 2. A pharmacist and clinician review of the lines Ripple shows
 3. Tencent Cloud ASR compared with MERaLiON on Singapore-accented Mandarin
 4. A caregiver role
 5. A second-vendor checker
+
+### The iOS app
+
+[Ripple Health AI on the App Store](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791). The version on the App Store now is our earlier release (1.1.0, August 2026). The update with the Challenge 2 features is in App Store review; **once the review is approved, the update will appear on that page.**
 
 ---
 

@@ -240,11 +240,15 @@ Ripple 还是原型。它不是医疗器械，也还没有做过临床审核或�
 
 然后：
 
-1. 带题 2 功能的 iOS App（正在提交 App Store 审核）
+1. 带题 2 功能的 iOS App（正在 App Store 审核）
 2. 请药剂师和医生审核 Ripple 显示的句子
 3. 在新加坡口音的华语上比较腾讯云语音识别和 MERaLiON
 4. 照护者角色
 5. 另一家厂商的检查模型
+
+### iOS App
+
+[App Store 上的 Ripple Health AI](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791)。现在上架的是我们之前的版本（1.1.0，2026 年 8 月）。带题 2 功能的更新正在 App Store 审核，**审核通过后，这个页面上就会看到 App 的更新。**
 
 ---
 
