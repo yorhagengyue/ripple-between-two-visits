@@ -83,8 +83,9 @@ Core problems solved, shown in the film through Mr Tan, 67 (a fictional patient)
 
 ## Links
 
+- Demo video (7:56): https://youtu.be/2VmBRCeDO3I
 - Live demo: https://app.ripple-health-ai.com (a web demo built for this challenge)
-- iOS app: https://apps.apple.com/sg/app/ripple-health-ai/id6786394791 (the Challenge 2 update may not be live yet)
+- iOS app: https://apps.apple.com/sg/app/ripple-health-ai/id6786394791 (the Challenge 2 update is in App Store review and will appear there once approved)
 - Source code: https://github.com/yorhagengyue/ripple-between-two-visits
 - CodeBuddy screenshots: [`codebuddy/`](codebuddy/)
 - Cover image: [`cover/`](cover/)

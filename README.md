@@ -10,12 +10,12 @@ Tencent Cloud AI CAN DO IT Hackathon Singapore 2026 · Healthcare track · **NTU
 
 https://github.com/user-attachments/assets/12c3e150-9f8b-4e37-bc89-76b46c30e48d
 
-A sharper copy: [play the 480p version](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4) in the browser; the full-quality link is in the submission form. Files in [`docs/video/`](docs/video/).
+**Full quality (1080p) on YouTube: https://youtu.be/2VmBRCeDO3I** · a 480p copy also [plays in the browser](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4). Files in [`docs/video/`](docs/video/).
 
 | | |
 |---|---|
 | **Live demo** | https://app.ripple-health-ai.com — a web demo built for this challenge. Judge log-ins are in the submission form. |
-| **Demo video** | 7:56: the player above, or [the 480p version](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4); the full-quality link is in the submission form. Its source code is in [`videos/`](videos/). |
+| **Demo video** | 7:56: the player above, or in full quality on YouTube: https://youtu.be/2VmBRCeDO3I. Its source code is in [`videos/`](videos/). |
 | **iOS app** | [Ripple Health AI on the App Store](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791). The product ships as this iOS app. The version on the App Store now (1.1.0, August 2026) is our earlier release; the update with the Challenge 2 features is being submitted for review and **may not be live, or may not be the latest version, when you judge**. |
 | **Source code** | [`web/`](web/) the app · [`videos/`](videos/) the film · [`docs/`](docs/) diagrams, screenshots, submission text |
 

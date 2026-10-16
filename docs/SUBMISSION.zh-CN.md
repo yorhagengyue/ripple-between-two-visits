@@ -85,8 +85,9 @@ app.ripple-health-ai.com 上的网页版是为这次比赛做的演示。正式�
 
 ## 链接
 
+- 演示视频（7:56）：https://youtu.be/2VmBRCeDO3I
 - 在线演示：https://app.ripple-health-ai.com （为比赛做的网页演示版）
-- iOS App：https://apps.apple.com/sg/app/ripple-health-ai/id6786394791 （题 2 的更新可能还没上架）
+- iOS App：https://apps.apple.com/sg/app/ripple-health-ai/id6786394791 （题 2 的更新正在 App Store 审核，审核通过后会在这里看到）
 - 源代码：https://github.com/yorhagengyue/ripple-between-two-visits
 - CodeBuddy 截图：[`codebuddy/`](codebuddy/)
 - 封面：[`cover/`](cover/)

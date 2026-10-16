@@ -10,12 +10,12 @@
 
 https://github.com/user-attachments/assets/12c3e150-9f8b-4e37-bc89-76b46c30e48d
 
-更清楚的版本：[在浏览器里播放 480p 版](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)；高清版链接在提交表单里。文件在 [`docs/video/`](docs/video/)。
+**YouTube 高清版（1080p）：https://youtu.be/2VmBRCeDO3I** · 也可以[在浏览器里播放 480p 版](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)。文件在 [`docs/video/`](docs/video/)。
 
 | | |
 |---|---|
 | **在线演示** | https://app.ripple-health-ai.com ：为这次比赛做的网页演示版。评委登录账号写在提交表单里。 |
-| **演示视频** | 7:56：上面的播放器，或 [480p 版](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)；高清版链接在提交表单里。视频的源代码在 [`videos/`](videos/)。 |
+| **演示视频** | 7:56：上面的播放器，或 YouTube 高清版：https://youtu.be/2VmBRCeDO3I。视频的源代码在 [`videos/`](videos/)。 |
 | **iOS App** | [App Store 上的 Ripple Health AI](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791)。正式产品就是这个 iOS App。现在 App Store 上的是我们之前的版本（1.1.0，2026 年 8 月）；带题 2 功能的更新正在提交审核，**评审时可能还没上架，或者还不是比赛的最新版本**。 |
 | **源代码** | [`web/`](web/) 应用 · [`videos/`](videos/) 演示片 · [`docs/`](docs/) 图、截图、提交文字 |
 
