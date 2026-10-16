@@ -28,7 +28,7 @@ The challenge starts from one sentence: *"Good health is shaped by what patients
 - **At the visit.** He asks his doctor's consent on screen, then records. Live captions appear on his phone and his daughter's phone, in English and Mandarin, each line marked with who is speaking. After the visit he confirms, line by line, what the doctor actually said.
 - **Every day after that.** When he asks about a medicine, a reading or a symptom, Ripple answers **first from his own sources**: his doctor's recorded words (with who said it and when), his confirmed pharmacy label, and reviewed leaflet lines. He can type or hold to speak, in English or Mandarin.
 - **What Ripple must not answer becomes a question for his doctor.** "Can I take one more tablet?" never gets a yes or a no. It gets his doctor's own words, his label, a referral, and the question saved on his list for the next visit.
-- **Medicines.** Scan the box: Ripple reads his pharmacy label, explains what the medicine is for in plain words, and plays his doctor's recorded words about it. An unknown medicine gets exactly the sentence the challenge asks for.
+- **Medicines.** Scan the box: Ripple reads his pharmacy label, explains what the medicine is for in plain words, and plays his doctor's recorded words about it. An unknown medicine gets exactly the sentence the challenge asks for. (Since the move to Hunyuan on 16 Oct 2026 the live demo reads only the example label photos: our Hunyuan account has no model that reads images yet, so a new photo asks him to type the label instead.)
 - **Readings and patterns.** Blood pressure sits next to his doctor's own target. Out of range, he can say why ("tai chi this morning, no breakfast yet"), and a repeating pattern becomes a question for the doctor, not advice from an app.
 - **When something is wrong.** Emergency words get 995 at once, self-harm words get the helplines, and his family's phone is notified with his words and what Ripple told him.
 
@@ -36,7 +36,7 @@ The challenge starts from one sentence: *"Good health is shaped by what patients
 
 1. **Quotes, not guesses.** The medical content Ripple shows comes from his own doctor, his own label and reviewed leaflet lines, with who said it and when.
 2. **Code decides first, the AI works inside a fence.** The answers that must never go wrong are decided by deterministic code before any model runs (section 3).
-3. **Built for Singapore.** One speech engine for Mandarin and English on Tencent Cloud in Singapore, 995 and local helplines, and the Healthier SG context.
+3. **Built on Tencent Cloud, for Singapore.** EdgeOne, Lighthouse in Singapore, speech recognition with one engine for Mandarin and English, and Hunyuan for the language models; 995 and local helplines, and the Healthier SG context.
 
 ## 2. Architecture
 
@@ -48,7 +48,7 @@ The challenge starts from one sentence: *"Good health is shaped by what patients
 | **Tencent Cloud Lighthouse** ★ | One always-on server in **Singapore**: Caddy → Next.js (TypeScript): pages, APIs, the safety layer, the visit pipeline, a live event stream (Server-Sent Events) and notifications | Tencent Cloud, Singapore |
 | **Tencent Cloud Speech Recognition (ASR)** ★ | Region **ap-singapore**, engine **16k_zh_en** (Mandarin and English in one engine), medicine names sent as **hot words**, recording-file recognition (CreateRecTask) with speaker separation. Each line is sent when he pauses (caption about 2–3 s later); after the visit the whole recording is recognised again in pieces of at most 100 s | Tencent Cloud, Singapore |
 | Who is speaking | Our own: a voice fingerprint per line (MFCC + pitch; the audio is not kept) grouped into voices, combined with a vote from the words. Labels stay "inferred" until he confirms | Server (`web/lib/visit/`) |
-| Language models | **DeepSeek**: `deepseek-flash` picks which of his sources to quote; `deepseek-v4-pro` checks any reworded line and blocks it unless it gives a clear yes. Called only after his separate AI-processing consent | DeepSeek API |
+| **Tencent Cloud Hunyuan** ★ | Language models: `hy3` picks which of his sources to quote; a second model, `hy4-preview`, checks any reworded line and blocks it unless it gives a clear yes. Called only after his separate AI-processing consent (DeepSeek until 16 Oct 2026) | Tencent Cloud TokenHub, international site (Singapore) |
 | Data | **Supabase**: Postgres with row-level security, private storage, sign-in. The service key stays on the server; visit audio goes from the phone straight to private storage through a 10-minute signed link | Supabase |
 | Notifications | Web Push: dose reminders, and the emergency notice to the family | Browser push |
 
@@ -154,17 +154,17 @@ Assoc Prof Faith Chia (LKCMedicine) introduced Challenge 2 with a person who has
 ## 6. Privacy and consent
 
 - The doctor agrees on screen before anything is recorded.
-- AI processing is a separate consent: DeepSeek processes data in China, so he can refuse it, and Ripple then answers with fixed sentences and referrals only. Speech recognition runs on Tencent Cloud in Singapore.
+- AI processing is a separate consent that he can refuse; Ripple then answers with fixed sentences and referrals only. The language models are Tencent Cloud Hunyuan through TokenHub's international site (Singapore); Tencent says that processing may use computing resources in other countries or regions and that the data is generally kept for up to 30 days. Speech recognition runs on Tencent Cloud in Singapore.
 - Recordings are kept 90 days unless he keeps them; he can export or delete everything, and deleting the account removes his data at once.
 - Keys live only on the server; the database uses row-level security; audio and photos sit in private storage, opened with links that last 10 minutes.
 
 ## 7. Built with CodeBuddy
 
-We set up CodeBuddy with our rules first (`CODEBUDDY.md` and `.codebuddy/rules/`: never cross into medical advice; keys only in `web/.env`; follow the design direction). In Craft mode it read our task cards and built the first milestones: the app skeleton, the DeepSeek wiring, the safety layer and the question API. Our tip: have it run the type check, lint, unit tests, the evaluation set and the Playwright end-to-end tests after every change.
+We set up CodeBuddy with our rules first (`CODEBUDDY.md` and `.codebuddy/rules/`: never cross into medical advice; keys only in `web/.env`; follow the design direction). In Craft mode it read our task cards and built the first milestones: the app skeleton, the model wiring (DeepSeek at the time; the app moved to Tencent Cloud Hunyuan on 16 Oct 2026), the safety layer and the question API. Our tip: have it run the type check, lint, unit tests, the evaluation set and the Playwright end-to-end tests after every change.
 
 | | |
 |---|---|
-| ![CodeBuddy reads the project rules](docs/codebuddy/01-codebuddy-reads-the-project-rules.jpg) | ![CodeBuddy connects DeepSeek and plans M0–M7](docs/codebuddy/02-codebuddy-connects-deepseek-and-plans-m0-m7.jpg) |
+| ![CodeBuddy reads the project rules](docs/codebuddy/01-codebuddy-reads-the-project-rules.jpg) | ![CodeBuddy connects DeepSeek, our model until 16 Oct, and plans M0–M7](docs/codebuddy/02-codebuddy-connects-deepseek-and-plans-m0-m7.jpg) |
 | ![CodeBuddy builds and runs the tests](docs/codebuddy/03-codebuddy-builds-and-runs-the-tests.jpg) | ![CodeBuddy finishes M1, the safety layer](docs/codebuddy/04-codebuddy-finishes-m1-safety-layer.jpg) |
 
 More in [`docs/codebuddy/`](docs/codebuddy/).
@@ -185,7 +185,7 @@ npm run test:e2e     # end-to-end tests (Playwright)
 npm run eval         # the frozen question set, offline
 ```
 
-`web/.env.example` documents every setting, including how to turn on DeepSeek and Tencent Cloud speech recognition.
+`web/.env.example` documents every setting, including how to turn on Tencent Cloud Hunyuan and Tencent Cloud speech recognition.
 
 ## 9. Repository layout
 

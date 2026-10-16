@@ -34,7 +34,7 @@ import {
 export const BUILD = {
   lines: [
     "We set up CodeBuddy with our rules first: never cross into medical advice, keys only in .env.",
-    "In Craft mode it built the first task cards: the app skeleton, DeepSeek wiring, the safety layer.",
+    "In Craft mode it built the first task cards: the app skeleton, the model wiring, the safety layer.",
     "Tip: have it run types, lint, unit tests, the eval and Playwright after each change.",
   ],
   shots: [
@@ -80,7 +80,7 @@ export const COPY = {
     lh: ["TENCENT CLOUD", "Lighthouse", "Singapore", "NEXT.JS APP"],
     pills: ["Pages and APIs", "Safety layer", "Live event stream"],
     asr: ["TENCENT CLOUD", "Speech recognition", "Singapore · Mandarin + English"],
-    llm: ["DEEPSEEK", "Language models", "One answers; a second checks"],
+    llm: ["TENCENT CLOUD", "Hunyuan", "One answers; a second checks"],
     db: ["SUPABASE", "Database and storage", "Row-level security · private storage"],
   },
   visit: {
@@ -139,7 +139,7 @@ export const COPY = {
     label: "05 · PRIVACY AND CONSENT", title: "Privacy and consent",
     // [icon, the phrase, a small line]
     cards: [
-      ["consent", "Two separate consents", "AI processing (DeepSeek, China) can be refused"],
+      ["consent", "Two separate consents", "AI processing (Tencent Cloud Hunyuan) can be refused"],
       ["clock", "Recordings kept\n90 days", "Unless he keeps them"],
       ["export", "He can export or delete everything", "Account deletion removes data at once"],
     ],

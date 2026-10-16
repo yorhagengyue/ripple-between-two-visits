@@ -1,0 +1,476 @@
+{
+ "note": "Version 10 captions (identical to v9; same times as v7), burned by post.mjs onto out/frames-v10-raw -> out/frames-v10-final. start/end are FINAL v7 film seconds (edl-v10.json); the same times as v6 (everything before part 3 is unchanged); p3's subline now 'How it works, safety and next steps' (the results slide is gone). v6 holds each caption's v6 times.",
+ "fps": 30,
+ "inFrames": 5,
+ "outFrames": 5,
+ "presets": {
+  "br": {
+   "align": "center",
+   "x": 1332,
+   "anchor": "bottom",
+   "y": 1056,
+   "maxW": 1060,
+   "box": [
+    770,
+    850,
+    1895,
+    1068
+   ],
+   "note": "bottom right of the time card"
+  },
+  "bc": {
+   "align": "center",
+   "x": 960,
+   "anchor": "bottom",
+   "y": 1056,
+   "maxW": 1300,
+   "box": [
+    250,
+    850,
+    1670,
+    1068
+   ],
+   "note": "bottom centre, no card on screen"
+  },
+  "bl_panel": {
+   "align": "center",
+   "x": 600,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1080,
+   "box": [
+    25,
+    760,
+    1180,
+    975
+   ],
+   "note": "left of the c03/c05 app panel, above the time card"
+  },
+  "bl_panel4": {
+   "align": "center",
+   "x": 620,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1120,
+   "box": [
+    25,
+    760,
+    1222,
+    975
+   ],
+   "note": "left of the c04 app panel, above the time card"
+  },
+  "tl_panel": {
+   "align": "center",
+   "x": 600,
+   "anchor": "top",
+   "y": 22,
+   "maxW": 1080,
+   "box": [
+    25,
+    12,
+    1180,
+    260
+   ],
+   "note": "top, left of the app panel"
+  },
+  "gap": {
+   "align": "center",
+   "x": 962,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 930,
+   "box": [
+    462,
+    760,
+    1462,
+    975
+   ],
+   "note": "between the two c07 panels, above the time card"
+  },
+  "c11": {
+   "align": "center",
+   "x": 640,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1150,
+   "box": [
+    25,
+    760,
+    1255,
+    975
+   ],
+   "note": "left of the c11 panel, above the EXP card"
+  },
+  "bl_exp": {
+   "align": "center",
+   "x": 520,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 900,
+   "box": [
+    25,
+    760,
+    1000,
+    975
+   ],
+   "note": "bottom left above the EXP card, clear of the c11 warning card and the SAFE stamp"
+  },
+  "tl": {
+   "align": "left",
+   "x": 40,
+   "anchor": "top",
+   "y": 30,
+   "maxW": 620,
+   "box": [
+    20,
+    15,
+    720,
+    280
+   ],
+   "note": "top left, where c11's own caption box then lands"
+  },
+  "part": {
+   "align": "left",
+   "x": 110,
+   "anchor": "top",
+   "y": 96,
+   "box": [
+    0,
+    60,
+    1500,
+    330
+   ],
+   "note": "a part marker in the agenda's row style, top left"
+  }
+ },
+ "captions": [
+  {
+   "id": "s01",
+   "start": 12.2,
+   "end": 16.6,
+   "position": "br",
+   "text": "MEET MR TAN, 67. HIS BLOOD PRESSURE NEEDS WATCHING.",
+   "v6": [
+    12.2,
+    16.6
+   ]
+  },
+  {
+   "id": "s02",
+   "start": 17.5,
+   "end": 21.8,
+   "position": "br",
+   "text": "BETWEEN DOCTOR VISITS, HE MANAGES ON HIS OWN.",
+   "v6": [
+    17.5,
+    21.8
+   ]
+  },
+  {
+   "id": "s03",
+   "start": 24.3,
+   "end": 32.4,
+   "position": "br",
+   "text": "ON TAI CHI MORNINGS, HE SKIPS BREAKFAST. REMEMBER THIS.",
+   "v6": [
+    24.3,
+    32.4
+   ]
+  },
+  {
+   "id": "s04",
+   "start": 35.0,
+   "end": 37.6,
+   "position": "br",
+   "text": "HE CHECKS HIS BLOOD PRESSURE AT HOME.",
+   "v6": [
+    35.0,
+    37.6
+   ]
+  },
+  {
+   "id": "s05",
+   "start": 43.6,
+   "end": 51.4,
+   "position": "tl_panel",
+   "text": "HE LOGS 152/96 IN RIPPLE. IT'S ABOVE THE TARGET DR LIM SET.",
+   "v6": [
+    43.6,
+    51.4
+   ]
+  },
+  {
+   "id": "s06",
+   "start": 52.4,
+   "end": 55.3,
+   "position": "tl_panel",
+   "text": "HE HOLDS THE BUTTON AND SAYS WHY.",
+   "v6": [
+    52.4,
+    55.3
+   ]
+  },
+  {
+   "id": "s07",
+   "start": 59.8,
+   "end": 63.0,
+   "position": "bl_panel",
+   "text": "RIPPLE KEEPS HIS OWN WORDS.",
+   "v6": [
+    59.8,
+    63.0
+   ]
+  },
+  {
+   "id": "s08",
+   "start": 63.4,
+   "end": 68.0,
+   "position": "bl_panel",
+   "text": "AND ADDS A QUESTION FOR HIS NEXT VISIT.",
+   "v6": [
+    63.4,
+    68.0
+   ]
+  },
+  {
+   "id": "s09",
+   "start": 74.0,
+   "end": 78.6,
+   "position": "br",
+   "text": "HIS DAUGHTER WEI LING, AT WORK.",
+   "v6": [
+    74.0,
+    78.6
+   ]
+  },
+  {
+   "id": "s10",
+   "start": 79.4,
+   "end": 86.0,
+   "position": "bl_panel4",
+   "text": "SHE SEES DAD'S READING AND HIS REASON.",
+   "v6": [
+    79.4,
+    86.0
+   ]
+  },
+  {
+   "id": "s11",
+   "start": 92.8,
+   "end": 96.8,
+   "position": "br",
+   "text": "FOUR BOXES. HOW MANY OF EACH? BEFORE OR AFTER FOOD?",
+   "v6": [
+    92.8,
+    96.8
+   ]
+  },
+  {
+   "id": "s12",
+   "start": 99.4,
+   "end": 106.0,
+   "position": "bl_panel",
+   "text": "HE SCANS THE BOX. RIPPLE READS HIS PHARMACY LABEL.",
+   "v6": [
+    99.4,
+    106.0
+   ]
+  },
+  {
+   "id": "s13",
+   "start": 108.5,
+   "end": 116.0,
+   "position": "bl_panel",
+   "text": "THEN IT PLAYS DR LIM'S OWN RECORDED WORDS, WITH WHO SAID IT AND WHEN.",
+   "v6": [
+    108.5,
+    116.0
+   ]
+  },
+  {
+   "id": "s14",
+   "start": 123.5,
+   "end": 133.0,
+   "position": "br",
+   "text": "WITH WEI LING, ON THE WAY TO HIS FOLLOW-UP VISIT.",
+   "v6": [
+    123.5,
+    133.0
+   ]
+  },
+  {
+   "id": "s15",
+   "start": 137.4,
+   "end": 146.0,
+   "position": "gap",
+   "text": "HE ASKS DR LIM IF HE MAY RECORD. THE DOCTOR AGREES.",
+   "v6": [
+    137.4,
+    146.0
+   ]
+  },
+  {
+   "id": "s16",
+   "start": 149.6,
+   "end": 155.0,
+   "position": "gap",
+   "text": "LIVE CAPTIONS ON BOTH PHONES, MARKED WITH WHO IS SPEAKING.",
+   "v6": [
+    149.6,
+    155.0
+   ]
+  },
+  {
+   "id": "s17",
+   "start": 155.6,
+   "end": 162.4,
+   "position": "gap",
+   "text": "A LIVE SUMMARY BUILDS AS THEY TALK.",
+   "v6": [
+    155.6,
+    162.4
+   ]
+  },
+  {
+   "id": "s18",
+   "start": 181.0,
+   "end": 190.0,
+   "position": "gap",
+   "text": "HE ASKS THIS MORNING'S QUESTION. THE ANSWER COMES FROM HIS DOCTOR.",
+   "v6": [
+    181.0,
+    190.0
+   ]
+  },
+  {
+   "id": "s19",
+   "start": 196.6,
+   "end": 204.6,
+   "position": "gap",
+   "text": "HE CHECKS RIPPLE'S SUMMARY AGAINST WHAT THE DOCTOR SAID.",
+   "v6": [
+    196.6,
+    204.6
+   ]
+  },
+  {
+   "id": "s20",
+   "start": 209.7,
+   "end": 219.7,
+   "position": "br",
+   "text": "TODAY'S READINGS, QUESTIONS AND THE DOCTOR'S WORDS ARE KEPT FOR NEXT TIME.",
+   "v6": [
+    209.7,
+    219.7
+   ]
+  },
+  {
+   "id": "p2",
+   "start": 226.2,
+   "end": 228.8,
+   "position": "part",
+   "style": "part",
+   "text": "PART 2 · RIPPLE IN ACTION",
+   "n": "2",
+   "head": "RIPPLE IN ACTION",
+   "sub": "The problem and the trust lab",
+   "v6": [
+    226.2,
+    228.8
+   ]
+  },
+  {
+   "id": "s21",
+   "start": 251.7,
+   "end": 254.7,
+   "position": "bc",
+   "text": "ONE MORE THING THE STORY DIDN'T SHOW",
+   "v6": [
+    251.7,
+    254.7
+   ]
+  },
+  {
+   "id": "s22",
+   "start": 267.77,
+   "end": 270.77,
+   "position": "c11",
+   "text": "THE TRUST LAB: RIPPLE'S SAFETY RULES, PUT TO THE TEST",
+   "v6": [
+    267.77,
+    270.77
+   ]
+  },
+  {
+   "id": "s23",
+   "start": 271.0,
+   "end": 277.4,
+   "position": "c11",
+   "text": "ONE MORE TABLET? RIPPLE LEAVES THAT TO HIS DOCTOR.",
+   "v6": [
+    271.0,
+    277.4
+   ]
+  },
+  {
+   "id": "s24",
+   "start": 279.1,
+   "end": 284.8,
+   "position": "c11",
+   "text": "IT PLAYS DR LIM'S OWN WORDS AND SAVES THE QUESTION FOR HIS NEXT VISIT.",
+   "v6": [
+    279.1,
+    284.8
+   ]
+  },
+  {
+   "id": "s25",
+   "start": 286.95,
+   "end": 290.65,
+   "position": "tl",
+   "text": "AN UNKNOWN BOX: IT SAYS SO, AND SENDS HIM TO THE PHARMACIST.",
+   "v6": [
+    286.95,
+    290.65
+   ]
+  },
+  {
+   "id": "s26",
+   "start": 295.67,
+   "end": 299.07,
+   "position": "tl",
+   "text": "CHEST TIGHT AFTER THE STAIRS? RIPPLE SAVES IT FOR HIS DOCTOR.",
+   "v6": [
+    295.67,
+    299.07
+   ]
+  },
+  {
+   "id": "s26b",
+   "start": 301.0,
+   "end": 304.0,
+   "position": "bl_exp",
+   "text": "RIPPLE'S ANSWER ENDS WITH WHEN TO CALL 995.",
+   "v6": [
+    301.0,
+    304.0
+   ]
+  },
+  {
+   "id": "p3",
+   "start": 304.27,
+   "end": 307.9,
+   "position": "part",
+   "style": "part",
+   "text": "PART 3 · ARCHITECTURE AND SAFETY",
+   "n": "3",
+   "head": "ARCHITECTURE AND SAFETY",
+   "sub": "How it works, safety and next steps",
+   "v6": [
+    304.27,
+    307.9
+   ]
+  }
+ ]
+}

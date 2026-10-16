@@ -55,7 +55,7 @@ Core problems solved, shown in the film through Mr Tan, 67 (a fictional patient)
 - Web app and mobile app clients (the web app is the challenge demo; the product ships as an iOS app).
 - A Next.js app (pages, APIs, the safety layer, a live event stream with Server-Sent Events) on a **Tencent Cloud Lighthouse** server in **Singapore**, behind **Tencent Cloud EdgeOne**.
 - **Tencent Cloud Speech Recognition** (Singapore region): one engine for Mandarin and English, medicine names sent as hot words; captions arrive about 2 to 3 seconds after each line. Who is speaking is Ripple's guess (voice fingerprints plus a vote from the words) until he confirms.
-- **DeepSeek** language models: one picks what to quote, a second checks.
+- **Tencent Cloud Hunyuan** language models through TokenHub's international site: `hy3` picks what to quote, `hy4-preview` checks.
 - **Supabase**: Postgres with row-level security, private storage, sign-in.
 
 **How prompts drive the AI generation (the trust boundary)** (diagram: [`images/safety-pipeline.en.png`](images/safety-pipeline.en.png)).
@@ -68,7 +68,7 @@ Core problems solved, shown in the film through Mr Tan, 67 (a fictional patient)
 
 **Key design trade-offs.** An always-on server instead of serverless (live streams outlast serverless request limits); the speech engine chosen by test (only one passed our English-Mandarin test; one short test, not a benchmark); quotes before generation; a same-vendor checker (less independent than a second vendor, which is on our next-steps list); emergencies never wait for a model.
 
-**Privacy and consent.** The doctor agrees on screen before anything is recorded; AI processing is a separate consent (DeepSeek processes data in China) that he can refuse; recordings are kept 90 days unless he keeps them; he can export or delete everything.
+**Privacy and consent.** The doctor agrees on screen before anything is recorded; AI processing (Tencent Cloud Hunyuan; Tencent says it may use computing resources in other countries or regions) is a separate consent that he can refuse; recordings are kept 90 days unless he keeps them; he can export or delete everything.
 
 ### 4. Business value: impact
 
