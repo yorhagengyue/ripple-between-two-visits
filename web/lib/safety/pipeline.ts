@@ -2690,7 +2690,10 @@ ${s.zh ?? ""}`).length === 0);
         pathway: made.followUp.pathway,
         questionId: made.followUp.templateId,
         answers: sameSequence ? decideAnswers : {},
-        values: made.values,
+        // (the medicines behind an earlier medicines question's buttons stay with its answer: the 10-16 re-take, "Amlodipine"
+        // then "By mistake" read the which-medicine answer with the purpose question's empty values, as "not sure", and the
+        // two-medicines 995 row fired. A pathway has one medicines question, so the ids never collide)
+        values: sameSequence ? { ...continuing!.values, ...made.values } : made.values,
         frame: frameCodes(frameNow),
         frameSource,
         originEventId: continuing?.originEventId ?? eventId,

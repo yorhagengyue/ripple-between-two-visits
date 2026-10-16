@@ -87,3 +87,32 @@ describe("C8: a name nobody can identify, in a question about taking it, is the 
     expect(r.sentences.find((s) => s.templateId === "unknown_med")?.en).toMatch(/not able to identify that medication.*pharmacist/i);
   });
 });
+
+describe("C1 re-take (8e2fc090): one medicine chosen, then 'By mistake', is level 2, never the two-medicines 995 row", () => {
+  async function tapOn(s: { id: string }, r: AskResult, ids: string[], locale: Locale): Promise<AskResult> {
+    const f = r.followUp!;
+    const words = ids.map((id) => { const o = f.options.find((x) => x.id === id)!; return locale === "zh-Hans" ? o.zh : o.en; }).join(", ");
+    return ask({ sessionId: s.id, text: words, locale, role: "patient", reply: { followUpId: f.id, optionIds: ids } }, { store, llm: createMockLlm(), checker: null, checkerReason: "test", publish: () => {}, costGuard: null });
+  }
+  for (const [text, locale] of [
+    ["I think I took my pill twice today, not sure", "en"],
+    ["我今天好像吃了两次药，不确定", "zh-Hans"],
+  ] as const) {
+    it(`${text}: None of these -> his one medicine -> By mistake -> level 2, the 995 signs in the "ask today" line`, async () => {
+      const s = await store.createSession({ story_day: 45, story_time: "21:00", ttl_hours: 1 });
+      const first = await ask({ sessionId: s.id, text, locale, role: "patient" }, { store, llm: createMockLlm(), checker: null, checkerReason: "test", publish: () => {}, costGuard: null });
+      expect(first.followUp?.pathway, text).toBe("extra_dose");
+      let r = await tapOn(s, first, [first.followUp!.templateId === "extra_symptoms" ? "none" : first.followUp!.options[0].id], locale);
+      while (r.followUp && r.followUp.templateId !== "extra_which" && r.followUp.templateId !== "extra_purpose") r = await tapOn(s, r, [r.followUp.options.find((o) => o.tone === "calm")?.id ?? r.followUp.options[0].id], locale);
+      if (r.followUp?.templateId === "extra_which") {
+        const amlo = r.followUp.options.find((o) => /amlodipine|氨氯地平/i.test(`${o.en} ${o.zh}`))!;
+        r = await tapOn(s, r, [amlo.id], locale);
+      }
+      expect(r.followUp?.templateId, text).toBe("extra_purpose");
+      const end = await tapOn(s, r, ["mistake"], locale);
+      expect([end.risk?.level, end.risk?.rows, end.route, end.followUp ?? null], text).toEqual([2, ["extra-dose-one-own"], "refuse_route", null]);
+      expect(end.sentences.map((x) => x.templateId), text).toContain("extra_dose_taken");
+      expect(end.sentences.map((x) => x.templateId), text).not.toContain("emergency_overdose");
+    });
+  }
+});
