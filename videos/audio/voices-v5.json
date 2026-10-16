@@ -22,30 +22,34 @@
  },
  "c04-wei": {
   "speaker": "family",
-  "voice": "qsy",
+  "voice": "Scq",
   "spoken": "Dad, I'll come with you to Dr Lim at ten thirty!",
   "bubble": [
    "Dad, I'll come with you to Dr Lim at 10:30!"
   ],
   "file": "audio/voices-v5/c04-wei.wav",
-  "duration": 4.56,
+  "duration": 3.87,
   "phrases": [
    [
-    -0.07,
-    -0.06
+    0.03,
+    0.32
    ],
    [
-    0.06,
-    0.48
+    0.49,
+    1.36
    ],
    [
-    0.85,
-    4.38
+    1.71,
+    2.63
+   ],
+   [
+    2.91,
+    3.79
    ]
   ],
-  "heard": "Dad, I'll come with you to Dr. Lim at 10.30.",
+  "heard": "Dad, I'll come with you to Dr. Lim at 10 .30.",
   "match": 1.0,
-  "source_take": "c04-wei-qsy-s7.wav",
+  "source_take": "c04-wei-v0-s23-trim.wav",
   "new_takes": [
    {
     "seed": 23,
@@ -59,7 +63,11 @@
     "heard": "Dad, I'll come with you to Dr. Lim at 10.30.",
     "score": 1.0
    }
-  ]
+  ],
+  "spoken_as": "Dad... I'll come with you, to Dr Lim, at ten thirty!",
+  "second_line_at": null,
+  "env": "7988611686688994788722211487883499999863111485478768647761",
+  "replaced_qsy_take": "voices-v5/qsy/c04-wei.wav"
  },
  "c05-lim-a": {
   "speaker": "doctor",
@@ -312,28 +320,36 @@
  },
  "c07-wei-sunday": {
   "speaker": "family",
-  "voice": "qsy",
+  "voice": "Scq",
   "spoken": "Dad, you missed it on Sunday, remember? You went to the market early.",
   "bubble": [
    "Dad, you missed it on Sunday, remember?",
    "You went to the market early."
   ],
   "file": "audio/voices-v5/c07-wei-sunday.wav",
-  "duration": 4.62,
+  "duration": 4.27,
   "phrases": [
    [
     0.03,
-    0.37
+    0.46
    ],
    [
-    0.53,
-    4.54
+    0.81,
+    2.35
+   ],
+   [
+    2.93,
+    4.19
    ]
   ],
-  "heard": "Dad, you missed it on Sunday. Remember you went to the market early.",
+  "heard": "Dad, you missed it on Sunday, remember? You went to the market early.",
   "match": 1.0,
-  "source_take": "conv05-qsy-s23.wav",
-  "new_takes": []
+  "source_take": "c07-wei-sunday-v0-s7-trim.wav",
+  "new_takes": [],
+  "spoken_as": "Dad, you missed it on Sunday, remember? ... You went to the market early.",
+  "second_line_at": 2.93,
+  "env": "7887864111118998978789788666788878731111111187887777876717877651",
+  "replaced_qsy_take": "voices-v5/qsy/c07-wei-sunday.wav"
  },
  "c07-lim-10mg": {
   "speaker": "doctor",

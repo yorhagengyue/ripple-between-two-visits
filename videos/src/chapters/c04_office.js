@@ -16,7 +16,7 @@ import { buildOffice, FULL, FULL_COLS, BOT, DESK_TOP, DESK_PHONE, BAG_FLOOR } fr
 
 // clip windows: all the timing that changes when the recordings are retimed lives here (s2-her, the 8:12 story-time re-recording; same tap times as old-s2-her)
 // v5: the recording is still from 4.6 to 8.1 and after 8.5, so read and decide were trimmed there to give her call room
-// for her whole line (c04-wei, 4.56 s)
+// for her whole line (c04-wei, 3.87 s; v9, the Scq voice)
 const WIN = {
   match: { clip: "s2-her", at: 3.7 },               // the month calendar, Dad's triangle on the 15th
   read: { clip: "s2-her", in: 3.7, out: 6.9 },      // tap today (4.3) › the day opens: 152/96 above target, "Dad noted …" (4.6)
@@ -27,9 +27,9 @@ const TAP_TODAY = 4.3, NOTE_UP = 4.6, SWIPE = 8.1, QUESTION = 8.5;
 const T0 = 65;
 const S = { match: [T0, T0 + 2.4], floor: [T0 + 2.4, T0 + 4.8], buzz: [T0 + 4.8, T0 + 6.3], read: [T0 + 6.3, T0 + 9.5],
   decide: [T0 + 9.5, T0 + 12.1], call: [T0 + 12.1, T0 + 17.6], go: [T0 + 17.6, T0 + 20.0] };
-// her line on the phone: voice c04-wei (audio/voices-v5.json): "Dad," 0.06–0.48, "I'll come with you to Dr Lim at ten
+// her line on the phone: voice c04-wei (audio/voices-v5.json): "Dad," 0.03–0.32, "I'll come with you to Dr Lim at ten
 // thirty!" 0.85–4.38 (seconds into the voice); it starts `at` seconds into the call shot (on a 1/30 s frame)
-const VOICE = { id: "c04-wei", at: 0.7, dur: 4.56, phrases: [[0.06, 0.48], [0.85, 4.38]] };
+const VOICE = { id: "c04-wei", at: 0.7, dur: 3.87, phrases: [[0.03, 0.32], [0.49, 1.36], [1.71, 2.63], [2.91, 3.79]] }; // v9: Scq voice
 /** k for a voiced speech bubble at film time t (VOICE_SYNC.md): its first frame (t >= at) is the voice's first frame;
  *  up for the voice's whole duration, then gone after a pop-out of at most two frames */
 function voiceK(t, at, dur) {

@@ -83,8 +83,8 @@ const VOX = {
     env: "1199995893895695266344210100889538993887986368282299475787663631784126773554554124321" },
   "c07-tan-amlo": { dur: 4.53, size: 27, lines: [["Doctor, I take amlodipine every morning.", 0], ["I haven't forgotten!", 0], ["医生，amlodipine 我每天早上都有吃，没有忘记。", 0]],
     env: "6899985100001999899945236531037777516678468529985268664479979523542" },
-  "c07-wei-sunday": { dur: 4.62, lines: [["Dad, you missed it on Sunday, remember?", 0], ["You went to the market early.", 2.3]],
-    env: "698822019956875419943775596499659689569989968973468666784383349947740" },
+  "c07-wei-sunday": { dur: 4.27, lines: [["Dad, you missed it on Sunday, remember?", 0], ["You went to the market early.", 2.93]], // v9: Scq voice
+    env: "7887864111118998978789788666788878731111111187887777876717877651" },
   "c07-lim-10mg": { dur: 4.93, lines: [["Mr Tan, we will increase the amlodipine", 0], ["to 10 milligrams every morning.", 0]],
     env: "1149493896421799986535721469899542246524412776532322210000000049366554322" },
   "c07-tan-taichi": { dur: 6.66, size: 27, lines: [["On tai chi mornings I skip breakfast", 0], ["and my pressure is higher. What should I do?", 0], ["医生，我打太极的早上没吃早餐，血压就比较高，要怎么安排？", 0]],
@@ -679,7 +679,7 @@ takeWin("c07 sunday", WIN.sunday, (x) => {
   const { lt, ov, src, dur } = x, t = twos(lt), T = x.t;
   roomDefaults();
   phones(x, src);
-  const vw = vAt(x, L.sunday), mk = vw + 2.3, end = vw + VOX[L.sunday].dur;
+  const vw = vAt(x, L.sunday), mk = vw + VOX[L.sunday].lines[1][1], end = vw + VOX[L.sunday].dur;
   const wag = t < mk ? wob(t, 2.6) * 0.18 : 0, point = ease(seg(t, mk, mk + 0.25)) * (1 - ease(seg(t, end, end + 0.3)));
   // the finger wag, then a point out of the door ("the market") with her right hand
   weiSeat(t, { armR: lerp(1.75 + wag, 1.35, point), armOutR: lerp(0.35, 1.1, point), headYaw: kf(t, [[mk, -0.2], [mk + 0.3, 0.1], [end, 0.1], [end + 0.3, -0.15]]),
