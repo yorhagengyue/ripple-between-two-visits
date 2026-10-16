@@ -20,7 +20,7 @@ Ripple is a health companion for older adults living with a long-term condition 
 
 - **At the visit**, he asks the doctor's consent on screen and records. The conversation becomes live captions on his phone and his daughter's phone, each line marked with who is speaking, plus a short live summary. After the visit he confirms, line by line, what the doctor actually said.
 - **Every day after that**, when he asks about a medicine, a reading or a symptom, Ripple answers first from his own sources: his doctor's recorded words (with who said it and when), his confirmed medicine label and reviewed leaflet lines. What it must not answer, such as "can I take one more tablet?", becomes a question for his next visit, together with his doctor's own words.
-- **When something may be serious**, emergency and self-harm words get 995 and helpline guidance at once, and his daughter's phone is notified with his words and what Ripple told him.
+- **When something may be serious**, a sign of an emergency gets 995 at once; words that may mean self-harm get the helplines and one direct question; when a fact is missing (is the pain still there? which medicine?), Ripple asks one scripted question with buttons before it answers; his daughter's phone gets the conversation.
 
 Value: the doctor's instructions keep working at home, in his language; he owns the record; his family hears about the things that matter.
 
@@ -55,12 +55,15 @@ Core problems solved, shown in the film through Mr Tan, 67 (a fictional patient)
 - Web app and mobile app clients (the web app is the challenge demo; the product ships as an iOS app).
 - A Next.js app (pages, APIs, the safety layer, a live event stream with Server-Sent Events) on a **Tencent Cloud Lighthouse** server in **Singapore**, behind **Tencent Cloud EdgeOne**.
 - **Tencent Cloud Speech Recognition** (Singapore region): one engine for Mandarin and English, medicine names sent as hot words; captions arrive about 2 to 3 seconds after each line. Who is speaking is Ripple's guess (voice fingerprints plus a vote from the words) until he confirms.
-- **Tencent Cloud Hunyuan** language models through TokenHub's international site: `hy3` picks what to quote, `hy4-preview` checks.
+- **Tencent Cloud Hunyuan** language models through TokenHub's international site: `hy3` reads each message with his last 10 turns for risk and picks what to quote, `hy4-preview` checks reworded lines. TokenHub limits each model to 60 requests a minute; over it the model is rate limited (HTTP 429) and the rules answer alone.
+- **Tencent Cloud OCR** (Singapore): label photos read by two engines that check each other; he confirms every field.
 - **Supabase**: Postgres with row-level security, private storage, sign-in.
 
-**How prompts drive the AI generation (the trust boundary)** (diagram: [`images/safety-pipeline.en.png`](images/safety-pipeline.en.png)).
+**How prompts drive the AI generation (the trust boundary): the model reads, code decides, Ripple asks** (diagram: [`images/safety-pipeline.en.png`](images/safety-pipeline.en.png)).
 
-1. **Rules first.** Emergency, self-harm, dose-change, unknown-medicine and injection attempts are routed by code before any model call, with fixed 995 and helpline text. A model crisis screen can only move an answer toward 995, never away.
+**The risk screen prompt reads, it does not decide.** Hunyuan `hy3` reads his message with his last 10 turns and fills a fixed form (who, what, which medicine, how much, when, symptoms still happening now, thoughts of dying, a plan, the means, how soon, a lethal-amount question, what is missing), quoting his words for every field; the prompt is sensitive on purpose. Code checks the quotes asymmetrically (a field that lowers risk needs his exact words), merges the form with the rules' floor (the higher risk wins), and a decision table with a source on every row (61 rows, pending a clinician's signature) decides: 995 now, today, kept for the doctor, or an ordinary answer, plus a self-harm ladder (possible → a direct question; thoughts → helplines and family; danger → 995). When a fact is missing, one scripted question with buttons is asked; "not sure" counts as the dangerous side. On wording nobody tuned on, rules alone caught 12 of 24 self-harm signals; with the model reading the conversation, 23 of 24.
+
+1. **Rules first.** Emergency, self-harm, dose-change, unknown-medicine and injection attempts are routed by code before any model call, with fixed 995 and helpline text. The risk screen can only move an answer toward 995, never away.
 2. **Grounded selection, not free writing, for medicines.** The prompt gives the model only his own sources (doctor and pharmacist lines from his recordings, his confirmed label, reviewed leaflet lines, fixed templates) and asks it to choose which to quote.
 3. **Three checks on every quoted or reworded line**: every number and medicine must be in the source; instructions appear only as someone's own words; a second model checks reworded lines, and anything but a clear yes is blocked and becomes a referral plus a question on his list.
 4. **Everyday questions** (sleep, diet) get a short general answer written under a policy file and labelled as Ripple's own information. It never tells him to change a medicine, never diagnoses, never judges or reassures.
@@ -68,7 +71,7 @@ Core problems solved, shown in the film through Mr Tan, 67 (a fictional patient)
 
 **Key design trade-offs.** An always-on server instead of serverless (live streams outlast serverless request limits); the speech engine chosen by test (only one passed our English-Mandarin test; one short test, not a benchmark); quotes before generation; a same-vendor checker (less independent than a second vendor, which is on our next-steps list); emergencies never wait for a model.
 
-**Privacy and consent.** The doctor agrees on screen before anything is recorded; AI processing (Tencent Cloud Hunyuan; Tencent says it may use computing resources in other countries or regions) is a separate consent that he can refuse; recordings are kept 90 days unless he keeps them; he can export or delete everything.
+**Privacy and consent.** The doctor agrees on screen before anything is recorded; AI processing (Tencent Cloud Hunyuan; Tencent says it may use computing resources in other countries or regions) is a separate consent that he can refuse; label photos are read by Tencent Cloud OCR in Singapore and only the fields he confirms are kept; recordings are kept 90 days unless he keeps them; he can export or delete everything.
 
 ### 4. Business value: impact
 
