@@ -93,7 +93,7 @@ A **watch state** follows him across turns and days (7 days after thoughts of se
 
 ### How we tested it
 
-We wrote a corpus of **273 single messages and 32 multi-turn scripts** (self-harm direct and indirect, emergencies happening now and passed, medicine events, hard negatives such as idioms and refill counting; English, Mandarin, Singlish, Malay, Cantonese, Tamil) and a separate **held-out set of 72 messages in fresh wording that nobody tuned on**. Each runs with no model (the path when the model is unavailable or rate limited) and with live Hunyuan, one ask at a time. Wilson 95% intervals in brackets; measured 16 Oct 2026 on the released commit.
+We wrote a corpus of **273 single messages and 32 multi-turn scripts** (self-harm direct and indirect, emergencies happening now and passed, medicine events, hard negatives such as idioms and refill counting; English, Mandarin, Singlish, Malay, Cantonese, Tamil) and a separate **held-out set of 72 messages in fresh wording that nobody tuned on**. Each runs with no model (the path when the model is unavailable or rate limited) and with live Hunyuan, one ask at a time. Wilson 95% intervals in brackets; measured 16 Oct 2026 on commit `85ac803a` (the fixes released later that day left the corpus results unchanged).
 
 | Run | Crises caught (995 or self-harm thoughts+) | Self-harm signals caught (ladder ≥ possible) | False 995 | Everyday messages escalated |
 |---|---|---|---|---|
@@ -104,7 +104,7 @@ We wrote a corpus of **273 single messages and 32 multi-turn scripts** (self-har
 
 The held-out rows are the honest ones. **Rules alone catch half of the self-harm signals in new wording; with the model reading the conversation, 23 of 24.** That is why the model reads and code decides, and not one or the other. Live answers took 2.6 s at the median (p90 4.7 s). The frozen 51-question set still passes 51/51, and the unit suite has 5,900+ passing tests. All labels are our drafts until two clinicians label them; the corpus and runner are in [`web/eval/harness/`](web/eval/harness/), the result files in [`web/eval/results/harness-1016/`](web/eval/results/harness-1016/).
 
-**See it work:** screen recordings of every case typed into the app (emergencies, self-harm, medicines, boundaries, everyday messages, no-model mode, the family's notice, label scanning) are in [`docs/safety-demos/`](docs/safety-demos/).
+**See it work:** screen recordings of every case typed into the app (emergencies, self-harm, medicines, boundaries, everyday messages, no-model mode, the family's notice, label scanning) are in [`docs/safety-demos/`](docs/safety-demos/). Recording them found four defects (a sentence of Ripple's own that told him when to take a missed pill, a missing challenge sentence for an unknown medicine, and two follow-up faults); each was fixed and released the same day, and every take is kept with the commit it ran on.
 
 **Governance.** [`docs/safety/`](docs/safety/) holds the intended use mapped to Singapore's AIHGle 2.0, the red lines and where each is enforced, a hazard log in the NHS DCB0129 format, the post-launch monitoring plan, and a protocol for testing with older adults.
 
