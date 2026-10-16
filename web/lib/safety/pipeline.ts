@@ -888,8 +888,16 @@ const SINCE_MEDICINE_WORDS: RegExp[] = [
   /புதிய மருந்து|மருந்து[^.?!]{0,30}(?:பிறகு|முதல்|ஆரம்பித்த)/u,
 ];
 
-/** A dose taken by mistake, in his words (the extra-dose pathway then does not ask whether it was on purpose). */
-const ACCIDENTAL = /\bby (?:mistake|accident)\b|\baccident(?:al)?ly\b|\bwrongly\b|\bdidn'?t mean\b|\bforgot (?:i|that i)(?:'d| had)?(?: already)?\b|\bnot sure\b|\bi think i (?:took|had|ate)\b|\bconfused\b|不小心|不留神|搞错|搞錯|弄错|弄錯|糊里糊涂|糊裡糊塗|不记得|不記得|忘了(?:已经)?吃过|好像|不确定|不確定|唔小心|唔记得|\btak sengaja\b|\bterlupa\b/i;
+/**
+ * A dose taken by mistake, in his words (the extra-dose pathway then does not ask whether it was on purpose). Only words that
+ * say it was a mistake: "not sure", "I think I took it twice", 好像, 不记得 say he does not know what he took, not why (the
+ * recordings of 10-16: "I think I took my pill twice today, not sure" must be asked)
+ */
+const ACCIDENTAL = /\bby (?:mistake|accident)\b|\baccident(?:al)?ly\b|\bwrongly\b|\bdidn'?t mean\b|\bforgot (?:i|that i)(?:'d| had)?(?: already)?\b|\bconfused\b|不小心|不留神|搞错|搞錯|弄错|弄錯|糊里糊涂|糊裡糊塗|忘了(?:已经)?吃过|唔小心|\btak sengaja\b/i;
+
+/** The harness's medicine pathways and the topics under which Ripple's own answer is never shown (pipeline.ts harnessHoldsGeneral). */
+const MEDICINE_PATHWAYS: string[] = ["missed_dose", "extra_dose", "looks_different", "side_effect", "stop_change"];
+const NO_GENERAL_TOPICS = ["missed", "dose_change", "stopping", "combination"];
 
 /** A medicine, a dose or taking one, in his words (the missed-dose pathway's topic needs it). */
 const MEDICINE_OR_DOSE = /\b(?:pills?|tablets?|medicines?|medications?|meds|doses?|capsules?|take|took|taken|taking|amlodipine|losartan|ibuprofen)\b|药|藥|吃|服|\bubat\b|மருந்து/i;
@@ -1678,9 +1686,19 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
         emit({ type: "delta", text: words });
       }
     : undefined;
+  /**
+   * The recordings of 10-16 (C3, a red line: under "I forgot this morning's pill, it's 9pm now, should I take it?" Ripple's
+   * own answer told him to take the one he forgot now, beside the missed-dose question and the leaflet's line). Ripple's own
+   * answer never stands beside the harness's medicine guidance: an answer that asks a follow-up question, or whose decision
+   * is a medicine pathway's row (a missed dose, one tablet too many, a medicine that looks different, a side effect, stopping
+   * or changing one), or whose topics are a missed dose, a dose, stopping or combining his medicines. It is not even asked
+   * for when the decision so far says so, and it is never shown or streamed when the final one does.
+   */
+  const harnessHoldsGeneral = (): boolean =>
+    cls.topics.some((t) => NO_GENERAL_TOPICS.includes(t)) || (!!decision && (!!decision.ask || MEDICINE_PATHWAYS.includes(decision.medicalRow.pathway)));
   const generalP: Promise<GeneralOutcome> | null =
     // (never under the harness's pharmacist referral for a medicine that looks different: that answer is the referral)
-    !offlineWhy && !cls.injection && generalRoute(cls.route) && cls.reason !== "harness:looks_different"
+    !offlineWhy && !cls.injection && generalRoute(cls.route) && cls.reason !== "harness:looks_different" && !harnessHoldsGeneral()
       ? writeGeneral({
           locale,
           question: text,
@@ -2293,7 +2311,7 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   if (sink && generalP && !generalWords.released && !reply) {
     const helplines = [...content, ...tail].some((s) => HELPLINE_IDS.includes(s.templateId ?? ""));
     const offlineQuotes = llm.provider === "mock" && content.some((s) => s.origin !== "template" && !s.templateId);
-    if (!CRISIS_ROUTES.includes(route) && generalRoute(route) && !helplines && !offlineQuotes) {
+    if (!CRISIS_ROUTES.includes(route) && generalRoute(route) && !helplines && !offlineQuotes && !harnessHoldsGeneral()) {
       generalWords.released = true;
       emit({ type: "stage", stage: "writing" });
       if (generalWords.buffer) {
@@ -2432,6 +2450,8 @@ ${s.zh ?? ""}`).length === 0);
     // (a reply to a follow-up question is the decision's fixed lines: never with Ripple's own general words)
     if (out.answer && (crisisNow || !generalRoute(route) || !!reply)) {
       generalRecord = { ...out.record, shown: false, why: "gate" };
+    } else if (out.answer && harnessHoldsGeneral()) {
+      generalRecord = { ...out.record, shown: false, why: "harness" };
     } else if (out.answer && offlineQuoted) {
       generalRecord = { ...out.record, shown: false, why: "offline_quoted" };
     } else if (out.answer) {

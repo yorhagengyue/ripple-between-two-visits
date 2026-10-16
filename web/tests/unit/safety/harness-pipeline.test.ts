@@ -309,7 +309,10 @@ describe("reply sequences", () => {
     const s3 = await demo();
     const named = await say(s3, "I think I took my pill twice today, not sure");
     const sure = await tap(s3, named.followUp, ["none"]);
-    expect(sure.risk?.rows).toEqual(["extra-dose-one-own"]);
+    // (10-16 recordings: not sure what he took says nothing of why: the last question is whether it was on purpose)
+    expect(sure.followUp?.templateId).toBe("extra_purpose");
+    const mistake = await tap(s3, sure.followUp, ["mistake"]);
+    expect(mistake.risk?.rows).toEqual(["extra-dose-one-own"]);
     // a follow-up of another conversation is no reply here: his words are a new message
     const elsewhere = await tap(s, named.followUp, ["none"]);
     expect((elsewhere.events[0].output as { replyRefused: string }).replyRefused).toBe("unknown");

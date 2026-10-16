@@ -928,6 +928,52 @@ export function unknownDrugName(text: string, opts: { asrLowConfidence?: boolean
   return null;
 }
 
+// ---------------------------------------------------------------- 10-16: a name Ripple does not know, asked about taking it
+
+/** A question about taking something: can I take, should I take, is it OK to take, 可以吃吗, 能不能吃, boleh makan. */
+const TAKE_ASK: RegExp[] = [
+  /\b(?:can|could|may|should|shall|must|do)\s+i\s+(?:still\s+|also\s+|now\s+)?(?:take|have|use|try|swallow|eat|start)\b|\b(?:is|would)\s+it\s+(?:be\s+)?(?:ok(?:ay)?|safe|fine|alright|all right)\s+(?:for me\s+)?(?:to\s+)?(?:take|have|use|try)\b|\b(?:ok(?:ay)?|safe|fine)\s+to\s+(?:take|have|use)\b|\bboleh\s+(?:saya\s+)?(?:makan|ambil|minum)\b/i,
+  /可以吃|可不可以吃|能不能吃|能吃吗|能吃嗎|可以服|能不能服|要不要吃|该不该吃|該不該吃|吃得吗|吃得嗎|可唔可以食|食得唔得|可以食/,
+];
+/** The word taken: "take (the|my|some ...) <Name>". */
+const NAME_AFTER_TAKE = /\b(?:take|have|use|try|swallow|eat|start|makan|ambil|minum)\s+(?:(?:the|my|this|that|some|a|an|these|those|his|her|one|ubat)\s+)?([A-Za-z][A-Za-z-]{3,})/gi;
+/** Capitalised words that are no medicine (drinks, shops, places, people), beside NOT_DRUG_WORDS. */
+const NOT_A_MEDICINE_NAME = new Set([
+  "milo", "kopi", "teh", "coffee", "tea", "horlicks", "ovaltine", "ripple", "singapore", "malaysia", "china", "grab", "gojek",
+  "doctor", "dr", "mum", "dad", "mummy", "daddy", "uncle", "auntie", "aunty", "guardian", "watsons", "unity", "ntuc", "polyclinic",
+  "clinic", "hospital", "pharmacy", "walk", "bath", "shower", "nap", "rest", "break", "breakfast", "lunch", "dinner", "supper",
+  "them", "both", "they", "one", "more", "less", "half", "another", "extra", "twice", "something",
+]);
+
+/**
+ * The recordings of 10-16 (C8; the challenge's own sentence: "Can I take the Zorvalin my cousin gave me?" went to the model,
+ * which refused and referred him to his pharmacist, not the fixed unknown-medicine sentence). In any question about taking
+ * something (TAKE_ASK), a word that looks like a medicine's name and is none Ripple knows is the unknown-medicine answer
+ * (rule:unknown_name): the word taken in English ("take the Zorvalin"), capitalised or with a medicine's ending, or a Latin
+ * name in a Chinese question (「Zorvalin 可以吃吗？」). Never a word of the KB's (said exactly or nearly: matchDrug, so a
+ * misspelt name of his own medicine stays his), a supplement, food or drink (KNOWN_NON_KB, substances.ts), or a word that is
+ * no medicine (NOT_DRUG_WORDS, NOT_A_MEDICINE_NAME: take a walk, take Grab, have Milo).
+ */
+export function unknownNameTaken(text: string, ctx: Pick<ClassifyContext, "asrLowConfidence">): string | null {
+  const t = text.normalize("NFKC");
+  if (!matchAny(TAKE_ASK, t)) return null;
+  const candidates: string[] = [];
+  for (const m of t.matchAll(NAME_AFTER_TAKE)) candidates.push(m[1]);
+  if (/\p{Script=Han}/u.test(t)) for (const w of t.match(/[A-Za-z][A-Za-z-]{3,}/g) ?? []) candidates.push(w);
+  for (const word of candidates) {
+    const w = word.toLowerCase();
+    if (NOT_DRUG_WORDS.has(w) || NOT_A_MEDICINE_NAME.has(w)) continue;
+    const looksLikeName = /^[A-Z]/.test(word) || (w.length >= 6 && DRUG_SUFFIX.test(w)) || /\p{Script=Han}/u.test(t);
+    if (!looksLikeName) continue;
+    if (matchDrug(w, { maxDistance: ctx.asrLowConfidence ? 0 : undefined })) continue;
+    if (matchAny(KNOWN_NON_KB, word)) continue;
+    const other = otherSubstances(word);
+    if (other.medicines.length || other.foods.length) continue;
+    return word;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------- 10-14: a name Ripple does not know, asked to explain
 
 /**
@@ -1289,6 +1335,9 @@ export function classifyRules(text: string, ctx: ClassifyContext): Classificatio
   if (explicitUnknown) return make("unknown_med", "rule:unidentified_med_selected", ["unidentified_med"], "pharmacist");
   if (unidentifiable) return make("unknown_med", "rule:unidentifiable", ["unidentifiable"], "pharmacist");
   if (unknownName) return make("unknown_med", "rule:unknown_name", [`unknown_name:${unknownName}`], "pharmacist");
+  // 10-16 recordings (C8): a name nobody can identify, in a question about taking it
+  const takenName = unknownNameTaken(text, ctx);
+  if (takenName) return make("unknown_med", "rule:unknown_name", [`unknown_name:${takenName}`], "pharmacist");
 
   // 10-14: he says he took one tablet too many, or today's dose twice, and names no symptom ("I took two by mistake", 「我多
   // 吃了一粒怎么办」, 「今天的药吃了两次」): not the emergency route. A reason of its own, so the answer is his doctor's words

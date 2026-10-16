@@ -61,7 +61,7 @@ export const GENERAL_FORMAT = [
 /** What Ripple's own answer did for one ask (safety_event.output.general): codes and counts, never dropped words. */
 export interface GeneralRecord {
   shown: boolean;
-  /** why there is none: offline_reason (no consent, spend cap, question limit), no_policy, model_failed, time, empty, guard, gate */
+  /** why there is none: offline_reason (no consent, spend cap, question limit), no_policy, model_failed, time, empty, guard, gate, harness (pipeline.ts harnessHoldsGeneral) */
   why?: string;
   /** the guard codes that dropped it */
   reasons?: string[];
@@ -187,6 +187,26 @@ const MED_CHANGE_EN: RegExp[] = [
   /\b(?:can|may|could|should|it'?s (?:fine|ok(?:ay)?|safe) to)\s+(?:just\s+)?(?:take (?:an? )?(?:extra|another|one more|double)|stop taking|double (?:up|your|the))\b/i,
 ];
 
+/**
+ * The recordings of 10-16 (C3, a red line): under 「I forgot this morning's pill, it's 9pm now, should I take it?」 Ripple's own
+ * answer said "you can take the one you forgot now, just not a double dose": when to take his medicine. Any permission or
+ * instruction to take, skip, delay or time a dose drops the answer: "you can take", "take it now", "take the one you forgot",
+ * "it's fine to skip", "wait until tomorrow's dose", 「可以吃药」, 「现在吃」, 「补吃」. A negation before it ("don't take it
+ * now", 「不要补吃」) is the opposite and passes; food is not a dose (「饭后可以吃水果」).
+ */
+const DOSE_TIMING_EN: RegExp[] = [
+  /\byou\s+(?:can|could|may|should|might want to|are able to)\s+(?:still\s+|just\s+|safely\s+|now\s+|go ahead and\s+)?(?:take|have|skip|delay|leave out|miss|swallow)\b/i,
+  /(?<!\b(?:don'?t|do not|never|not|shouldn'?t|should not|no need to)\s+)\b(?:take|have|swallow)\s+(?:it|them|that one|this one|the (?:one|dose|tablet|pill|medicine)s?|your (?:dose|tablet|pill|medicine|medication)s?|the (?:missed|forgotten|morning'?s?|evening'?s?) (?:dose|one|tablet|pill)s?)\s+(?:now|right away|straight away|tonight|later|tomorrow|when you remember|as soon as)\b/i,
+  /\btake the (?:one|dose|tablet|pill)s? you (?:forgot|missed)\b/i,
+  /\b(?:go ahead and|it'?s (?:fine|ok(?:ay)?|safe|alright) to|feel free to)\s+(?:take|have|skip|delay|miss)\b/i,
+  /\b(?:wait|hold off|delay)\s+(?:until|till|for)\b[^.?!]{0,40}\b(?:dose|tablet|pill|take)\b/i,
+];
+const DOSE_TIMING_ZH: RegExp[] = [
+  /(?<!(?:不|别|別|勿|没|沒|莫|不要|不用|不必|无须|無須|不需要)(?:自己|先|再|随便|隨便)?)(?:补吃|補吃|补服|補服)/u,
+  /(?<![不别別勿没沒莫])(?:可以|可|能|就|直接|马上|馬上|赶紧|趕緊)\s*(?:现在|現在|今晚|今天|晚上|明天|等下|待会|待會)?\s*(?:吃|服用|服)(?=[^，。！？,.!?]{0,4}(?:药|藥|粒|片|颗|顆|它|那颗|那粒|这粒|這粒|忘|漏|剂|劑)|\s*[，。！？,.!?]|$)/u,
+  /(?<![不别別勿])(?:现在|現在|今晚|马上|馬上)(?:就)?(?:吃|服)(?:药|藥|它|掉|了吧|吧|那粒|那片)/u,
+];
+
 /** He is told he has an illness (「你得了…」, "you have a stroke"). Saying what is common, or what a doctor checks, is fine. */
 const DIAGNOSIS: RegExp[] = [
   /你(?:这是|這是|这就是|這就是|得了|患了|肯定是|一定是|就是)[^，。！？,.!?]{0,10}(?:病|症|炎|癌|中风|中風|梗|瘤)/u,
@@ -210,6 +230,7 @@ export function guardGeneral(text: string, locale: Locale): string[] {
   if (!t) return ["empty"];
   const reasons: string[] = [];
   if ([...MED_CHANGE_ZH, ...MED_CHANGE_EN].some((re) => re.test(t))) reasons.push("med_change");
+  if ([...DOSE_TIMING_ZH, ...DOSE_TIMING_EN].some((re) => re.test(t))) reasons.push("dose_timing");
   if (DIAGNOSIS.some((re) => re.test(t))) reasons.push("diagnosis");
   if (findForbiddenNumbers(t).length > 0) reasons.push("number");
   if (MACHINERY.test(t)) reasons.push("machinery");

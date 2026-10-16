@@ -403,3 +403,22 @@ describe("i. one tablet too many not said to be a mistake: the last question is 
     expect([after.risk?.rows, after.followUp ?? null]).toEqual([["extra-dose-one-own"], null]);
   });
 });
+
+// ---------------------------------------------------------------- 10-16 recordings, C1
+
+describe("C1 (10-16 recordings): not sure he took it twice says nothing of why; the purpose question is asked", () => {
+  it("through ask(): 'I think I took my pill twice today, not sure' -> None of these -> his medicine -> by mistake or on purpose?", async () => {
+    const s = await day45();
+    const first = await say(s, "I think I took my pill twice today, not sure");
+    expect(first.followUp?.pathway).toBe("extra_dose");
+    let r = await tap(s, first.followUp, ["none"]);
+    if (r.followUp?.templateId === "extra_which") r = await tap(s, r.followUp, ["med:0"]);
+    expect(r.followUp?.templateId).toBe("extra_purpose");
+    // (words that say it was a mistake are not asked: 不小心, by accident)
+    const zh = await day45();
+    const z = await say(zh, "我今天早上不小心多吃了一粒降压药。");
+    const z2 = await tap(zh, z.followUp, ["none"]);
+    const z3 = await tap(zh, z2.followUp, ["med:0"]);
+    expect([z3.risk?.rows, z3.followUp ?? null]).toEqual([["extra-dose-one-own"], null]);
+  });
+});
