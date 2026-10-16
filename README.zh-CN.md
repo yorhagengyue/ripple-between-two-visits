@@ -6,14 +6,16 @@
 
 腾讯云 AI CAN DO IT Hackathon 新加坡 2026 · Healthcare 赛道 · **NTU 李光前医学院 题 2：AI Healthier Every Day（长期自我照护的智能支持）** · 队伍 **YoRHa2**
 
-[![演示片：24 秒预览，点击播放完整影片（7:56）](docs/video/preview.webp)](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)
+**▶ 演示片（7:56）**，点播放：
 
-**▶ [播放演示片（7:56）](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)**：点上面的预览或这个链接，在浏览器里直接播放。文件也在 [`docs/video/`](docs/video/)。
+https://github.com/user-attachments/assets/12c3e150-9f8b-4e37-bc89-76b46c30e48d
+
+更清楚的版本：[在浏览器里播放 480p 版](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)；高清版链接在提交表单里。文件在 [`docs/video/`](docs/video/)。
 
 | | |
 |---|---|
 | **在线演示** | https://app.ripple-health-ai.com ：为这次比赛做的网页演示版。评委登录账号写在提交表单里。 |
-| **演示视频** | 7:56：[在这里播放](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)（就是上面的预览）；高清版链接在提交表单里。视频的源代码在 [`videos/`](videos/)。 |
+| **演示视频** | 7:56：上面的播放器，或 [480p 版](https://cdn.jsdelivr.net/gh/yorhagengyue/ripple-between-two-visits@98921114f487f08ea40c63248b8a52370521605b/docs/video/ripple-demo.mp4)；高清版链接在提交表单里。视频的源代码在 [`videos/`](videos/)。 |
 | **iOS App** | [App Store 上的 Ripple Health AI](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791)。正式产品就是这个 iOS App。现在 App Store 上的是我们之前的版本（1.1.0，2026 年 8 月）；带题 2 功能的更新正在提交审核，**评审时可能还没上架，或者还不是比赛的最新版本**。 |
 | **源代码** | [`web/`](web/) 应用 · [`videos/`](videos/) 演示片 · [`docs/`](docs/) 图、截图、提交文字 |
 
