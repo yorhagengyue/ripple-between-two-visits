@@ -25,7 +25,7 @@ const CATEGORY: Record<string, string> = {
   logistics: "Practical questions",
 };
 const LANGUAGE: Record<string, string> = { en: "English", zh: "Mandarin", singlish: "Singlish" };
-const PROVIDER: Record<string, string> = { deepseek: "DeepSeek", mock: "offline stand-in (no model)", openai: "OpenAI" };
+const PROVIDER: Record<string, string> = { hunyuan: "Tencent Cloud Hunyuan", mock: "offline stand-in (no model)", openai: "OpenAI" };
 
 const pct = (r: Rate | null) => (r ? `${Math.round(r.rate * 1000) / 10}%` : "not measured");
 const frac = (r: Rate | null) => (r ? `${r.k} of ${r.n}` : "");

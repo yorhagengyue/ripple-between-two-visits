@@ -84,7 +84,7 @@ describe.skipIf(!FULL_RUNS)("provision.sh, run with stand-in commands (RIPPLE_SA
   const log = `${top}/calls.log`;
   let caddyfile = "";
   const SECRET_FILES: Record<string, string> = {
-    [`${root}/etc/ripple/web.env`]: "RIPPLE_DEEPSEEK_API_KEY=sk-already-on-the-server-zz\n",
+    [`${root}/etc/ripple/web.env`]: "HUNYUAN_API_KEY=sk-already-on-the-server-zz\n",
     [`${root}/etc/ripple/backup.env`]: "BACKUP_COS_SECRET_KEY=cos-already-on-the-server-zz\n",
     [`${root}/etc/ripple/backup.age.pub`]: "age1alreadyontheserver\n",
     [`${root}/etc/caddy/edge.env`]: "EDGE_SECRET=too-short\n",

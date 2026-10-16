@@ -83,7 +83,7 @@ export function modeOf(args: Args): Mode {
 }
 
 /** values a deployment file may hold that are ordinary words, not worth hiding (and hiding them would garble the text) */
-const ORDINARY = new Set(["ubuntu", "root", "mock", "true", "false", "supabase", "deepseek", "whisper", "memory", "local", "https", "judges", "commercial"]);
+const ORDINARY = new Set(["ubuntu", "root", "mock", "true", "false", "supabase", "hunyuan", "whisper", "memory", "local", "https", "judges", "commercial"]);
 const MIN_HIDDEN = 5;
 
 export class Output {

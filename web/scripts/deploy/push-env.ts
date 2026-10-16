@@ -22,6 +22,12 @@
  *
  * The server must have been provisioned (/etc/ripple exists). Before the first release there is no app to restart:
  * the file is put in place and the first release compares.
+ *
+ * --no-restart: for a change of the code and the environment together, which the running version cannot report (the
+ * move to Hunyuan on 10-16: the version before knows no LLM_PROVIDER=hunyuan and would report llm=mock, so a restart
+ * would put the old file back; and the new version refuses the old LLM_PROVIDER=deepseek, so a release first would switch
+ * back). The files are put in place, nothing is restarted, and the next release.ts restarts with them and compares. If
+ * that release fails and switches back, the old version starts with the new file: push-env --restore-prev then.
  */
 import { randomBytes } from "node:crypto";
 import { webRoot } from "@/lib/llm/root";
@@ -58,9 +64,9 @@ export function describeWebEnv(web: WebEnv): string[] {
 
 export async function main(argv: readonly string[], out: Output, run: Runner = realRunner(out), webDir: string = webRoot()): Promise<number> {
   return guardMain(out, async () => {
-    const args = parseArgs(argv, { bool: ["restore-prev", "accept-new-host-key"], value: ["speech", "tts", "profile", "host"] });
+    const args = parseArgs(argv, { bool: ["restore-prev", "accept-new-host-key", "no-restart"], value: ["speech", "tts", "profile", "host"] });
     if (args.bool("help")) {
-      out.say("usage: npx tsx scripts/deploy/push-env.ts --speech mock|whisper|tencent --tts mock|trtc [--restore-prev] --dry-run | --yes");
+      out.say("usage: npx tsx scripts/deploy/push-env.ts --speech mock|whisper|tencent --tts mock|trtc [--no-restart] [--restore-prev] --dry-run | --yes");
       return 0;
     }
     const mode = modeOf(args);
@@ -102,7 +108,8 @@ export async function main(argv: readonly string[], out: Output, run: Runner = r
     const envText = formatEnvFile(web.env, `written by scripts/deploy/push-env.ts on ${stamp} (--speech ${sw.speech} --tts ${sw.tts}); change web/.env.deploy and push again, do not edit here`);
     const putEnv = putRootFile(target, "/etc/ripple/web.env.new", "0600", envText, "the app environment (contents below)");
     const putExpect = putRootFile(target, "/etc/ripple/web.expect.json.new", "0644", `${JSON.stringify(expect)}\n`, "what /api/health must answer (provider names, no secrets)");
-    const apply = remoteOp(target, webDir, "env-apply");
+    const noRestart = args.bool("no-restart");
+    const apply = remoteOp(target, webDir, "env-apply", noRestart ? ["no-restart"] : []);
 
     let applied: { code: number; status: string } = { code: 0, status: "" };
     const steps: Step[] = [
@@ -113,7 +120,9 @@ export async function main(argv: readonly string[], out: Output, run: Runner = r
         run: async () => void (await must(run, out, putExpect, "staging the expectation")),
       },
       {
-        title: "server: put the file in place (the one before becomes web.env.prev), restart ripple-web, compare /api/health with the expectation; on a difference put the previous file back and restart again",
+        title: noRestart
+          ? "server: put the file in place (the one before becomes web.env.prev) WITHOUT restarting ripple-web (--no-restart): the next release restarts with it and compares"
+          : "server: put the file in place (the one before becomes web.env.prev), restart ripple-web, compare /api/health with the expectation; on a difference put the previous file back and restart again",
         show: [apply.show, "before the first release there is no app: the file is put in place and the first release compares", "undo: push-env --restore-prev"],
         run: async () => {
           const res = await run(apply);
@@ -126,7 +135,13 @@ export async function main(argv: readonly string[], out: Output, run: Runner = r
     if (mode !== "act") return planned;
     if (applied.code === 3) throw new DeployError("the running app did not report what was pushed; the previous environment file is back in place (see DIFFERS above)", 3);
     if (applied.code !== 0) throw new DeployError(`the environment was not applied cleanly (exit ${applied.code}${applied.status ? `, ${applied.status}` : ""}); see the lines above and run status`, applied.code === 255 ? 1 : applied.code);
-    out.say(applied.status === "staged" ? "push-env: the file is in place; no release is installed yet, so nothing was restarted or compared." : "push-env: done; the running app reports what was pushed.");
+    out.say(
+      applied.status !== "staged"
+        ? "push-env: done; the running app reports what was pushed."
+        : noRestart
+          ? "push-env: the file is in place and nothing was restarted (--no-restart); the next release.ts restarts with it and compares (push-env --restore-prev puts the one before back)."
+          : "push-env: the file is in place; no release is installed yet, so nothing was restarted or compared.",
+    );
     return 0;
   });
 }

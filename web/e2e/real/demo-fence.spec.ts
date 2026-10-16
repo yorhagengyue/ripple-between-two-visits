@@ -202,11 +202,10 @@ test("signed in to an account: /demo shows the demo copy and Back to my account;
 
 test("/eval shows the real results; /how shows what runs here without paths or ports", async ({ page }) => {
   expect((await page.goto("/eval"))?.status()).toBe(200);
-  await expect(page.getByTestId("eval-live-score")).toHaveText("51 of 51 passed");
-  await expect(page.getByTestId("eval-live-meta")).toContainText("(Singapore time)");
-  await expect(page.getByTestId("eval-live-meta")).toContainText("DeepSeek deepseek-flash");
+  // no run of the 51 questions with the live model since Hunyuan replaced DeepSeek (10-16): the page shows the offline run
+  // only until a Hunyuan run is written to eval/results (then check its score and "Tencent Cloud Hunyuan" here)
+  await expect(page.getByTestId("eval-live")).toHaveCount(0);
   await expect(page.getByTestId("eval-offline-score")).toHaveText("51 of 51 passed");
-  await expect(page.getByTestId("eval-live-categories")).toContainText("Asking to change the dose (must be refused)");
   const evalText = (await page.locator("main").textContent()) ?? "";
   expect(evalText).not.toMatch(/[A-Z]:\\|llm-spend|\.jsonl?\b|M8|built in/);
 

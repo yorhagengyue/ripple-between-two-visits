@@ -1,6 +1,7 @@
 /**
- * OpenAI-compatible chat client, ported from ripple-core src/lib/llm.ts (read-only reference). Serves OpenAI,
- * DeepSeek (the main model and the layer-3 checker since 10-09) and the other compatible vendors in index.ts.
+ * OpenAI-compatible chat client, ported from ripple-core src/lib/llm.ts (read-only reference). Serves Tencent Cloud
+ * Hunyuan on TokenHub (the main model and the layer-3 checker since 10-16; ./hunyuan.ts), OpenAI and the other
+ * compatible vendors in index.ts.
  *
  * Kept from ripple-core: POST {baseUrl}/chat/completions with a Bearer key; bounded retries on a dropped socket,
  * a timeout or a retryable status (429/5xx) with exponential backoff and jitter, honouring Retry-After; other 4xx
@@ -11,7 +12,7 @@
  * timeouts are configurable (LLM_TIMEOUT_MS, a per-call `timeoutMs`; the response body is read inside the same
  * timeout, so a stalled body cannot hang a request); attempts default to 2; the concurrency cap queues callers
  * (LLM_QUEUE_TIMEOUT_MS) instead of failing at once; `images` are sent as data-URL image parts; vendor body fields
- * come from `extraBody` (DeepSeek: `thinking: { type: "disabled" }`); every call is priced and written to the
+ * come from `extraBody` (Hunyuan: `thinking: { type: "disabled" }`); every call is priced and written to the
  * spend ledger (spend.ts) and refused when the US$ cap would be passed; the reservation covers every attempt the
  * call may make, so charged retries cannot pass the cap. Keys are never logged, and neither error messages nor the
  * ledger carry prompt text.
@@ -32,14 +33,21 @@
  * rebuilt from the pieces, so pricing, the ledger and the result are the same as for a plain call. The token counts come
  * from the last chunk; a stream that ends without it is charged its estimate (estimated: true). A failure before the
  * first piece is retried and may fail over as before; after it, never (the words are on his screen already). A vendor
- * that answers a streamed request with a plain body gives its content to onDelta once.
+ * that answers a streamed request with a plain body gives its content to onDelta once. An error the vendor sends inside
+ * the stream after its 200 headers (TokenHub: a data frame with an `error` object, then [DONE]) breaks the call off as a
+ * dropped stream would; it is never read as the end of a shorter answer.
+ *
+ * Content safety (10-16, TokenHub's protocol page: finish_reason "content_filter" when the vendor's safety policy filtered
+ * the content; a refusal in message.refusal): such a reply is a failed call (LlmError "upstream", 451), billed but never
+ * an answer, and the caller falls back to its fixed words as when the model is down. HTTP 451 (TokenHub 451001,
+ * CodeContentFiltered) fails the same way, at once.
  */
 import { createSseParser, EVENT_STREAM } from "@/lib/sse/frames";
 import { estimateUsd, costUsd, getSpendLedger, type SpendLedger } from "./spend";
 import { LlmError, type ChatOpts, type ChatResult, type ChatUsage, type LlmClient } from "./types";
 
 export interface CompatConfig {
-  /** provider name for logs and cassettes (openai, deepseek, gemini ...) */
+  /** provider name for logs and cassettes (hunyuan, openai, gemini ...) */
   name: string;
   /** company behind the model */
   vendor: string;
@@ -54,7 +62,7 @@ export interface CompatConfig {
   maxAttempts?: number;
   /** one failover target used when this provider is down */
   fallback?: CompatConfig | null;
-  /** vendor-specific body fields merged into every request (DeepSeek: { thinking: { type: "disabled" } }) */
+  /** vendor-specific body fields merged into every request (Hunyuan: { thinking: { type: "disabled" } }) */
   extraBody?: Record<string, unknown>;
   /** parallel calls to this provider from this process; 0 = no cap. Default LLM_MAX_CONCURRENCY */
   maxConcurrency?: number;
@@ -225,12 +233,15 @@ interface StreamTap {
 interface StreamChunk {
   choices?: { delta?: { content?: string | null }; finish_reason?: string | null }[];
   usage?: CompletionBody["usage"];
+  /** an error the vendor sends inside the stream after the 200 headers (TokenHub) */
+  error?: unknown;
 }
 
 /**
  * Read an event-stream reply to its end: every content piece goes to the tap as it comes, and the completion body is
  * rebuilt from the pieces (content, finish_reason, and the usage of the last chunk), so the rest of the call reads it as
- * it reads a plain reply. A chunk that is not JSON is passed over (DeepSeek's keep-alive lines are comments already).
+ * it reads a plain reply. A chunk that is not JSON is passed over (keep-alive lines are comments already). A chunk that
+ * carries an `error` throws: the stream broke off (postChat retries when nothing went out yet).
  */
 async function readStream(resp: Response, tap: StreamTap): Promise<{ text: string; noUsage: boolean }> {
   let content = "";
@@ -244,6 +255,7 @@ async function readStream(resp: Response, tap: StreamTap): Promise<{ text: strin
     } catch {
       return;
     }
+    if (chunk.error) throw new LlmError("upstream", "the stream carried an error", 502);
     if (chunk.usage) usage = chunk.usage;
     const choice = chunk.choices?.[0];
     if (choice?.finish_reason) finish = choice.finish_reason;
@@ -334,7 +346,7 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
     if (sig.outer?.aborted) throw stoppedError(cfg, sig, timedOut, made);
     made = attempt;
     try {
-      // the timeout covers the headers and the body (DeepSeek keeps a slow request open with blank lines), a streamed
+      // the timeout covers the headers and the body (a vendor may keep a slow request open with blank lines), a streamed
       // body to its last chunk
       const perAttempt = AbortSignal.timeout(timeoutMs);
       const resp = await fetchImpl(url, { ...init, signal: sig.outer ? AbortSignal.any([perAttempt, sig.outer]) : perAttempt });
@@ -376,7 +388,7 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
 interface CompletionBody {
-  choices?: { message?: { content?: string | null }; finish_reason?: string | null }[];
+  choices?: { message?: { content?: string | null; refusal?: string | null }; finish_reason?: string | null }[];
   usage?: {
     prompt_tokens?: number;
     completion_tokens?: number;
@@ -406,6 +418,7 @@ export function parseUsage(body: CompletionBody): ChatUsage & { total: number } 
 export function upstreamError(cfg: Pick<CompatConfig, "name">, status: number): LlmError {
   if (status === 401 || status === 403) return new LlmError("auth", `${cfg.name} ${status}: API key rejected`, status);
   if (status === 402) return new LlmError("insufficient_balance", `${cfg.name} 402: account balance is used up`, 402);
+  if (status === 451) return new LlmError("upstream", `${cfg.name} 451: the vendor's content safety filtered the request or the reply`, 451);
   // 5xx and a 429 that survived the retries count as "provider down" (failover); other 4xx are our mistake
   const mapped = PROVIDER_DOWN.has(status) ? status : status >= 500 || status === 429 ? 503 : status;
   return new LlmError("upstream", `${cfg.name} ${status}: request failed`, mapped);
@@ -498,11 +511,13 @@ async function chatOnce(cfg: CompatConfig, opts: ChatOpts, fetchImpl: FetchLike,
     const usage = parseUsage(data);
     // a streamed reply whose last chunk (the token counts) never came is charged its estimate, as a timed-out attempt is
     const usd = (raw.noUsage ? estimate : costUsd(cfg.model, usage)) + timedOutUsd;
+    // the vendor's content safety filtered the reply (see the header): billed, but a failed call
+    const filtered = data?.choices?.[0]?.finish_reason === "content_filter" || !!data?.choices?.[0]?.message?.refusal;
     ledger?.record({
       at: new Date().toISOString(),
       ...entryBase,
-      ok: true,
-      error: null,
+      ok: !filtered,
+      error: filtered ? "upstream" : null,
       attempts: raw.attempts,
       latency_ms: latencyMs,
       prompt_tokens: usage.promptTokens,
@@ -513,6 +528,10 @@ async function chatOnce(cfg: CompatConfig, opts: ChatOpts, fetchImpl: FetchLike,
       usd,
       estimated: raw.timedOut > 0 || !!raw.noUsage,
     });
+    if (filtered) {
+      const err = new LlmError("upstream", `${cfg.name}: the vendor's content safety filtered the reply`, 451);
+      throw tap?.emitted ? Object.assign(err, { emitted: true }) : err;
+    }
     const choice = data?.choices?.[0];
     const { total, ...split } = usage;
     const content = choice?.message?.content ?? "";

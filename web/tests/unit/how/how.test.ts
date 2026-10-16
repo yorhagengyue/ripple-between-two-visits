@@ -1,7 +1,8 @@
 /**
- * M8 /how: the architecture boxes come from one config (lib/how/stack.ts); the products and models are the 10-09
- * decisions: DeepSeek deepseek-flash as the main model (non-thinking), deepseek-v4-pro as the layer-3 checker from
- * the same vendor (said plainly, with the live-run numbers taken from web/eval/results), Tencent Cloud speech recognition
+ * M8 /how: the architecture boxes come from one config (lib/how/stack.ts); the products and models are the 10-16
+ * decisions: Tencent Cloud Hunyuan hy3 on TokenHub as the main model (thinking off), hy4-preview as the layer-3 checker
+ * from the same vendor (said plainly; the note says the 51-question evaluation has not been run with them, and that is
+ * held against web/eval/results), Tencent Cloud speech recognition
  * decided on 10-14 (recorded replays on the judges' link until it is switched to it; the local Whisper service on the
  * filming laptop answers the same screens), Ripple's summary of a visit as Ripple's own notes that are never a source,
  * TRTC TTS as mock until keys exist and the voice is checked
@@ -51,7 +52,7 @@ import { LIVE_SUMMARY_EVERY_MS, MAX_POINTS } from "@/lib/visit/ripple-summary";
 import { AUDIO, CLINICAL_TEXT, FAMILY, RECORDING_RETENTION_DAYS } from "@/lib/how/trust";
 import { AUDIO_KEEP_DAYS } from "@/lib/privacy/rules";
 import { evidenceFor, getPatientText } from "@/lib/kb/load";
-import { createMockLlm, DEEPSEEK_CHECKER_MODEL, DEEPSEEK_MAIN_MODEL, LlmError, type ChatResult, type LlmClient } from "@/lib/llm";
+import { createMockLlm, HUNYUAN_CHECKER_MODEL, HUNYUAN_MAIN_MODEL, LlmError, type ChatResult, type LlmClient } from "@/lib/llm";
 import { lineContext } from "@/lib/safety/candidates";
 import { classifyRules, crisisCue, emergencyCue, selfHarmCue } from "@/lib/safety/classify";
 import { CostGuard, CostLimitError } from "@/lib/safety/cost-guard";
@@ -75,15 +76,16 @@ const src = (...p: string[]) => readFileSync(path.join(WEB, ...p), "utf8");
 const serverLine = (start: string) => CLINICAL_TEXT[1].lines.find((l) => l.startsWith(start)) ?? "";
 
 describe("the architecture config", () => {
-  it("names each box's product and model as decided on 10-09", () => {
-    expect(DEEPSEEK_MAIN_MODEL).toBe("deepseek-flash");
-    expect(DEEPSEEK_CHECKER_MODEL).toBe("deepseek-v4-pro");
-    expect(STACK.main_model).toMatchObject({ product: "DeepSeek", model: DEEPSEEK_MAIN_MODEL, status: "in_use" });
-    expect(STACK.main_model.note).toContain("non-thinking mode");
+  it("names each box's product and model as decided (the model on 10-16)", () => {
+    expect(HUNYUAN_MAIN_MODEL).toBe("hy3");
+    expect(HUNYUAN_CHECKER_MODEL).toBe("hy4-preview");
+    expect(STACK.main_model).toMatchObject({ product: "Tencent Cloud Hunyuan", model: HUNYUAN_MAIN_MODEL, status: "in_use" });
+    expect(STACK.main_model.note).toContain("thinking mode off");
+    expect(STACK.main_model.note).toContain("TokenHub");
     // owner 10-15: Ripple answers everyday questions and words the 995 answers; it never changes his medicines
     expect(STACK.main_model.note).toContain("answers everyday health questions in his language as the owner's policy file says");
     expect(STACK.main_model.note).toContain("It never tells him to change his medicines.");
-    expect(STACK.checker).toMatchObject({ product: "DeepSeek", model: DEEPSEEK_CHECKER_MODEL, status: "in_use" });
+    expect(STACK.checker).toMatchObject({ product: "Tencent Cloud Hunyuan", model: HUNYUAN_CHECKER_MODEL, status: "in_use" });
     expect(STACK.checker.productZh).toBeUndefined();
     // the owner's decision of 10-14: Tencent Cloud speech recognition (lib/asr/tencent.ts), deployed that evening
     expect(STACK.stt).toMatchObject({ product: "Tencent Cloud speech recognition", status: "in_use" });
@@ -166,7 +168,7 @@ describe("the architecture config", () => {
 
   it("the page takes every product and model name from lib/how/stack.ts (none written in the page itself)", () => {
     const page = readFileSync(path.join(WEB, "app", "how", "page.tsx"), "utf8").replace(/\/\*\*[\s\S]*?\*\//, "");
-    for (const name of ["DeepSeek", "deepseek", "OpenAI", "gpt-", "Whisper", "TRTC", "Tencent", "Lighthouse", "Supabase", "EdgeOne", "Vercel", "Next.js"]) {
+    for (const name of ["DeepSeek", "deepseek", "Hunyuan", "TokenHub", "OpenAI", "gpt-", "Whisper", "TRTC", "Tencent", "Lighthouse", "Supabase", "EdgeOne", "Vercel", "Next.js"]) {
       expect(page, name).not.toContain(name);
     }
     expect(page).toContain('from "@/lib/how/stack"');
@@ -178,7 +180,7 @@ describe("every case /how says layer 3 blocks is blocked by lib/safety/verify.ts
   const SOURCE: Candidate = { sourceId: "hh-amlodipine:amlodipine.purpose", kind: "patient_text", span: ev.en, attribution: "leaflet", topics: ["purpose"], drugs: ["amlodipine"] };
   // a rewording in the model's own words: the only kind of sentence that goes to the checker
   const REWORDED: Sentence = { speechAct: "restate", sourceId: SOURCE.sourceId, span: ev.en, slots: {}, en: "Amlodipine is a blood pressure medicine.", attribution: "leaflet" };
-  const checker = (reply: () => Promise<ChatResult>): LlmClient => ({ provider: "deepseek", model: DEEPSEEK_CHECKER_MODEL, chat: reply });
+  const checker = (reply: () => Promise<ChatResult>): LlmClient => ({ provider: "hunyuan", model: HUNYUAN_CHECKER_MODEL, chat: reply });
   const fails = (code: ConstructorParameters<typeof LlmError>[0]) => checker(async () => Promise.reject(new LlmError(code, `${code} (test)`)));
 
   it("the checker note and the Layer 3 line both list the deadline and the spend cap", () => {
@@ -206,38 +208,17 @@ describe("every case /how says layer 3 blocks is blocked by lib/safety/verify.ts
   });
 });
 
-describe("the checker note quotes the 10-09 live runs (web/eval/results)", () => {
-  it("both 51-question DeepSeek runs used these two models and called layer 3 zero times", () => {
-    for (const file of ["deepseek-run1.json", "deepseek-run2.json"]) {
-      const run = result(file);
-      expect(run.meta.case_count, file).toBe(51);
-      expect(run.cases, file).toHaveLength(51);
-      expect(run.meta.llm, file).toMatchObject({
-        provider: "deepseek",
-        model: DEEPSEEK_MAIN_MODEL,
-        checker: "deepseek",
-        checkerModel: DEEPSEEK_CHECKER_MODEL,
-        checkerIndependence: "same_vendor",
-      });
-      // a new live run where layer 3 is called fails here until the /how note is rewritten
-      expect(run.metrics.layer3Invoked, file).toEqual({ sentencesNeedingIt: 0, casesNeedingIt: 0, checkerCalls: 0 });
-      expect(run.metrics.blockedPerLayer.layer3, file).toBe(0);
-    }
-    expect(STACK.checker.note).toContain(`In the ${51}-question evaluation, run twice with these two models, no sentence needed layer 3 (0 checker calls)`);
-  });
-
-  it("the 14 written sentences: the numbers in the note are the ones in deepseek-checker.json", () => {
-    const c = result("deepseek-checker.json");
-    expect(c.checker).toBe(DEEPSEEK_CHECKER_MODEL);
-    expect(c.independence).toBe("same_vendor");
-    expect(c.timeoutFailClosed).toBe(true);
-    const { faithful, faithfulPassed, unsupported, unsupportedBlocked, checkerOnly } = c.counts;
-    expect(c.cases).toHaveLength(faithful + unsupported);
-    expect(faithfulPassed).toBe(faithful);
-    expect(unsupportedBlocked).toBe(unsupported);
-    expect(STACK.checker.note).toContain(
-      `tested with ${faithful + unsupported} written sentences: ${faithfulPassed} faithful ones passed, all ${unsupportedBlocked} unsupported ones were blocked, ${checkerOnly} of them by the checker alone`,
-    );
+describe("the checker note says what was run with these two models (web/eval/results)", () => {
+  it("no 51-question run with hy3 and hy4-preview yet: the note says so; a run written to eval/results fails this until the note gives its numbers", () => {
+    const dir = path.join(WEB, "eval", "results");
+    const runs = readdirSync(dir)
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => ({ f, run: result(f) as { meta?: { llm?: { model?: string } } } }))
+      .filter((x) => x.run.meta?.llm?.model === HUNYUAN_MAIN_MODEL);
+    expect(runs.map((x) => x.f)).toEqual([]);
+    expect(STACK.checker.note).toContain("The 51-question evaluation has not been run with these two models yet.");
+    // the DeepSeek runs of 10-09 are gone with DeepSeek: the note quotes none of their numbers
+    expect(STACK.checker.note).not.toMatch(/run twice|14 written sentences/);
   });
 });
 
@@ -833,12 +814,12 @@ describe("what this server runs, box by box (lib/how/runtime.ts)", () => {
     expect(r.hosting).toBe("a development server on this machine");
   });
 
-  it("the judge link's configuration: DeepSeek and its checker, Supabase, Whisper; never a key, an address or a port", () => {
+  it("the judge link's configuration: Hunyuan and its checker, Supabase, Whisper; never a key, an address or a port", () => {
     const env = {
       NODE_ENV: "production",
-      LLM_PROVIDER: "deepseek",
-      RIPPLE_DEEPSEEK_API_KEY: "sk-secret-value",
-      CHECKER_PROVIDER: "deepseek",
+      LLM_PROVIDER: "hunyuan",
+      HUNYUAN_API_KEY: "sk-secret-value",
+      CHECKER_PROVIDER: "hunyuan",
       SPEECH_PROVIDER: "whisper",
       WHISPER_URL: "http://127.0.0.1:7810",
       STORE: "supabase",
@@ -848,13 +829,14 @@ describe("what this server runs, box by box (lib/how/runtime.ts)", () => {
       AUTH_PROVIDER: "supabase",
     };
     const r = runtimeStack(env);
-    expect(r.main_model).toBe(`DeepSeek ${DEEPSEEK_MAIN_MODEL}, called live`);
-    expect(r.checker).toBe(`DeepSeek ${DEEPSEEK_CHECKER_MODEL} (the same vendor as the main model)`);
+    expect(r.main_model).toBe(`Tencent Cloud Hunyuan ${HUNYUAN_MAIN_MODEL}, called live (TokenHub's Singapore site, resources scheduled globally)`);
+    expect(r.checker).toBe(`Tencent Cloud Hunyuan ${HUNYUAN_CHECKER_MODEL} (the same vendor as the main model)`);
+    expect(runtimeStack({ ...env, HUNYUAN_BASE_URL: "https://tokenhub.tencentcloudmaas.com/v1" }).main_model).toContain("TokenHub's Guangzhou site, resources scheduled in mainland China");
     expect(r.stt).toBe("local Whisper");
     expect(r.database).toBe("Supabase; sign-in through Supabase Auth");
     expect(r.hosting).toBe("a production build on this machine");
     const all = JSON.stringify(r);
-    for (const secret of ["sk-secret", "service-secret", "127.0.0.1", "7810", "example.supabase.co"]) expect(all).not.toContain(secret);
+    for (const secret of ["sk-secret", "service-secret", "127.0.0.1", "7810", "example.supabase.co", "tencentcloudmaas"]) expect(all).not.toContain(secret);
     expect(runtimeStack({ ...env, RIPPLE_DEPLOYED: "1" }).hosting).toBe("the real deployment");
   });
 

@@ -1,6 +1,6 @@
 /**
  * His AI-processing consent, read and changed from 「我 → AI 处理」 (docs/plan/real-app.md 3.11, 2.23; C2 架构审核 信任边界:
- * 「没同意 AI 处理时，不调 DeepSeek」; C2 track H). Server-only.
+ * 「没同意 AI 处理时，不调 DeepSeek」, the model since 10-16 being Hunyuan; C2 track H). Server-only.
  *
  *   aiState(store, userId)          the latest ai_processing decision (records are append-only, oldest first): on only
  *                                   when the last one is "granted", the same rule lib/safety/consent.ts aiConsent uses

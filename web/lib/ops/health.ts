@@ -10,7 +10,7 @@
  * missing) is caught there instead of by a judge.
  *
  * Every field comes from the function the app itself uses to pick that provider, so a fallback the app would take
- * (LLM_PROVIDER=deepseek without its key runs the offline mock) is what gets reported. Server-only.
+ * (LLM_PROVIDER=hunyuan without its key pair runs the offline mock) is what gets reported. Server-only.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -33,7 +33,7 @@ export interface HealthReport {
   blob: string;
   /** memory | supabase | another AUTH_PROVIDER value's kind is never echoed: anything else reads "other" */
   auth: string;
-  /** deepseek | openai | replay | mock: what answers a question (mock also when the key is missing) */
+  /** hunyuan | openai | replay | mock: what answers a question (mock also when the key is missing) */
   llm: string;
   /** the checker's provider name, or mock | replay | none (none: borderline sentences are all blocked) */
   checker: string;

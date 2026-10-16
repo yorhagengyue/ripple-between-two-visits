@@ -13,7 +13,7 @@ const ORIGIN = `https://${ORIGIN_DOMAIN}`;
 const AUTH = `https://${PROD_REF}.supabase.co`;
 const ASSET = "/_next/static/chunks/main-abc123.js";
 
-const GOOD_HEALTH = { ok: true, store: "supabase", blob: "supabase", auth: "supabase", llm: "deepseek", checker: "deepseek", speech: "mock", speech_problem: null, tts: "mock", tts_ready: true, jobs: true, deployed: true, push: true, build: "BUILD-1" };
+const GOOD_HEALTH = { ok: true, store: "supabase", blob: "supabase", auth: "supabase", llm: "hunyuan", checker: "hunyuan", speech: "mock", speech_problem: null, tts: "mock", tts_ready: true, jobs: true, deployed: true, push: true, build: "BUILD-1" };
 
 interface Seen {
   method: string;
@@ -129,7 +129,7 @@ describe("edge-check: what each check catches", () => {
   const healthOf = (body: Record<string, unknown>): Route => (req) => (req.url === `${APP}/api/health` ? json({ ...GOOD_HEALTH, time: String(Math.random()), ...body }) : undefined);
 
   it("health: a provider that fell back, a server that is not the deployment, or no answer", async () => {
-    expect((await run(healthOf({ llm: "mock", checker: "none" }))).byName.health.detail).toBe("llm is mock, must be deepseek; checker is none, must be deepseek");
+    expect((await run(healthOf({ llm: "mock", checker: "none" }))).byName.health.detail).toBe("llm is mock, must be hunyuan; checker is none, must be hunyuan");
     expect((await run(healthOf({ deployed: false }))).byName.health.verdict).toBe("FAIL");
     expect((await run(healthOf({ store: "memory" }))).byName.health.verdict).toBe("FAIL");
     expect((await run(healthOf({ push: false }))).byName.health.detail).toMatch(/push is false/);

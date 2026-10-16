@@ -164,14 +164,14 @@ for (const locale of ["zh-Hans", "en"] as const) {
       await check(page, `/privacy?lang=${locale}`, '[data-testid="page-privacy"]');
       await expect(page.getByTestId("page-privacy")).toHaveAttribute("data-locale", locale);
       await expect(page.getByTestId("page-privacy")).toContainText(locale === "en" ? "Tokyo" : "东京");
-      await expect(page.getByTestId("page-privacy")).toContainText("DeepSeek");
+      await expect(page.getByTestId("page-privacy")).toContainText(locale === "en" ? "Tencent Cloud's Hunyuan model" : "腾讯云的混元模型");
       await expect(page.getByTestId("privacy-officer")).toHaveText(locale === "en" ? "the YoRHa2 team" : "YoRHa2 团队");
       const consents = page.getByTestId("privacy-consents").locator("article");
       await expect(consents).toHaveCount(8);
       expect(await consents.evaluateAll((els) => els.map((e) => e.getAttribute("data-consent")))).toEqual(["terms_privacy", "ai_processing", "example_data", "visit_recording", "retention_keep_forever", "family_accept", "family_share", "family_reset_helper"]);
       // what a family member sees whatever the six switches say (the morning reminder's time) is said in the notice
       await expect(page.locator('[data-section="who"]')).toContainText(locale === "en" ? "not governed by the six switches" : "不归这六个开关管");
-      await expect(page.getByTestId("page-privacy")).toHaveAttribute("data-version", "2026-10-11");
+      await expect(page.getByTestId("page-privacy")).toHaveAttribute("data-version", "2026-10-16");
       for (const sha of await consents.evaluateAll((els) => els.map((e) => e.getAttribute("data-sha256")))) expect(sha).toMatch(/^[0-9a-f]{64}$/);
       await page.getByTestId("privacy-consents").locator("summary").first().click();
       await expectPageChecks(page, { side: "elder" });

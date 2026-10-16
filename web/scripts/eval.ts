@@ -19,7 +19,7 @@
  * eval/results/<name>-latest.json, never latest.json), --out <file> (default eval/results/latest.json), --concurrency <n> (cases run in parallel; default
  * EVAL_CONCURRENCY, else 1 offline and 4 with a live model). With a live model the spend in US$ for the run is in
  * meta.llm.spend; with LLM_RECORD=1 every model call is also written as a cassette, and a run with
- * LLM_PROVIDER=replay REPLAY_PROVIDER=deepseek CHECKER_PROVIDER=replay reproduces it offline
+ * LLM_PROVIDER=replay REPLAY_PROVIDER=hunyuan CHECKER_PROVIDER=replay reproduces it offline
  * (metrics.generationErrors lists any case whose cassette is missing).
  */
 import { execSync } from "node:child_process";
@@ -192,7 +192,7 @@ async function main() {
   const llm = createMainLlm();
   const checker = createChecker();
   const status = llmStatus();
-  const live = mainProviderKind() === "deepseek" || mainProviderKind() === "openai";
+  const live = mainProviderKind() === "hunyuan" || mainProviderKind() === "openai";
   const concurrency = Number(argValue("--concurrency") ?? process.env.EVAL_CONCURRENCY ?? (live ? 4 : 1)) || 1;
   const outArg = argValue("--out");
   const outFile = outArg ? path.resolve(ROOT, outArg) : path.join(OUT_DIR, suite === "seed" ? "latest.json" : `${suite}-latest.json`);
@@ -204,7 +204,7 @@ async function main() {
   // at the same time, e.g. a hero run next to it)
   let spentRun = 0;
   try {
-    if (live || checker.client?.provider === "deepseek") spentRun = ledger.spentByThisProcess(t0);
+    if (live || checker.client?.provider === "hunyuan") spentRun = ledger.spentByThisProcess(t0);
   } catch (e) {
     console.warn("[eval] spend ledger unreadable:", (e as { code?: string }).code ?? "error");
   }
@@ -341,7 +341,7 @@ async function main() {
         checkerReason: checker.reason,
         recording: status.recording,
         concurrency,
-        spend: live || checker.client?.provider === "deepseek" ? { runUsd: Math.round(spentRun * 1e6) / 1e6, ledger: ledger.summary() } : null,
+        spend: live || checker.client?.provider === "hunyuan" ? { runUsd: Math.round(spentRun * 1e6) / 1e6, ledger: ledger.summary() } : null,
       },
       thresholds_status: thresholds.status ?? null,
       gate,

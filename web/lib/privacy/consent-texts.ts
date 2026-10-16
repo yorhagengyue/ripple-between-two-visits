@@ -47,7 +47,10 @@ export const CURRENT_CONSENT_VERSIONS: Record<SignupConsentKind, string> = {
   // 2026-10-15: visit recordings are transcribed by Tencent Cloud's speech recognition (said as a fact, outside what his
   //             yes sends), and the visit transcript also goes to the model for Ripple's summary (the entries are at the
   //             end of DRAFTS)
-  ai_processing: "2026-10-15",
+  // 2026-10-16: the model is Tencent Cloud's Hunyuan (TokenHub, Singapore site), no longer DeepSeek (the owner: 「模型本身用
+  //             混元。把 DeepSeek 直接去掉。」): where and how long as Tencent's pages say, label photos to no model (the
+  //             entries are at the end of DRAFTS)
+  ai_processing: "2026-10-16",
   example_data: "2026-10-10",
 };
 
@@ -236,7 +239,7 @@ const DRAFTS: readonly Draft[] = [
     ],
     sha256: "5ae4aaaf89b0d89d9757212f39dbc0a2eb5d182ec1a19a9a0b9a6d1bb696a68b",
   },
-  // ---------------------------------------------------------------- ai_processing 2026-10-15 (in force)
+  // ---------------------------------------------------------------- ai_processing 2026-10-15 (kept: records point at it)
   // The owner's decision of 2026-10-14: a visit recording is turned into text by Tencent Cloud's speech recognition (in
   // Singapore; lib/asr/tencent.ts), and the model writes Ripple's summary of what was said while he records and when the
   // visit ends (lib/visit/ripple-summary.ts). The list of what his yes sends to DeepSeek names the summary under the visit
@@ -281,6 +284,63 @@ const DRAFTS: readonly Draft[] = [
       "You can change this any time under Me.",
     ],
     sha256: "df3055d446a97e7e6d4e2aa0522a1e0fdee0ed6e4d8df61fb83e05db1a591a55",
+  },
+  // ---------------------------------------------------------------- ai_processing 2026-10-16 (in force)
+  // The owner's decision of 2026-10-16: 「模型本身用混元。把 DeepSeek 直接去掉。」 Every model call goes to Tencent Cloud's
+  // Hunyuan on TokenHub's international Singapore site (lib/llm/hunyuan.ts). What changed from 2026-10-15, and why:
+  //   - the first paragraph names Hunyuan where it named DeepSeek and no longer gives a place;
+  //   - a new paragraph after the list says where and how long, in what Tencent's own pages say and nothing more: the API
+  //     page gives the Singapore site's "resource scheduling scope" as "Global"
+  //     (https://www.tencentcloud.com/document/product/1300/78941), and the Data Processing and Security Protocol
+  //     (https://www.tencentcloud.com/document/product/1300/78953) says computing resources come "from different
+  //     countries/regions based on resource availability" and that content is generally kept "for up to 30 days" unless
+  //     Zero Data Retention is switched on (it is not, as far as this code knows). Nothing says Singapore, so the text
+  //     does not either;
+  //   - the label-photo line is gone from the list: no Hunyuan model on the account reads images (10-16, lib/llm/hunyuan.ts
+  //     HUNYUAN_VISION_MODEL), so a photo goes to no model; the paragraph about saying no is unchanged (he still types a
+  //     label's words himself then).
+  // Every other paragraph is the 2026-10-15 one word for word. A deployment on another TokenHub site, or one with a model
+  // that reads label photos, needs a new version of this text first. The older entries above stay exactly as they are:
+  // records point at them.
+  // What this means for an account that already decided: his decision stands across versions (lib/safety/consent.ts
+  // reads the latest decision, whatever its version), and there is no flow that asks again for ai_processing
+  // (lib/care/reconsent.ts is the family texts' only). So an account that said yes to the DeepSeek text has his words
+  // sent to Hunyuan without having seen this one; an account that said no stays off; a new account sees this text.
+  {
+    kind: "ai_processing",
+    version: "2026-10-16",
+    locale: "zh-Hans",
+    title: "要不要让 AI 帮忙？",
+    paragraphs: [
+      "你同意以后，下面这些内容会发给腾讯云的混元模型处理：",
+      "· 你问的话，和要引用的医生原话、药品标签原文",
+      "· 就诊的逐字稿，用来找出医生交代的事，并在录音时和就诊结束后写出 Ripple 的总结（几条要点，标明未经确认，不当作医生的原话）",
+      "· 要翻译成中文的医生原话",
+      "腾讯云写明：处理用的算力按可用情况来自不同的国家或地区，所以不一定在新加坡处理；这些内容一般最多保留 30 天。",
+      "模型只能从这些原话里挑句子、整理要点，不自己说医疗建议。",
+      "就诊录音转成文字，由腾讯云的语音识别服务在新加坡完成：录音时一句一句发过去，就诊结束时把录音分段发过去，转出的文字发回 Ripple。这一项不需要你同意 AI 处理，没有它就没有就诊记录。",
+      "不同意也照样能用：记录、就诊录音、服药、血压、家人都照常。只是问一句只给固定的回答和原话，就诊后的事项要你自己一件件确认，没有 Ripple 的总结，药袋照片上的字要你自己输入，医生的英文原话不翻译成中文。",
+      "以后在「我」里随时能改。",
+    ],
+    sha256: "bdf8d552d8d70c195b9c53a8a80410320f3342ef2448e4ed71739f4920434bb4",
+  },
+  {
+    kind: "ai_processing",
+    version: "2026-10-16",
+    locale: "en",
+    title: "Can AI help?",
+    paragraphs: [
+      "If you agree, these are sent to Tencent Cloud's Hunyuan model to be processed:",
+      "· what you ask, with the doctor's words and the label text it may quote",
+      "· visit transcripts, to find what the doctor asked you to do, and to write Ripple's summary while you record and when the visit ends (a few short points, marked as not confirmed, never taken as the doctor's words)",
+      "· the doctor's words that are translated into Chinese",
+      "Tencent Cloud says the computing resources it uses come from different countries or regions, depending on availability, so they are not necessarily processed in Singapore; it generally keeps them for up to 30 days.",
+      "The model only picks sentences from those original words and sums up what was said; it never gives medical advice of its own.",
+      "Visit recordings are turned into text by Tencent Cloud's speech recognition service, in Singapore: while you record, each stretch of speech is sent as you finish it, and when the visit ends the recording is sent in pieces; the text comes back to Ripple. This does not need your agreement to AI processing: without it there is no visit record.",
+      "If you say no, Ripple still works: records, visit recordings, doses, blood pressure and family work as usual. Asking gives fixed answers and original words only, you confirm the points from a visit one by one, there is no Ripple summary, you type the label text yourself, and the doctor's English is not translated.",
+      "You can change this any time under Me.",
+    ],
+    sha256: "e3181994e683126561fec73870596321503a3a5c8ecac6324edc1f47f84019a9",
   },
 ];
 

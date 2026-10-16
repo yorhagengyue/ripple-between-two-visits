@@ -1,7 +1,8 @@
 /**
  * The words of /privacy (隐私说明 / Privacy notice; docs/plan/real-app.md 3.11 告知 「写清：收集什么、为什么、存在哪、保留多久、
  * 谁能看、怎么导出和删除」; hosting.md 5.14 for the backups; C2 track H). Fixed text, never a model's, in step with the
- * sign-up texts (lib/privacy/consent-texts.ts: Tokyo, Singapore, 90 days, DeepSeek in China, 7 and about 21 days).
+ * sign-up texts (lib/privacy/consent-texts.ts: Tokyo, Singapore, 90 days, Tencent Cloud's Hunyuan since 10-16 where
+ * Tencent's pages say, 7 and about 21 days).
  * The data protection officer's name comes from consent-texts.ts (a placeholder until the owner names one). Pure.
  */
 import { AUDIO_KEEP_DAYS, BUS_EVENT_KEEP_DAYS, EXAMPLE_IDLE_DAYS, EXPORT_LIMIT_PER_DAY, ORPHAN_GRACE_DAYS, SAFETY_EVENT_KEEP_DAYS } from "./rules";
@@ -57,7 +58,7 @@ export interface Notice {
  * what the visit transcript is sent for; 「存什么」 and 「留多久」 name the summary. Everything else is the 2026-10-14
  * words. The 2026-10-14 version is kept word for word (NOTICE_VERSIONS): it is what was published until this one.
  */
-export const NOTICE_VERSION = "2026-10-15";
+export const NOTICE_VERSION = "2026-10-16";
 
 const zh1014: Notice = {
   title: "隐私说明",
@@ -248,7 +249,7 @@ function withSections(base: Notice, updated: string, changed: Record<string, Par
 
 const section = (n: Notice, id: string): NoticeSection => n.sections.find((s) => s.id === id)!;
 
-/** 2026-10-15 (in force): Tencent Cloud transcribes the visit recordings; the model writes Ripple's summary. */
+/** 2026-10-15: Tencent Cloud transcribes the visit recordings; the model writes Ripple's summary. */
 const zh1015: Notice = withSections(zh1014, "最后更新：2026年10月15日", {
   what: {
     items: section(zh1014, "what").items!.map((item) =>
@@ -302,10 +303,44 @@ const en1015: Notice = withSections(en1014, "Last updated: 15 October 2026", {
   },
 });
 
+/**
+ * 2026-10-16 (in force): the model is Tencent Cloud's Hunyuan, no longer DeepSeek (the owner: 「模型本身用混元。把 DeepSeek 直接
+ * 去掉。」), on TokenHub's international Singapore site. The AI processing line names Hunyuan, says where and how long in
+ * Tencent's own words (computing resources in different countries or regions as available, so not necessarily
+ * Singapore; generally kept up to 30 days) and no longer lists label photos (no Hunyuan model reads images); the
+ * paragraph under 「存在哪」 says so too. The ai_processing consent text of the same day gives the pages. Everything else is
+ * the 2026-10-15 text.
+ */
+const zh1016: Notice = withSections(zh1015, "最后更新：2026年10月16日", {
+  where: {
+    terms: section(zh1015, "where").terms!.map(([term, value]): [string, string] =>
+      term === "AI 处理"
+        ? [term, "只在你同意以后：你问的话、就诊的逐字稿（用来找出医生交代的事，并在录音时和就诊结束后写出 Ripple 的总结）、要翻译的医生原话，交给腾讯云的混元模型处理。腾讯云写明，处理用的算力按可用情况来自不同的国家或地区，所以不一定在新加坡；一般最多保留 30 天。药袋的照片不交给模型。不同意就不发，也没有 Ripple 的总结。在「我」→「AI 处理」随时能改。"]
+        : [term, value],
+    ),
+    paragraphs: ["所以你的资料会离开新加坡：数据库在日本；同意 AI 处理以后，要处理的那一部分可能在别的国家或地区处理。"],
+  },
+});
+
+const en1016: Notice = withSections(en1015, "Last updated: 16 October 2026", {
+  where: {
+    terms: section(en1015, "where").terms!.map(([term, value]): [string, string] =>
+      term === "AI processing"
+        ? [
+            term,
+            "Only after you agree: what you ask, visit transcripts (to find what the doctor asked you to do, and to write Ripple's summary while you record and when the visit ends) and the doctor's words to be translated go to Tencent Cloud's Hunyuan model. Tencent Cloud says the computing resources it uses come from different countries or regions, depending on availability, so not necessarily Singapore, and it generally keeps them for up to 30 days. Label photos are not sent to the model. If you say no, nothing is sent, and there is no summary. Change it any time under Me → AI processing.",
+          ]
+        : [term, value],
+    ),
+    paragraphs: ["So your data leaves Singapore: the database is in Japan, and once you agree to AI processing, the parts it works on may be processed in other countries or regions."],
+  },
+});
+
 /** Every published version of these words, both languages: the one in force is NOTICE_VERSION; the older ones word for word. */
 export const NOTICE_VERSIONS: Readonly<Record<string, { "zh-Hans": Notice; en: Notice }>> = {
   "2026-10-14": { "zh-Hans": zh1014, en: en1014 },
   "2026-10-15": { "zh-Hans": zh1015, en: en1015 },
+  "2026-10-16": { "zh-Hans": zh1016, en: en1016 },
 };
 
 export function privacyNotice(locale: NoticeLocale, version: string = NOTICE_VERSION): Notice {

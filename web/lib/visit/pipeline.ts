@@ -7,7 +7,7 @@
  *                  items, publish asr.final / utterance.role / card.created
  *   finalizeVisit  the whole-visit transcript is back: replace the live lines, roles and items in one pass,
  *                  cut per-sentence clips from the recording when the transcript came from the audio,
- *                  status "review". With a real main model (LLM_PROVIDER deepseek / openai / replay) the model
+ *                  status "review". With a real main model (LLM_PROVIDER hunyuan / openai / replay) the model
  *                  also labels the whole transcript (model-extract.ts) and adds what the rules missed; the
  *                  model writes no text, and any failure leaves the rules' items
  *   confirmVisit   he marks his own lines and checks each item: roles become confirmed, answered questions

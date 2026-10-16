@@ -1,6 +1,6 @@
 /**
  * The long press's sheet as Server-Sent Events (owner 10-15: 「需要非常完整的 SSE 的输出」): POST /api/explain with Accept:
- * text/event-stream, through the real route and the real OpenAI-compatible client, DeepSeek answered by a fake fetch that
+ * text/event-stream, through the real route and the real OpenAI-compatible client, Hunyuan (TokenHub) answered by a fake fetch that
  * streams. What Ripple looked at goes out first, the sentence word by word, then the answer, which is exactly the JSON the
  * plain request gives; words the model abstains on or the guards drop are taken back; offline it is the one final event.
  */
@@ -49,10 +49,10 @@ async function events(res: Response): Promise<{ event: string; data: Record<stri
   return out;
 }
 
-/** DeepSeek, faked: the reply's JSON streamed in pieces of a few characters, then the usage chunk. */
+/** Hunyuan on TokenHub, faked: the reply's JSON streamed in pieces of a few characters, then the usage chunk. */
 function liveModel(reply: Record<string, unknown>) {
-  vi.stubEnv("LLM_PROVIDER", "deepseek");
-  vi.stubEnv("RIPPLE_DEEPSEEK_API_KEY", "sk-test-not-real");
+  vi.stubEnv("LLM_PROVIDER", "hunyuan");
+  vi.stubEnv("HUNYUAN_API_KEY", "sk-test-not-real");
   const content = JSON.stringify(reply);
   const pieces = content.match(/[\s\S]{1,5}/g) ?? [];
   const calls: { stream: unknown }[] = [];

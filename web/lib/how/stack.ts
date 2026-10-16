@@ -4,13 +4,13 @@
  * say today; a decision that is made but not running yet is "planned", an open one "undecided".
  * Speech-to-text is Tencent Cloud speech recognition (the owner's decision of 10-14; the local Whisper service on the
  * filming laptop answers the same screens), never "TRTC speech recognition".
- * Server-only (reads the DeepSeek model defaults from lib/llm).
+ * Server-only (reads the Hunyuan model defaults from lib/llm).
  *
- * The checker note quotes the 10-09 live runs: web/eval/results/deepseek-run1.json and deepseek-run2.json (51 cases
- * each, layer 3 called 0 times) and deepseek-checker.json (14 written sentences). tests/unit/how/how.test.ts reads
- * those files, so a new live run that changes the numbers fails the test until this note is updated.
+ * The model is Tencent Cloud Hunyuan on TokenHub since 16 October (the owner: 「模型本身用混元。把 DeepSeek 直接去掉。」). The checker note
+ * says that the 51-question evaluation has not been run with these two models yet: when a live run is written to
+ * web/eval/results, the note gets its numbers (tests/unit/how/how.test.ts holds the note to that).
  */
-import { DEEPSEEK_CHECKER_MODEL, DEEPSEEK_MAIN_MODEL } from "@/lib/llm";
+import { HUNYUAN_CHECKER_MODEL, HUNYUAN_MAIN_MODEL } from "@/lib/llm";
 
 export type BoxStatus = "in_use" | "planned" | "undecided" | "mock_until_keys" | "filming_laptop_only";
 
@@ -66,20 +66,20 @@ export const STACK: Record<StackBox["id"], StackBox> = {
   main_model: {
     id: "main_model",
     role: "Main model",
-    product: "DeepSeek",
-    model: DEEPSEEK_MAIN_MODEL,
+    product: "Tencent Cloud Hunyuan",
+    model: HUNYUAN_MAIN_MODEL,
     status: "in_use",
     note:
-      "Runs in non-thinking mode. Sorts a question the rules cannot, picks sentences from the sources it is given, copies the printed text off a label photo, marks the doctor's instructions in a finished visit transcript, writes short notes of what was said at a visit (shown as Ripple's and not confirmed, never a source), and screens messages for an emergency or self-harm the rules missed. Since 15 October it also answers everyday health questions in his language as the owner's policy file says (shown after his own sources as general information from Ripple), and words the 995 and self-harm answers for what he said (the fixed sentences stand when it fails). It never tells him to change his medicines.",
+      "Hy3 on Tencent Cloud's TokenHub, with its thinking mode off. Sorts a question the rules cannot, picks sentences from the sources it is given, marks the doctor's instructions in a finished visit transcript, writes short notes of what was said at a visit (shown as Ripple's and not confirmed, never a source), and screens messages for an emergency or self-harm the rules missed. Since 15 October it also answers everyday health questions in his language as the owner's policy file says (shown after his own sources as general information from Ripple), and words the 995 and self-harm answers for what he said (the fixed sentences stand when it fails). It never tells him to change his medicines. No Hunyuan model on the account reads images, so label photos go to no model: the sample labels show their recorded readings, and he types the words of any other label.",
   },
   checker: {
     id: "checker",
     role: "Checker model (layer 3)",
-    product: "DeepSeek",
-    model: DEEPSEEK_CHECKER_MODEL,
+    product: "Tencent Cloud Hunyuan",
+    model: HUNYUAN_CHECKER_MODEL,
     status: "in_use",
     note:
-      "Gets a sentence the main model worded itself together with the whole source passage, and says whether the source supports it. It is the same vendor as the main model (a different model), so it is less independent than a checker from a second vendor would be. Not configured, a timeout, the answer's time limit reached, a call refused by the spend cap, or anything but a clear yes: the sentence is blocked. In the 51-question evaluation, run twice with these two models, no sentence needed layer 3 (0 checker calls); on its own it was tested with 14 written sentences: 3 faithful ones passed, all 11 unsupported ones were blocked, 5 of them by the checker alone.",
+      "A different Hunyuan model (Hy4 preview, thinking off) gets a sentence the main model worded itself together with the whole source passage, and says whether the source supports it. It is the same vendor as the main model (a different model), so it is less independent than a checker from a second vendor would be. Not configured, a timeout, the answer's time limit reached, a call refused by the spend cap, or anything but a clear yes: the sentence is blocked. The 51-question evaluation has not been run with these two models yet.",
   },
   stt: {
     id: "stt",

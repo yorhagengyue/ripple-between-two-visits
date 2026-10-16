@@ -6,18 +6,17 @@
  * never a value or a hash.
  *
  *   node node_modules/tsx/dist/cli.mjs scripts/llm/env-check.ts            (what a plain shell would use)
- *   env -u DEEPSEEK_API_KEY node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/...   (use web/.env's key)
+ *   env -u HUNYUAN_API_KEY node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/...   (use web/.env's key)
  *
- * Since 10-09 wave B the app reads RIPPLE_DEEPSEEK_API_KEY from web/.env first, so a DEEPSEEK_API_KEY in the user
- * environment no longer overrides it; the line for DEEPSEEK_API_KEY shows whether that legacy variable is still around.
+ * The model is Tencent Cloud Hunyuan on TokenHub since 10-16: its key is HUNYUAN_API_KEY (lib/llm/hunyuan.ts).
  */
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { webRoot } from "@/lib/llm/root";
 
-/** The project key first (lib/llm reads RIPPLE_DEEPSEEK_API_KEY, and DEEPSEEK_API_KEY only when that is not set). */
-export const KEY_NAMES = ["RIPPLE_DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY", "CHECKER_API_KEY", "OPENAI_API_KEY"] as const;
+/** The model keys lib/llm reads (Hunyuan's TokenHub key, a separate checker key, OpenAI's). */
+export const KEY_NAMES = ["HUNYUAN_API_KEY", "CHECKER_API_KEY", "OPENAI_API_KEY"] as const;
 
 /** KEY=value lines of a .env file (no expansion; quotes stripped). */
 export function parseEnvFile(text: string): Record<string, string> {
@@ -49,7 +48,7 @@ export function keySource(name: string, env: Record<string, string | undefined>,
   return h(live).equals(h(file)) ? "web/.env" : "environment, DIFFERS from web/.env";
 }
 
-/** One line per key name: "DEEPSEEK_API_KEY: web/.env" etc. */
+/** One line per key name: "HUNYUAN_API_KEY: web/.env" etc. */
 export function keySourceLines(env: Record<string, string | undefined> = process.env, file = path.join(webRoot(), ".env")): string[] {
   const values = existsSync(file) ? parseEnvFile(readFileSync(file, "utf8")) : {};
   return KEY_NAMES.map((n) => `${n}: ${keySource(n, env, values)}`);

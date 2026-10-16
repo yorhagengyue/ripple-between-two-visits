@@ -12,7 +12,7 @@ export function AiConsentEntry({ locale, href = "/p/me/ai", on }: { locale: UiLo
   const c = meScreenCopy(locale);
   const title = zh ? "AI 处理" : "AI processing";
   if (on === undefined) {
-    return <MeEntry entry="ai" href={href} title={title} status={zh ? "开着时问句和就诊转写交给 DeepSeek 处理（在中国）" : "When on, questions and visit transcripts go to DeepSeek (in China)"} />;
+    return <MeEntry entry="ai" href={href} title={title} status={zh ? "开着时问句和就诊转写交给腾讯云的混元模型处理（可能在新加坡以外）" : "When on, questions and visit transcripts go to Tencent Cloud's Hunyuan model (possibly outside Singapore)"} />;
   }
   return <MeEntry entry="ai" href={href} title={title} status={on ? c.aiOnSub : c.aiOffSub} right={<span data-on={on ? "true" : "false"}>{on ? c.aiOn : c.aiOff}</span>} />;
 }

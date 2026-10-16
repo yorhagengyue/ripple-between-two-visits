@@ -11,7 +11,7 @@
  *   dose         dose questions the rules missed in round 2 -> refuse_route, R4 and the label word for word, doctor
  *   painkiller   the painkiller's "two tonight" questions -> their own question, never the amlodipine q-extra-tablet
  *
- *   LLM_PROVIDER=deepseek CHECKER_PROVIDER=deepseek CHECKER_MODEL=deepseek-v4-pro [LLM_RECORD=1] \
+ *   LLM_PROVIDER=hunyuan CHECKER_PROVIDER=hunyuan [LLM_RECORD=1] \
  *     node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/crisis.ts [--out <file>]
  */
 import { writeFileSync } from "node:fs";

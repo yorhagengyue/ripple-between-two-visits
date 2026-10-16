@@ -3,7 +3,8 @@
  * 怎样」; C2 track H; laid out after the timeline draft's 15-5). The header names the screen; under it the switch (POST
  * /api/me/consent, a new consent record) that says 开 or 关 in words, what the tap just changed, when he last changed
  * it, and the AI-processing text itself, the same version and words whose hash the record keeps (track A's
- * CONSENT_TEXTS): what goes to DeepSeek and that it is processed in China, and what changes when it is off.
+ * CONSENT_TEXTS): what goes to Tencent Cloud's Hunyuan model, where Tencent says it may be processed and for how long,
+ * and what changes when it is off.
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";

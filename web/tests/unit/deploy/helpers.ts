@@ -43,7 +43,7 @@ export function baseDeploy(dir: string): Record<string, string> {
 
 /** Everything a push-env needs on top: the owner's key and decision, and the secrets this computer makes. */
 export const APP_EXTRA: Record<string, string> = {
-  RIPPLE_DEEPSEEK_API_KEY: "sk-FAKEdeepseek0123456789abcdefZZ",
+  HUNYUAN_API_KEY: "sk-FAKEtokenhub0123456789abcdefZZ",
   AUTH_USERNAME_DOMAIN: "users.fake-ripple-zz.example",
   EDGE_SECRET: "FAKEedge-0123456789abcdefghijklmnopqrstuvZZ",
   BLOB_SIGNING_SECRET: "FAKEblob-0123456789abcdefghijklmnopqrstuvZZ",

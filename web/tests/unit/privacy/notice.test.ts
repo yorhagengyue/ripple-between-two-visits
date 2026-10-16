@@ -44,9 +44,9 @@ describe("the privacy notice", () => {
     }
   });
 
-  it("where: Tokyo, Singapore, DeepSeek in China only with consent, and that the data leaves Singapore", () => {
-    for (const w of ["东京", "新加坡", "DeepSeek", "中国", "不同意就不发", "离开新加坡", "10 分钟"]) expect(section(zh, "where"), w).toContain(w);
-    for (const w of ["Tokyo", "Singapore", "DeepSeek", "China", "If you say no, nothing is sent", "leaves Singapore", "10 minutes"]) expect(section(en, "where"), w).toContain(w);
+  it("where: Tokyo, Singapore, Tencent Cloud's Hunyuan only with consent and where Tencent says, and that the data leaves Singapore", () => {
+    for (const w of ["东京", "新加坡", "腾讯云的混元模型", "不同的国家或地区", "最多保留 30 天", "不同意就不发", "离开新加坡", "10 分钟"]) expect(section(zh, "where"), w).toContain(w);
+    for (const w of ["Tokyo", "Singapore", "Tencent Cloud's Hunyuan model", "different countries or regions", "up to 30 days", "If you say no, nothing is sent", "leaves Singapore", "10 minutes"]) expect(section(en, "where"), w).toContain(w);
     expect(READ_LINK_SECONDS).toBe(600);
   });
 
@@ -93,10 +93,10 @@ describe("the privacy notice", () => {
       expect(words(n)).not.toMatch(/\bmg\b|毫克|should take|应该吃/);
     }
     // 2026-10-14 (the owner's decision of that day): 「谁能看」 names what a linked family member sees as the kinds
-    // themselves, in full, not as counts of them (kept in 2026-10-15)
-    expect(NOTICE_VERSION).toBe("2026-10-15");
-    expect(zh.updated).toContain("2026年10月15日");
-    expect(en.updated).toContain("15 October 2026");
+    // themselves, in full, not as counts of them (kept in 2026-10-15 and 2026-10-16)
+    expect(NOTICE_VERSION).toBe("2026-10-16");
+    expect(zh.updated).toContain("2026年10月16日");
+    expect(en.updated).toContain("16 October 2026");
     expect(section(zh, "who")).toContain("每日服药情况（药物名称、服药时间、未服药的原因）、血压读数、待问医生的问题");
     expect(section(en, "who")).toContain("your medicine each day (which medicine, when, and the reason when you did not take it), your blood pressure readings and the questions you want to ask your doctor");
     expect(section(zh, "who")).not.toMatch(/吃药的天数|量了几次血压|有几个问题/);
@@ -117,8 +117,7 @@ describe("the privacy notice", () => {
     for (const locale of ["zh-Hans", "en"] as const) {
       expect(createHash("sha256").update(JSON.stringify(privacyNotice(locale, "2026-10-14")), "utf8").digest("hex"), locale).toBe(old[locale]);
     }
-    expect(Object.keys(NOTICE_VERSIONS)).toEqual(["2026-10-14", "2026-10-15"]);
-    expect(privacyNotice("en")).toBe(privacyNotice("en", "2026-10-15"));
+    expect(Object.keys(NOTICE_VERSIONS)).toEqual(["2026-10-14", "2026-10-15", "2026-10-16"]);
     const term = (n: Notice, name: string) => (n.sections.find((s) => s.id === "where")!.terms ?? []).find(([t]) => t === name)?.[1] ?? "";
     const tzh = term(zh, "就诊录音的转写");
     for (const w of ["腾讯云的语音识别服务", "新加坡", "以停顿为界", "每段不超过 100 秒", "转出的文字发回 Ripple", "保留 24 小时", "不需要你同意 AI 处理"]) expect(tzh, w).toContain(w);
@@ -137,5 +136,24 @@ describe("the privacy notice", () => {
     expect(section(en, "how-long")).toContain("Ripple's visit summaries");
     // the numbers it states are the code's: the pieces of the whole visit, and the region
     expect(TENCENT_ASR_DEFAULTS).toMatchObject({ pieceMs: 100_000, region: "ap-singapore" });
+  });
+
+  // The owner's decision of 2026-10-16: 「模型本身用混元。把 DeepSeek 直接去掉。」 A new version whose AI processing line and
+  // 「存在哪」 paragraph name Tencent Cloud's Hunyuan and say where and how long in Tencent's words; 2026-10-15 stays word for
+  // word (it named DeepSeek).
+  it("2026-10-16: the model is Tencent Cloud's Hunyuan, where and how long as Tencent says, no label photos; 2026-10-15 kept as it was", () => {
+    expect(privacyNotice("en")).toBe(privacyNotice("en", "2026-10-16"));
+    const term = (n: Notice, name: string) => (n.sections.find((s) => s.id === "where")!.terms ?? []).find(([t]) => t === name)?.[1] ?? "";
+    expect(term(zh, "AI 处理")).toContain("交给腾讯云的混元模型处理。腾讯云写明，处理用的算力按可用情况来自不同的国家或地区，所以不一定在新加坡；一般最多保留 30 天。药袋的照片不交给模型。");
+    expect(term(en, "AI processing")).toContain("go to Tencent Cloud's Hunyuan model. Tencent Cloud says the computing resources it uses come from different countries or regions, depending on availability, so not necessarily Singapore, and it generally keeps them for up to 30 days. Label photos are not sent to the model.");
+    expect(section(zh, "where")).toContain("要处理的那一部分可能在别的国家或地区处理");
+    expect(section(en, "where")).toContain("the parts it works on may be processed in other countries or regions");
+    for (const n of [zh, en]) expect(words(n)).not.toMatch(/DeepSeek/i);
+    // the 10-15 words are still there to read, DeepSeek and all
+    expect(term(privacyNotice("zh-Hans", "2026-10-15"), "AI 处理")).toContain("交给 DeepSeek 的模型处理，处理在中国");
+    // the rest is the 10-15 text
+    const s16 = privacyNotice("en", "2026-10-16").sections.filter((s) => s.id !== "where");
+    const s15 = privacyNotice("en", "2026-10-15").sections.filter((s) => s.id !== "where");
+    expect(s16).toEqual(s15);
   });
 });

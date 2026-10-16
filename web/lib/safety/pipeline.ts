@@ -94,7 +94,7 @@
  * routes the rules found make no model call, so 995 and the helplines never wait for a model.
  * The budget starts with the answer, so the store's time counts too. A model call that starts late (the database was slow
  * that time) still gets a share of its own (lateCallMs), never past the total (fix round of 10-11: the first run against
- * the real database and the real model cut a compose call 1.6 s after it began; DeepSeek's own time was ordinary).
+ * the real database and the real model cut a compose call 1.6 s after it began; the model's own time was ordinary).
  * A generation that fails (the deadline, an outage, a reply that is not the expected JSON) is not the end of the answer:
  * the offline composer (lib/llm/mock.ts: it picks the sources by the topic table and returns each word for word, the way
  * every answer is made without a model) composes it from the same candidates, and the three checks run on that. He reads
@@ -298,8 +298,8 @@ export function layer3ReserveMs(deadlineMs: number): number {
  * What a model call is given when it starts with less than this left of the generation budget (three eighths of the
  * total, at most 3 s; never past the total). The budget starts with the answer, so a slow database eats into it: on the
  * first real run a compose call was cut 1566 ms after it began, so it began about 3.9 s into the answer (the generation
- * budget's 5.5 s less those 1566 ms). Recorded deepseek-flash compose calls (fixtures/cassettes, 75 of them): median
- * 1.0 s, nine in ten under 1.4 s, the slowest 3.0 s.
+ * budget's 5.5 s less those 1566 ms). The compose calls recorded on 10-09 with the main model of that day (75 of them):
+ * median 1.0 s, nine in ten under 1.4 s, the slowest 3.0 s. Hunyuan's times are not measured yet (16 October).
  */
 export function lateCallMs(deadlineMs: number): number {
   return Math.min(3000, Math.floor((deadlineMs * 3) / 8));
@@ -1882,7 +1882,7 @@ ${s.zh ?? ""}`).length === 0);
   pub(sid, "verify.layer1", `Layer 1 (slots): ${count(l1)}`, { sentences: l1 });
   pub(sid, "verify.layer2", `Layer 2 (directives): ${count(l2)}`, { sentences: l2 });
   const l3Needed = l3.filter((x) => x.ran && (x as { needed?: boolean }).needed).length;
-  // the checker is deepseek-v4-pro next to the main deepseek-flash: the same vendor, a different model (10-09), so the
+  // the checker is hy4-preview next to the main hy3: the same vendor, a different model (10-16), so the
   // line names it the checker model, never a cross-model or second-vendor check (components/backstage/sentences.ts
   // names it from `checker` the same way)
   pub(

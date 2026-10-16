@@ -145,7 +145,7 @@ describe("the app's environment file", () => {
     expect(web.env.SPEECH_PROVIDER).toBe("mock");
     expect(web.env.SUPABASE_ANON_KEY).toBe(ctx.deploy.values.SUPABASE_ANON_KEY);
     expect(web.env.EDGE_SECRET).toBe(APP_EXTRA.EDGE_SECRET);
-    expect(expectedHealth(web.env)).toEqual({ store: "supabase", blob: "supabase", auth: "supabase", llm: "deepseek", checker: "deepseek", speech: "mock", speech_problem: null, tts: "mock", jobs: true, deployed: true, push: true });
+    expect(expectedHealth(web.env)).toEqual({ store: "supabase", blob: "supabase", auth: "supabase", llm: "hunyuan", checker: "hunyuan", speech: "mock", speech_problem: null, tts: "mock", jobs: true, deployed: true, push: true });
   });
 
   it("never holds the connection string, a deploy-only name or a backup setting", () => {
@@ -187,19 +187,19 @@ describe("the app's environment file", () => {
     expect(buildWebEnv(ctxOf(fullDeploy({ STORE: "supabase", APP_BASE_URL: `https://${APP_DOMAIN}/` })), sw).env.STORE).toBe("supabase");
   });
 
-  it("refuses a main model that is not DeepSeek, including the key left empty", () => {
+  it("refuses a main model that is not Hunyuan, including the key left empty", () => {
     expect(() => buildWebEnv(ctxOf(fullDeploy({ LLM_PROVIDER: "mock" })), sw)).toThrow(/LLM_PROVIDER is written by the script/);
-    const problems = problemsFor({ RIPPLE_DEEPSEEK_API_KEY: null });
-    expect(problems.join("\n")).toMatch(/RIPPLE_DEEPSEEK_API_KEY is not set \(the owner supplies it/);
-    expect(problems.join("\n")).toMatch(/the app would run with llm=mock; a deployment needs llm=deepseek/);
+    const problems = problemsFor({ HUNYUAN_API_KEY: null });
+    expect(problems.join("\n")).toMatch(/HUNYUAN_API_KEY is not set \(the owner supplies it/);
+    expect(problems.join("\n")).toMatch(/the app would run with llm=mock; a deployment needs llm=hunyuan/);
   });
 
   it("refuses a checker that is missing, a mock or a replay", () => {
     expect(() => buildWebEnv(ctxOf(fullDeploy({ CHECKER_PROVIDER: "mock" })), sw)).toThrow(/CHECKER_PROVIDER is written by the script/);
     expect(() => buildWebEnv(ctxOf(fullDeploy({ CHECKER_PROVIDER: "replay" })), sw)).toThrow(/CHECKER_PROVIDER is written by the script/);
-    expect(problemsFor({ RIPPLE_DEEPSEEK_API_KEY: null }).join("\n")).toMatch(/checker=none; a deployment needs checker=deepseek/);
+    expect(problemsFor({ HUNYUAN_API_KEY: null }).join("\n")).toMatch(/checker=none; a deployment needs checker=hunyuan/);
     // the checker may not be the main model itself: the app then has no checker
-    expect(problemsFor({ CHECKER_MODEL: "deepseek-flash", LLM_MODEL: "deepseek-flash" }).join("\n")).toMatch(/checker=none/);
+    expect(problemsFor({ CHECKER_MODEL: "hy3", LLM_MODEL: "hy3" }).join("\n")).toMatch(/checker=none/);
   });
 
   it("with a transcription service, refuses a missing, malformed or plain-http address and a missing or short token", () => {
@@ -306,7 +306,7 @@ describe("push-env", () => {
     const res = await go(f, ["--speech", "mock", "--tts", "mock", "--dry-run"]);
     expect(res.code).toBe(2);
     expect(res.text).toMatch(/A run with --yes would first create in the deploy file: EDGE_SECRET, BLOB_SIGNING_SECRET, AUTH_COOKIE_SECRET, RATE_LIMIT_SALT, RECOVERY_PEPPER, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY/);
-    expect(res.text).toMatch(/REFUSED: this environment would not be a working deployment[\s\S]*RIPPLE_DEEPSEEK_API_KEY is not set \(the owner supplies it/);
+    expect(res.text).toMatch(/REFUSED: this environment would not be a working deployment[\s\S]*HUNYUAN_API_KEY is not set \(the owner supplies it/);
     expect(res.text).toMatch(/AUTH_USERNAME_DOMAIN is not set/);
     expect(res.text).not.toMatch(/EDGE_SECRET is not set|push=false/);
     expect(readFileSync(f.deployFile, "utf8")).toBe(before);
@@ -322,9 +322,19 @@ describe("push-env", () => {
     expect(res.text).toContain('ssh -i <DEPLOY_SSH_KEY> <DEPLOY_USER>@<DEPLOY_HOST> "sudo -n install -m 0600 -o root -g root /dev/null /etc/ripple/web.env.new && sudo -n tee /etc/ripple/web.env.new > /dev/null"');
     expect(res.text).toContain("RIPPLE_DEPLOYED=1");
     expect(res.text).toContain("APP_BASE_URL=https://<DEPLOY_APP_DOMAIN>");
-    expect(res.text).toMatch(/from the deploy file \(values not shown\): .*RIPPLE_DEEPSEEK_API_KEY.*SUPABASE_SERVICE_KEY/);
-    expect(res.text).toContain("expected health: store=supabase blob=supabase auth=supabase llm=deepseek checker=deepseek speech=mock speech_problem=null tts=mock jobs=true deployed=true push=true");
+    expect(res.text).toMatch(/from the deploy file \(values not shown\): .*HUNYUAN_API_KEY.*SUPABASE_SERVICE_KEY/);
+    expect(res.text).toContain("expected health: store=supabase blob=supabase auth=supabase llm=hunyuan checker=hunyuan speech=mock speech_problem=null tts=mock jobs=true deployed=true push=true");
     expect(res.text).toContain("Dry run: nothing was touched.");
+    expectNoLeak(res.text, f);
+  });
+
+  it("--no-restart (the move to Hunyuan): the plan applies the file without a restart and says the next release compares", async () => {
+    const f = fullDeploy();
+    const res = await go(f, ["--speech", "mock", "--tts", "mock", "--no-restart", "--dry-run"]);
+    expect(res.code).toBe(0);
+    expect(res.calls).toHaveLength(0);
+    expect(res.text).toContain("node --input-type=module - env-apply no-restart");
+    expect(res.text).toContain("WITHOUT restarting ripple-web (--no-restart): the next release restarts with it and compares");
     expectNoLeak(res.text, f);
   });
 
@@ -344,12 +354,12 @@ describe("push-env", () => {
     expect(putEnv.args).toContain(`${f.values.DEPLOY_USER}@${f.values.DEPLOY_HOST}`);
     expect(putEnv.args).toContain("BatchMode=yes");
     const sent = String(putEnv.stdin);
-    expect(sent).toContain(`RIPPLE_DEEPSEEK_API_KEY=${APP_EXTRA.RIPPLE_DEEPSEEK_API_KEY}`);
+    expect(sent).toContain(`HUNYUAN_API_KEY=${APP_EXTRA.HUNYUAN_API_KEY}`);
     expect(sent).toContain(`EDGE_SECRET=${APP_EXTRA.EDGE_SECRET}`);
     expect(sent).toContain("TRUSTED_PROXY_HOPS=1");
     expect(sent).not.toContain("SUPABASE_DB_URL");
     expect(sent).not.toContain("FakeProdPassw0rdZZ");
-    expect(JSON.parse(String(putExpect.stdin))).toMatchObject({ llm: "deepseek", speech: "mock", deployed: true });
+    expect(JSON.parse(String(putExpect.stdin))).toMatchObject({ llm: "hunyuan", speech: "mock", deployed: true });
     expect(remoteOpOf(apply)).toBe("env-apply");
     expect(String(apply.stdin)).toContain("export async function envApply");
     for (const call of res.calls) for (const secret of Object.values(APP_EXTRA)) expect(call.args.join(" ")).not.toContain(secret);
@@ -358,7 +368,7 @@ describe("push-env", () => {
   });
 
   it("creates the missing secrets in the deploy file on the first run with --yes, without showing them", async () => {
-    const f = fakeFiles({ RIPPLE_DEEPSEEK_API_KEY: APP_EXTRA.RIPPLE_DEEPSEEK_API_KEY, AUTH_USERNAME_DOMAIN: APP_EXTRA.AUTH_USERNAME_DOMAIN });
+    const f = fakeFiles({ HUNYUAN_API_KEY: APP_EXTRA.HUNYUAN_API_KEY, AUTH_USERNAME_DOMAIN: APP_EXTRA.AUTH_USERNAME_DOMAIN });
     const res = await go(f, ["--speech", "mock", "--tts", "mock", "--yes"], applied("staged"));
     expect(res.code).toBe(0);
     expect(res.text).toMatch(/Created in the deploy file \(values not shown\): EDGE_SECRET/);
@@ -390,7 +400,7 @@ describe("push-env", () => {
   });
 
   it("refuses a film crew key and an unknown name before anything else", async () => {
-    const sets: Array<Record<string, string>> = [{ SCRIPTED_FALLBACK_KEY: "crew-key-zz-0123456789" }, { DEEPSEEK_API_KEY: "sk-old-name-zz-0123456789" }];
+    const sets: Array<Record<string, string>> = [{ SCRIPTED_FALLBACK_KEY: "crew-key-zz-0123456789" }, { RIPPLE_DEEPSEEK_API_KEY: "sk-old-name-zz-0123456789" }];
     for (const set of sets) {
       const res = await go(fullDeploy(set), ["--speech", "mock", "--tts", "mock", "--yes"]);
       expect(res.code).toBe(2);

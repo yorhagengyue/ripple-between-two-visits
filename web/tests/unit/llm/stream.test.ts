@@ -1,6 +1,6 @@
 /**
  * The model client's streaming call (ChatOpts.onDelta, owner 10-15 SSE), with no network: the OpenAI-compatible client
- * asks DeepSeek for `stream: true` and reads its event stream piece by piece; the result, the price and the ledger are what
+ * asks the model (Hunyuan on TokenHub since 10-16) for `stream: true` and reads its event stream piece by piece; the result, the price and the ledger are what
  * a plain call gives; a stream cut after its first piece is never tried again; the mock streams its canned words in
  * pieces; a vendor that answers in one piece still reaches the caller.
  */
@@ -12,11 +12,11 @@ import { costUsd, SpendLedger } from "@/lib/llm/spend";
 
 function cfg(over: Partial<CompatConfig> = {}): CompatConfig {
   return {
-    name: "deepseek",
-    vendor: "deepseek",
-    baseUrl: "https://api.deepseek.com",
+    name: "hunyuan",
+    vendor: "tencent",
+    baseUrl: "https://tokenhub-intl.tencentcloudmaas.com/v1",
     apiKey: "sk-test-not-real",
-    model: "deepseek-flash",
+    model: "hy3",
     maxTokensField: "max_tokens",
     jsonMode: true,
     extraBody: { thinking: { type: "disabled" } },
@@ -29,7 +29,7 @@ function cfg(over: Partial<CompatConfig> = {}): CompatConfig {
 
 const USAGE = { prompt_tokens: 900, completion_tokens: 60, total_tokens: 960, prompt_cache_hit_tokens: 0, prompt_cache_miss_tokens: 900 };
 
-/** DeepSeek's stream: one chunk per piece, the usage chunk, [DONE]; the bytes cut at odd places. */
+/** An OpenAI-style stream (TokenHub sends one): one chunk per piece, the usage chunk, [DONE]; the bytes cut at odd places. */
 function sseBody(pieces: string[], opts: { usage?: boolean; breakAfter?: number } = {}): ReadableStream<Uint8Array> {
   const frames = pieces.map((p) => `data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: p }, finish_reason: null }] })}\n\n`);
   frames.push(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { content: "" }, finish_reason: "stop" }] })}\n\n`);
@@ -87,7 +87,7 @@ describe("streaming from an OpenAI-compatible vendor", () => {
     expect(got).toEqual(pieces);
     expect(res.content).toBe(pieces.join(""));
     expect(res).toMatchObject({ streamed: true, finishReason: "stop", tokens: 960 });
-    const usd = costUsd("deepseek-flash", { promptTokens: 900, completionTokens: 60 });
+    const usd = costUsd("hy3", { promptTokens: 900, completionTokens: 60 });
     expect(res.usd).toBeCloseTo(usd, 10);
     expect(record).toHaveBeenCalledTimes(1);
     expect(record.mock.calls[0][0]).toMatchObject({ ok: true, prompt_tokens: 900, completion_tokens: 60, estimated: false });

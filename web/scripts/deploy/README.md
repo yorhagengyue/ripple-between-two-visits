@@ -23,7 +23,7 @@ Exit codes: 0 done; 1 a step failed; 2 refused, nothing was done; 3 failed and p
 
 | # | Who | Step | What it changes | Undo |
 |---|---|---|---|---|
-| 1 | owner, by hand | In `web/.env.deploy` add `RIPPLE_DEEPSEEK_API_KEY` and `AUTH_USERNAME_DOMAIN` (a name under the app's own domain that receives no mail; it cannot change after the first account). | the local file | edit the file |
+| 1 | owner, by hand | In `web/.env.deploy` add `HUNYUAN_API_KEY` (a TokenHub API key for Tencent Cloud Hunyuan, made in the TokenHub console on the site `HUNYUAN_BASE_URL` names; the international Singapore site when it is empty) and `AUTH_USERNAME_DOMAIN` (a name under the app's own domain that receives no mail; it cannot change after the first account). | the local file | edit the file |
 | 2 | `check-env.ts` | Says by name what is set, what each step still needs, what is malformed. | nothing | nothing to undo |
 | 3 | `check-env.ts --create-secrets --yes` | Creates the secrets this computer can make (origin lock, signing and account secrets, push key pair) and appends them to the deploy file, not showing them. | the local file | delete the appended lines, only before anything was pushed |
 | 4 | owner, by hand | Lighthouse console firewall: open TCP 80 and 443 to everyone; TCP 22 only from the owner's address; remove other default rules. | the instance's firewall | remove the rules |
@@ -46,7 +46,7 @@ Exit codes: 0 done; 1 a step failed; 2 refused, nothing was done; 3 failed and p
 | 21 | owner, with `backup-verify.ts --file <downloaded .dump.age> --identity <key file> --restore` | The restore drill on the owner's computer. | a scratch database on that computer, dropped again | it cleans up after itself |
 | 22 | owner, by hand | An outside monitor that requests `https://<public name>/api/health` every five minutes; CPU and memory alarms in the Lighthouse console. | the monitoring account | delete the checks |
 
-Later releases: `release.ts --commit <sha> --yes` (with the public check). Later migrations: on the server `sudo systemctl start ripple-backup.service` first, then, after the owner's nod, `prod-db.ts migrate --yes`, then the release; `release.ts` stops at a pending migration and never applies one.
+Later releases: `release.ts --commit <sha> --yes` (with the public check). A release that changes the code and the environment together, where the running version cannot report the new expectation (the move from DeepSeek to Hunyuan on 10-16): first `push-env.ts --speech ... --tts ... --no-restart --yes` (the file goes in place, nothing restarts), then `release.ts --commit <sha> --yes`, which restarts with it and compares; if that release fails and switches back, run `push-env.ts --restore-prev --yes`. Later migrations: on the server `sudo systemctl start ripple-backup.service` first, then, after the owner's nod, `prod-db.ts migrate --yes`, then the release; `release.ts` stops at a pending migration and never applies one.
 
 ## The scripts
 
@@ -55,7 +55,7 @@ Later releases: `release.ts --commit <sha> --yes` (with the public check). Later
 | `check-env.ts [--speech ...] [--tts ...] [--create-secrets --yes]` | Reads the deploy file; names only. | nothing; exit code 1 on a malformed value, a name problem, or the test project |
 | `provision.ts [--node-version 24.15.0] [--pg-major 17] [--accept-new-host-key]` | Sends `server/provision.sh` and the files it installs as one bundle and runs it as root. | a missing or malformed way to the server; it never writes the secret files, never changes SSH or a firewall |
 | `prod-db.ts <migrate [--status]\|inspect [--rls\|--counts --actor <who> --reason "<why>"]\|setup-storage\|privileges\|preflight>` | Runs the existing database scripts with the production project's four variables in the child's environment. | one of the four missing; any of them equal to the test project's; a connection string for another project than the address; `--counts` without who and why; a `--url` that is not the public name |
-| `push-env.ts --speech mock\|whisper\|tencent --tts mock\|trtc [--restore-prev]` | Writes `/etc/ripple/web.env`, keeps the previous copy, restarts, compares `/api/health` with what was pushed, puts the previous file back on a difference. | missing switches; a result the app would not start with or run as intended (checked with the app's own code: store, file driver, sign-in, main model and its key, checker, speech, read-aloud, the account secrets, the origin lock, the push key pair); a value that contradicts what the script writes; the test project; unknown or `[not deployed]` names |
+| `push-env.ts --speech mock\|whisper\|tencent --tts mock\|trtc [--no-restart] [--restore-prev]` | Writes `/etc/ripple/web.env`, keeps the previous copy, restarts, compares `/api/health` with what was pushed, puts the previous file back on a difference. | missing switches; a result the app would not start with or run as intended (checked with the app's own code: store, file driver, sign-in, main model and its key, checker, speech, read-aloud, the account secrets, the origin lock, the push key pair); a value that contradicts what the script writes; the test project; unknown or `[not deployed]` names |
 | `push-secrets.ts [--only edge\|backup] [--restore-prev]` | Writes `edge.env`, `backup.env`, `backup.age.pub`, each keeping its previous copy; restarts Caddy and checks it runs. | a short or malformed `EDGE_SECRET`; a public key that is not an age key; incomplete backup settings; a heartbeat address that is not https; the test database |
 | `release.ts --commit <sha> [--branch c2-real] [--skip-public-check]` | One release; switches back by itself on failure; keeps five versions. | a modified checkout; a commit that is not on `origin/<branch>`; a pending migration; it never applies a migration |
 | `rollback.ts [--to <release>]` | Switches to the version before (or the named one), restarts, checks; switches back if that fails. | an unknown release name; it never touches the database |
@@ -123,7 +123,7 @@ Changing `EDGE_SECRET` later: change the value in rule 1 first, then run `push-s
 
 ### Accounts and money
 
-- The DeepSeek key and its balance; the Lighthouse instance, the EdgeOne plan, the Supabase project's plan; the outside monitor's account.
+- The TokenHub API key (Tencent Cloud Hunyuan) and the account's balance or free quota; the Lighthouse instance, the EdgeOne plan, the Supabase project's plan; the outside monitor's account.
 
 ## Where things are on the server
 

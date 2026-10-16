@@ -4,7 +4,7 @@
  * owner's policy file (lib/safety/policy/answer-policy.md). What the code still keeps: never changing his medicines, never a
  * diagnosis, no number on the do-not-display list, 995 and the helplines always there, the fixed sentences as the fallback.
  *
- * The live model is a stand-in (tests/unit/safety/live-stand-in.ts: provider "deepseek", no network); each test scripts its
+ * The live model is a stand-in (tests/unit/safety/live-stand-in.ts: provider "hunyuan", no network); each test scripts its
  * "general" or "crisis_words" reply.
  */
 import { createElement } from "react";
@@ -166,6 +166,19 @@ describe("what code still keeps (guardGeneral): the answer is then what it was b
     ]) {
       expect(guardGeneral(text, /\p{Script=Han}/u.test(text) ? "zh-Hans" : "en"), text).toEqual([]);
     }
+  });
+
+  it("the model's machinery in the answer (Hunyuan, 10-16: its JSON tail, think and tool_call tags): not shown", () => {
+    for (const text of [
+      '量血压前先坐下休息五分钟。","ask":"none"}',
+      "Ask your pharmacist. None. Final json.</think:6124c78e>",
+      "Take it as usual.<tool_call:1>",
+      "Yes, after measuring. Ask none. (End.)",
+      "Use {answer} here.",
+    ]) {
+      expect(guardGeneral(text, /\p{Script=Han}/u.test(text) ? "zh-Hans" : "en"), text).toContain("machinery");
+    }
+    expect(guardGeneral("You can ask your pharmacist (the one at the clinic) about it.", "en")).toEqual([]);
   });
 
   it("the wrong language and a reply that is not the JSON asked for: no answer of Ripple's own", async () => {

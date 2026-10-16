@@ -10,7 +10,7 @@
  *                   writes the look into his access log).
  *   我的数据         export: the file saved on his phone, every table of his records in it, his recordings as links that
  *                   work for 24 hours (one is fetched); three a day, then the button rests (the fourth is 429)
- *   AI 处理          on, with what goes to DeepSeek in China; off: a new consent record, and the next answer says it used
+ *   AI 处理          on, with what goes to Tencent Cloud's Hunyuan model; off: a new consent record, and the next answer says it used
  *                   the fixed rules only; on again
  *   录音留多久        both recordings kept until 90 days after their visit; 9月1日 kept for good; he listens to it
  *   90 days later   the test clock at 12月1日, one pass of the retention job: 8月24日's recording is gone (its file and
@@ -112,7 +112,7 @@ journey("15 我的数据：导出、删除、录音保留期", async ({ kit, req
   await kit.show(pp.getByTestId("export-none-left"));
 
   // ---- AI 处理
-  await kit.step(pp, "「AI 处理」现在开着：写明问一句交给 DeepSeek 的模型，在中国处理");
+  await kit.step(pp, "「AI 处理」现在开着：写明问一句交给腾讯云的混元模型处理");
   await pp.goto("/p/me");
   await pp.locator('[data-entry="ai"]').click();
   const ai = pp.getByTestId("page-ai");
@@ -123,16 +123,15 @@ journey("15 我的数据：导出、删除、录音保留期", async ({ kit, req
   await expect(pp.locator('[data-rp="page-title"]')).toHaveText("AI 处理");
   await expect(aiSwitch).toHaveAttribute("aria-checked", "true");
   await expect(aiSwitch).toContainText("开");
-  await expect(pp.getByTestId("ai-text")).toContainText("DeepSeek");
-  await expect(pp.getByTestId("ai-text")).toContainText("处理在中国");
+  await expect(pp.getByTestId("ai-text")).toContainText("腾讯云的混元模型");
   await kit.show(aiSwitch);
 
-  await kit.step(pp, "他把开关点成「关」：记下一条新的同意，从现在起不发给 DeepSeek");
+  await kit.step(pp, "他把开关点成「关」：记下一条新的同意，从现在起不发给混元模型");
   await aiSwitch.click();
   await expect(ai).toHaveAttribute("data-on", "false");
   await expect(aiSwitch).toHaveAttribute("aria-checked", "false");
   await expect(aiSwitch).toContainText("关");
-  await expect(pp.getByTestId("ai-notice")).toContainText("不发给 DeepSeek");
+  await expect(pp.getByTestId("ai-notice")).toContainText("不发给混元模型");
   const meOff = (await (await api.get("/api/me")).json()) as { consents: { kind: string; decision: string }[] };
   expect(meOff.consents.find((c) => c.kind === "ai_processing")?.decision).toBe("withdrawn");
 

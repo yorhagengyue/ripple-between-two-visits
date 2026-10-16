@@ -1,7 +1,8 @@
 /**
  * The consent texts (lib/privacy/consent-texts.ts, track A): every published text's sha256 is the hash of exactly its
  * words, a (kind, version, locale) appears once, each sign-up kind has its current version in both languages, and the
- * texts say what real-app 3.11 requires (DeepSeek in China, where data is stored, the placeholder officer).
+ * texts say what real-app 3.11 requires (the model and where it processes: Tencent Cloud's Hunyuan since 10-16, where
+ * Tencent's pages say; DeepSeek in China before; where data is stored, the placeholder officer).
  */
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
@@ -41,11 +42,42 @@ describe("consent texts", () => {
     expect(consentText("terms_privacy", "1999-01-01", "en")).toBeNull();
   });
 
-  it("the AI text names DeepSeek and China and lists what is sent; refusing keeps the app working", () => {
+  it("the AI text names Tencent Cloud's Hunyuan, where and how long as Tencent says, and lists what is sent; refusing keeps the app working", () => {
     const zh = currentConsentText("ai_processing", "zh-Hans").text;
     const en = currentConsentText("ai_processing", "en").text;
-    for (const word of ["DeepSeek", "中国", "你问的话", "逐字稿", "药袋的照片", "翻译", "不同意也照样能用"]) expect(zh).toContain(word);
-    for (const word of ["DeepSeek", "China", "what you ask", "transcripts", "labels", "translated", "If you say no"]) expect(en).toContain(word);
+    for (const word of ["腾讯云的混元模型", "不同的国家或地区", "不一定在新加坡", "最多保留 30 天", "你问的话", "逐字稿", "翻译", "不同意也照样能用"]) expect(zh).toContain(word);
+    for (const word of ["Tencent Cloud's Hunyuan model", "different countries or regions", "not necessarily processed in Singapore", "up to 30 days", "what you ask", "transcripts", "translated", "If you say no"]) expect(en).toContain(word);
+    expect(`${zh}\n${en}`).not.toMatch(/DeepSeek/i);
+  });
+
+  // The owner's decision of 2026-10-16: 「模型本身用混元。把 DeepSeek 直接去掉。」 The AI text got a new version: Hunyuan named,
+  // where and how long in Tencent's words (TokenHub's Singapore site), the label-photo line gone (no Hunyuan model reads
+  // images); every other paragraph is the 2026-10-15 one, and the older versions stay published word for word.
+  it("ai_processing 2026-10-16: Hunyuan, Tencent's words on where and how long, no label photos; the rest as 2026-10-15; older versions still published", () => {
+    expect(CURRENT_CONSENT_VERSIONS.ai_processing).toBe("2026-10-16");
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const before = consentText("ai_processing", "2026-10-15", locale)!;
+      const now = consentText("ai_processing", "2026-10-16", locale)!;
+      expect(currentConsentText("ai_processing", locale), locale).toBe(now);
+      expect(sha(now.text), locale).toBe(now.sha256);
+      expect(now.title, locale).toBe(before.title);
+      // the list without the photo line, then the new paragraph on where and how long, then the 10-15 paragraphs
+      const photo = before.paragraphs.findIndex((p) => /药袋的照片|photos of medicine labels/.test(p));
+      const kept = before.paragraphs.filter((_, i) => i !== 0 && i !== photo);
+      expect(now.paragraphs.filter((p, i) => i !== 0 && !/腾讯云写明|Tencent Cloud says/.test(p)), locale).toEqual(kept);
+      expect(now.paragraphs[0], locale).not.toBe(before.paragraphs[0]);
+      expect(now.text, locale).not.toMatch(/药袋的照片，用来|photos of medicine labels, to read/);
+      expect(before.paragraphs[0], locale).toMatch(/DeepSeek/);
+      expect(consentText("ai_processing", "2026-10-10", locale), locale).not.toBeNull();
+    }
+    expect(consentText("ai_processing", "2026-10-16", "zh-Hans")!.paragraphs[0]).toBe("你同意以后，下面这些内容会发给腾讯云的混元模型处理：");
+    expect(consentText("ai_processing", "2026-10-16", "en")!.paragraphs[0]).toBe("If you agree, these are sent to Tencent Cloud's Hunyuan model to be processed:");
+    // nothing Tencent's pages do not say: no claim that the model processes in Singapore or in mainland China
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const where = consentText("ai_processing", "2026-10-16", locale)!.paragraphs.find((p) => /腾讯云写明|Tencent Cloud says/.test(p))!;
+      expect(where, locale).not.toMatch(/处理在中国|中国大陆|mainland/);
+      expect(where, locale).toMatch(/不一定在新加坡|not necessarily processed in Singapore/);
+    }
   });
 
   it("the terms say where data is, how long, who sees it, export and deletion, and the officer", () => {
@@ -123,14 +155,14 @@ describe("consent texts", () => {
   // word, because the records of everyone who agreed to it point at it (and their yes still counts: nothing asks again).
   it("ai_processing 2026-10-15: Tencent's transcription said as a fact outside his yes, the summary among what his yes sends; 2026-10-10 still published as it was", () => {
     const FIRST = { "zh-Hans": "ee325d64ad7989a154d7c737070cfa9ef368ed0841613a447fc9bbb69713965b", en: "56be326a59b1a7cf12499f14b090fcc78113cd4ab70f17d7bf4a00c174d805fb" } as const;
-    expect(CURRENT_CONSENT_VERSIONS.ai_processing).toBe("2026-10-15");
     for (const locale of ["zh-Hans", "en"] as const) {
       const old = consentText("ai_processing", "2026-10-10", locale)!;
       const now = consentText("ai_processing", "2026-10-15", locale)!;
       expect(old.sha256, locale).toBe(FIRST[locale]);
       expect(sha(old.text), locale).toBe(FIRST[locale]);
       expect(now.title, locale).toBe(old.title);
-      expect(currentConsentText("ai_processing", locale), locale).toBe(now);
+      // in force from 10-15 to 10-16 (the 10-16 version replaced it: the test above)
+      expect(sha(now.text), locale).toBe(now.sha256);
     }
     const zh = consentText("ai_processing", "2026-10-15", "zh-Hans")!;
     const en = consentText("ai_processing", "2026-10-15", "en")!;

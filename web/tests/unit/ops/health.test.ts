@@ -21,9 +21,9 @@ function deployedEnv(over: Record<string, string | undefined> = {}): Record<stri
     SUPABASE_URL: "https://zzfakeprojectrefzzzz.supabase.co",
     SUPABASE_SERVICE_KEY: "sb_secret_FAKE-service-key-0123456789abcdef",
     SUPABASE_ANON_KEY: "sb_publishable_FAKE-anon-key-0123456789abcdef",
-    LLM_PROVIDER: "deepseek",
-    RIPPLE_DEEPSEEK_API_KEY: "sk-FAKE-deepseek-key-0123456789abcdef",
-    CHECKER_PROVIDER: "deepseek",
+    LLM_PROVIDER: "hunyuan",
+    HUNYUAN_API_KEY: "sk-FAKE-tokenhub-key-0123456789abcdef",
+    CHECKER_PROVIDER: "hunyuan",
     SPEECH_PROVIDER: "mock",
     TTS_PROVIDER: "mock",
     JOBS: "1",
@@ -63,8 +63,8 @@ describe("healthReport", () => {
       store: "supabase",
       blob: "supabase",
       auth: "supabase",
-      llm: "deepseek",
-      checker: "deepseek",
+      llm: "hunyuan",
+      checker: "hunyuan",
       speech: "mock",
       speech_problem: null,
       tts: "mock",
@@ -78,7 +78,7 @@ describe("healthReport", () => {
   it("carries no value of the environment, only names", () => {
     const env = deployedEnv({ SPEECH_PROVIDER: "whisper", WHISPER_URL: "https://asr.fake-ripple.example", WHISPER_TOKEN: "FAKE-whisper-token-0123456789abcdef0123456789" });
     const text = JSON.stringify(healthReport(env));
-    for (const name of ["SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "RIPPLE_DEEPSEEK_API_KEY", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "EDGE_SECRET", "BLOB_SIGNING_SECRET", "WHISPER_URL", "WHISPER_TOKEN"]) {
+    for (const name of ["SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "HUNYUAN_API_KEY", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "EDGE_SECRET", "BLOB_SIGNING_SECRET", "WHISPER_URL", "WHISPER_TOKEN"]) {
       expect(text, name).not.toContain(env[name]!);
     }
     expect(text).not.toContain("zzfakeprojectrefzzzz");
@@ -86,14 +86,14 @@ describe("healthReport", () => {
   });
 
   it("says mock when the main model's key is missing, as the app would run", () => {
-    const report = healthReport(deployedEnv({ RIPPLE_DEEPSEEK_API_KEY: undefined }));
+    const report = healthReport(deployedEnv({ HUNYUAN_API_KEY: undefined }));
     expect(report.llm).toBe("mock");
     expect(report.checker).toBe("none");
   });
 
   it("does not print the model's fallback warning on every call", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    healthReport(deployedEnv({ RIPPLE_DEEPSEEK_API_KEY: undefined }));
+    healthReport(deployedEnv({ HUNYUAN_API_KEY: undefined }));
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });

@@ -78,7 +78,7 @@ describe("/eval reads the real results", () => {
     meta: {
       created_at: "2026-10-09T20:07:50.085Z",
       case_count: 3,
-      llm: { provider: "deepseek", model: "deepseek-flash", checkerModel: "deepseek-v4-pro", checkerIndependence: "same_vendor", spend: { runUsd: 0.069801, ledger: { file: "D:\\secret\\path\\llm-spend.jsonl" } } },
+      llm: { provider: "hunyuan", model: "hy3", checkerModel: "hy4-preview", checkerIndependence: "same_vendor", spend: { runUsd: 0.069801, ledger: { file: "D:\\secret\\path\\llm-spend.jsonl" } } },
     },
     thresholds: [{ name: "a", pass: true }, { name: "b", pass: true }],
     metrics: {
@@ -98,7 +98,7 @@ describe("/eval reads the real results", () => {
 
   it("takes the numbers, never a file path", () => {
     const v = evalRunView(live)!;
-    expect(v).toMatchObject({ cases: 3, passed: 3, provider: "deepseek", model: "deepseek-flash", checkerModel: "deepseek-v4-pro", sameVendorChecker: true, costUsd: 0.069801 });
+    expect(v).toMatchObject({ cases: 3, passed: 3, provider: "hunyuan", model: "hy3", checkerModel: "hy4-preview", sameVendorChecker: true, costUsd: 0.069801 });
     expect(v.blocked).toEqual({ layer1: 0, layer2: 1, layer3: 0 });
     expect(v.latency).toEqual({ p50: 877, p95: 1640, max: 2967 });
     expect(v.thresholdsPassed).toBe(2);
@@ -110,10 +110,10 @@ describe("/eval reads the real results", () => {
     const dir = mkdtempSync(path.join(tmpdir(), "ripple-eval-"));
     try {
       mkdirSync(path.join(dir, "results"));
-      writeFileSync(path.join(dir, "results", "deepseek-run1.json"), JSON.stringify({ ...live, meta: { ...live.meta, created_at: "2026-10-09T06:23:50.248Z" } }));
-      writeFileSync(path.join(dir, "results", "deepseek-run2.json"), JSON.stringify(live));
+      writeFileSync(path.join(dir, "results", "hunyuan-run1.json"), JSON.stringify({ ...live, meta: { ...live.meta, created_at: "2026-10-09T06:23:50.248Z" } }));
+      writeFileSync(path.join(dir, "results", "hunyuan-run2.json"), JSON.stringify(live));
       writeFileSync(path.join(dir, "results", "latest.json"), JSON.stringify(offline));
-      writeFileSync(path.join(dir, "results", "deepseek-round1.json"), JSON.stringify({ at: "2026-10-09", rows: [] }));
+      writeFileSync(path.join(dir, "results", "hunyuan-round1.json"), JSON.stringify({ at: "2026-10-09", rows: [] }));
       writeFileSync(path.join(dir, "pending.jsonl"), '{"id":"p1"}\n{"id":"p2"}\n');
       const page = readEvalPage(dir);
       expect(page.live?.at).toBe("2026-10-09T20:07:50.085Z");
@@ -125,9 +125,9 @@ describe("/eval reads the real results", () => {
     }
   });
 
-  it("this repository's own results: a 51-question run with DeepSeek and the offline run", () => {
+  it("this repository's own results: no live run since Hunyuan replaced DeepSeek (10-16; the DeepSeek runs went with it), and the offline run", () => {
     const page = readEvalPage();
-    expect(page.live).toMatchObject({ cases: 51, provider: "deepseek" });
+    expect(page.live).toBeNull();
     expect(page.offline).toMatchObject({ cases: 51, provider: "mock" });
   });
 });

@@ -29,7 +29,7 @@
  *                   consent to AI processing, consent.ts; his day's model spend used up, lib/subject/usage.ts; the
  *                   question limit), and the mock is never asked (the record names which, as verdict.ts does). Nor is a
  *                   replay client (no_model): it answers only the prompts that were recorded, and the recorded eval
- *                   (eval/results/deepseek-run2.json) replays as it was recorded
+ *                   replays as it was recorded
  *   no_checker      a checker that can pass a sentence (layer 3, verify.ts): with none configured, the mock or a replay
  *                   checker, no sentence a model worded is ever shown (fail closed, as for every restatement and every
  *                   translation, lib/translate), so the model is not asked either

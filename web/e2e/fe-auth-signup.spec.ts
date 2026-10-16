@@ -136,7 +136,7 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
 
     // ---- 7 AI: agree is the filled button, the refusal the second one, both after the text
     await expect(page.getByTestId("signup-step-ai")).toBeVisible();
-    await expect(page.getByTestId("signup-ai-text")).toContainText("DeepSeek");
+    await expect(page.getByTestId("signup-ai-text")).toContainText(/腾讯云的混元模型|Tencent Cloud's Hunyuan model/);
     expect((await look(page, '[data-testid="signup-ai-agree"]')).height).toBe(SHAPE.primary.height);
     const decline = await look(page, '[data-testid="signup-ai-decline"]');
     expect([decline.height, decline.background, decline.color]).toEqual([SHAPE.secondary.height, rgb(ELDER.fill2), rgb(ELDER.textPrimary)]);
@@ -246,7 +246,7 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-6-条款-英文");
     await page.getByTestId("signup-agree").click();
-    await expect(page.getByTestId("signup-ai-text")).toContainText("DeepSeek");
+    await expect(page.getByTestId("signup-ai-text")).toContainText(/腾讯云的混元模型|Tencent Cloud's Hunyuan model/);
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-7-AI-英文");
     await page.getByTestId("signup-ai-decline").click();

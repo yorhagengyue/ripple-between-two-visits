@@ -102,7 +102,7 @@ export async function signUpThroughPages(kit: Journey, phone: Phone, opts: SignU
 
   await kit.step(page, "第二项同意：AI 处理，不同意也能用，他点同意");
   await expect(page.getByTestId("signup-step-ai")).toBeVisible();
-  await expect(page.getByTestId("signup-ai-text")).toContainText("DeepSeek");
+  await expect(page.getByTestId("signup-ai-text")).toContainText(/腾讯云的混元模型|Tencent Cloud's Hunyuan model/);
   await expect(page.getByTestId("signup-ai-decline")).toHaveText("不同意，也继续用");
   await after();
   await kit.show(page.getByTestId("signup-ai-agree"));

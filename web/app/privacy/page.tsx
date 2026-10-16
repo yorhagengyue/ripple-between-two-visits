@@ -2,7 +2,7 @@
  * /privacy — 隐私说明 / Privacy notice (docs/plan/real-app.md 3.11 告知; the elder brief 15.5; journey 15; C2 track H;
  * laid out with the timeline draft's pieces, its 15-6). A plain page anyone can read, signed in or not (the sign-up
  * screens open it in a new tab): what Ripple keeps and why, where it is (the database in Tokyo, the server in Singapore,
- * AI answers processed by DeepSeek in China and only with his consent), how long each kind is kept, who can see it, how
+ * AI answers processed by Tencent Cloud's Hunyuan model, possibly outside Singapore, and only with his consent), how long each kind is kept, who can see it, how
  * to export and delete, and who answers for it (track A's DATA_PROTECTION_OFFICER, a placeholder until the owner names
  * one). Fixed words, never a model's (lib/privacy/notice.ts; nothing is reworded here), consistent with the sign-up
  * texts in lib/privacy/consent-texts.ts. 华语 by default; ?lang=en, or the rp_lang cookie, for English.

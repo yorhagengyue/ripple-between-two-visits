@@ -81,8 +81,7 @@ test.describe("sign-up", () => {
     await page.getByTestId("signup-agree").click();
 
     await expect(page.getByTestId("signup-step-ai")).toBeVisible();
-    await expect(page.getByTestId("signup-ai-text")).toContainText("DeepSeek");
-    await expect(page.getByTestId("signup-ai-text")).toContainText("中国");
+    await expect(page.getByTestId("signup-ai-text")).toContainText(/腾讯云的混元模型|Tencent Cloud's Hunyuan model/);
     await expect(page.getByTestId("read-aloud")).toHaveCount(0);
     await expectPageChecks(page, { side: "elder" });
     await page.getByTestId("signup-ai-decline").click();

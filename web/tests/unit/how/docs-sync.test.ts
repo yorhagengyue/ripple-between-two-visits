@@ -2,7 +2,7 @@
  * The plan documents that describe the system to the team, CodeBuddy and the Ripple integration (CODEBUDDY.md,
  * docs/plan/web-app.md, spec.md, ripple-integration.md, tasks/) checked against the code they describe. A code
  * change that makes one of these sentences stale fails here, with the file and line to update.
- *   - The layer-3 checker is the same vendor as the main model (deepseek-v4-pro next to deepseek-flash); no document
+ *   - The layer-3 checker is the same vendor as the main model (hy4-preview next to hy3, since 10-16); no document
  *     says it is another vendor's model today, and a second vendor appears only as the future.
  *   - Wei Ling's phone: every route that turns her away in its own code (denyFamily, denyNonPatient,
  *     reminderAuthorFor) and every entry of her allow-list (lib/family/gate.ts FAMILY_API, FAMILY_PAGES) is named
@@ -36,7 +36,7 @@ import { et } from "@/lib/explain/i18n";
 import { FAMILY_SESSION_FIELDS } from "@/lib/family/events";
 import { ANONYMOUS_API, FAMILY_API, FAMILY_PAGES } from "@/lib/family/gate";
 import { PATIENT_EXISTS, ROLE_NOT_JOINABLE } from "@/lib/family/join";
-import { DEEPSEEK_CHECKER_MODEL, DEEPSEEK_MAIN_MODEL } from "@/lib/llm";
+import { HUNYUAN_CHECKER_MODEL, HUNYUAN_MAIN_MODEL } from "@/lib/llm";
 import { crisisCue, selfHarmCue } from "@/lib/safety/classify";
 import { MEMBER_VIEW_FIELDS } from "@/lib/session/members";
 
@@ -75,13 +75,13 @@ describe.skipIf(!HAVE_DOCS)("the layer-3 checker is the same vendor as the main 
   it("each document that describes the checker names it next to the main model and says it is the same vendor", () => {
     for (const rel of ["CODEBUDDY.md", "docs/plan/web-app.md", "docs/plan/spec.md", "docs/plan/tasks/M8-backstage.md"]) {
       expect(
-        lines(rel).some((l) => l.includes(DEEPSEEK_CHECKER_MODEL) && l.includes(DEEPSEEK_MAIN_MODEL) && l.includes("同一家")),
-        `${rel}: a line with ${DEEPSEEK_CHECKER_MODEL}, ${DEEPSEEK_MAIN_MODEL} and 同一家`,
+        lines(rel).some((l) => l.includes(HUNYUAN_CHECKER_MODEL) && l.includes(HUNYUAN_MAIN_MODEL) && l.includes("同一家")),
+        `${rel}: a line with ${HUNYUAN_CHECKER_MODEL}, ${HUNYUAN_MAIN_MODEL} and 同一家`,
       ).toBe(true);
     }
     // web-app.md 6.3 item 3 said "another vendor's model" until the 10-09 round 2 fix
     const item3 = lineStarting("docs/plan/web-app.md", "3. **核对模型**");
-    expect(item3).toContain(`同一家（DeepSeek）的 \`${DEEPSEEK_CHECKER_MODEL}\``);
+    expect(item3).toContain(`同一家（腾讯混元）的 \`${HUNYUAN_CHECKER_MODEL}\``);
     expect(item3).toContain("独立性比两家弱");
   });
 });
@@ -385,7 +385,7 @@ describe.skipIf(!HAVE_DOCS)("hosting.md cites EdgeOne's rule order from the row 
     const models = /async function checkModels[\s\S]*?\n}\n/.exec(preflight)?.[0] ?? "";
     // the code since 10-10: the configured main model and checker as lib/llm reads them (its key order included), one
     // free GET /models each, and a key whose environment value differs from web/.env is FAIL without a call
-    for (const used of ["mainProviderKind(process.env)", "mainModel(process.env)", "checkerConfig(process.env)", "vendorKey(VENDORS.deepseek, process.env)", "checkListed(", "note.differs"]) {
+    for (const used of ["mainProviderKind(process.env)", "mainModel(process.env)", "checkerConfig(process.env)", "vendorKey(VENDORS.hunyuan, process.env)", "checkListed(", "note.differs"]) {
       expect(models, used).toContain(used);
     }
     expect(preflight).toContain("fetch(`${baseUrl.replace(/\\/+$/, \"\")}/models`");
@@ -397,9 +397,9 @@ describe.skipIf(!HAVE_DOCS)("hosting.md cites EdgeOne's rule order from the row 
     expect(item6).toContain("对那一家调一次 `GET /models`");
     expect(item6).toContain("环境里同名变量的值和 `web/.env` 不一样时记 FAIL、不调用");
     const example = read("web/.env.example");
-    expect(example).not.toContain("do not check DeepSeek");
+    expect(example).not.toContain("DeepSeek's key");
     expect(example).toContain("# Preflight's two model lines check the configuration where it runs, read the way the app reads it");
-    expect(example).toContain("RIPPLE_DEEPSEEK_API_KEY, else DEEPSEEK_API_KEY; an environment value that differs from this file's is FAIL, not called.");
+    expect(example).toContain("HUNYUAN_API_KEY; an environment value that differs from this file's is FAIL, not called.");
   });
 });
 

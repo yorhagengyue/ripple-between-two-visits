@@ -60,31 +60,31 @@ export const REASON_WORDS: Record<string, string> = {
   directive_not_verbatim: "it is an instruction in Ripple's own words",
   judgement_word: "it has a judgement word (high, normal, fine…)",
   // layer 3 (lib/safety/verify.ts layer3): the checker is a different model from the same vendor as the main model
-  // (deepseek-v4-pro next to deepseek-flash, 10-09), never a second vendor; see checkerName below
+  // (hy4-preview next to hy3, 10-16), never a second vendor; see checkerName below
   no_checker: "it needs the checker model and none is configured",
   checker_not_supported: "the checker model said its source does not support it",
   checker_error: "the checker model failed or timed out",
 };
 
 /**
- * What the checker model behind lib/llm's default DeepSeek checker (DEEPSEEK_CHECKER_MODEL, deepseek-v4-pro) is called
+ * What the checker model behind lib/llm's default Hunyuan checker (HUNYUAN_CHECKER_MODEL, hy4-preview) is called
  * here. This module is client-safe and cannot import lib/llm; tests/unit/backstage/sentences.test.ts ties the two.
  */
-export const DEEPSEEK_CHECKER_NAME = "DeepSeek V4 Pro";
+export const HUNYUAN_CHECKER_NAME = "Hy4 preview";
 
 /**
  * The layer-3 checker as the crew reads it, from the event's own `checker` (the checker client's provider, published
- * with verify.layer3 by lib/safety/pipeline.ts): "the checker model (DeepSeek V4 Pro)" on the judge link (10-09:
- * deepseek-v4-pro checks deepseek-flash, same vendor, different model; /how says so), the replayed or offline stand-in
- * in rehearsal and tests, the provider's own name for any other checker, and no name when none is configured. A
- * DeepSeek checker is named after the default model; CHECKER_MODEL can point it elsewhere, which the event does not say.
+ * with verify.layer3 by lib/safety/pipeline.ts): "the checker model (Hy4 preview)" on the judge link (10-16:
+ * hy4-preview checks hy3, same vendor, different model; /how says so), the replayed or offline
+ * stand-in in rehearsal and tests, the provider's own name for any other checker, and no name when none is configured. A
+ * Hunyuan checker is named after the default model; CHECKER_MODEL can point it elsewhere, which the event does not say.
  */
 export function checkerName(provider: unknown): string {
   const p = str(provider);
   if (!p) return "the checker model";
   const replayed = p.startsWith("replay:");
   const base = replayed ? p.slice("replay:".length) : p;
-  const name = base === "deepseek" ? DEEPSEEK_CHECKER_NAME : base === "mock" ? "offline stand-in" : base;
+  const name = base === "hunyuan" ? HUNYUAN_CHECKER_NAME : base === "mock" ? "offline stand-in" : base;
   return `the checker model (${name}${replayed ? ", replayed" : ""})`;
 }
 
@@ -185,7 +185,7 @@ function layerCounts(e: BusEvent, d: Data, name: string): EventLine {
   return {
     sentence: `${name}: ${passed} of ${ran.length} sentences passed${blocked.length ? `, ${blocked.length} stopped` : ""}.`,
     tone: blocked.length ? "blocked" : "plain",
-    // only the first letter lowered: "Stopped at layer 3, the checker model (DeepSeek V4 Pro)" keeps the model's name
+    // only the first letter lowered: "Stopped at layer 3, the checker model (Hy4 preview)" keeps the model's name
     ...(blocked.length ? { badge: `Stopped at ${name.charAt(0).toLowerCase()}${name.slice(1)}`, why } : {}),
   };
 }

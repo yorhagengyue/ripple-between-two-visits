@@ -14,7 +14,7 @@
  *      dominant, but about one in six segments the energy alone would call the doctor's spans a turn change; requiring
  *      both keeps those out.) The page says so;
  *   3. items: the deterministic rules (lib/visit/extract.ts), plus the main model's labels (lib/visit/model-extract.ts:
- *      DeepSeek with LLM_PROVIDER=deepseek, nothing with mock) checked in code, on the doctor's lines only;
+ *      Hunyuan with LLM_PROVIDER=hunyuan, nothing with mock) checked in code, on the doctor's lines only;
  *   4. the safety layer: every card's text is the doctor's whole sentence as Whisper heard it, run through layers 1
  *      and 2 (lib/safety/verify.ts) as a verbatim restatement of that line; a card that does not pass is withheld and
  *      counted. never_cross = cards shown whose text is not, byte for byte, a transcript line (always 0: such a card

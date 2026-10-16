@@ -11,7 +11,7 @@
  *              passed in the round-1 check are here and are now blocked at layer 2.
  *   fail closed the first faithful sentence with a 1 ms checker timeout -> blocked (checker_error), never shown
  *
- *   LLM_PROVIDER=deepseek CHECKER_PROVIDER=deepseek CHECKER_MODEL=deepseek-v4-pro [LLM_RECORD=1] \
+ *   LLM_PROVIDER=hunyuan CHECKER_PROVIDER=hunyuan [LLM_RECORD=1] \
  *     node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/checker.ts [--out <file>]
  */
 import { writeFileSync } from "node:fs";

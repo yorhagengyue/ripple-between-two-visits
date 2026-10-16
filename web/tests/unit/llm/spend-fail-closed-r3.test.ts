@@ -34,11 +34,11 @@ afterEach(() => {
 
 const CAP = { capUsd: 5, windowMs: 86_400_000 };
 const line = (usd: number, extra: Record<string, unknown> = {}) =>
-  JSON.stringify({ at: new Date().toISOString(), provider: "deepseek", model: "deepseek-flash", purpose: "classify", ok: true, usd, ...extra }) + "\n";
+  JSON.stringify({ at: new Date().toISOString(), provider: "hunyuan", model: "hy3", purpose: "classify", ok: true, usd, ...extra }) + "\n";
 const entry = (usd: number) => ({
   at: new Date().toISOString(),
-  provider: "deepseek",
-  model: "deepseek-flash",
+  provider: "hunyuan",
+  model: "hy3",
   purpose: "classify" as const,
   ok: true,
   error: null,

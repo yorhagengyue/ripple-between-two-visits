@@ -6,8 +6,9 @@
  *       : Promise<{ content: string; tokens: number }>;
  *   }
  *
- * Implementations: openai.ts (OpenAI-compatible HTTP, ported from ripple-core src/lib/llm.ts; serves OpenAI and
- * DeepSeek), replay.ts (cassettes in web/fixtures/cassettes), mock.ts (deterministic, no network). Server-only.
+ * Implementations: openai.ts (HTTP, ported from ripple-core src/lib/llm.ts; serves Tencent Cloud Hunyuan through
+ * hunyuan.ts, OpenAI and the OpenAI-compatible vendors), replay.ts (cassettes in web/fixtures/cassettes), mock.ts
+ * (deterministic, no network). Server-only.
  * Streaming is an option of the same call (ChatOpts.onDelta), not a method of its own, so every wrapper that rebuilds a
  * client from provider, model and chat (the pipeline's spend counter, PersonSpend.wrap, withRecording) passes it on.
  */
@@ -45,7 +46,7 @@ export interface ChatOpts {
   onDelta?: (text: string) => void;
 }
 
-/** Token split as the vendor reports it (DeepSeek: prompt_cache_hit_tokens / prompt_cache_miss_tokens). */
+/** Token split as the vendor reports it (cached prompt tokens where the vendor reports them, Hunyuan's CachedTokens). */
 export interface ChatUsage {
   promptTokens: number;
   cacheHitTokens: number;
@@ -75,7 +76,7 @@ export interface ChatResult {
 }
 
 export interface LlmClient {
-  /** provider name as configured: openai, deepseek, gemini, replay:deepseek, mock ... */
+  /** provider name as configured: hunyuan, openai, gemini, replay:hunyuan, mock ... */
   readonly provider: string;
   readonly model: string;
   chat(opts: ChatOpts): Promise<ChatResult>;

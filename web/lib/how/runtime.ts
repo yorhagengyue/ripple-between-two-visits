@@ -7,12 +7,12 @@
 import { effectiveAuthProvider, isDeployed, type Env } from "@/lib/dev/enabled";
 import { speechProviderName } from "@/lib/asr";
 import { tencentAsrConfig } from "@/lib/asr/tencent";
-import { checkerConfig, mainModel, mainProviderKind } from "@/lib/llm";
+import { checkerConfig, hunyuanSettings, mainModel, mainProviderKind } from "@/lib/llm";
 import { storeKind } from "@/lib/store";
 import { realVoiceReady, ttsProviderName } from "@/lib/tts";
 import type { StackBox } from "./stack";
 
-const VENDOR_NAMES: Record<string, string> = { deepseek: "DeepSeek", openai: "OpenAI", anthropic: "Anthropic" };
+const VENDOR_NAMES: Record<string, string> = { tencent: "Tencent Cloud Hunyuan", openai: "OpenAI", anthropic: "Anthropic" };
 const vendorName = (v: string) => VENDOR_NAMES[v] ?? (v.startsWith("custom:") ? "a compatible service" : v);
 
 export type RuntimeStack = Partial<Record<StackBox["id"], string>>;
@@ -21,9 +21,13 @@ export function runtimeStack(env: Env = process.env): RuntimeStack {
   const out: RuntimeStack = {};
 
   const main = mainProviderKind(env);
+  // which TokenHub site, as Tencent's API page describes it (no address is shown)
+  const site = hunyuanSettings(env).site;
+  const where =
+    site === "guangzhou" ? "TokenHub's Guangzhou site, resources scheduled in mainland China" : site === "siliconvalley" ? "TokenHub's Silicon Valley site, resources scheduled in the United States" : "TokenHub's Singapore site, resources scheduled globally";
   out.main_model =
-    main === "deepseek"
-      ? `DeepSeek ${mainModel(env)}, called live`
+    main === "hunyuan"
+      ? `Tencent Cloud Hunyuan ${mainModel(env)}, called live (${where})`
       : main === "openai"
         ? `OpenAI ${mainModel(env)}, called live`
         : main === "replay"

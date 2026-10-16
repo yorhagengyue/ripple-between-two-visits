@@ -129,7 +129,7 @@ describe("the deploy file's names", () => {
 
   it("every name the scripts write or create is an app name of .env.example, and none is marked", () => {
     const app = readAppNames(WEB);
-    for (const name of [...Object.keys(FIXED), ...CREATABLE, "APP_BASE_URL", "SPEECH_PROVIDER", "TTS_PROVIDER", "ASR_REPLAY_FALLBACK", "BUS_STREAM_MAX_MS", "RIPPLE_PUBLIC_HOSTS", "VAPID_SUBJECT", "SUPABASE_ANON_KEY", "AUTH_USERNAME_DOMAIN", "RIPPLE_DEEPSEEK_API_KEY"]) {
+    for (const name of [...Object.keys(FIXED), ...CREATABLE, "APP_BASE_URL", "SPEECH_PROVIDER", "TTS_PROVIDER", "ASR_REPLAY_FALLBACK", "BUS_STREAM_MAX_MS", "RIPPLE_PUBLIC_HOSTS", "VAPID_SUBJECT", "SUPABASE_ANON_KEY", "AUTH_USERNAME_DOMAIN", "HUNYUAN_API_KEY", "HUNYUAN_BASE_URL", "HUNYUAN_MODEL"]) {
       expect(app.all, name).toContain(name);
       expect(app.notDeployed, name).not.toContain(name);
     }
@@ -139,9 +139,9 @@ describe("the deploy file's names", () => {
 
   it("refuses unknown names, retired names, test-only switches and marked names with a value", () => {
     const app = readAppNames(WEB);
-    const file = parseEnvText("DEPLOY_HOST=1.2.3.4\nDEEPSEEK_API_KEY=x\nRIPPLE_TEST_CLOCK=2026-01-01\nSCRIPTED_FALLBACK_KEY=crew\nPREVIEW_URL=\nSUPABASE_DB_URL=postgres://x\nSUPABSE_URL=typo\n");
+    const file = parseEnvText("DEPLOY_HOST=1.2.3.4\nRIPPLE_DEEPSEEK_API_KEY=x\nRIPPLE_TEST_CLOCK=2026-01-01\nSCRIPTED_FALLBACK_KEY=crew\nPREVIEW_URL=\nSUPABASE_DB_URL=postgres://x\nSUPABSE_URL=typo\n");
     const problems = nameProblems(file, app);
-    expect(problems.filter((p) => /is not a name these scripts know/.test(p)).map((p) => p.split(" ")[0])).toEqual(["DEEPSEEK_API_KEY", "RIPPLE_TEST_CLOCK", "SUPABSE_URL"]);
+    expect(problems.filter((p) => /is not a name these scripts know/.test(p)).map((p) => p.split(" ")[0])).toEqual(["RIPPLE_DEEPSEEK_API_KEY", "RIPPLE_TEST_CLOCK", "SUPABSE_URL"]);
     expect(problems.some((p) => p.startsWith("SCRIPTED_FALLBACK_KEY is marked [not deployed]"))).toBe(true);
     // marked but empty is fine; the connection string is marked for the app and still belongs in this file
     expect(problems.some((p) => p.startsWith("PREVIEW_URL"))).toBe(false);
@@ -280,7 +280,7 @@ describe("check-env", () => {
     expect(text).toMatch(/ready\s+provision/);
     expect(text).toMatch(/ready\s+prod-db/);
     expect(text).toMatch(/blocked\s+push-env/);
-    expect(text).toMatch(/only the owner can supply: RIPPLE_DEEPSEEK_API_KEY, AUTH_USERNAME_DOMAIN/);
+    expect(text).toMatch(/only the owner can supply: HUNYUAN_API_KEY, AUTH_USERNAME_DOMAIN/);
     expect(text).toMatch(/created here on first use.*EDGE_SECRET/);
     expect(text).toMatch(/blocked\s+push-secrets \(backup\)/);
     expect(text).toMatch(/BACKUP_AGE_RECIPIENT: the public half/);

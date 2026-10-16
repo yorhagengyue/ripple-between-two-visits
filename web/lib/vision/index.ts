@@ -3,9 +3,11 @@
  * printed on the label. Nothing here interprets the text; lib/meds/parse-label.ts turns it into fields, so the
  * model path and the offline path share one parser.
  *
- *   LLM_PROVIDER=deepseek | openai -> the main model through lib/llm (`images` input; deepseek-flash reads images,
- *                          in non-thinking mode), told to transcribe only; one attempt waits up to
- *                          LLM_VISION_TIMEOUT_MS (default 45 s)
+ *   LLM_PROVIDER=hunyuan | openai -> lib/llm createVisionLlm (`images` input): OpenAI's main model, or a Hunyuan model
+ *                          that reads images when LLM_VISION_MODEL names one; told to transcribe only; one attempt waits
+ *                          up to LLM_VISION_TIMEOUT_MS (default 45 s). Hunyuan has none on this account (10-16; lib/llm/
+ *                          hunyuan.ts HUNYUAN_VISION_MODEL: hy3 even answers as if it saw an image), so LLM_PROVIDER=hunyuan
+ *                          without LLM_VISION_MODEL reads as the offline path below
  *   LLM_PROVIDER=replay -> the same lib/llm call answered from web/fixtures/cassettes (prompt + image digest key)
  *   mock / stub / unset without a key -> web/fixtures/cassettes/vision/<sha256 of the image bytes>.json,
  *                          which holds only { "text": "<what a model would transcribe>" }. A photo without a
@@ -13,7 +15,7 @@
  *
  * CASSETTE_DIR moves both cassette folders (vision/ sits inside it). Server-only (node:fs, node:crypto).
  *
- * A second, independent read (model path only; 10-09 DeepSeek fixer): deepseek-flash invented a whole label from a
+ * A second, independent read (model path only; 10-09 fixer): the main model of that day invented a whole label from a
  * rotated, blurred photo (a Ghana address, a patient and a doctor that are not on it, a 2024 date) and said nothing
  * about it being unsure. So the model path also asks, in parallel, for the five fields as JSON with null for
  * anything not clearly legible (FIELDS_SYSTEM). lib/vision/check.ts compares the two reads field by field: a
@@ -24,7 +26,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { cassetteDir, createMainLlm, mainProviderKind } from "@/lib/llm";
+import { cassetteDir, createVisionLlm, mainProviderKind, visionModel } from "@/lib/llm";
 import { parseModelJson } from "@/lib/llm/json";
 import type { LlmClient } from "@/lib/llm/types";
 
@@ -51,7 +53,7 @@ export interface LabelImage {
 export interface LabelText {
   /** every printed line, in reading order, as transcribed */
   text: string;
-  /** "mock:vision-cassette", "openai", "replay:openai" ... (never a key) */
+  /** "mock:vision-cassette", "hunyuan", "openai", "replay:openai" ... (never a key) */
   provider: string;
   model: string | null;
   /** mock: the cassette file name */
@@ -122,7 +124,8 @@ export function visionCassettePath(bytes: Uint8Array, env: Env = process.env): s
 /** Which reader this process uses (names only). */
 export function visionMode(env: Env = process.env): "model" | "cassette" {
   const kind = mainProviderKind(env);
-  return kind === "deepseek" || kind === "openai" || kind === "replay" ? "model" : "cassette";
+  if (kind === "hunyuan") return visionModel(env) ? "model" : "cassette";
+  return kind === "openai" || kind === "replay" ? "model" : "cassette";
 }
 
 /** Per-attempt timeout for reading one label photo. */
@@ -160,7 +163,7 @@ function readCassette(image: LabelImage, env: Env): LabelText {
 
 export interface ReadLabelDeps {
   env?: Env;
-  /** the model client (tests); default createMainLlm(env) */
+  /** the model client (tests); default createVisionLlm(env) */
   llm?: LlmClient;
 }
 
@@ -173,7 +176,7 @@ export async function readLabelText(image: LabelImage, deps: ReadLabelDeps = {})
   if (!deps.llm && visionMode(env) === "cassette") {
     out = readCassette(image, env);
   } else {
-    const llm = deps.llm ?? createMainLlm(env);
+    const llm = deps.llm ?? createVisionLlm(env);
     const images = [{ mime, base64: Buffer.from(image.bytes).toString("base64") }];
     const common = { temperature: 0, timeoutMs: visionTimeoutMs(env), purpose: "vision" as const, images };
     // the transcription and the independent field read run side by side (no extra wait)

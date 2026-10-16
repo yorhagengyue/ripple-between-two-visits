@@ -42,7 +42,7 @@ const SERVER = [...SSH_NAMES, ...DOMAIN_NAMES];
 
 /** What each step reads from the deploy file. The two open decisions are switches here too. */
 export function stages(speech: string | undefined, tts: string | undefined): Stage[] {
-  const pushEnv = [...SERVER, "SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "RIPPLE_DEEPSEEK_API_KEY", "AUTH_USERNAME_DOMAIN", ...CREATABLE];
+  const pushEnv = [...SERVER, "SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "HUNYUAN_API_KEY", "AUTH_USERNAME_DOMAIN", ...CREATABLE];
   if (speech === "whisper") pushEnv.push("WHISPER_URL", "WHISPER_TOKEN");
   if (speech === "tencent") pushEnv.push("TENCENT_SECRET_ID", "TENCENT_SECRET_KEY");
   if (tts === "trtc") pushEnv.push("TRTC_SDK_APP_ID", ...["TENCENT_SECRET_ID", "TENCENT_SECRET_KEY"].filter((n) => !pushEnv.includes(n)));

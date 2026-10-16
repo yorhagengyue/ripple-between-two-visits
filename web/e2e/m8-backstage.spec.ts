@@ -135,12 +135,12 @@ for (const width of [390, 1440]) {
     expect((await page.goto("/how"))?.status()).toBe(200);
     await expect(page.getByTestId("page-how")).toBeVisible();
     for (const id of ["phones", "app", "hosting", "main_model", "checker", "stt", "tts", "database"]) await expect(page.getByTestId(`how-box-${id}`)).toBeVisible();
-    await expect(page.getByTestId("how-box-main_model")).toContainText("DeepSeek");
-    await expect(page.getByTestId("how-box-main_model")).toContainText("deepseek-flash");
-    await expect(page.getByTestId("how-box-main_model")).toContainText("non-thinking mode");
-    await expect(page.getByTestId("how-box-checker")).toContainText("deepseek-v4-pro");
+    await expect(page.getByTestId("how-box-main_model")).toContainText("Tencent Cloud Hunyuan");
+    await expect(page.getByTestId("how-box-main_model")).toContainText("hy3");
+    await expect(page.getByTestId("how-box-main_model")).toContainText("thinking mode off");
+    await expect(page.getByTestId("how-box-checker")).toContainText("hy4-preview");
     await expect(page.getByTestId("how-box-checker")).toContainText("same vendor as the main model");
-    await expect(page.getByTestId("how-box-checker")).toContainText("0 checker calls");
+    await expect(page.getByTestId("how-box-checker")).toContainText("has not been run with these two models yet");
     await expect(page.getByTestId("how-box-stt")).toContainText("Local Whisper on the filming laptop");
     await expect(page.getByTestId("how-box-stt")).toContainText("large-v3-turbo (live captions), large-v3 (full transcript)");
     await expect(page.getByTestId("how-box-stt")).toContainText("recorded replays");

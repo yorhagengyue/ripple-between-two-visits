@@ -11,7 +11,7 @@ import { cli, compareHealth, envApply, envRestore, paths, realSys, release, roll
 
 type Health = { status: number; body: Record<string, unknown> | null } | null;
 
-const EXPECT = { store: "supabase", llm: "deepseek", checker: "deepseek", speech: "mock", deployed: true };
+const EXPECT = { store: "supabase", llm: "hunyuan", checker: "hunyuan", speech: "mock", deployed: true };
 const healthy = (build?: string): Health => ({ status: 200, body: { ok: true, ...EXPECT, ...(build ? { build } : {}) } });
 
 interface Machine {
@@ -102,7 +102,7 @@ const systemctl = (m: Machine) => m.calls.filter((c) => c.startsWith("systemctl 
 describe("comparing the running app with what was pushed", () => {
   it("lists each field that differs, by provider name", () => {
     expect(compareHealth({ ok: true, ...EXPECT }, EXPECT)).toEqual([]);
-    expect(compareHealth({ ok: true, ...EXPECT, llm: "mock", deployed: false }, EXPECT)).toEqual(["llm: pushed deepseek, running mock", "deployed: pushed true, running false"]);
+    expect(compareHealth({ ok: true, ...EXPECT, llm: "mock", deployed: false }, EXPECT)).toEqual(["llm: pushed hunyuan, running mock", "deployed: pushed true, running false"]);
     expect(compareHealth({ ok: false, ...EXPECT }, EXPECT)).toEqual(["ok is not true"]);
     expect(compareHealth({ ok: true, build: "OLD" }, null, "NEW")).toEqual(["build: the server is not running the build that was just made"]);
     expect(compareHealth(null, EXPECT)[0]).toBe("ok is not true");
@@ -113,7 +113,7 @@ describe("comparing the running app with what was pushed", () => {
     m.health = [null, null, healthy()];
     expect(await waitHealthy(m.sys, { expect: EXPECT })).toMatchObject({ ok: true, diffs: [] });
     m.health = [null, { status: 200, body: { ok: true, ...EXPECT, llm: "mock" } }, healthy()];
-    expect(await waitHealthy(m.sys, { expect: EXPECT })).toMatchObject({ ok: false, diffs: ["llm: pushed deepseek, running mock"] });
+    expect(await waitHealthy(m.sys, { expect: EXPECT })).toMatchObject({ ok: false, diffs: ["llm: pushed hunyuan, running mock"] });
     m.health = [null];
     const never = await waitHealthy(m.sys, { expect: EXPECT, timeoutMs: 60_000 });
     expect(never.ok).toBe(false);
@@ -162,7 +162,7 @@ describe("env-apply", () => {
     m.link.target = addRelease(m, "20261010T010101-aaaaaaa");
     writeFileSync(m.P.webEnv, "OLD=1\n");
     writeFileSync(m.P.webExpect, JSON.stringify(EXPECT));
-    stage(m, "NEW=1\n", { ...EXPECT, llm: "deepseek" });
+    stage(m, "NEW=1\n", { ...EXPECT, llm: "hunyuan" });
     m.health = [{ status: 200, body: { ok: true, ...EXPECT, llm: "mock" } }, healthy()];
     const res = await envApply(m.sys, m.P);
     expect(res.code).toBe(3);
@@ -171,7 +171,7 @@ describe("env-apply", () => {
     expect(existsSync(`${m.P.webEnv}.prev`)).toBe(false);
     expect(existsSync(`${m.P.webEnv}.new`)).toBe(false);
     expect(systemctl(m)).toEqual(["systemctl restart ripple-web", "systemctl restart ripple-web"]);
-    expect(text(m)).toContain("DIFFERS  llm: pushed deepseek, running mock");
+    expect(text(m)).toContain("DIFFERS  llm: pushed hunyuan, running mock");
   });
 
   it("when the app never comes up with the new file: the same way back", async () => {
@@ -195,6 +195,27 @@ describe("env-apply", () => {
     const res = await envApply(m.sys, m.P);
     expect(res).toMatchObject({ code: 4, result: { status: "failed_no_previous" } });
     expect(readFileSync(m.P.webEnv, "utf8")).toBe("NEW=1\n");
+  });
+
+  it("no-restart (10-16, the move to Hunyuan: code and environment change together): the files go in place, nothing restarts", async () => {
+    const m = machine();
+    m.link.target = addRelease(m, "20261010T010101-aaaaaaa");
+    writeFileSync(m.P.webEnv, "OLD=1\n");
+    writeFileSync(m.P.webExpect, JSON.stringify(EXPECT));
+    stage(m, "NEW=1\n", { ...EXPECT, llm: "hunyuan" });
+    const res = await envApply(m.sys, m.P, { noRestart: true });
+    expect(res).toMatchObject({ code: 0, result: { status: "staged", restarted: false, noRestart: true } });
+    expect(readFileSync(m.P.webEnv, "utf8")).toBe("NEW=1\n");
+    expect(readFileSync(`${m.P.webEnv}.prev`, "utf8")).toBe("OLD=1\n");
+    expect(JSON.parse(readFileSync(m.P.webExpect, "utf8")).llm).toBe("hunyuan");
+    expect(systemctl(m)).toEqual([]);
+    // through the command line: only no-restart is taken
+    const m2 = machine();
+    m2.link.target = addRelease(m2, "20261010T010101-aaaaaaa");
+    stage(m2);
+    expect(await cli(["env-apply", "no-restart"], m2.sys, m2.P)).toBe(0);
+    expect(systemctl(m2)).toEqual([]);
+    expect(await cli(["env-apply", "something-else"], machine().sys, machine().P)).toBe(2);
   });
 
   it("env-restore swaps the two files, so restoring twice is where it started", async () => {
@@ -445,7 +466,7 @@ describe("status", () => {
   it("reads state and never opens an environment file", async () => {
     const m = machine();
     m.link.target = addRelease(m, "20261002T000000-bbbbbbb", "BUILD-B");
-    writeFileSync(m.P.webEnv, "RIPPLE_DEEPSEEK_API_KEY=sk-on-the-server-zz\n");
+    writeFileSync(m.P.webEnv, "HUNYUAN_API_KEY=sk-on-the-server-zz\n");
     writeFileSync(m.P.edgeEnv, "EDGE_SECRET=the-lock-on-the-server-zz\n");
     writeFileSync(m.P.backupEnv, "BACKUP_COS_SECRET_KEY=cos-key-on-the-server-zz\n");
     writeFileSync(m.P.webExpect, JSON.stringify(EXPECT));
@@ -457,7 +478,7 @@ describe("status", () => {
     const said = text(m);
     expect(said).not.toMatch(/on-the-server-zz/);
     expect(said).toContain("version: 20261002T000000-bbbbbbb (build BUILD-B)");
-    expect(said).toContain("DIFFERS  llm: pushed deepseek, running mock");
+    expect(said).toContain("DIFFERS  llm: pushed hunyuan, running mock");
     expect(said).toMatch(/file web\.env: mode \d{4}, written 20/);
     expect(said).toContain("file web.env.prev: not there");
     expect(said).toContain("last backup: not_configured | 2026-10-16T19:00:00.000Z | missing: BACKUP_COS_BUCKET");

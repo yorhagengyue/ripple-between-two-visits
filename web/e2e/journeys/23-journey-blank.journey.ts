@@ -61,7 +61,7 @@
  *   SPEECH_PROVIDER=whisper WHISPER_URL=http://127.0.0.1:7966 WHISPER_TOKEN=<any 43 characters or more> \
  *     node scripts/record/serve.mjs --port <port> --no-offline
  * with web/.env pointing at the TEST project (STORE=supabase, AUTH_PROVIDER=supabase and their keys; migrations
- * 0001-0017 applied; file storage as .env has it: the recording is really uploaded) and LLM_PROVIDER=deepseek with its key. The three
+ * 0001-0017 applied; file storage as .env has it: the recording is really uploaded) and LLM_PROVIDER=hunyuan with its key pair. The three
  * speech variables are given in the environment of that command so that they override .env. RIPPLE_DEPLOYED unset,
  * JOBS unset (the journey ticks the jobs itself), RIPPLE_DEV_TOOLS=1 (serve.mjs sets it). Then
  *   JOURNEY_MODEL=real node scripts/record/run.mjs 23 --base-url http://localhost:<port>

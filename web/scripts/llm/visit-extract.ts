@@ -15,7 +15,7 @@
  * For every R line: found or not, and the time point of the sentence it was found on against the script's
  * (expected within 3 s). Labels the checks dropped are listed with the reason.
  *
- *   LLM_PROVIDER=deepseek [LLM_RECORD=1] node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/visit-extract.ts [--out <file>]
+ *   LLM_PROVIDER=hunyuan [LLM_RECORD=1] node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/visit-extract.ts [--out <file>]
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";

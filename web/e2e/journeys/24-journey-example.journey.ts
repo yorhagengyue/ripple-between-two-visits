@@ -51,7 +51,7 @@
  * Against the real test database and the real model (the integrator):
  *   node scripts/record/serve.mjs --port <port> --no-offline
  * with web/.env pointing at the TEST project (STORE=supabase, AUTH_PROVIDER=supabase and their keys; migrations
- * 0001-0017 applied) and LLM_PROVIDER=deepseek with its key; TTS_PROVIDER as it is; RIPPLE_DEPLOYED unset; JOBS unset
+ * 0001-0017 applied) and LLM_PROVIDER=hunyuan with its key pair; TTS_PROVIDER as it is; RIPPLE_DEPLOYED unset; JOBS unset
  * (the journey ticks the medicine job itself); RIPPLE_DEV_TOOLS=1 (serve.mjs sets it). Then
  *   JOURNEY_MODEL=real node scripts/record/run.mjs 24 --base-url http://localhost:<port>
  * JOURNEY_MODEL=real (see _g/mode.ts) keeps every assertion the design requires with any model and drops only the

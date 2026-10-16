@@ -6,9 +6,11 @@
  *
  * so the server never keeps a copy that could fall behind the checkout. Operations:
  *
- *   env-apply                  put the staged /etc/ripple/web.env.new in place (the old one becomes web.env.prev),
+ *   env-apply [no-restart]     put the staged /etc/ripple/web.env.new in place (the old one becomes web.env.prev),
  *                              restart the app, compare /api/health with the staged expectation; on a difference put
- *                              the previous file back and restart again
+ *                              the previous file back and restart again. With no-restart (a change of the code and the
+ *                              environment together: the running version could not report the new expectation) the
+ *                              files are put in place and nothing is restarted: the next release restarts and compares
  *   env-restore                swap web.env with web.env.prev, restart, compare
  *   secrets-apply <parts>      parts: edge, backup. Put the staged edge.env / backup.env / backup.age.pub in place
  *                              (each old one becomes .prev); for edge restart Caddy and check it is running
@@ -233,6 +235,10 @@ export async function envApply(sys, P, opts = {}) {
   // null: no expectation came with this file; true / false: whether there was one before it
   const hadExpect = sys.exists(`${P.webExpect}.new`) ? promote(sys, P.webExpect) : null;
   sys.say(`web.env: in place${hadPrev ? " (the one before is web.env.prev)" : " (first one; nothing before it)"}`);
+  if (opts.noRestart) {
+    sys.say("not restarted (no-restart): the running app keeps the environment it started with; the next release restarts with this file and compares; push-env --restore-prev puts the one before back");
+    return { code: 0, result: { op: "env-apply", status: "staged", restarted: false, noRestart: true } };
+  }
   if (!sys.linkTarget(P.current)) {
     sys.say("no release is installed yet: the app was not restarted and nothing could be compared; the first release checks this file");
     return { code: 0, result: { op: "env-apply", status: "staged", restarted: false } };
@@ -538,7 +544,9 @@ export async function cli(argv, sys = realSys(), P = paths(process.env.RIPPLE_SA
   let outcome;
   try {
     if (!run) throw new Refused(`unknown operation; one of: ${Object.keys(OPERATIONS).join(", ")}`);
-    outcome = op === "env-apply" || op === "env-restore" || op === "status" ? await run(sys, P) : await run(sys, P, args);
+    if (op === "env-apply" && args.some((a) => a !== "no-restart")) throw new Refused("env-apply takes only no-restart");
+    outcome =
+      op === "env-apply" ? await run(sys, P, { noRestart: args.includes("no-restart") }) : op === "env-restore" || op === "status" ? await run(sys, P) : await run(sys, P, args);
   } catch (err) {
     if (!(err instanceof Refused)) {
       sys.say(`FAILED: ${err instanceof Error ? err.message : "unexpected error"}`);

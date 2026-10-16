@@ -7,7 +7,7 @@
  * real stack the compose call of the drill's ask ended at the answer's deadline and the judges' page read "the drill did
  * not run". The pipeline now adds the sentence itself after the answer is composed (AskDeps.plant), so these tests run
  * the drill with the offline mock AND with stand-ins for the live model (tests/unit/safety/live-stand-in.ts: a real
- * recorded deepseek-flash reply, a reply in another shape, a call stopped at the deadline, a model that is down) and
+ * real model's recorded reply (10-09), a reply in another shape, a call stopped at the deadline, a model that is down) and
  * expect the same stop from all of them.
  */
 import { randomUUID } from "node:crypto";
@@ -70,14 +70,14 @@ describe("the checks stop the planted sentence, every time, whoever composed the
   /** The providers the drill must work with: the mock, and stand-ins for the live model in each state it can be in. */
   const PROVIDERS: [string, (locale: "zh-Hans" | "en") => LlmClient, { deadlineMs?: number }?][] = [
     ["the offline mock", () => createMockLlm()],
-    ["deepseek-flash, its recorded reply to this question", () => liveStandIn({ compose: recorded("compose", DRILL_QUESTION.en) })],
+    ["a real model's recorded reply to this question", () => liveStandIn({ compose: recorded("compose", DRILL_QUESTION.en) })],
     ["a live model that picks the leaflet line and R3", () => liveStandIn({ compose: (_o, p) => composeReply(p as unknown as ComposePayload, [PURPOSE, "visit:v2:R3"]) })],
     ["a live model that answers a bare array", () => liveStandIn({ compose: (_o, p) => JSON.stringify((JSON.parse(composeReply(p as unknown as ComposePayload, [PURPOSE])) as { sentences: unknown[] }).sentences) })],
     ["a live model that picks nothing", () => liveStandIn({ compose: '{"sentences": []}' })],
     ["a compose call stopped at the deadline (the real run)", () => liveStandIn({ compose: deadline() })],
     ["a model that never answers", () => liveStandIn({ compose: "hang", crisis: "hang" }), { deadlineMs: 600 }],
     ["a reply that is not JSON", () => liveStandIn({ compose: "Sure! Amlodipine lowers blood pressure." })],
-    ["a model that is down (replay, nothing recorded)", () => createReplayClient({ provider: "deepseek", model: "deepseek-flash", dir: emptyCassettes() })],
+    ["a model that is down (replay, nothing recorded)", () => createReplayClient({ provider: "hunyuan", model: "hy3", dir: emptyCassettes() })],
   ];
 
   for (const [name, make, opts] of PROVIDERS) {
@@ -201,7 +201,7 @@ describe("POST /api/ask?drill=1", () => {
 
   it("the server's main model is not the mock and every call to it fails (replay, nothing recorded): the drill still stops its sentence", async () => {
     process.env.LLM_PROVIDER = "replay";
-    process.env.REPLAY_PROVIDER = "deepseek";
+    process.env.REPLAY_PROVIDER = "hunyuan";
     process.env.CASSETTE_DIR = emptyCassettes();
     delete process.env.CHECKER_PROVIDER;
     for (const locale of ["zh-Hans", "en"] as const) {
@@ -209,7 +209,7 @@ describe("POST /api/ask?drill=1", () => {
       const res = await askPost(post(`/api/ask?session=${s.id}&drill=1`, { text: DRILL_QUESTION[locale], locale }));
       expect(res.status, locale).toBe(200);
       const body = (await res.json()) as AskResult;
-      expect(body.llm.provider, locale).toBe("replay:deepseek");
+      expect(body.llm.provider, locale).toBe("replay:hunyuan");
       expect(body.drill, locale).toEqual({ planted: true });
       expect(body.blocked.map((b) => [b.layer, b.sentence.en]), locale).toEqual([[1, DRILL_SENTENCE]]);
       expect(drillLeaked(body.sentences), locale).toBe(false);

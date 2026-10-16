@@ -1,7 +1,7 @@
 /**
  * Spend ledger and budget for paid model calls (the US$ cost guard). Server-only (node:fs).
  *
- * Every call a live client (lib/llm/openai.ts: OpenAI, DeepSeek, any compatible vendor) makes is priced and
+ * Every call a live client (lib/llm/openai.ts: Hunyuan, OpenAI, any compatible vendor) makes is priced and
  * appended as one JSON line to the ledger file; before each call the client reserves the call's worst-case cost
  * and the call is refused (LlmError "budget", 402) when the spend in the window plus everything in flight would
  * pass the cap. Mock and replay clients never touch it.
@@ -40,7 +40,7 @@
  *
  * Pricing is deliberately an upper bound: every prompt token is charged at the cache-miss price (cache hits are
  * recorded but not discounted), at the vendor's peak rates; an attempt that timed out is charged at its estimate,
- * because the vendor may still have run it.
+ * because the vendor may still have run it. Hunyuan's rates are the international TokenHub page's (HUNYUAN_PRICE_PAGE).
  *
  * Fail closed (10-09 wave B; round-3 safety check problem 4): the cap is only as good as the ledger, so a paid call
  * is refused with LlmError "ledger_unavailable" (HTTP 507, not a "provider down" status, so there is no failover)
@@ -70,21 +70,31 @@ export interface ModelPrice {
   source: string;
 }
 
-const DEEPSEEK_SOURCE = "api-docs.deepseek.com/quick_start/pricing, peak, input cache miss (read 2026-10-09)";
+/**
+ * Tencent Cloud's international TokenHub price page, Model pricing (https://www.tencentcloud.com/document/product/1300/78937,
+ * last updated 2026-10-03, read 2026-10-16; the owner's account is on the international site), US$ per million tokens,
+ * input / output: Hy3 `hy3` 0.132 / 0.528 (cached input 0.033, not discounted here), Hy4 preview `hy4-preview` 0.834 / 2.501
+ * (cached 0.042); no tiers. `hy3-preview`, the name of the China site's May migration notice, is not on the page (and the
+ * account answers 400004 for it): charged at Hy4 preview's rates, an upper bound. The call's own usage is what is charged;
+ * only the rate is a table.
+ */
+export const HUNYUAN_PRICE_PAGE = "tencentcloud.com/document/product/1300/78937 (updated 2026-10-03, read 2026-10-16)";
 
-/** Known prices. DeepSeek's legacy names are served and billed as deepseek-flash. */
+/** Known prices (US$ per million tokens). */
 export const PRICES: Record<string, ModelPrice> = {
-  "deepseek-flash": { inputPerM: 0.3, outputPerM: 1.2, source: DEEPSEEK_SOURCE },
-  "deepseek-v4-flash": { inputPerM: 0.3, outputPerM: 1.2, source: DEEPSEEK_SOURCE },
-  "deepseek-v4-flash-vision-exp": { inputPerM: 0.3, outputPerM: 1.2, source: DEEPSEEK_SOURCE },
-  "deepseek-v4-pro": { inputPerM: 1.32, outputPerM: 3.96, source: DEEPSEEK_SOURCE },
+  hy3: { inputPerM: 0.132, outputPerM: 0.528, source: HUNYUAN_PRICE_PAGE },
+  "hy4-preview": { inputPerM: 0.834, outputPerM: 2.501, source: HUNYUAN_PRICE_PAGE },
+  "hy3-preview": { inputPerM: 0.834, outputPerM: 2.501, source: `${HUNYUAN_PRICE_PAGE} (not listed on the page: charged at Hy4 preview's rates, an upper bound)` },
 };
 
 /** A model without a price row is charged at this conservative rate, so the cap still bounds the spend. */
 export const UNKNOWN_MODEL_PRICE: ModelPrice = { inputPerM: 5, outputPerM: 20, source: "conservative default (no price row for this model)" };
 
-/** Tokens an image costs at most (DeepSeek: images are resized to at most 1024 tokens each). */
-export const IMAGE_TOKENS = 1100;
+/**
+ * Tokens one image is reserved at before a call (an upper bound for the reservation only: the vendor's own count comes back
+ * in Usage and is what is charged; Hunyuan's pages do not say how many tokens an image costs).
+ */
+export const IMAGE_TOKENS = 2048;
 
 export function priceFor(model: string, env: Env = process.env): ModelPrice {
   const raw = env.LLM_PRICES_JSON;
@@ -158,8 +168,9 @@ export function countedUsd(raw: unknown): number {
 /**
  * Fix round 3: what a ledger line that was cut off counts for (a process killed while appending, a disk that filled up):
  * the last line before its newline arrives, or a line that starts like a ledger line ({"at":") but is not whole JSON.
- * Its real US$ is unknown, so it counts as more than any one call this app makes (the costliest, deepseek-v4-pro with an
- * image and its full max_tokens, is about US$0.03): the spend is never under-counted. Any other line that is not a ledger
+ * Its real US$ is unknown, so it counts as more than any one call this app makes (the costliest, a long visit transcript
+ * at the checker's rates with its full max_tokens, is well under US$0.05):
+ * the spend is never under-counted. Any other line that is not a ledger
  * line is still damage (corrupt_line: every paid call refused).
  */
 export const TRUNCATED_LINE_USD = 0.25;

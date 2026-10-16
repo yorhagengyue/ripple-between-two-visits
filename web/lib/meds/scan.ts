@@ -190,7 +190,7 @@ export interface ScanView {
   doctor: ScanDoctorLine[];
   /** the question for the pharmacist he may put on his list (not_his, unknown): his words in a fixed frame */
   question: string | null;
-  /** which reader read the photo ("deepseek", "mock:vision-cassette"; never a key) */
+  /** which reader read the photo ("hunyuan", "mock:vision-cassette"; never a key) */
   provider: string;
 }
 

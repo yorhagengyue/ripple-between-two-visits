@@ -2,8 +2,8 @@
  * POST /api/labels/read — label photo -> fields (spec section 2; web-app.md section 8).
  *
  * The browser first uploads the photo through POST /api/upload-url ({ kind: "label" }) and sends the returned
- * path here. Body: { path }. The photo is read from the labels bucket, transcribed (lib/vision: the main model's
- * image input, deepseek-flash with LLM_PROVIDER=deepseek or OpenAI as the optional provider with LLM_PROVIDER=openai;
+ * path here. Body: { path }. The photo is read from the labels bucket, transcribed (lib/vision: Hunyuan's
+ * image-to-text model with LLM_PROVIDER=hunyuan, or OpenAI as the optional provider with LLM_PROVIDER=openai;
  * the recorded cassettes with LLM_PROVIDER=replay; the vision cassettes in mock mode) and parsed into fields
  * (lib/meds/parse-label). The raw transcription never leaves the server.
  *

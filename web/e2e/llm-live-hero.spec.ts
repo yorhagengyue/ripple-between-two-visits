@@ -5,16 +5,16 @@
  * Skipped unless LLM_LIVE=1, so the full e2e suite stays offline and free. Run it with the real provider in the
  * shell (the dev server Playwright starts inherits it; web/.env keeps LLM_PROVIDER=mock):
  *
- *   LLM_LIVE=1 LLM_PROVIDER=deepseek CHECKER_PROVIDER=deepseek CHECKER_MODEL=deepseek-v4-pro \
+ *   LLM_LIVE=1 LLM_PROVIDER=hunyuan CHECKER_PROVIDER=hunyuan \
  *   [LLM_RECORD=1] [LLM_LIVE_RUNS=10] [LLM_LIVE_OUT=<file.json>] PW_PORT=3211 \
  *     npx playwright test e2e/llm-live-hero.spec.ts --output <dir>
  *
  * Offline, from the cassettes that run recorded (no key, no spend):
  *
- *   LLM_LIVE=1 LLM_PROVIDER=replay REPLAY_PROVIDER=deepseek CHECKER_PROVIDER=replay PW_PORT=3211 \
+ *   LLM_LIVE=1 LLM_PROVIDER=replay REPLAY_PROVIDER=hunyuan CHECKER_PROVIDER=replay PW_PORT=3211 \
  *     npx playwright test e2e/llm-live-hero.spec.ts --output <dir>
  *
- * The key comes from web/.env through Next. Every answer must carry R4 word for word, the label's own words,
+ * The key pair comes from web/.env through Next. Every answer must carry R4 word for word, the label's own words,
  * "already on the question list" (the seeded q-extra-tablet, reused) and no dose; the latencies (client side,
  * HTTP round trip) are written to LLM_LIVE_OUT with p50 and p90, and p90 must be within LLM_LIVE_P90_MS (default
  * 4000, the plan's target): a slow model fails the run. A second test asks once through the phone page (/p/today)

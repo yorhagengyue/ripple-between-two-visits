@@ -37,15 +37,15 @@ afterEach(() => {
 const CAP = { capUsd: 5, windowMs: 86_400_000 };
 
 function cfg(ledger: SpendLedger, over: Partial<CompatConfig> = {}): CompatConfig {
-  return { name: "deepseek", vendor: "deepseek", baseUrl: "https://api.deepseek.com", apiKey: "sk-test", model: "deepseek-flash", maxTokensField: "max_tokens", jsonMode: true, timeoutMs: 1000, maxAttempts: 1, ledger, ...over };
+  return { name: "hunyuan", vendor: "tencent", baseUrl: "https://tokenhub-intl.tencentcloudmaas.com/v1", apiKey: "sk-test", model: "hy3", maxTokensField: "max_tokens", jsonMode: true, timeoutMs: 1000, maxAttempts: 1, ledger, ...over };
 }
 
 const ok = () => new Response(JSON.stringify({ choices: [{ message: { content: '{"ok":true}' }, finish_reason: "stop" }], usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 } }), { status: 200 });
 
 const entry = (usd: number): SpendEntry => ({
   at: new Date().toISOString(),
-  provider: "deepseek",
-  model: "deepseek-flash",
+  provider: "hunyuan",
+  model: "hy3",
   purpose: "classify",
   ok: true,
   error: null,

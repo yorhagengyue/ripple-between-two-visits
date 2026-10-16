@@ -2,7 +2,7 @@
  * One tiny live call to the main model and to the checker: confirms the key, the model names, non-thinking mode
  * (reasoning tokens 0) and the usage fields the spend ledger prices. Prints names, token counts and US$ only.
  *
- *   LLM_PROVIDER=deepseek CHECKER_PROVIDER=deepseek CHECKER_MODEL=deepseek-v4-pro \
+ *   LLM_PROVIDER=hunyuan CHECKER_PROVIDER=hunyuan \
  *     node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/ping.ts
  *
  * It first says where each key comes from (scripts/llm/env-check.ts): web/.env, or a shell / user-environment value

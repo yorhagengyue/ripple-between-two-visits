@@ -10,7 +10,7 @@
  *     (the first three also go to the server's web.env; the connection string goes to backup.env and nowhere else);
  *   - backup: BACKUP_*;
  *   - app settings: every name in web/.env.example, unless its line there is marked [not deployed].
- * Anything else in the file is a mistake (a typing error, a retired name such as DEEPSEEK_API_KEY, a test-only switch
+ * Anything else in the file is a mistake (a typing error, a retired name such as RIPPLE_DEEPSEEK_API_KEY, a test-only switch
  * such as RIPPLE_TEST_CLOCK) and stops every script.
  */
 import { createHash, randomBytes } from "node:crypto";
@@ -18,6 +18,7 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { parseEnv } from "node:util";
+import { tokenhubBaseUrl } from "@/lib/llm/hunyuan";
 import { generateVapidKeys, vapidPairMatches } from "@/lib/push/crypto";
 import { type Args, DeployError, type Output } from "./cli";
 
@@ -83,7 +84,7 @@ export const CREATABLE = [...RANDOM_SECRETS, ...VAPID_PAIR] as const;
 
 /** Only the owner has these (an account somewhere else, or a decision). */
 export const OWNER_ONLY: Record<string, string> = {
-  RIPPLE_DEEPSEEK_API_KEY: "the DeepSeek API key (platform.deepseek.com)",
+  HUNYUAN_API_KEY: "the TokenHub API key for Tencent Cloud Hunyuan (TokenHub console, API Key page; made on the site HUNYUAN_BASE_URL names, the international Singapore site by default)",
   AUTH_USERNAME_DOMAIN: "the internal mail domain a username maps to; it cannot change after the first account exists",
   BACKUP_COS_BUCKET: "the private COS bucket for backups, versioning on",
   BACKUP_COS_REGION: "that bucket's region, e.g. ap-singapore",
@@ -281,8 +282,10 @@ export function shapeProblem(name: string, v: string, all: Values): string | nul
       return /^[a-z]{2}-[a-z]+(-\d+)?$/.test(v) ? null : "is not a region name like ap-singapore";
     case "BACKUP_COS_SECRET_ID":
     case "BACKUP_COS_SECRET_KEY":
-    case "RIPPLE_DEEPSEEK_API_KEY":
+    case "HUNYUAN_API_KEY":
       return /\s/.test(v) ? "has white space in it" : null;
+    case "HUNYUAN_BASE_URL":
+      return tokenhubBaseUrl(v) ? null : "is not a TokenHub address (e.g. https://tokenhub-intl.tencentcloudmaas.com/v1)";
     default:
       return null;
   }

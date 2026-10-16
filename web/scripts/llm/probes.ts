@@ -14,7 +14,7 @@
  *              branch itself, so the hero runs measure latency and that the model adds nothing harmful; this pass
  *              measures whether the model, on its own, picks R4 and the label (a number for the report, not a gate).
  *
- *   LLM_PROVIDER=deepseek CHECKER_PROVIDER=deepseek CHECKER_MODEL=deepseek-v4-pro [LLM_RECORD=1] \
+ *   LLM_PROVIDER=hunyuan CHECKER_PROVIDER=hunyuan [LLM_RECORD=1] \
  *     node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/probes.ts [--out <file>]
  */
 import { writeFileSync } from "node:fs";

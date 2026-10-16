@@ -23,10 +23,10 @@ async function account(signup?: "granted" | "declined") {
 describe("setAiConsent", () => {
   it("off after a yes is a withdrawal with the text's version and hash; aiConsent follows it; on again is granted", async () => {
     const a = await account("granted");
-    // his yes to the 2026-10-10 text still counts under the 2026-10-15 one (nothing asks him again)
+    // his yes to the 2026-10-10 text still counts under the 2026-10-16 one (nothing asks him again)
     expect(await aiConsent(a.own, a.scope)).toBe(true);
     const off = await setAiConsent({ store: a.own, texts: a.store }, { userId: a.uid, scopeId: a.scope.id, on: false, locale: "zh-Hans" });
-    expect(off).toMatchObject({ changed: true, state: { on: false, decision: "withdrawn", version: "2026-10-15" } });
+    expect(off).toMatchObject({ changed: true, state: { on: false, decision: "withdrawn", version: "2026-10-16" } });
     expect(await aiConsent(a.own, a.scope)).toBe(false);
     const text = currentConsentText("ai_processing", "zh-Hans");
     const last = (await a.store.listConsentRecords(a.uid, { kind: "ai_processing" })).at(-1)!;

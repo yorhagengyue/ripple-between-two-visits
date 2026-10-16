@@ -8,9 +8,9 @@
  * - TODO means the keys are there but the adapter that would use them is not built yet.
  * - Exit code 1 only when a check FAILs.
  *
- * Network: with no keys and no --url it makes no network calls at all. With LLM_PROVIDER=deepseek (or
- * openai) and its key, and with CHECKER_PROVIDER=deepseek, one GET /models at that provider per key (free:
- * no tokens; the key is never printed, see checkModels); with Supabase keys one REST call; with --url
+ * Network: with no keys and no --url it makes no network calls at all. With LLM_PROVIDER=hunyuan (or openai) and
+ * its key, and with CHECKER_PROVIDER=hunyuan, one GET /models at that provider per key (free: no tokens; TokenHub
+ * answers it as OpenAI does; the key is never printed, see checkModels); with Supabase keys one REST call; with --url
  * (or PREVIEW_URL) it calls the deployed app: GET /, GET /api/health, a 30-second wait, one throwaway
  * sandbox session read back five times, one event over /api/events, a 4 MB upload. The session calls
  * carry the sandbox's own device cookies, as a phone's browser does (see checkSharedState).
@@ -19,7 +19,7 @@ import { spawnSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { checkerConfig, DEEPSEEK_KEY_ENV, DEEPSEEK_LEGACY_KEY_ENV, mainModel, mainProviderKind, VENDORS, vendorKey } from "@/lib/llm";
+import { checkerConfig, hunyuanSettings, mainModel, mainProviderKind, VENDORS, vendorKey } from "@/lib/llm";
 import { MemoryStore } from "@/lib/store/memory";
 import { buildSeedTables, loadTemplate } from "@/lib/story/seed";
 import { TtsError } from "@/lib/tts";
@@ -178,7 +178,7 @@ interface ModelList {
 const modelLists = new Map<string, Promise<ModelList>>();
 
 /**
- * GET <base>/models with the key as a Bearer token (OpenAI-compatible; DeepSeek and OpenAI both answer it). Free: no
+ * GET <base>/models with the key as a Bearer token (OpenAI-compatible; TokenHub and OpenAI both answer it). Free: no
  * tokens, nothing spent, so it bypasses the spend ledger. Only the status and the ids are read: an error answer's
  * body is never read or printed (it can echo part of the key), and the key never appears in what is returned.
  */
@@ -230,14 +230,13 @@ async function checkListed(name: string, baseUrl: string, apiKey: string, model:
  */
 function keyNote(name: string, fileValues: Record<string, string>): { text: string; differs: boolean } {
   const source = keySource(name, process.env, fileValues);
-  const legacy = name === DEEPSEEK_LEGACY_KEY_ENV ? `; the project's own name is ${DEEPSEEK_KEY_ENV}, read first` : "";
-  return { text: `key ${name} (${source}${legacy})`, differs: source === "environment, DIFFERS from web/.env" };
+  return { text: `key ${name} (${source})`, differs: source === "environment, DIFFERS from web/.env" };
 }
 
 /**
  * Items 12-13: the model and the checker this machine's configuration uses, read the way the app reads it (lib/llm
- * mainProviderKind, mainModel, checkerConfig and its key order: RIPPLE_DEEPSEEK_API_KEY, then DEEPSEEK_API_KEY; the
- * checker's CHECKER_API_KEY, else the DeepSeek key), each checked with one free GET /models at its provider: PASS when
+ * mainProviderKind, mainModel, checkerConfig and its key order: HUNYUAN_API_KEY at HUNYUAN_BASE_URL (TokenHub); the
+ * checker's CHECKER_API_KEY, else the Hunyuan key), each checked with one free GET /models at its provider: PASS when
  * the key is accepted and the configured model is listed. SKIP: the offline mock, the cassette replay, or a key that is
  * not set (the app then runs without that model). FAIL: a refused key, a model the key cannot use, no answer, a key
  * whose environment value differs from web/.env's (not called), or a checker the app would refuse to use.
@@ -251,17 +250,18 @@ async function checkModels(): Promise<void> {
   const kind = mainProviderKind(process.env);
   const model = mainModel(process.env);
   const mainName = `main model (${kind})`;
+  const hunyuan = hunyuanSettings(process.env);
   if (kind === "mock") {
-    const missingKey = raw === "deepseek" ? DEEPSEEK_KEY_ENV : raw === "openai" ? "OPENAI_API_KEY" : null;
+    const missingKey = raw === "hunyuan" ? (hunyuan.problem === "bad_base_url" ? "a TokenHub HUNYUAN_BASE_URL" : "HUNYUAN_API_KEY") : raw === "openai" ? "OPENAI_API_KEY" : null;
     record("SKIP", mainName, missingKey ? `LLM_PROVIDER=${raw} but ${missingKey} is not set: the app falls back to the offline mock` : `LLM_PROVIDER=${raw}: the offline mock, no model call`);
   } else if (kind === "replay") {
     record("SKIP", mainName, `LLM_PROVIDER=replay: answers from cassettes recorded with ${env("REPLAY_PROVIDER") || "openai"} (${model}), no model call`);
-  } else if (kind === "deepseek") {
-    const key = vendorKey(VENDORS.deepseek, process.env);
+  } else if (kind === "hunyuan") {
+    const key = vendorKey(VENDORS.hunyuan, process.env);
     const note = key ? keyNote(key.name, fileValues) : null;
-    if (!key || !note) record("SKIP", mainName, `${DEEPSEEK_KEY_ENV} not set`);
+    if (!key || !note) record("SKIP", mainName, "HUNYUAN_API_KEY not set");
     else if (note.differs) record("FAIL", mainName, `${note.text}: the environment's value is used instead of web/.env's; unset it in this shell or the Windows user environment (not called)`);
-    else await checkListed(mainName, env("DEEPSEEK_BASE_URL") || VENDORS.deepseek.baseUrl, key.value, model, note.text);
+    else await checkListed(mainName, hunyuan.baseUrl, key.value, model, `${note.text}; TokenHub's ${hunyuan.site} site`);
   } else {
     const note = keyNote("OPENAI_API_KEY", fileValues);
     if (note.differs) record("FAIL", mainName, `${note.text}: the environment's value is used instead of web/.env's (not called)`);
@@ -278,13 +278,13 @@ async function checkModels(): Promise<void> {
     // a variable that is not set: SKIP, as everywhere here; a checker the app refuses (the main model itself, a vendor
     // that may not check its own model, an unknown name) leaves it without one although one was asked for: FAIL
     record(/not set$/.test(reason) ? "SKIP" : "FAIL", checkerName, `${reason}; without a checker the app blocks every borderline sentence (fail closed)`);
-  } else if (checker.config.vendor !== "deepseek" && checker.config.vendor !== "openai") {
-    record("TODO", checkerName, `${checker.config.model} at ${checker.config.vendor}: preflight lists models for DeepSeek and OpenAI keys only`);
+  } else if (checker.config.vendor !== "tencent" && checker.config.vendor !== "openai") {
+    record("TODO", checkerName, `${checker.config.model} at ${checker.config.vendor}: preflight lists models for Hunyuan (TokenHub) and OpenAI keys only`);
   } else {
     const keyName = env("CHECKER_API_KEY") ? "CHECKER_API_KEY" : (vendorKey(VENDORS[checker.config.vendor], process.env)?.name ?? "CHECKER_API_KEY");
     const note = keyNote(keyName, fileValues);
-    // next to a live main model: the same vendor (deepseek-v4-pro next to deepseek-flash, 10-09) or another one
-    const live = kind === "deepseek" || kind === "openai";
+    // next to a live main model: the same vendor or another one
+    const live = kind === "hunyuan" || kind === "openai";
     const independence = !live ? "" : checker.independence === "same_vendor" ? "; same vendor as the main model, a different model" : "; another vendor than the main model";
     if (note.differs) record("FAIL", checkerName, `${note.text}: the environment's value is used instead of web/.env's (not called)`);
     else await checkListed(checkerName, checker.config.baseUrl, checker.config.apiKey, checker.config.model, `${note.text}${independence}`);
@@ -629,8 +629,9 @@ async function checkSharedState(root: string): Promise<void> {
 
 const ENV_NAMES = [
   "LLM_PROVIDER",
-  "RIPPLE_DEEPSEEK_API_KEY",
-  "DEEPSEEK_API_KEY",
+  "HUNYUAN_API_KEY",
+  "HUNYUAN_BASE_URL",
+  "HUNYUAN_MODEL",
   "OPENAI_API_KEY",
   "LLM_MODEL",
   "CHECKER_PROVIDER",

@@ -6,7 +6,7 @@
  *   JOURNEY_MODEL   stub (default)   the server answers with the stub model (LLM_PROVIDER=mock): every assertion is on
  *                                    the stub's exact output (which lines of a visit become items, the label's fields
  *                                    as read, the sentences of an answer)
- *                   real             the server answers with a real model (LLM_PROVIDER=deepseek or openai, its key in
+ *                   real             the server answers with a real model (LLM_PROVIDER=hunyuan or openai, its key in
  *                                    web/.env). What a model may do differently is no longer asserted word for word:
  *                                    it may find more items in a visit than the rules do, read a label's fields in
  *                                    its own spelling, pick other candidate sentences for an answer. What the design

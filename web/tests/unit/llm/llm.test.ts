@@ -58,7 +58,8 @@ describe("provider selection", () => {
   it("has no checker unless a different vendor is fully configured (fail closed)", () => {
     expect(checkerConfig({}).config).toBeNull();
     expect(checkerConfig({ CHECKER_PROVIDER: "anthropic", CHECKER_API_KEY: KEY }).reason).toBe("CHECKER_MODEL not set");
-    expect(checkerConfig({ CHECKER_PROVIDER: "openai", CHECKER_API_KEY: KEY, CHECKER_MODEL: "x" }).reason).toMatch(/different vendor/);
+    // OpenAI as the main model cannot be its own checker (the offline mock stands in for Hunyuan since 10-16)
+    expect(checkerConfig({ OPENAI_API_KEY: KEY, CHECKER_PROVIDER: "openai", CHECKER_API_KEY: KEY, CHECKER_MODEL: "x" }).reason).toMatch(/different vendor/);
     expect(checkerConfig({ CHECKER_PROVIDER: "compatible", CHECKER_API_KEY: KEY, CHECKER_MODEL: "x" }).reason).toBe("CHECKER_BASE_URL not set");
     expect(checkerConfig({ CHECKER_PROVIDER: "nope", CHECKER_API_KEY: KEY, CHECKER_MODEL: "x" }).config).toBeNull();
     const ok = checkerConfig({ CHECKER_PROVIDER: "gemini", CHECKER_API_KEY: KEY, CHECKER_MODEL: "some-model" });

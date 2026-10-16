@@ -76,7 +76,7 @@ describe("what is read: the screen's own sentences", () => {
         expect(spoken).toBe([t.title, ...t.paragraphs].map((p) => p.replace(/^·\s*/, "")).join("\n"));
       }
     }
-    expect(readAloudLines("ai_processing", "zh-Hans").join("")).toContain("DeepSeek");
+    expect(readAloudLines("ai_processing", "zh-Hans").join("")).toContain("腾讯云的混元模型");
   });
 
   it("a recovery-code screen reads the fixed sentences it shows, and never a code", () => {

@@ -9,7 +9,7 @@
  * named aml_* / ibu_* / rel_* / anything else) and reports, per photo, whether it was refused as unreadable and
  * whether any field offered for confirmation is WRONG (a field left empty is fine; a wrong one is the failure).
  *
- *   LLM_PROVIDER=deepseek [LLM_RECORD=1] node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/labels.ts \
+ *   LLM_PROVIDER=hunyuan [LLM_RECORD=1] node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/llm/labels.ts \
  *     [--out <file>] [--degraded <dir>]
  *
  * Prints field names, pass / fail and token counts; the raw label text stays inside the run (it is fictional demo

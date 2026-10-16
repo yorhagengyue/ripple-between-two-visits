@@ -211,12 +211,13 @@ journey("22 评委入口：/demo 分屏和拍摄组的门", async ({ kit, reques
   expect((await laptop.context.cookies()).find((c) => c.name === "rp_view")).toBeUndefined();
   await kit.show(page.locator('[data-rp="example-line"]'));
 
-  await kit.step(page, "Evaluation：最近一次真模型的评测，51 题全过，写明模型和新加坡时间");
+  await kit.step(page, "Evaluation：离线评测 51 题全过；混元的真模型评测还没跑");
   expect((await page.goto("/eval"))?.status()).toBe(200);
-  await expect(page.getByTestId("eval-live-score")).toHaveText("51 of 51 passed");
-  await expect(page.getByTestId("eval-live-meta")).toContainText("DeepSeek deepseek-flash");
-  await expect(page.getByTestId("eval-live-meta")).toContainText("(Singapore time)");
-  await kit.show(page.getByTestId("eval-live-safety"));
+  // no run of the 51 questions with the live model since Hunyuan replaced DeepSeek (10-16): the page shows the offline run
+  // only until a Hunyuan run is written to eval/results (then check its score and "Tencent Cloud Hunyuan" here)
+  await expect(page.getByTestId("eval-live")).toHaveCount(0);
+  await expect(page.getByTestId("eval-offline-score")).toHaveText("51 of 51 passed");
+  await kit.show(page.getByTestId("eval-offline-score"));
 
   await kit.step(page, "How it works：每一格写着这台服务器实际在跑什么，没有文件路径和端口");
   expect((await page.goto("/how"))?.status()).toBe(200);

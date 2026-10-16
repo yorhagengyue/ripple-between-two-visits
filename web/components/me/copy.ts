@@ -1,8 +1,8 @@
 /**
  * The words the 「我」 screens need that the tracks' own copy modules do not have (the rebuild after the timeline draft,
  * line fe-me; web/progress/fe-me.md). Chrome only: where a way back leads, a screen's name in its header, a state split
- * off a sentence that used to be one line (「开着 · DeepSeek，在中国处理」 is now 「开着」 on the right and the rest under the
- * title). Every sentence that explains a consequence stays in its track's module: lib/privacy/copy.ts (export, AI,
+ * off a sentence that used to be one line (「开着 · 腾讯云混元，可能在新加坡以外处理」: 「开着」 on the right and the rest under
+ * the title). Every sentence that explains a consequence stays in its track's module: lib/privacy/copy.ts (export, AI,
  * deleting), lib/auth/copy.ts (devices, password, recovery code, family help), lib/push/copy.ts (reminders),
  * lib/profile/copy.ts (name, language, times, the example), app/p/me/filming/copy.ts. Client-safe.
  */
@@ -16,7 +16,7 @@ const zh = {
   // 「我」: the state on the right of a row
   aiOn: "开着",
   aiOff: "关着",
-  aiOnSub: "DeepSeek，在中国处理",
+  aiOnSub: "腾讯云混元，可能在新加坡以外处理",
   aiOffSub: "提问只给固定的回答和原话",
   devices: (n: number) => `${n} 台`,
   // the names of screens whose header had no title of its own
@@ -34,7 +34,7 @@ const en: MeCopy = {
   stepBack: "Back",
   aiOn: "On",
   aiOff: "Off",
-  aiOnSub: "DeepSeek, processed in China",
+  aiOnSub: "Tencent Cloud Hunyuan, possibly processed outside Singapore",
   aiOffSub: "Asking gives fixed answers and original words only",
   devices: (n) => (n === 1 ? "1 device" : `${n} devices`),
   aiTitle: "AI processing",

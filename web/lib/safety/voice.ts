@@ -13,7 +13,7 @@
  *
  * Where his voice goes: to the speech recognition the deployment uses (Tencent Cloud in Singapore, lib/asr/tencent.ts, as a
  * visit's lines do; or this app's own Whisper service, WHISPER_URL, lib/asr/whisper.ts) and nowhere else. No language
- * model (DeepSeek) hears it, so it does not wait on his ai_processing consent, the same as a visit recording. The audio
+ * model (Hunyuan) hears it, so it does not wait on his ai_processing consent, the same as a visit recording. The audio
  * is not kept: no file, no store row, no bus event, and no log line carries what he said (reasons only).
  *
  * transcribeRoute is POST /api/ask/transcribe (app/api/ask/transcribe/route.ts exports only POST over it, as a Next.js

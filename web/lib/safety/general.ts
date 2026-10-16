@@ -17,6 +17,7 @@
  *                on his own (「可以多吃一粒」, 「先停药」, "you can skip a dose"); telling him not to do so on his own is fine
  *   diagnosis    it never says he has an illness (「你得了…」, "you have a stroke")
  *   number       no number on the do-not-display list (forbidden.ts)
+ *   machinery    no JSON key, brace or model tag in the text (10-16, Hunyuan: see MACHINERY)
  *   language     his language (Chinese with Chinese, English with English)
  *   too_long     a short answer (at most GENERAL_MAX_CHARS of its language)
  * Anything else the policy allows is allowed: general advice, reassurance, food, sleep, exercise, when to see a doctor.
@@ -195,6 +196,14 @@ const DIAGNOSIS: RegExp[] = [
 
 const HAN = /\p{Script=Han}/u;
 
+/**
+ * Text that is the model's machinery, not an answer (10-16, measured with Hunyuan hy3 on TokenHub when its JSON mode was on:
+ * the reply's own JSON tail `","ask":"none"}` inside the answer, `</think:...>` and `<tool_call:...>` tags, "(End.)"). An
+ * everyday answer never holds braces, a JSON key or a tag; with any of them it is not shown (the answer is what it was
+ * before, as for every other guard).
+ */
+const MACHINERY = /[{}]|"\s*(?:ask|answer)\s*"\s*:|'\s*(?:ask|answer)\s*'\s*:|<\/?(?:think|tool_call)\b|\(End\.\)/i;
+
 /** Why a general answer may not be shown (codes; empty: it may). Only the lines in the header. */
 export function guardGeneral(text: string, locale: Locale): string[] {
   const t = text.normalize("NFKC").trim();
@@ -203,6 +212,7 @@ export function guardGeneral(text: string, locale: Locale): string[] {
   if ([...MED_CHANGE_ZH, ...MED_CHANGE_EN].some((re) => re.test(t))) reasons.push("med_change");
   if (DIAGNOSIS.some((re) => re.test(t))) reasons.push("diagnosis");
   if (findForbiddenNumbers(t).length > 0) reasons.push("number");
+  if (MACHINERY.test(t)) reasons.push("machinery");
   if (locale === "zh-Hans" ? !HAN.test(t) : HAN.test(t)) reasons.push("language");
   if (t.length > GENERAL_MAX_CHARS[locale]) reasons.push("too_long");
   return reasons;

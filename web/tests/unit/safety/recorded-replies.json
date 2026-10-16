@@ -1,0 +1,11 @@
+{
+  "about": "Two compose replies of a real model, kept as samples of the reply shape of the app's compose protocol (lib/llm/protocol.ts) for the live stand-in (live-stand-in.ts). Recorded on 2026-10-09 with LLM_RECORD=1 from the main model of that day (DeepSeek deepseek-flash, retired on 2026-10-16); the cassettes they came from were removed with it. They are not Hunyuan replies.",
+  "recorded_at": {
+    "今天 150/95，我能不能多吃一粒？": "2026-10-09T15:54:47.327Z",
+    "What is amlodipine for?": "2026-10-09T20:07:40.194Z"
+  },
+  "compose": {
+    "今天 150/95，我能不能多吃一粒？": "{\"sentences\":[{\"speechAct\":\"restate\",\"sourceId\":\"visit:v2:R4\",\"span\":\"Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.\",\"slots\":{},\"en\":\"Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.\",\"attribution\":\"doctor\"},{\"speechAct\":\"restate\",\"sourceId\":\"label:med-amlodipine\",\"span\":\"Take ONE tablet every MORNING\",\"slots\":{},\"en\":\"Take ONE tablet every MORNING\",\"attribution\":\"label\"}]}",
+    "What is amlodipine for?": "{\"sentences\":[{\"speechAct\":\"restate\",\"sourceId\":\"hh-amlodipine:amlodipine.purpose\",\"span\":\"The leaflet describes amlodipine as a medicine that brings blood pressure down; it does this by letting the blood vessels loosen and open wider. Lowering blood pressure is the only purpose the page gives - chest pain (angina) is not mentioned, and the words 'high blood pressure' or 'hypertension' do not appear in the leaflet text itself.\",\"slots\":{\"medicine\":\"amlodipine\"},\"en\":\"Amlodipine lowers blood pressure. It relaxes and widens the blood vessels.\",\"attribution\":\"leaflet\"}]}"
+  }
+}

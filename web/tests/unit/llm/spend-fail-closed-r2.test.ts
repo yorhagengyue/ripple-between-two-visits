@@ -27,13 +27,13 @@ afterEach(() => {
 });
 
 const CAP = { capUsd: 5, windowMs: 86_400_000 };
-const line = (usd: unknown) => JSON.stringify({ at: new Date().toISOString(), provider: "deepseek", model: "deepseek-flash", purpose: "classify", ok: true, usd }) + "\n";
+const line = (usd: unknown) => JSON.stringify({ at: new Date().toISOString(), provider: "hunyuan", model: "hy3", purpose: "classify", ok: true, usd }) + "\n";
 const cfg = (ledger: SpendLedger): CompatConfig => ({
-  name: "deepseek",
-  vendor: "deepseek",
-  baseUrl: "https://api.deepseek.com",
+  name: "hunyuan",
+  vendor: "tencent",
+  baseUrl: "https://tokenhub-intl.tencentcloudmaas.com/v1",
   apiKey: "sk-test",
-  model: "deepseek-flash",
+  model: "hy3",
   maxTokensField: "max_tokens",
   jsonMode: true,
   timeoutMs: 1000,

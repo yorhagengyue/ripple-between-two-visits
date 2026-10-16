@@ -3,7 +3,7 @@
 /**
  * 「AI 处理」 on his phone (journey 15; C2 track H; the timeline draft's 15-5): one switch in a white card, with 开 or 关
  * written under it, a line saying what just changed, when he last changed it, and the AI-processing text he agrees to
- * (what goes to DeepSeek, processed in China, and what changes when it is off). One tap, no confirm dialog: the switch
+ * (what goes to Tencent Cloud's Hunyuan model, where Tencent says it may be processed, and what changes when it is off). One tap, no confirm dialog: the switch
  * records a new consent decision (POST /api/me/consent) that the next ask already follows. A second switch at the foot
  * says someone is helping him with the phone: the decision is still his tap, and the record then carries
  * assisted = true with the note (real-app 3.11 「家人代操作时，同意必须由他本人点」).

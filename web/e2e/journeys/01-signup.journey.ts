@@ -4,7 +4,7 @@
  *
  *   sign-up      language, how to address him, a username (no e-mail), a password (a common one refused, then shown
  *                once to check), Wei Ling helping (so both consents say his own tap), the terms in plain words, AI with
- *                DeepSeek in China (refusable), Mr Tan's example data; the recovery code shown once and its card
+ *                Tencent Cloud's Hunyuan model (refusable), Mr Tan's example data; the recovery code shown once and its card
  *   two devices  the tablet logs in with 「这不是我的手机」; his phone lists both devices
  *   log out      his phone logs out; /p/today sends him to the login
  *   lockout      a wrong password says only "账号或密码不对"; the sixth locks this phone with the time it opens; the
@@ -91,10 +91,9 @@ journey("01 注册和建档（注册、登录、退出、恢复）", async ({ ki
   await kit.show(pp.getByTestId("signup-agree"));
   await pp.getByTestId("signup-agree").click();
 
-  await kit.step(pp, "AI 这一页写明 DeepSeek、在中国处理；不同意也照样能用，他点同意");
+  await kit.step(pp, "AI 这一页写明交给腾讯云的混元模型处理；不同意也照样能用，他点同意");
   await expect(pp.getByTestId("signup-step-ai")).toBeVisible();
-  await expect(pp.getByTestId("signup-ai-text")).toContainText("DeepSeek");
-  await expect(pp.getByTestId("signup-ai-text")).toContainText("处理在中国");
+  await expect(pp.getByTestId("signup-ai-text")).toContainText("腾讯云的混元模型");
   await expect(pp.getByTestId("signup-ai-decline")).toHaveText("不同意，也继续用");
   await kit.show(pp.getByTestId("signup-ai-agree"));
   await pp.getByTestId("signup-ai-agree").click();

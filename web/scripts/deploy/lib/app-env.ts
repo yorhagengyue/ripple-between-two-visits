@@ -6,7 +6,7 @@
  * The check does not have rules of its own where the app has them: the candidate environment is handed to the app's own
  * functions, the ones the server runs at start-up (lib/auth/boot.ts, lib/guard/boot.ts: what a deployment refuses to
  * start with) and the ones that pick each provider (lib/ops/health.ts, which is also what /api/health answers). So
- * "LLM_PROVIDER=deepseek with an empty key" is refused here because the app would run its mock, not because this file
+ * "LLM_PROVIDER=hunyuan with an empty key" is refused here because the app would run its mock, not because this file
  * knows about keys.
  *
  * Two decisions are still open and are switches on the command line, never read from the file and never assumed:
@@ -59,8 +59,8 @@ export const FIXED: Readonly<Values> = {
   STORE: "supabase",
   BLOB_DRIVER: "supabase",
   AUTH_PROVIDER: "supabase",
-  LLM_PROVIDER: "deepseek",
-  CHECKER_PROVIDER: "deepseek",
+  LLM_PROVIDER: "hunyuan",
+  CHECKER_PROVIDER: "hunyuan",
   TRUSTED_PROXY_HOPS: "1",
   JOBS: "1",
   FILMING_MODE: "false",
@@ -170,12 +170,12 @@ export function expectedHealth(env: Values): Record<string, unknown> {
 
 /** What a deployment's health must be for these switches, whatever the file says. */
 export function requiredHealth(sw: Switches): Record<string, unknown> {
-  return { store: "supabase", blob: "supabase", auth: "supabase", llm: "deepseek", checker: "deepseek", speech: sw.speech, speech_problem: null, tts: sw.tts, jobs: true, deployed: true, push: true };
+  return { store: "supabase", blob: "supabase", auth: "supabase", llm: "hunyuan", checker: "hunyuan", speech: sw.speech, speech_problem: null, tts: sw.tts, jobs: true, deployed: true, push: true };
 }
 
 const NEEDS: Record<string, string> = {
-  llm: "LLM_PROVIDER=deepseek with RIPPLE_DEEPSEEK_API_KEY set (without the key the app answers from its offline mock)",
-  checker: "CHECKER_PROVIDER=deepseek with a key (without a checker every borderline sentence is blocked)",
+  llm: "LLM_PROVIDER=hunyuan with HUNYUAN_API_KEY set (a TokenHub API key) and, when set, a TokenHub HUNYUAN_BASE_URL (without them the app answers from its offline mock)",
+  checker: "CHECKER_PROVIDER=hunyuan with a key and a CHECKER_MODEL other than the main model (without a checker every borderline sentence is blocked)",
   push: "VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY, a matching pair (without it reminders reach a phone only while the app is open)",
   speech: "the speech provider the --speech switch names",
   speech_problem: "WHISPER_URL and WHISPER_TOKEN (32 or more characters) for --speech whisper; TENCENT_SECRET_ID and TENCENT_SECRET_KEY for --speech tencent",
@@ -190,7 +190,7 @@ export function webEnvProblems(ctx: DeployContext, web: WebEnv, sw: Switches): s
   const candidate: Record<string, string | undefined> = { ...env, NODE_ENV: "production" };
   const out: string[] = [];
 
-  for (const name of ["SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "RIPPLE_DEEPSEEK_API_KEY", "AUTH_USERNAME_DOMAIN", "EDGE_SECRET", "BLOB_SIGNING_SECRET"]) {
+  for (const name of ["SUPABASE_URL", "SUPABASE_SERVICE_KEY", "SUPABASE_ANON_KEY", "HUNYUAN_API_KEY", "AUTH_USERNAME_DOMAIN", "EDGE_SECRET", "BLOB_SIGNING_SECRET"]) {
     if (!env[name]) out.push(`${name} is not set${OWNER_ONLY[name] ? ` (the owner supplies it: ${OWNER_ONLY[name]})` : ""}`);
   }
   for (const name of Object.keys(env)) {

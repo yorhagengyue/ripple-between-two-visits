@@ -5,7 +5,7 @@
  * who-said-it changes and scripted fallback are highlighted. The M5/M6/M7 events (the understanding checklist's
  * question, his switches for Wei Ling, her reminder recording, the director's reminder) are in the scan and render
  * from their own data. A new event type without a renderer fails here. Layer 3 names the checker model it ran with
- * (DeepSeek V4 Pro on the judge link: the main model's vendor, a different model), never a second checker.
+ * (Hy4 preview on the judge link: the main model's vendor, a different model), never a second checker.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
@@ -13,11 +13,11 @@ import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { POST as grantsPost } from "@/app/api/family/grants/route";
 import { PATCH as medPatch } from "@/app/api/meds/[id]/route";
-import { checkerName, DEEPSEEK_CHECKER_NAME, REASON_WORDS, reasonWords, renderEvent, RENDERERS } from "@/components/backstage/sentences";
+import { checkerName, HUNYUAN_CHECKER_NAME, REASON_WORDS, reasonWords, renderEvent, RENDERERS } from "@/components/backstage/sentences";
 import { EXTRA_EVENT_TYPES, getBus, SPEC_EVENT_TYPES, type BusEvent } from "@/lib/bus";
 import { answerUnderstanding } from "@/lib/explain/understanding";
 import { evidenceFor, getPatientText } from "@/lib/kb/load";
-import { createDecidingChecker, createMockLlm, DEEPSEEK_CHECKER_MODEL, type LlmClient } from "@/lib/llm";
+import { createDecidingChecker, createMockLlm, HUNYUAN_CHECKER_MODEL, type LlmClient } from "@/lib/llm";
 import { ask } from "@/lib/safety/pipeline";
 import { cueReminder } from "@/lib/session/ops";
 import { getMemoryStore } from "@/lib/store/memory";
@@ -203,7 +203,7 @@ describe("highlights", () => {
 });
 
 /**
- * Layer 3 in plain words (10-10): the checker is deepseek-v4-pro next to the main model deepseek-flash, the same vendor
+ * Layer 3 in plain words (10-10; Hunyuan since 10-16): the checker is hy4-preview next to the main model hy3, the same vendor
  * and a different model (10-09), so no backstage line calls it a second, independent or other vendor's checker.
  */
 describe("layer 3 names the checker model as what it is", () => {
@@ -214,13 +214,13 @@ describe("layer 3 names the checker model as what it is", () => {
   ];
   const NOT_ANOTHER_CHECKER = /second|independent|vendor|cross-model/i;
 
-  it("the DeepSeek checker is “the checker model (DeepSeek V4 Pro)”, lib/llm's default checker model", () => {
-    expect(DEEPSEEK_CHECKER_NAME.toLowerCase().replace(/ /g, "-")).toBe(DEEPSEEK_CHECKER_MODEL);
-    const line = renderEvent(ev("verify.layer3", { checker: "deepseek", sentences: ran }));
+  it("the Hunyuan checker is “the checker model (Hy4 preview)”, lib/llm's default checker model", () => {
+    expect(HUNYUAN_CHECKER_NAME.toLowerCase().replace(/ /g, "-")).toBe(HUNYUAN_CHECKER_MODEL);
+    const line = renderEvent(ev("verify.layer3", { checker: "hunyuan", sentences: ran }));
     expect(line).toMatchObject({
-      sentence: "Layer 3, the checker model (DeepSeek V4 Pro): 1 of 2 sentences passed, 1 stopped.",
+      sentence: "Layer 3, the checker model (Hy4 preview): 1 of 2 sentences passed, 1 stopped.",
       tone: "blocked",
-      badge: "Stopped at layer 3, the checker model (DeepSeek V4 Pro)",
+      badge: "Stopped at layer 3, the checker model (Hy4 preview)",
       why: ["the checker model said its source does not support it"],
     });
     // the other two layers' badges read as before
@@ -229,7 +229,7 @@ describe("layer 3 names the checker model as what it is", () => {
   });
 
   it("replayed, offline, another provider's or no checker: each named from the event, none as a second checker", () => {
-    expect(checkerName("replay:deepseek")).toBe("the checker model (DeepSeek V4 Pro, replayed)");
+    expect(checkerName("replay:hunyuan")).toBe("the checker model (Hy4 preview, replayed)");
     expect(checkerName("mock")).toBe("the checker model (offline stand-in)");
     expect(checkerName("anthropic")).toBe("the checker model (anthropic)");
     expect(checkerName(null)).toBe("the checker model");
@@ -237,7 +237,7 @@ describe("layer 3 names the checker model as what it is", () => {
     expect(none).toMatchObject({ sentence: "Layer 3, the checker model: 0 of 1 sentences passed, 1 stopped.", why: ["it needs the checker model and none is configured"] });
     const words = reasonWords(["no_checker", "checker_not_supported", "checker_error"]);
     expect(words).toEqual(["it needs the checker model and none is configured", "the checker model said its source does not support it", "the checker model failed or timed out"]);
-    const lines = [...Object.values(REASON_WORDS), ...["deepseek", "replay:deepseek", "mock", null].map((c) => renderEvent(ev("verify.layer3", { checker: c, sentences: ran })))].map((x) =>
+    const lines = [...Object.values(REASON_WORDS), ...["hunyuan", "replay:hunyuan", "mock", null].map((c) => renderEvent(ev("verify.layer3", { checker: c, sentences: ran })))].map((x) =>
       typeof x === "string" ? x : `${x.sentence} ${x.badge ?? ""} ${(x.why ?? []).join(" ")}`,
     );
     for (const text of lines) expect(text).not.toMatch(NOT_ANOTHER_CHECKER);
@@ -252,16 +252,16 @@ describe("layer 3 names the checker model as what it is", () => {
       {
         store,
         llm: createMockLlm(),
-        // a stand-in named like the DeepSeek checker client (lib/llm names a client by its CHECKER_PROVIDER)
-        checker: createDecidingChecker(() => false, "deepseek"),
+        // a stand-in named like the Hunyuan checker client (lib/llm names a client by its CHECKER_PROVIDER)
+        checker: createDecidingChecker(() => false, "hunyuan"),
         checkerReason: null,
         costGuard: null,
         publish: (sid, type, say, data) => void events.push({ id: events.length + 1, type, session_id: sid, at: new Date().toISOString(), say, data }),
       },
     );
     const layer3 = events.find((e) => e.type === "verify.layer3")!;
-    expect((layer3.data as { checker: unknown }).checker).toBe("deepseek");
-    expect(renderEvent(layer3).sentence).toBe("Layer 3, the checker model (DeepSeek V4 Pro): not needed, every sentence is a quote, a leaflet line or a template.");
+    expect((layer3.data as { checker: unknown }).checker).toBe("hunyuan");
+    expect(renderEvent(layer3).sentence).toBe("Layer 3, the checker model (Hy4 preview): not needed, every sentence is a quote, a leaflet line or a template.");
     // the publisher's own `say` (raw JSON, logs) says the same: the checker model, not a cross-model check (10-10)
     expect(layer3.say).toBe("Layer 3 (checker model): not needed, every sentence is a quote, a leaflet line or a template");
   });
@@ -272,7 +272,7 @@ describe("layer 3 names the checker model as what it is", () => {
     const say = async (checker: LlmClient | null) =>
       (await runAsk({ text: "What is amlodipine for?", locale: "en", day: 29 }, { inject: () => [paraphrase], checker })).events.find((e) => e.type === "verify.layer3")!.say;
     const none = await say(null);
-    const ran = await say(createDecidingChecker(() => true, "deepseek"));
+    const ran = await say(createDecidingChecker(() => true, "hunyuan"));
     // with no checker the paraphrase is stopped at layer 3 and the referral template that replaces it is checked too
     expect(none).toBe("Layer 3 (checker model): 2/3 passed (no checker configured: borderline sentences blocked)");
     expect(ran).toBe("Layer 3 (checker model): 2/2 passed");
@@ -379,11 +379,11 @@ describe("judges read plain words", () => {
     expect(renderEvent(ev("ask.route", { route: "refuse_route", reason: "rule:dose_change" })).sentence).toBe(
       "Sorted as a request that is not Ripple's to answer, by a fixed rule (it asks to change the dose).",
     );
-    expect(renderEvent(ev("ask.route", { route: "explain", reason: "model:deepseek" })).sentence).toBe("Sorted as a question Ripple can answer from its sources, by the main model.");
+    expect(renderEvent(ev("ask.route", { route: "explain", reason: "model:hunyuan" })).sentence).toBe("Sorted as a question Ripple can answer from its sources, by the main model.");
     expect(renderEvent(ev("ask.route", { route: "emergency", reason: "rule:emergency; raised from log_only by crisis words, no crisis screen (offline)" })).sentence).toBe(
       "Sorted as an emergency, raised by its crisis words (no crisis check ran).",
     );
-    expect(renderEvent(ev("ask.route", { route: "emergency", reason: "model_crisis:deepseek:emergency; raised from explain by the crisis screen" })).sentence).toBe(
+    expect(renderEvent(ev("ask.route", { route: "emergency", reason: "model_crisis:hunyuan:emergency; raised from explain by the crisis screen" })).sentence).toBe(
       "Sorted as an emergency, raised by the crisis check.",
     );
     expect(renderEvent(ev("ask.route", { route: "emergency", reason: "rule:emergency; crisis screen unavailable (timeout), rules only" })).sentence).toBe(
