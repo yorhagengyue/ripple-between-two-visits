@@ -80,7 +80,7 @@ export const COPY = {
     lh: ["TENCENT CLOUD", "Lighthouse", "Singapore", "NEXT.JS APP"],
     pills: ["Pages and APIs", "Safety layer", "Live event stream"],
     asr: ["TENCENT CLOUD", "Speech recognition", "Singapore · Mandarin + English"],
-    llm: ["TENCENT CLOUD", "Hunyuan", "One answers; a second checks"],
+    llm: ["TENCENT CLOUD", "Hunyuan", "Reads the risk; a second checks"],
     db: ["SUPABASE", "Database and storage", "Row-level security · private storage"],
   },
   visit: {
@@ -106,10 +106,10 @@ export const COPY = {
     ],
     shown: "Shown with who said it, and when",
     blocked: "Blocked: a question on his list",
-    emerg: [["995", "HELPLINES"], "Emergency and self-harm words", "Rules that never wait for a model"],
+    emerg: [["995", "HELPLINES"], "Emergency and self-harm signs", "A model reads the talk; code decides"],
     // what happens when Ripple finds a problem (the owner, PART3_V7; the daughter's notification is being built in the
     // app now, so the main session may adjust this line): its own field, two lines
-    emergNow: "995 and the helplines at once\nHis daughter's phone is notified",
+    emergNow: "Fact missing? Ripple asks, with buttons\n995 and helplines first · daughter notified",
     everyday: ["OUTSIDE THE THREE CHECKS", "Everyday questions", "Short general answer, labelled as Ripple's"],
     willNot: "Ripple will not",
     nots: ["Tell him to change a medicine", "Diagnose", "Judge or reassure", "Guess an unknown medicine"],
@@ -132,7 +132,7 @@ export const COPY = {
       ["wave", "Speech engine chosen by test", "Only one passed our English–Mandarin test", "16k_zh_en · one short test, not a benchmark"],
       ["quote", "Quotes before generation", "His own sources come first", null],
       ["samevendor", "Same-vendor checker", "Less independent than a second vendor", null],
-      ["bolt", "Rules for emergencies", "Never wait\nfor a model", null],
+      ["bolt", "Model reads, code decides", "Asks before\nit answers", "New wording: 23 of 24 caught"],
     ],
   },
   privacy: {

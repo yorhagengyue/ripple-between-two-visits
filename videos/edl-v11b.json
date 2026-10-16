@@ -1,0 +1,138 @@
+{
+ "note": "Version 11b cut (16 Oct): v11 with the trust boundary's emergency lane keeping the daughter's notification (the owner's v7 ask): trust.emergNow 'Fact missing? Ripple asks, with buttons' + '995 and helplines first · daughter notified'; part 3 (600-762.5) from out/frames-t11b. Everything else as v11; TIMES unchanged; sound out/audio-v9.wav as is. Captions: captions-v11b.json = captions-v9.json (out/frames-v11b-raw -> out/frames-v11b-final). Version 11 cut (16 Oct: the app's safety layer changed, live since ~15:40: Hunyuan hy3 reads each message with the last 10 turns, code decides from a decision table, a missing fact gets one scripted question with buttons, 995 and the helplines always above it): edl-v10.json with part 3 (600-762.5) from out/frames-t11, re-rendered from t_serious.js with four texts changed: the architecture model box 'Reads the risk; a second checks'; the trust boundary's emergency lane 'Emergency and self-harm signs' / 'A model reads the talk; code decides' / 'Fact missing? One question, with buttons' + '995 and the helplines always come first'; the last trade-off 'Model reads, code decides' / 'Asks before it answers' / 'New wording: 23 of 24 caught'. TIMES unchanged; sound out/audio-v9.wav as is. Captions: captions-v11.json = captions-v9.json (out/frames-v11-raw -> out/frames-v11-final). Version 10 cut (16 Oct: the live app's language model is now Tencent Cloud Hunyuan; DeepSeek removed): edl-v9.json with part 3 (600-762.5) from out/frames-t10, re-rendered from t_serious.js with three texts changed: the architecture slide's model box 'TENCENT CLOUD / Hunyuan / One answers; a second checks' (was 'DEEPSEEK / Language models'), the privacy card 'AI processing (Tencent Cloud Hunyuan) can be refused' (was '(DeepSeek, China)'), the build slide's second line '... the app skeleton, the model wiring, the safety layer.' (was 'DeepSeek wiring'). TIMES unchanged, so the v9 sound (out/audio-v9.wav) is used as is. Captions: captions-v10.json = captions-v9.json (out/frames-v10-raw -> out/frames-v10-final). Version 9 cut (owner 16 Oct: Wei Ling re-voiced with the Voicebox profile Scq): edl-v8.json with c04 office (65-85, out/frames-c04v9) and the c07 Sunday line (1158-1166, out/frames-c07v9) re-rendered for the new line lengths (c04-wei 3.87 s, c07-wei-sunday 4.27 s). Same times as v8. Version 8 cut (v7 plus the filled How we built it slide: CodeBuddy lines and screenshot, 14 s; part 3 600-762.5 in out/frames-t8). Version 7 cut (owner 16 Oct): v6 plus part 3 reworked (out/frames-t7, 600-755: results slide removed, 'Web app / mobile app', the web app is a demo for the challenge and the product ships as an iOS app, the emergency row notifies his daughter, a visit step by step and 'can I take one more tablet?' with real recordings, next steps with the iOS app in review and Singapore-accented Mandarin), the c08 end card and c14 URL card with the demo note (out/frames-c08v7, out/frames-c14v7), the agenda's part 3 subline 'How it works, safety and next steps' (out/frames-a8). c07 frames are the --clip cache out/clip-c07_clinic-1127-1201.2. Captions: captions-v7.json (out/frames-v7-raw -> out/frames-v7-final).",
+ "fps": 30,
+ "segments": [
+  {
+   "name": "agenda",
+   "a": 800,
+   "b": 807,
+   "dir": "out/frames-a8"
+  },
+  {
+   "name": "story c01-c02",
+   "a": 0,
+   "b": 27,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "story c03",
+   "a": 27,
+   "b": 65,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "story c04 office (Scq voice)",
+   "a": 65,
+   "b": 85,
+   "dir": "out/frames-c04v9"
+  },
+  {
+   "name": "story c05-c06",
+   "a": 85,
+   "b": 127,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c07 clinic",
+   "a": 1127,
+   "b": 1158,
+   "dir": "out/clip-c07_clinic-1127-1201.2"
+  },
+  {
+   "name": "c07 clinic sunday (Scq voice)",
+   "a": 1158,
+   "b": 1166,
+   "dir": "out/frames-c07v9"
+  },
+  {
+   "name": "c07 clinic after sunday",
+   "a": 1166,
+   "b": 1201.2,
+   "dir": "out/clip-c07_clinic-1127-1201.2"
+  },
+  {
+   "name": "c08 evening",
+   "a": 187,
+   "b": 205,
+   "dir": "out/frames-c08v7"
+  },
+  {
+   "name": "c09 fly-in and lights",
+   "a": 205,
+   "b": 209.4,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 1 (cannot read English)",
+   "a": 210,
+   "b": 215.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 2 (forgotten)",
+   "a": 218.0,
+   "b": 227.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 3 (between two visits)",
+   "a": 230.6,
+   "b": 237,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c10 curtain opens",
+   "a": 237,
+   "b": 239,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 B6 management and prevention",
+   "a": 305.5,
+   "b": 315.1,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 curtain closes",
+   "a": 319.6,
+   "b": 322,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c11 intro",
+   "a": 1322,
+   "b": 1323.5,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 01 can I take one more",
+   "a": 1324,
+   "b": 1343.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 02 unknown box",
+   "a": 1344.5,
+   "b": 1353.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 03 chest pain",
+   "a": 1354.6,
+   "b": 1363.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "t sober technical and safety summary",
+   "a": 600,
+   "b": 762.5,
+   "dir": "out/frames-t11b"
+  },
+  {
+   "name": "c14 try it",
+   "a": 430,
+   "b": 440,
+   "dir": "out/frames-c14v7"
+  }
+ ]
+}
