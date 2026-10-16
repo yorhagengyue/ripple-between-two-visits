@@ -217,17 +217,18 @@ describe("near misses stay ordinary", () => {
 });
 
 describe("cues: the safety line, and the helplines with it on self-harm words", () => {
-  it("a statement with self-harm words gets the helpline templates when no screen vouched for it (fix round 3: it was 'Noted.' and the safety line)", async () => {
+  it("a statement with self-harm words gets the helplines and the confirm question when no screen vouched for it", async () => {
+    // (fix round 3: it was 'Noted.' and the safety line. The harness's round 2, 10-16: cue words alone never reach the
+    // self-harm route's "thoughts" or tell his family; they are the ladder's "possible" step: the safety line and the
+    // helplines first, the route as it was, the confirm question last)
     const text = "Nobody would notice if I died";
     expect(classifyRules(text, CTX)?.route).toBe("log_only");
     expect(selfHarmCue(text)).toBe(true);
     const r = await askAt(text);
-    expect(r.route).toBe("self_harm");
-    expect(r.routeReason).toBe("rule:self_harm_cue");
+    expect([r.route, r.risk?.ladder, r.followUp?.templateId]).toEqual(["log_only", "possible", "self_harm_confirm"]);
     const ids = r.sentences.map((s) => s.templateId);
-    expect(ids).toEqual(["self_harm_995", "self_harm_sos", "self_harm_mindline"]);
-    expect(ids).not.toContain("noted");
-    expect((r.events[0].output as { rulesOnlyCue: { from: string; gap: string } }).rulesOnlyCue).toMatchObject({ from: "log_only", gap: "offline" });
+    expect(ids.slice(0, 3)).toEqual(["safety_line", "self_harm_sos", "self_harm_mindline"]);
+    expect(r.risk?.rows).toContain("self-harm-cue");
   });
 
   it("a question with self-harm words keeps its answer and gets the safety line with the helplines when no screen vouched for it", async () => {

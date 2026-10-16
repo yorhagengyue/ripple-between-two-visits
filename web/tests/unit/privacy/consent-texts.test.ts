@@ -5,6 +5,8 @@
  * Tencent's pages say; DeepSeek in China before; where data is stored, the placeholder officer).
  */
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   CONSENT_TEXTS,
@@ -15,6 +17,7 @@ import {
   currentConsentText,
   type SignupConsentKind,
 } from "@/lib/privacy/consent-texts";
+import { OCR_REGION } from "@/lib/vision/ocr";
 
 const sha = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
 
@@ -54,11 +57,12 @@ describe("consent texts", () => {
   // where and how long in Tencent's words (TokenHub's Singapore site), the label-photo line gone (no Hunyuan model reads
   // images); every other paragraph is the 2026-10-15 one, and the older versions stay published word for word.
   it("ai_processing 2026-10-16: Hunyuan, Tencent's words on where and how long, no label photos; the rest as 2026-10-15; older versions still published", () => {
-    expect(CURRENT_CONSENT_VERSIONS.ai_processing).toBe("2026-10-16");
+    // in force until 2026-10-16.2 (label photos read by Tencent Cloud OCR: the test below), published word for word
+    const PUBLISHED = { "zh-Hans": "bdf8d552d8d70c195b9c53a8a80410320f3342ef2448e4ed71739f4920434bb4", en: "e3181994e683126561fec73870596321503a3a5c8ecac6324edc1f47f84019a9" } as const;
     for (const locale of ["zh-Hans", "en"] as const) {
       const before = consentText("ai_processing", "2026-10-15", locale)!;
       const now = consentText("ai_processing", "2026-10-16", locale)!;
-      expect(currentConsentText("ai_processing", locale), locale).toBe(now);
+      expect(now.sha256, locale).toBe(PUBLISHED[locale]);
       expect(sha(now.text), locale).toBe(now.sha256);
       expect(now.title, locale).toBe(before.title);
       // the list without the photo line, then the new paragraph on where and how long, then the 10-15 paragraphs
@@ -85,6 +89,39 @@ describe("consent texts", () => {
     const en = currentConsentText("terms_privacy", "en").text;
     for (const word of ["东京", "新加坡", "90 天", "家人", "导出", "删除", "7 天", "21 天", DATA_PROTECTION_OFFICER["zh-Hans"]]) expect(zh).toContain(word);
     for (const word of ["Tokyo", "Singapore", "90 days", "family", "export", "delete", "7 days", "21 days", DATA_PROTECTION_OFFICER.en]) expect(en).toContain(word);
+  });
+
+  // The owner's decision of 2026-10-16, later the same day: label photos are read by Tencent Cloud OCR (lib/vision/ocr.ts),
+  // still only after his yes. The AI text got a new version with one paragraph more, after the one on what the model does:
+  // who reads the photo and where, that no Hunyuan model sees it, what Tencent's OCR module says about keeping it (no
+  // number of days), and what Ripple keeps. Every other paragraph is the 2026-10-16 one; that version stays published.
+  it("ai_processing 2026-10-16.2: label photos read by Tencent Cloud OCR in Singapore after his yes, what is kept; the rest as 2026-10-16", () => {
+    expect(CURRENT_CONSENT_VERSIONS.ai_processing).toBe("2026-10-16.2");
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const before = consentText("ai_processing", "2026-10-16", locale)!;
+      const now = consentText("ai_processing", "2026-10-16.2", locale)!;
+      expect(currentConsentText("ai_processing", locale), locale).toBe(now);
+      expect(sha(now.text), locale).toBe(now.sha256);
+      expect(now.title, locale).toBe(before.title);
+      const added = now.paragraphs.findIndex((p) => /^药袋的照片：|^Photos of medicine labels:/.test(p));
+      expect(added, locale).toBe(before.paragraphs.findIndex((p) => /^模型只能|^The model only picks/.test(p)) + 1);
+      expect(now.paragraphs.filter((_, i) => i !== added), locale).toEqual([...before.paragraphs]);
+    }
+    const zh = consentText("ai_processing", "2026-10-16.2", "zh-Hans")!.paragraphs.find((p) => p.startsWith("药袋的照片："))!;
+    const en = consentText("ai_processing", "2026-10-16.2", "en")!.paragraphs.find((p) => p.startsWith("Photos of medicine labels:"))!;
+    for (const w of ["你同意以后", "腾讯云的文字识别服务（OCR）", "在新加坡", "照片不交给混元模型", "读出的字发回 Ripple", "没有写具体天数", "Ripple 不存读出的整段文字", "药名、规格、用法、配药日期和诊所", "你确认或改过的内容", "只有服务器能打开的私有空间"]) expect(zh, w).toContain(w);
+    for (const w of ["once you agree", "Tencent Cloud's text recognition service (OCR)", "in Singapore", "the photo goes to no Hunyuan model", "the words come back to Ripple", "without giving a number of days", "Ripple does not keep the whole text it reads", "the medicine, strength, directions, dispensing date and clinic", "saves what you confirm or correct", "private storage that only the server can open"]) expect(en, w).toContain(w);
+    // the list of what goes to the model still has no photo; saying no still means typing the label
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const t = currentConsentText("ai_processing", locale);
+      expect(t.paragraphs.filter((p) => p.startsWith("· ")).join(" "), locale).not.toMatch(/照片|photo/i);
+      expect(t.text, locale).toMatch(/药袋照片上的字要你自己输入|you type the label text yourself/);
+    }
+    // the code it describes: the reader's region, and his consent asked before any reader (lib/meds/write.ts)
+    expect(OCR_REGION).toBe("ap-singapore");
+    const write = readFileSync(fileURLToPath(new URL("../../../lib/meds/write.ts", import.meta.url)), "utf8");
+    expect(write.indexOf("aiConsent(store, session)")).toBeGreaterThan(-1);
+    expect(write.indexOf("aiConsent(store, session)")).toBeLessThan(write.indexOf("readLabelText("));
   });
 
   // Line bind, 2026-10-11: binding by account (lib/care/bind.ts) shows a linked family member four items at once, so

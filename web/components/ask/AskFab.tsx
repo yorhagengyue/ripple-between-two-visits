@@ -18,18 +18,26 @@
  * SSE (owner 10-15: 「需要非常完整的 SSE 的输出」): the question goes as a stream (components/today/AskSection.tsx streamAsk), so
  * the sheet shows his words, then the answer as it is made: the sentences that are final already, Ripple's own words as
  * they are written with a soft caret, the stage line under them (「在找医生说过的话……」, 「正在写……」; hook ask-thinking), all
- * drawn by AnswerCard's draft; then the final answer as before (ask-fab-answer). The button stands above the tab bar and above any buttons fixed at the bottom of
+ * drawn by AnswerCard's draft; then the final answer as before (ask-fab-answer).
+ * The guided harness (2026-10-16): an answer may end on one follow-up question with buttons (AnswerCard, FollowUpQuestion).
+ * His tap is asked as a typed question is, with `reply`: the answer stays in the sheet with what he chose marked and the
+ * waiting line under it until the new answer begins, then the sheet shows the new answer as the next question's, and the
+ * focus moves to it; a tap that did not go through opens the question again with the sentence that says why. The sheet holds
+ * one answer, so only its question is ever shown. The button stands above the tab bar and above any buttons fixed at the bottom of
  * the page (a [data-rp="dock"]) or the undo strip after a reading (a [data-rp="toast"]), so it never covers them.
  */
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { AnswerCard } from "@/components/daily/AnswerCard";
+import { FollowUpChip } from "@/components/daily/FollowUpQuestion";
+import { placeFollowUp } from "@/components/daily/follow-up-place";
 import { askCopy, limitWords } from "@/components/daily/ask-copy";
 import { draftAnswer, hasProgress, stageWords, streamAsk, type AskProgress } from "@/components/today/AskSection";
 import { Icon } from "@/components/ui/icons";
 import { barsFor } from "@/components/visit/elder/MicCheck";
 import { micName, rememberMic, settleMic, startRecording } from "@/components/visit/mic-devices";
 import { useWavRecorder } from "@/components/visit/useWavRecorder";
+import type { FollowUpReply } from "@/lib/safety/risk/types";
 import type { AskTurn } from "@/lib/safety/turns";
 import type { UiLocale } from "@/lib/ui/tokens";
 import { parseWav, sliceWav } from "@/lib/visit/wav";
@@ -126,6 +134,14 @@ export function AskFab({ locale, voice }: { locale: UiLocale; voice: boolean }) 
   const [progress, setProgress] = useState<AskProgress | null>(null);
   /** SSE: the answer took the place of its draft, which was on the screen (it does not rise in again) */
   const [settled, setSettled] = useState(false);
+  /** harness (10-16): his tap on the answer's follow-up question is on its way */
+  const [replying, setReplying] = useState<FollowUpReply | null>(null);
+  /** harness (10-16): the question could not show with the 995 line when the answer came: the chip (the answer's turn id) */
+  const [chipFor, setChipFor] = useState<string | null>(null);
+  const sheet = useRef<HTMLElement | null>(null);
+  const hideChip = useCallback(() => setChipFor(null), []);
+  const sheetRoot = useCallback(() => sheet.current, []);
+  const openQuestion = useCallback(() => sheet.current?.querySelector<HTMLElement>('[data-testid="ask-fab-answer"] [data-testid="ask-followup"][data-state="open"]') ?? null, []);
   const [heard, setHeard] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [lit, setLit] = useState(0);
@@ -179,33 +195,67 @@ export function AskFab({ locale, voice }: { locale: UiLocale; voice: boolean }) 
   }, [mode]);
 
   const ask = useCallback(
-    async (text: string) => {
+    async (text: string, reply?: FollowUpReply) => {
       const q = text.trim();
       if (!q) return;
-      setHeard(q);
       setNote(null);
       setProgress(null);
-      setMode("asking");
-      if (typeof navigator !== "undefined" && navigator.onLine === false) {
-        setNote(copy.offline);
-        setMode("typing");
-        return;
+      if (reply) {
+        // harness (10-16): his tap on the answer's follow-up question: the answer stays in the sheet, what he chose marked
+        // and the waiting line under it, until the new answer begins
+        if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          setNote(copy.offline);
+          return;
+        }
+        setReplying(reply);
+      } else {
+        setHeard(q);
+        setMode("asking");
+        if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          setNote(copy.offline);
+          setMode("typing");
+          return;
+        }
       }
       // SSE: the answer as it is made goes to the sheet (the outcome is the plain request's)
       let drafted = false;
-      const out = await streamAsk(q, locale, (p) => {
-        if (hasProgress(p)) drafted = true;
-        setProgress(p);
-      });
+      const out = await streamAsk(
+        q,
+        locale,
+        (p) => {
+          if (hasProgress(p) && !drafted && reply) {
+            // his tap's answer has begun: the next turn, as a typed question's
+            setHeard(q);
+            setMode("asking");
+          }
+          if (hasProgress(p)) drafted = true;
+          setProgress(p);
+        },
+        reply,
+      );
       setProgress(null);
       setSettled(drafted);
+      setReplying(null);
       if (!out.ok) {
         setNote(out.status === 429 ? limitWords(locale, out) : out.status === 0 ? copy.offline : copy.failed);
-        setMode("typing");
+        // a tap that did not go through: the answer and its question again (the sheet still holds that turn)
+        setMode(reply ? "answer" : "typing");
         return;
       }
       setTurn(out.turn);
       setMode("answer");
+      setChipFor(null);
+      requestAnimationFrame(() => {
+        // harness (10-16): an answer with a question: the sheet goes where the question shows, the 995 line kept in view
+        const answer = sheet.current?.querySelector<HTMLElement>('[data-testid="ask-fab-answer"]');
+        if (answer && placeFollowUp(answer, sheet.current?.querySelector<HTMLElement>(".rpa-holdbar") ?? null, sheet.current)) setChipFor(out.turn.id);
+        // after his tap: the focus on the new answer (his words, its heading)
+        if (!reply) return;
+        const heading = document.querySelector<HTMLElement>('[data-testid="ask-fab-answer"] h1');
+        if (!heading) return;
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      });
     },
     [copy, locale, setMode],
   );
@@ -340,7 +390,7 @@ export function AskFab({ locale, voice }: { locale: UiLocale; voice: boolean }) 
       {open ? (
         <div className="rpa-sheet-wrap" data-testid="ask-sheet" data-mode={shown}>
           <div className="rpa-scrim" onClick={() => (shown === "listening" ? undefined : setMode("closed"))} aria-hidden="true" />
-          <section className="rpa-sheet" role="dialog" aria-modal="true" aria-label={w.button}>
+          <section ref={sheet} className="rpa-sheet" role="dialog" aria-modal="true" aria-label={w.button}>
             {shown === "listening" ? (
               <div className="rpa-listen" data-testid="ask-listening" data-cancel={cancelling ? "true" : "false"}>
                 <p className="rpa-listen-t">{cancelling ? w.cancelNow : w.listening}</p>
@@ -376,8 +426,22 @@ export function AskFab({ locale, voice }: { locale: UiLocale; voice: boolean }) 
                   ) : null}
                   {shown === "answer" && turn?.answer ? (
                     <div data-testid="ask-fab-answer">
-                      <AnswerCard key={turn.id} question={turn.text} answer={turn.answer} locale={locale} latest askedAt={turn.at} settled={settled} />
+                      <AnswerCard
+                        key={turn.id}
+                        question={turn.text}
+                        answer={turn.answer}
+                        locale={locale}
+                        latest
+                        askedAt={turn.at}
+                        settled={settled}
+                        // harness (10-16): the answer's follow-up question, his to answer here (or his tap on its way)
+                        followUp={replying ? { chosen: replying.optionIds, pending: true } : { onReply: (a) => ask(a.text, a.reply) }}
+                      />
                     </div>
+                  ) : null}
+                  {/* harness (10-16): the question could not show with the 995 line: the chip over the foot of the sheet */}
+                  {shown === "answer" && turn && chipFor === turn.id && !replying ? (
+                    <FollowUpChip locale={turn.answer?.locale ?? locale} question={openQuestion} root={sheetRoot} bottom={voice ? "86px" : "12px"} onSeen={hideChip} />
                   ) : null}
                   {note ? <p className="rpa-note" data-testid="ask-fab-note">{note}</p> : null}
                   {shown === "typing" || shown === "answer" ? (

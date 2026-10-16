@@ -23,6 +23,7 @@ import { checkerConfig, mainProviderKind } from "@/lib/llm";
 import { vapidConfig } from "@/lib/push/vapid";
 import { storeKind } from "@/lib/store";
 import { ttsProviderName, ttsReady } from "@/lib/tts";
+import { visionMode } from "@/lib/vision";
 
 type Env = Record<string, string | undefined>;
 
@@ -55,9 +56,18 @@ export interface HealthReport {
   deployed: boolean;
   /** web push can be sent (a VAPID key pair is configured) */
   push: boolean;
+  /**
+   * ocr | model | cassette | invalid: who reads label photos (lib/vision visionMode). Not compared (HEALTH_COMPARED): a
+   * version from before it answers without it, and a release must not wait for a field the running version cannot give.
+   */
+  label_reader: string;
 }
 
-/** The fields a deployment is compared on (tts_ready depends on the vendor's last answer, so it is not one of them). */
+/**
+ * The fields a deployment is compared on (tts_ready depends on the vendor's last answer, so it is not one of them;
+ * label_reader came after the deployment's first versions, and a field the running version cannot report would make
+ * push-env put the previous file back).
+ */
 export const HEALTH_COMPARED = ["store", "blob", "auth", "llm", "checker", "speech", "speech_problem", "tts", "jobs", "deployed", "push"] as const;
 
 const KNOWN_AUTH = new Set(["memory", "supabase"]);
@@ -111,6 +121,7 @@ export function healthReport(env: Env = process.env): HealthReport {
     jobs: (env.JOBS ?? "").trim() === "1",
     deployed: isDeployed(env),
     push: guarded(() => (vapidConfig(env) ? "yes" : "no")) === "yes",
+    label_reader: quietly(() => guarded(() => visionMode(env))),
   };
 }
 

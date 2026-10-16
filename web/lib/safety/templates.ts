@@ -12,6 +12,7 @@
  * - zh texts are drafts (status "draft") until a Mandarin reader reviews them.
  */
 import { NO_AI_SENTENCE } from "./no-ai";
+import type { FollowUpOption, PathwayId } from "./risk/types";
 import type { Locale } from "./types";
 
 export const UNKNOWN_MED_SENTENCE = "I'm not able to identify that medication, please check with your pharmacist.";
@@ -325,6 +326,102 @@ export const TEMPLATES = {
     speechAct: "referral",
     zhStatus: "draft",
   }),
+
+  // ---- the guided harness (2026-10-16; lib/safety/risk, kb/pathways.json). Each line is shown when a decision-table row
+  // names it in `show`. Written for an older reader: short, one idea per sentence, no medical words. Every row that shows
+  // one of these is "pending_clinician" until a pharmacist or doctor signs it (kb/pathways.json).
+
+  // breathing trouble that may be happening now, shown above the follow-up question (995 before any question). B1-02
+  // (SCDF: breathlessness, lips turning blue or grey) makes the 995 legal
+  signal_995_breathing: T({
+    id: "signal_995_breathing",
+    en: "If you cannot catch your breath even when resting, or your lips or face turn blue or grey, call 995 straight away or go to the nearest A&E.",
+    zh: "要是坐着休息也喘不上气，或者嘴唇、脸色发紫发灰，请马上打 995，或者去最近的急诊。",
+    referralId: "B1-02",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  // a medicine that looks different from before (level 2). The words follow ISMP's advice to consumers (check with the
+  // pharmacist before taking it: consumermedsafety.org "Top 10 reasons to suspect a pharmacy error"); referrals.json B3-05 is
+  // the pharmacist row. Never "stop taking it" as Ripple's own instruction
+  looks_different_pharmacist: T({
+    id: "looks_different_pharmacist",
+    en: "Please check with your pharmacist before you take them.",
+    zh: "吃之前，请先问一下药剂师。",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  added_for_pharmacist: T({
+    id: "added_for_pharmacist",
+    en: "I've added this to your questions for the pharmacist.",
+    zh: "我已把这件事加入给药剂师的问题单。",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  // a possible side effect with no red flag (level 3): the safety net under his doctor's words and the leaflet's line. B1-05
+  // (a severe allergic reaction: swelling of the face, lips or throat, trouble breathing) makes the 995 legal
+  side_effect_995: T({
+    id: "side_effect_995",
+    en: "If you faint, cannot catch your breath, get chest pain, or your face, lips or throat swell, call 995 straight away or go to the nearest A&E.",
+    zh: "要是晕倒、喘不上气、胸口痛，或者脸、嘴唇、喉咙肿起来，请马上打 995，或者去最近的急诊。",
+    referralId: "B1-05",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  // he has already stopped a blood pressure medicine (or one nobody can tell) for days (level 2, pending a clinician: decided
+  // on the careful side). referrals.json B3-02 (stopping a medicine: doctor or pharmacist first); signal_995_unwell follows it
+  stopped_ask_today: T({
+    id: "stopped_ask_today",
+    en: "Since you have already stopped it, please ask your doctor today.",
+    zh: "药已经停了的话，请今天就问医生。",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  // he fainted or passed out and has come round (level 2, pending a clinician: round 2, 10-16). referrals.json B2-07 (felt
+  // faint, or fainted and came round: checked by a doctor soon to find out why); signal_995_unwell follows it
+  fainted_see_doctor: T({
+    id: "fainted_see_doctor",
+    en: "Since you fainted, please get checked by a doctor today to find out why, even if you feel fine now.",
+    zh: "晕倒过的话，就算现在觉得没事，也请今天去看医生，查一查原因。",
+    referralId: "B2-07",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
+  // the self-harm ladder (the research report: Judd et al.'s clinical baseline: name the risk, ask directly, give concrete
+  // resources, encourage contact with the people close to him, keep inviting him to talk). The helpline lines above stay as
+  // they are; these come after them
+  self_harm_here: T({
+    id: "self_harm_here",
+    en: "I'm here. You can keep telling me how you feel.",
+    zh: "我在这里，你可以继续跟我说说你的感受。",
+    speechAct: "logistics",
+    zhStatus: "draft",
+  }),
+  // only when his family is told (lib/care/told.ts: an account with at least one active care link; the pipeline checks)
+  self_harm_family_told: T({
+    id: "self_harm_family_told",
+    en: "I've let your family know, so they can check on you.",
+    zh: "我已经告诉了你的家人，让他们来看看你。",
+    speechAct: "logistics",
+    zhStatus: "draft",
+  }),
+  self_harm_doctor: T({
+    id: "self_harm_doctor",
+    en: "You can also tell your doctor how you have been feeling.",
+    zh: "你也可以把最近的感受告诉医生。",
+    speechAct: "logistics",
+    zhStatus: "draft",
+  }),
+  // immediate danger on the ladder (thoughts with a plan, the means and within a day, or he says so): 995 first, without a
+  // condition. B1-15 (a person at immediate risk of harming themselves: 995 or the nearest A&E)
+  self_harm_danger_995: T({
+    id: "self_harm_danger_995",
+    en: "Please call 995 now, or go to the nearest A&E.",
+    zh: "请现在就打 995，或者去最近的急诊。",
+    referralId: "B1-15",
+    speechAct: "referral",
+    zhStatus: "draft",
+  }),
 } as const satisfies Record<string, Template>;
 
 export type TemplateId = keyof typeof TEMPLATES;
@@ -370,6 +467,273 @@ export function selfHarmTemplateIds(locale: Locale, aboutSomeoneElse = false): T
   if (locale === "zh-Hans") ids.push("self_harm_care_corner");
   return ids;
 }
+
+/**
+ * The guided harness's follow-up questions (2026-10-16; lib/safety/risk/types.ts FollowUp, kb/pathways.json `ask`). Each is
+ * one fixed question with its buttons, in both languages, written for an older reader: short, plain, one idea per line, no
+ * medical words. Rules for anyone editing:
+ * - the option ids are stable (the reply names them, the decision table maps them to facts in risk/pathways.ts); change
+ *   the words, never the ids;
+ * - every option list ends with "Not sure" / 「不确定」, or for the self-harm questions "I'd rather not say" / 「不想说」, and
+ *   that answer counts as the more dangerous side (risk/pathways.ts applyReply);
+ * - at most five buttons (the contract: two to five), so a list of signs is grouped two to a button where the task named
+ *   more ("Chest pain, or short of breath");
+ * - an option's words come back as his words in the conversation (the reply's `text`): no amount, no dose, no medicine
+ *   advice in them;
+ * - a question whose buttons are his medicines (`medicines`) gets one button per medicine of his on the day, by name,
+ *   before "Not sure" (risk/pathways.ts buildFollowUp).
+ * The questions are not Sentences: they never go through the three checks (they say nothing about a medicine), and the
+ * screen draws them under the answer's lines, below 995 and the helplines.
+ */
+export interface FollowUpTemplate {
+  id: string;
+  pathway: PathwayId;
+  en: string;
+  zh: string;
+  /** the fixed buttons (for a medicines question: the ones after his medicines) */
+  options: FollowUpOption[];
+  /** more than one may be chosen (a short list of signs, or of medicines) */
+  multi?: boolean;
+  /** the buttons are his medicines, then `options` */
+  medicines?: boolean;
+  zhStatus: "draft" | "reviewed";
+}
+
+const NOT_SURE: FollowUpOption = { id: "unsure", en: "Not sure", zh: "不确定", tone: "neutral" };
+const RATHER_NOT: FollowUpOption = { id: "rather_not", en: "I'd rather not say", zh: "不想说", tone: "neutral" };
+const NONE_OF_THESE: FollowUpOption = { id: "none", en: "None of these", zh: "都没有", tone: "calm" };
+const F = (f: FollowUpTemplate) => f;
+
+export const FOLLOW_UPS = {
+  // ---- chest pain or pressure (red flags first: is it still there, how long, what comes with it)
+  chest_now: F({
+    id: "chest_now",
+    pathway: "chest",
+    en: "Is the chest pain or pressure still there now?",
+    zh: "胸口现在还痛或者还闷吗？",
+    options: [{ id: "yes", en: "Yes", zh: "还在", tone: "danger" }, { id: "gone", en: "No, it's gone", zh: "没有了，已经好了", tone: "calm" }, NOT_SURE],
+    zhStatus: "draft",
+  }),
+  chest_long: F({
+    id: "chest_long",
+    pathway: "chest",
+    en: "How long has it lasted so far?",
+    zh: "到现在有多久了？",
+    options: [
+      { id: "under5", en: "Under 5 minutes", zh: "不到 5 分钟", tone: "calm" },
+      { id: "over5", en: "5 minutes or more", zh: "5 分钟或更久", tone: "danger" },
+      { id: "comes_goes", en: "It comes and goes", zh: "一阵一阵的", tone: "danger" },
+      NOT_SURE,
+    ],
+    zhStatus: "draft",
+  }),
+  chest_with: F({
+    id: "chest_with",
+    pathway: "chest",
+    en: "Do you have any of these with it?",
+    zh: "同时有没有下面这些情况？",
+    options: [
+      { id: "sweat", en: "Sweating", zh: "出冷汗", tone: "danger" },
+      { id: "breathless", en: "Short of breath", zh: "喘不上气", tone: "danger" },
+      { id: "spreading", en: "Pain spreading to arm, jaw or back", zh: "痛到手臂、下巴或背", tone: "danger" },
+      NONE_OF_THESE,
+      NOT_SURE,
+    ],
+    multi: true,
+    zhStatus: "draft",
+  }),
+  // ---- breathing trouble
+  breathing_rest: F({
+    id: "breathing_rest",
+    pathway: "breathing",
+    en: "Are you short of breath right now, even while resting?",
+    zh: "现在坐着休息也喘不上气吗？",
+    options: [{ id: "yes", en: "Yes", zh: "是", tone: "danger" }, { id: "no", en: "No", zh: "不是", tone: "calm" }, NOT_SURE],
+    zhStatus: "draft",
+  }),
+  breathing_blue: F({
+    id: "breathing_blue",
+    pathway: "breathing",
+    en: "Are your lips or face turning blue or grey?",
+    zh: "嘴唇或脸色有没有发紫、发灰？",
+    options: [{ id: "yes", en: "Yes", zh: "有", tone: "danger" }, { id: "no", en: "No", zh: "没有", tone: "calm" }, NOT_SURE],
+    zhStatus: "draft",
+  }),
+  // ---- a reading above his doctor's line: a sign with it?
+  reading_redflags: F({
+    id: "reading_redflags",
+    pathway: "reading_high",
+    en: "With this reading, do you have any of these now?",
+    zh: "量到这个血压，现在有没有下面这些情况？",
+    options: [
+      { id: "headache_vision", en: "Worst headache ever, or blurred vision", zh: "从没这么痛过的头痛，或看不清楚", tone: "danger" },
+      { id: "chest_breath", en: "Chest pain, or short of breath", zh: "胸口痛，或喘不上气", tone: "danger" },
+      { id: "weak_confused", en: "Weak on one side, or confused", zh: "一边身体没力，或糊涂", tone: "danger" },
+      NONE_OF_THESE,
+      NOT_SURE,
+    ],
+    multi: true,
+    zhStatus: "draft",
+  }),
+  // ---- more of a medicine than the label (webPOISONCONTROL's order: who, a sign now, how much, which ones)
+  extra_who: F({
+    id: "extra_who",
+    pathway: "extra_dose",
+    en: "Who took the extra medicine?",
+    zh: "多吃药的是谁？",
+    options: [
+      { id: "me", en: "Me", zh: "我自己", tone: "neutral" },
+      { id: "child", en: "A child", zh: "小孩", tone: "danger" },
+      { id: "other", en: "Someone else", zh: "别人", tone: "neutral" },
+      NOT_SURE,
+    ],
+    zhStatus: "draft",
+  }),
+  extra_symptoms: F({
+    id: "extra_symptoms",
+    pathway: "extra_dose",
+    en: "Do you have any of these now?",
+    zh: "现在有没有下面这些情况？",
+    options: [
+      { id: "dizzy_faint", en: "Very dizzy, or about to faint", zh: "很晕，或快要晕倒", tone: "danger" },
+      { id: "heart_chest", en: "Very slow heartbeat, or chest pain", zh: "心跳很慢，或胸口痛", tone: "danger" },
+      { id: "vomit_sleepy", en: "Vomiting, or unusually sleepy", zh: "呕吐，或特别想睡", tone: "danger" },
+      NONE_OF_THESE,
+      NOT_SURE,
+    ],
+    multi: true,
+    zhStatus: "draft",
+  }),
+  extra_amount: F({
+    id: "extra_amount",
+    pathway: "extra_dose",
+    en: "How many extra were taken?",
+    zh: "多吃了几粒？",
+    options: [{ id: "one", en: "One", zh: "一粒", tone: "neutral" }, { id: "more", en: "Two or more", zh: "两粒或更多", tone: "danger" }, NOT_SURE],
+    zhStatus: "draft",
+  }),
+  extra_which: F({
+    id: "extra_which",
+    pathway: "extra_dose",
+    en: "Which medicine was it?",
+    zh: "是哪一种药？",
+    options: [NOT_SURE],
+    multi: true,
+    medicines: true,
+    zhStatus: "draft",
+  }),
+  // ---- (round 2, 10-16) taken on purpose? Last, and only when his words do not already say it was a mistake ("by mistake",
+  // 不小心): the contract's intent question (webPOISONCONTROL asks it too). "On purpose" or "I'd rather not say" is 995 now
+  // and the self-harm ladder's "thoughts"
+  extra_purpose: F({
+    id: "extra_purpose",
+    pathway: "extra_dose",
+    en: "Was it by mistake, or did you take them on purpose?",
+    zh: "是不小心多吃的，还是故意多吃的？",
+    options: [{ id: "mistake", en: "By mistake", zh: "不小心的", tone: "calm" }, { id: "purpose", en: "On purpose", zh: "故意的", tone: "danger" }, RATHER_NOT],
+    zhStatus: "draft",
+  }),
+  // ---- a missed dose: which medicine (then the leaflet's own line for it)
+  missed_which: F({
+    id: "missed_which",
+    pathway: "missed_dose",
+    en: "Which medicine did you miss?",
+    zh: "漏吃的是哪一种药？",
+    options: [NOT_SURE],
+    medicines: true,
+    zhStatus: "draft",
+  }),
+  // ---- a medicine that looks different
+  looks_which: F({
+    id: "looks_which",
+    pathway: "looks_different",
+    en: "Which medicine looks different?",
+    zh: "哪一种药看起来不一样？",
+    options: [NOT_SURE],
+    medicines: true,
+    zhStatus: "draft",
+  }),
+  // ---- a possible side effect (red flags first)
+  side_redflags: F({
+    id: "side_redflags",
+    pathway: "side_effect",
+    en: "Since then, have you had any of these?",
+    zh: "这之后有没有出现下面这些情况？",
+    options: [
+      { id: "swelling", en: "Face, lips or throat swelling", zh: "脸、嘴唇或喉咙肿", tone: "danger" },
+      { id: "chest_breath", en: "Chest pain, or short of breath", zh: "胸口痛，或喘不上气", tone: "danger" },
+      { id: "faint_weak", en: "Fainted, or weak on one side", zh: "晕倒过，或一边身体没力", tone: "danger" },
+      NONE_OF_THESE,
+      NOT_SURE,
+    ],
+    multi: true,
+    zhStatus: "draft",
+  }),
+  side_which: F({
+    id: "side_which",
+    pathway: "side_effect",
+    en: "Which medicine do you think it is from?",
+    zh: "你觉得是哪一种药引起的？",
+    options: [NOT_SURE],
+    medicines: true,
+    zhStatus: "draft",
+  }),
+  side_since: F({
+    id: "side_since",
+    pathway: "side_effect",
+    en: "Since when has it been like this?",
+    zh: "从什么时候开始这样的？",
+    options: [
+      { id: "since_start", en: "Since it started", zh: "刚开始吃就有", tone: "neutral" },
+      { id: "since_change", en: "Since a dose change", zh: "换了剂量以后", tone: "neutral" },
+      NOT_SURE,
+    ],
+    zhStatus: "draft",
+  }),
+  // ---- stopping or changing a medicine (his idea or someone else's)
+  stop_already: F({
+    id: "stop_already",
+    pathway: "stop_change",
+    en: "Have you already stopped it?",
+    zh: "这个药你已经停了吗？",
+    options: [{ id: "yes", en: "Yes", zh: "已经停了", tone: "neutral" }, { id: "not_yet", en: "Not yet", zh: "还没有", tone: "calm" }, NOT_SURE],
+    zhStatus: "draft",
+  }),
+  stop_since: F({
+    id: "stop_since",
+    pathway: "stop_change",
+    en: "When did you stop?",
+    zh: "什么时候停的？",
+    options: [
+      { id: "today", en: "Today", zh: "今天", tone: "neutral" },
+      { id: "days", en: "A few days ago", zh: "几天前", tone: "neutral" },
+      { id: "longer", en: "Longer ago", zh: "更早以前", tone: "neutral" },
+      NOT_SURE,
+    ],
+    zhStatus: "draft",
+  }),
+  // ---- the self-harm ladder: ask directly (accepted practice; the research report, Judd et al.)
+  self_harm_confirm: F({
+    id: "self_harm_confirm",
+    pathway: "self_harm_check",
+    en: "It sounds like things are very hard right now. Are you having thoughts of ending your life or hurting yourself?",
+    zh: "听起来你现在很难受。你有没有想过结束自己的生命，或者伤害自己？",
+    options: [{ id: "yes", en: "Yes", zh: "有", tone: "danger" }, { id: "no", en: "No", zh: "没有", tone: "calm" }, RATHER_NOT],
+    zhStatus: "draft",
+  }),
+  self_harm_danger: F({
+    id: "self_harm_danger",
+    pathway: "self_harm_check",
+    en: "Are you thinking of doing it soon, or do you have something ready to do it with?",
+    zh: "你是不是打算很快就这样做，或者已经准备好了东西？",
+    options: [{ id: "yes", en: "Yes", zh: "是", tone: "danger" }, { id: "no", en: "No", zh: "不是", tone: "calm" }, RATHER_NOT],
+    zhStatus: "draft",
+  }),
+} as const satisfies Record<string, FollowUpTemplate>;
+
+export type FollowUpTemplateId = keyof typeof FOLLOW_UPS;
+
+export const ALL_FOLLOW_UPS: FollowUpTemplate[] = Object.values(FOLLOW_UPS);
 
 /** Which B1 row backs the emergency template for the symptoms found (default B1-01). */
 export function emergencyReferralFor(signals: string[]): string {

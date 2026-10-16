@@ -81,7 +81,7 @@ afterEach(() => {
 });
 
 describe("store round trips for the hero question", () => {
-  it("POST /api/ask on the example account: no read twice, at most 6 round trips in a row, 20 calls", async () => {
+  it("POST /api/ask on the example account: no read twice, at most 6 round trips in a row, 22 calls", async () => {
     const store = getMemoryStore();
     const him = await createAccountWithSpace(store, getAuthProvider(), { login: `rt${randomUUID().slice(0, 10)}`, password: "a long test password", space: "example" });
     const m = countRoundTrips(store);
@@ -99,7 +99,8 @@ describe("store round trips for the hero question", () => {
     const trace = m.calls.map((c) => `${c.depth} ${c.method}`).join("\n");
     expect(m.repeatedReads(), trace).toEqual([]);
     expect(m.depth(), trace).toBeLessThanOrEqual(6);
-    expect(m.calls.length, trace).toBeLessThanOrEqual(20);
+    // (the harness, 10-16: his conversation of today and his safety records are read too, side by side with the rest: 22)
+    expect(m.calls.length, trace).toBeLessThanOrEqual(22);
     // his counters: one hit, two reads, none of them after the reads they sit beside
     expect(m.count("rateHit")).toBe(1);
     expect(m.count("getRateWindow")).toBe(2);

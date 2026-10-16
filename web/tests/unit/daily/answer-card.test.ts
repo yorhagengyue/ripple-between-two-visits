@@ -94,7 +94,11 @@ describe("AnswerCard: an answer as one line", () => {
     // one line: his entry, then the group that is the part
     expect((out.match(/data-rp="timeline"/g) ?? []).length).toBe(1);
     expect(out).toMatch(/<div class="rpu-tl-group" data-rp="tl-group" data-testid="answer-line" data-kind="hotlines" data-source="[^"]+">/);
-    expect(entries(out)).toEqual(["me", "rip", "rip", "rip", "rip"]);
+    // (the harness, 10-16: right after the helplines the ladder's follow-up question, FollowUpQuestion's entry, then the
+    // ladder's "I'm here ..." and "tell your doctor", Ripple's own lines with no number)
+    expect(entries(out)).toEqual(["me", "rip", "rip", "rip", "rip", "rip", "rip:ripple", "rip:ripple"]);
+    expect(out.indexOf('data-testid="ask-followup"')).toBeGreaterThan(out.lastIndexOf('class="rpu-hotline"'));
+    expect(out.indexOf('data-testid="ask-followup"')).toBeLessThan(out.indexOf('data-kind="ripple"'));
     expect((out.match(/class="rpu-hotline"/g) ?? []).length).toBe(4);
     const calls = [...out.matchAll(/<a class="rpu-act" href="([^"]+)" data-variant="([a-z]+)"(?: data-urgent="true")? data-rp="call">/g)].map((m) => [m[1], m[2]]);
     expect(calls).toEqual([

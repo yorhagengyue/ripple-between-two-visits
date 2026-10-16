@@ -72,7 +72,45 @@ const HOTLINE_TEMPLATES = new Set([
   "signal_995_chest",
   "signal_995_stroke",
   "signal_995_unwell",
+  // the guided harness's own 995 lines (lib/safety/templates.ts, 10-16): Ripple's line with its 打 995 button, as the ones
+  // above (they were drawn as a plain bubble with no way to dial)
+  "signal_995_breathing",
+  "side_effect_995",
+  "self_harm_danger_995",
 ]);
+
+/**
+ * A crisis line of an answer: the 995 card's sentence, or a fixed line with a number to call (995, the helplines, the safety
+ * line). The harness's follow-up question is drawn right after these and before the rest of the answer (10-16).
+ */
+export function isCrisisLine(s: Pick<Sentence, "templateId" | "origin">): boolean {
+  const id = s.templateId ?? "";
+  return EMERGENCY_TEMPLATES.has(id) || HOTLINE_TEMPLATES.has(id);
+}
+
+/** His doctor's (a clinician's) own warning line: a quoted line that names 995 or A&E (R2: "go to A&E or call 995"). */
+const WARNING_WORDS = /\b995\b|A&E|急诊/i;
+export const isWarningQuote = (text: string, translation?: string): boolean => WARNING_WORDS.test(text) || (!!translation && WARNING_WORDS.test(translation));
+
+/**
+ * An answer's lines around its follow-up question (the harness, 10-16; the owner's coordinator's decisions for the owner):
+ *   - his doctor's warning line comes before the first crisis line (the reading above his doctor's line, the chest pain
+ *     kept for his doctor: the owner's order of 10-14, kept): everything up to the last crisis line stays as it was, the
+ *     question follows it, and only what came after the crisis lines goes under the question;
+ *   - otherwise the crisis lines first in their order, the question, then the rest in its order;
+ *   - no crisis line: the question first.
+ * `head` is drawn before the question, `tail` after it.
+ */
+export function aroundQuestion<T>(items: readonly T[], isCrisis: (t: T) => boolean, isWarning: (t: T) => boolean): { head: T[]; tail: T[] } {
+  const first = items.findIndex(isCrisis);
+  if (first < 0) return { head: [], tail: [...items] };
+  let last = first;
+  items.forEach((t, i) => {
+    if (isCrisis(t)) last = i;
+  });
+  if (items.slice(0, first).some(isWarning)) return { head: items.slice(0, last + 1), tail: items.slice(last + 1) };
+  return { head: items.filter(isCrisis), tail: items.filter((t) => !isCrisis(t)) };
+}
 
 const hasHan = (s: string) => /\p{Script=Han}/u.test(s);
 

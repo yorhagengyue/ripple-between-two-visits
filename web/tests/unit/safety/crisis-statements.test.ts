@@ -15,6 +15,7 @@ import { ask } from "@/lib/safety/pipeline";
 import { renderText } from "@/lib/safety/render";
 import { TEMPLATES } from "@/lib/safety/templates";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const CTX = { doctorThresholdSystolic: 180, meds: [] };
 
@@ -114,10 +115,12 @@ function screeningLlm(answer: string | Error, calls: ChatOpts[] = []): LlmClient
     model: "fake",
     async chat(opts) {
       calls.push(opts);
-      const task = JSON.parse(opts.user).task as string;
-      if (task === "crisis") {
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
+      // (the harness: the risk screen replaced the crisis screen; it answers with the frame of the scripted word)
+      if (task === "crisis" || task === "risk_screen") {
         if (answer instanceof Error) throw answer;
-        return { content: answer, tokens: 5 };
+        return { content: task === "risk_screen" ? frameReply(answer, payload.message ?? "") : answer, tokens: 5 };
       }
       return { content: JSON.stringify({ sentences: [] }), tokens: 1 };
     },
@@ -132,10 +135,11 @@ describe("the live model's crisis screen on a statement the rules only log", () 
     const calls: ChatOpts[] = [];
     const { res, shown, notesAdded } = await askAt(STATEMENT, 30, null, screeningLlm('{"crisis":"self_harm","reason":"hopeless"}', calls));
     expect(res.route).toBe("self_harm");
-    expect(res.routeReason).toMatch(/^model_crisis:fake-live:self_harm/);
+    // (the harness, 10-16: the risk screen, task risk_screen, replaced the single-message crisis screen; the route reason is the decision table's row, a code)
+    expect(res.routeReason).toBe("harness:self-harm-thoughts");
     expect(shown).toContain("1767");
     expect(notesAdded).toBe(0);
-    expect(calls.filter((c) => c.purpose === "crisis")).toHaveLength(1);
+    expect(calls.filter((c) => c.purpose === "risk_screen")).toHaveLength(1);
   });
 
   it("'none', an invalid answer or an error keep the note (the model can never lower or invent a route)", async () => {
@@ -144,12 +148,13 @@ describe("the live model's crisis screen on a statement the rules only log", () 
       expect(res.route, String(answer)).toBe("log_only");
       expect(notesAdded).toBe(1);
     }
-    // an LlmError keeps its own message (written by lib/llm); any other error is the code alone (fix round 1: never the
-    // text of the error, which can quote the model's reply)
+    // the error is a code alone: an LlmError's code, anything else "error" (fix round 1: never the text of the error, which
+    // can quote the model's reply; the risk screen keeps codes only, risk/screen.ts)
     const timedOut = await askAt(STATEMENT, 30, null, screeningLlm(new LlmError("timeout", "deepseek timed out after 5000 ms (1 attempt)", 504)));
-    expect((timedOut.res.events[0].output as { crisisScreen: { error: string } }).crisisScreen.error).toMatch(/timed out/);
+    expect((timedOut.res.events[0].output as { crisisScreen: { error: string } }).crisisScreen.error).toBe("timeout");
+    expect(timedOut.res.risk).toMatchObject({ frameSource: "rules", screen: { error: "timeout" } });
     const failed = await askAt(STATEMENT, 30, null, screeningLlm(new Error("deepseek timed out")));
-    expect((failed.res.events[0].output as { crisisScreen: { error: string } }).crisisScreen.error).toBe("crisis screen unavailable (error)");
+    expect((failed.res.events[0].output as { crisisScreen: { error: string } }).crisisScreen.error).toBe("error");
   });
 
   it("offline (mock) there is no screen call: the rules are the crisis screen", async () => {
@@ -167,7 +172,8 @@ describe("the live model's crisis screen on a statement the rules only log", () 
     const calls: ChatOpts[] = [];
     const { res } = await askAt("chest damn pain leh", 30, null, screeningLlm('{"crisis":"none"}', calls));
     expect(res.route).toBe("emergency");
-    expect(calls.map((c) => c.purpose)).toEqual(["crisis_words"]);
+    // (the harness, 10-16: the risk screen starts with the answer and its lines never wait for it)
+    expect(calls.map((c) => c.purpose).sort()).toEqual(["crisis_words", "risk_screen"]);
     expect(renderText(res, "en")).toContain("995");
   });
 });

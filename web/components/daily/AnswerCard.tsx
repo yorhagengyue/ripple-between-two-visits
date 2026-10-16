@@ -34,6 +34,16 @@
  *                     it gets bad with its 打 995 button, drawn as the helplines are (answer-parts.ts)
  *   helplines (10)    Ripple's entries on the same line as his words, one per fixed sentence: the sentence in its
  *                     bubble, its numbers as buttons under it (the foundation's <Hotlines>); only 995 is red
+ *   a question        (the guided harness, 2026-10-16; only when the answer carries one) ONE fixed question of
+ *                     lib/safety's with its options as buttons (FollowUpQuestion.tsx). 10-16, the owner's coordinator's
+ *                     decisions (the question is seen on arrival; the owner's order of 10-14 kept): the answer's crisis
+ *                     lines first (the 995 card, the 995 lines, the helplines, the safety line: answer-parts.ts
+ *                     isCrisisLine), in their order, then the question, then the rest of the answer in its order (his
+ *                     doctor's words, the label, Ripple's notes, where his question went); but when his doctor's warning
+ *                     line came before the 995 sentence (the reading above his doctor's line, chest pain kept for his
+ *                     doctor), everything up to the 995 sentence stays as it was and the question follows it
+ *                     (answer-parts.ts aroundQuestion). Without a question nothing moves. The screen says how it stands
+ *                     (`followUp`: his to answer, on its way, answered, or closed)
  *
  * The words are lib/safety's and the app's own (ask-copy.ts, lib/ui/copy.ts): nothing here writes a sentence, and the
  * parts keep the order lib/safety gave them (on the hero question: the doctor's words, the label, then the fixed
@@ -64,8 +74,8 @@
  * stage line under them (「在找医生说过的话……」, 「正在写……」; its hook is the screen's waiting line, ask-pending or
  * ask-thinking). A draft is never "the answer": it is ask-draft (data-complete="false", aria-busy) instead of ask-answer,
  * ask-draft-turn instead of ask-turn, offers nothing to tap (no offer, no way to the list, no 记下来, nothing plays by
- * itself), and draws chit-chat and notes as plain parts. When the final answer comes the screen draws it without `draft`:
- * exactly the card it always was.
+ * itself, no follow-up question: the final answer carries it), and draws chit-chat and notes as plain parts. When the final
+ * answer comes the screen draws it without `draft`: exactly the card it always was.
  */
 import { Fragment, useState, type ReactNode } from "react";
 import { ChatAnswer, SourceLine } from "@/components/chat/ChatAnswer";
@@ -75,8 +85,9 @@ import { Act, Acts, Bubble, EmergencyBlock, Hotlines, LabelOriginal, Said, SaidT
 import type { StoredAnswer } from "@/lib/safety/turns";
 import { uiCopy } from "@/lib/ui/copy";
 import type { UiLocale } from "@/lib/ui/tokens";
-import { answerLine, type AnswerPart, type GlossPart } from "./answer-parts";
+import { answerLine, aroundQuestion, isCrisisLine, isWarningQuote, type AnswerPart, type GlossPart } from "./answer-parts";
 import { askCopy, questionRowWords } from "./ask-copy";
+import { FollowUpQuestion, type FollowUpState } from "./FollowUpQuestion";
 
 const words = (text: string) => <span data-testid="answer-text">{text}</span>;
 
@@ -253,7 +264,7 @@ function OfferToList({ text, who, locale }: { text: string; who: "doctor" | "pha
  * 「只记录」 and 「帮不上」 (07-2d, 07-2g), as the day's record draws them: its ChatAnswer for the entries, the same
  * buttons under the sentence they answer. `text`: his own words (what 「记下来」 saves as today's note).
  */
-function NotedOrCantHelp({ text, answer, locale, noted: notedBefore }: { text: string; answer: StoredAnswer; locale: UiLocale; noted: boolean }) {
+function NotedOrCantHelp({ text, answer, locale, noted: notedBefore, asks }: { text: string; answer: StoredAnswer; locale: UiLocale; noted: boolean; asks?: ReactNode }) {
   const copy = askCopy(locale);
   const ui = uiCopy(locale);
   const w = CHAT_WORDS[locale];
@@ -278,10 +289,31 @@ function NotedOrCantHelp({ text, answer, locale, noted: notedBefore }: { text: s
     if (res?.ok) setNoted(true);
     else setFailed(true);
   };
+  // harness (10-16): with a question, the lines before it and after it as answer-parts.ts aroundQuestion says (the crisis
+  // lines first, or the owner's 10-14 order up to the 995 sentence when his doctor's warning line came first), then the rest
+  // and everything that hangs at the end of the answer (where his question went, the no-AI line, Ripple's own words)
+  const split = asks ? aroundQuestion(answer.sentences, isCrisisLine, (s) => s.sourceId.startsWith("visit:") && isWarningQuote(s.en, s.zh ?? s.translation?.text)) : null;
+  const crisis = split ? split.head : [];
+  const rest = split ? split.tail : answer.sentences;
+  const restAnswer: StoredAnswer = split
+    ? {
+        ...answer,
+        sentences: rest,
+        ...(answer.gloss ? { gloss: { ...answer.gloss, at: answer.sentences.slice(0, answer.gloss.at).filter((s) => rest.includes(s)).length } } : {}),
+      }
+    : answer;
   return (
     <>
+      {crisis.length ? (
+        <ChatAnswer
+          answer={{ route: answer.route, sentences: crisis, locale: answer.locale }}
+          locale={locale}
+          hooks={{ answer: null, part: "answer-line", added: "ask-question-added", noAi: "answer-no-ai" }}
+        />
+      ) : null}
+      {asks}
       <ChatAnswer
-        answer={answer}
+        answer={restAnswer}
         locale={locale}
         hooks={{ answer: null, part: "answer-line", added: "ask-question-added", noAi: "answer-no-ai" }}
         slots={{
@@ -344,11 +376,17 @@ export function AnswerCard({
   aiNote = true,
   draft,
   settled = false,
+  followUp,
 }: {
   question: string;
   answer: StoredAnswer;
   locale: UiLocale;
   latest?: boolean;
+  /**
+   * harness (2026-10-16): how the answer's follow-up question stands on this screen and what a tap does
+   * (FollowUpQuestion.tsx). Left out, a question the answer carries is drawn closed: nothing to tap.
+   */
+  followUp?: FollowUpState;
   /** SSE: the answer as it stands while it is being made (never the answer itself: see the header) */
   draft?: AnswerDraft;
   /** SSE: this answer takes the place of its draft, which was on the screen: it does not rise in again (app/motion.css) */
@@ -379,6 +417,8 @@ export function AnswerCard({
   ) : null;
   /** the answer said without his consent to AI processing says so, once, unless the screen already does */
   const noAi = aiNote && !!answer.noAiConsent && !answer.sentences.some((s) => s.templateId === "no_ai_consent");
+  /** harness: the follow-up question, under every sentence of the answer (never on a draft: the final answer carries it) */
+  const asks = !draft && answer.followUp ? <FollowUpQuestion key="follow-up" followUp={answer.followUp} locale={answer.locale ?? locale} state={followUp} /> : null;
 
   let body: ReactNode;
   if (!draft && (answer.route === "log_only" || answer.route === "cant_help")) {
@@ -386,13 +426,19 @@ export function AnswerCard({
     body = (
       <Timeline>
         {his}
-        <NotedOrCantHelp text={question} answer={aiNote ? answer : { ...answer, noAiConsent: undefined }} locale={locale} noted={noted} />
+        <NotedOrCantHelp text={question} answer={aiNote ? answer : { ...answer, noAiConsent: undefined }} locale={locale} noted={noted} asks={asks} />
       </Timeline>
     );
   } else {
     // the parts in the order lib/safety gave them (the doctor's words first, the fixed referral last): never re-sorted here;
     // Ripple's own explanation, when the answer has one, where the answer says it stands (after the last quote)
-    const parts = answerLine(answer.sentences, locale, answer.gloss);
+    const given = answerLine(answer.sentences, locale, answer.gloss);
+    // harness (10-16): with a question, the lines before it (answer-parts.ts aroundQuestion), the question at `askAt`, the rest
+    const crisisPart = (p: { kind: string }) => p.kind === "emergency" || p.kind === "hotlines";
+    const warningPart = (p: AnswerPart | GlossPart) => p.kind === "quote" && isWarningQuote(p.text, p.translation);
+    const split = asks ? aroundQuestion(given, crisisPart, warningPart) : null;
+    const parts = split ? [...split.head, ...split.tail] : given;
+    const askAt = split ? split.head.length : -1;
     const lastAt = parts.length - 1;
     // answered at a visit already: the answer's own line stands in a card, and the way to the list hangs under the last entry
     const before = answer.answeredBefore;
@@ -412,6 +458,7 @@ export function AnswerCard({
     };
     parts.forEach((part, i) => {
       const key = `${part.source}-${i}`;
+      if (i === askAt) line.push(asks);
       if (part.kind === "emergency") {
         flush(`line-${i}`);
         blocks.push(
@@ -448,6 +495,8 @@ export function AnswerCard({
       const caret = !!draft?.writing && part.kind === "gloss" && part.source === "general";
       line.push(<PartItem key={key} part={part} locale={locale} card={part.kind === "quote" && before?.sourceId === part.source} after={after ?? undefined} caret={caret} />);
     });
+    // harness: an answer of crisis lines only: the question after all of them
+    if (asks && askAt >= parts.length) line.push(asks);
     // where his question went: on the list for the next visit (a tick), with the way to the list
     if (!before && answer.addedQuestionId) {
       line.push(

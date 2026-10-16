@@ -11,6 +11,7 @@ import { createCompatClient } from "@/lib/llm";
 import type { CompatConfig } from "@/lib/llm/openai";
 import type { ChatOpts, LlmClient } from "@/lib/llm/types";
 import { CRISIS_WORDS_TIMEOUT_MS } from "@/lib/safety/crisis-words";
+import { RISK_SCREEN_TIMEOUT_MS } from "@/lib/safety/risk/screen";
 import { askDeadlineMs, layer3ReserveMs, ask } from "@/lib/safety/pipeline";
 import { renderText } from "@/lib/safety/render";
 import { getMemoryStore } from "@/lib/store/memory";
@@ -91,9 +92,11 @@ describe("a model that never answers", () => {
   it("a crisis waits for no model to be answered: only for the wording of its 995 line, at most CRISIS_WORDS_TIMEOUT_MS, then the fixed sentence stands", async () => {
     const calls: ChatOpts[] = [];
     const { res, ms } = await askWith("I have chest pain and my left arm feels heavy", hangingLlm(calls), { deadlineMs: 60_000 });
-    // (owner 10-15: the one call is the wording, crisis-words.ts; no classification, no screen, no generation)
-    expect(ms).toBeLessThan(CRISIS_WORDS_TIMEOUT_MS + 1000);
-    expect(calls.map((c) => c.purpose)).toEqual(["crisis_words"]);
+    // (owner 10-15: the wording, crisis-words.ts; no classification, no generation. The harness, 10-16: the risk screen starts
+    // with the answer; his chest pain is kept for his doctor here, so its frame is waited for beside the wording, no longer
+    // than its own time, in case it says 995 now; the lines went out before either)
+    expect(ms).toBeLessThan(Math.max(RISK_SCREEN_TIMEOUT_MS, CRISIS_WORDS_TIMEOUT_MS) + 1000);
+    expect(calls.map((c) => c.purpose).sort()).toEqual(["crisis_words", "risk_screen"]);
     expect(renderText(res, "en")).toContain("995");
     expect(res.sentences.some((s) => s.origin === "voiced")).toBe(false);
     expect((res.events[0].output as { crisisWords: { voiced: boolean; why: string } }).crisisWords).toMatchObject({ voiced: false, why: "time" });

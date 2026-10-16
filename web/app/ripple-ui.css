@@ -562,6 +562,9 @@
   .rpu-act[data-variant="primary"]:active { background: var(--rp-accent-press); border-color: var(--rp-accent-press); }
   .rpu-act[data-variant="outline"] { border-color: var(--rp-accent); color: var(--rp-accent); font-weight: 800; }
   .rpu-act[data-variant="danger"] { background: var(--rp-urgent); border-color: var(--rp-urgent); color: var(--rp-on-urgent); font-weight: 800; }
+  /* the 995 side of a follow-up question's answers (the guided harness, 10-16: the owner's coordinator's decision: no fill,
+     so the only filled red on the screen is the real 995 call): .rpu-btn[data-variant="danger-outline"] on a row's button */
+  .rpu-act[data-variant="danger-outline"] { border-color: var(--rp-urgent); background: var(--rp-white); color: var(--rp-urgent); font-weight: 800; }
   .rpu-act[data-variant="on"] { background: var(--rp-ink); color: var(--rp-on-ink); font-weight: 800; }
   .rpu-act:disabled:not([aria-busy="true"]) { background: var(--rp-tint); border-color: var(--rp-tint); color: var(--rp-off); cursor: default; }
   .rpu-act[aria-busy="true"] { cursor: progress; }

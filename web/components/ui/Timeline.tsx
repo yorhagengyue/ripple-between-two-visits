@@ -231,10 +231,13 @@ export function TimelineItem({
   );
 }
 
-/** Ripple's fixed sentence in its tinted bubble (node "rip"), or his own words, plain (any other node). Sans. */
-export function Bubble({ node = "rip", children, lang, testId }: { node?: NodeKind; children: ReactNode; lang?: string; testId?: string }) {
+/**
+ * Ripple's fixed sentence in its tinted bubble (node "rip"), or his own words, plain (any other node). Sans. `id`: for a
+ * group the sentence names (the harness's follow-up question is labelled by its own words, 2026-10-16).
+ */
+export function Bubble({ node = "rip", children, lang, testId, id }: { node?: NodeKind; children: ReactNode; lang?: string; testId?: string; id?: string }) {
   return (
-    <p className="rpu-bubble" data-rp="bubble" data-node={node === "rip" ? "rip" : undefined} data-rp-role="say" lang={lang} data-testid={testId}>
+    <p id={id} className="rpu-bubble" data-rp="bubble" data-node={node === "rip" ? "rip" : undefined} data-rp-role="say" lang={lang} data-testid={testId}>
       {children}
     </p>
   );
@@ -543,7 +546,8 @@ function countChildren(children: ReactNode): number {
   return children === null || children === undefined || children === false ? 0 : 1;
 }
 
-type ActVariant = "secondary" | "primary" | "outline" | "danger" | "on";
+/** "danger-outline": the 995 side of a follow-up question's answers (red words and edge, no fill: the harness, 10-16) */
+type ActVariant = "secondary" | "primary" | "outline" | "danger" | "danger-outline" | "on";
 
 type ActButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & { children: ReactNode; variant?: ActVariant; href?: undefined; pending?: boolean };
 type ActLinkProps = DataAttrs & { children: ReactNode; variant?: ActVariant; href: string; "aria-label"?: string; className?: string; /** how the screen moves (lib/ui/nav-motion.ts) */ nav?: NavMotion };

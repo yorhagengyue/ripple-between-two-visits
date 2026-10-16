@@ -43,6 +43,10 @@ const LINKED: Partial<Record<TemplateId, string[]>> = {
   signal_995_chest: ["995"],
   signal_995_stroke: ["995"],
   signal_995_unwell: ["995"],
+  // the harness (10-16): breathing's and a side effect's 995 line, and 995 now at the self-harm ladder's danger step
+  signal_995_breathing: ["995"],
+  side_effect_995: ["995"],
+  self_harm_danger_995: ["995"],
 };
 
 const digitsOf = (s: string) => s.replace(/\D/g, "");
@@ -185,7 +189,8 @@ describe("AnswerView: the crisis answers from POST /api/ask", () => {
   it("self-harm (华语): 995, 1767, 1771 and 1800-3535-800 are tel: links and CareText a WhatsApp link, each once; every line's words unchanged", async () => {
     const result = await ask("我不想活了", "zh-Hans");
     expect(result.route).toBe("self_harm");
-    const ids: TemplateId[] = ["self_harm_995", "self_harm_sos", "self_harm_mindline", "self_harm_care_corner"];
+    // (the harness, 10-16: the ladder's "I'm here ..." and "tell your doctor" follow the helplines; no number in them)
+    const ids: TemplateId[] = ["self_harm_995", "self_harm_sos", "self_harm_mindline", "self_harm_care_corner", "self_harm_here", "self_harm_doctor"];
     expect(result.sentences.map((s) => s.templateId)).toEqual(ids);
     const html = render(result, "zh-Hans");
     expect(answerTexts(html).map(decode)).toEqual(ids.map((id) => TEMPLATES[id].zh));
@@ -216,7 +221,7 @@ describe("AnswerView: the crisis answers from POST /api/ask", () => {
     const result = await ask("I don't want to live anymore", "en");
     expect(result.route).toBe("self_harm");
     const html = render(result, "en");
-    expect(answerTexts(html).map(decode)).toEqual([TEMPLATES.self_harm_995.en, TEMPLATES.self_harm_sos.en, TEMPLATES.self_harm_mindline.en]);
+    expect(answerTexts(html).map(decode)).toEqual([TEMPLATES.self_harm_995.en, TEMPLATES.self_harm_sos.en, TEMPLATES.self_harm_mindline.en, TEMPLATES.self_harm_here.en, TEMPLATES.self_harm_doctor.en]);
     expect(linksIn(html).map((l) => l.attrs.href)).toEqual(["tel:995", "tel:1767", "https://wa.me/6591511767", "tel:1771"]);
     expect(linksIn(html)[2].attrs["aria-label"]).toBe("WhatsApp text 9151 1767");
   });

@@ -202,6 +202,9 @@ describe("what she gets: every bound link, whatever the switches", () => {
   let first: { res: AskResult; told: TellResult | null };
 
   beforeAll(async () => {
+    // a new conversation (the harness, 10-16, reads today's safety records: the chest questions the tests above left
+    // unanswered would count by now, and his fourth chest message of the day would be 995 now)
+    await store.pruneSafetyEvents(him.userId, "2100-01-01T00:00:00.000Z");
     let told: TellResult | null = null;
     const { res } = await askHim(TIGHT, "en", {
       tell: async (input) => {
@@ -240,7 +243,10 @@ describe("what she gets: every bound link, whatever the switches", () => {
       expect(n.url).toBe(`/f/alert/told?link=${encodeURIComponent(n.to.role === "family" ? n.to.linkId : "")}&id=${encodeURIComponent(n.deliveryId)}`);
       const built = payloadFromNotice(n);
       expect(built.replaced).toBe(false);
-      expect(JSON.stringify(built.payload)).not.toMatch(/chest|stairs|995|180|胸/);
+      // the words a lock screen shows (the ids and the url are random: a uuid like "…b38bc31803a7" once held "180" and
+      // failed this under load, 10-16), with the ids and the url taken out
+      const shown = JSON.stringify({ ...built.payload, url: "", tag: "", delivery: "", sent_at: "" });
+      expect(shown).not.toMatch(/chest|stairs|995|180|胸/);
     }
   });
 
@@ -354,7 +360,13 @@ describe("a helpline answer, as she receives it (his own words about hurting him
     const [n] = await toldNotices(store, s, link);
     expect(n.words).toBe("我不想活了");
     expect(n.answerLang).toBe("zh-Hans");
-    expect(n.lines).toEqual(["self_harm_995", "self_harm_sos", "self_harm_mindline", "self_harm_care_corner"].map((id) => ({ text: TEMPLATES[id as keyof typeof TEMPLATES].zh, lang: "zh-Hans" })));
+    // (the harness, 10-16: the ladder's lines after the helplines; "I've let your family know" because she is told)
+    expect(n.lines).toEqual(
+      ["self_harm_995", "self_harm_sos", "self_harm_mindline", "self_harm_care_corner", "self_harm_here", "self_harm_family_told", "self_harm_doctor"].map((id) => ({
+        text: TEMPLATES[id as keyof typeof TEMPLATES].zh,
+        lang: "zh-Hans",
+      })),
+    );
   });
 
   it("her screens in Chinese and English: the sentence, his words, the helplines, the call button; no clinical line of Ripple's own", async () => {
@@ -420,5 +432,49 @@ describe("the push sender lets it through on her link alone (no switch)", () => 
     expect(await no(notice, store)).toEqual({ sent: 0 });
     expect(listed).toEqual([her.userId]);
     expect(mayNotify).not.toHaveBeenCalled();
+  });
+});
+
+describe("told after his answer to a follow-up question (the harness, 10-16): the conversation before it", () => {
+  it("her notice: his first message, Ripple's question and his tap, then Ripple's lines; never told for the question alone", async () => {
+    const elder = await createAccountWithSpace(store, auth, { login: `q${randomUUID().slice(0, 10)}`, password: "a long test password", space: "example" });
+    const daughter = await createAccountWithSpace(store, auth, { login: `r${randomUUID().slice(0, 10)}`, password: "a long test password", space: "none" });
+    const inv = await store.createInvite({ patient_id: elder.userId, patient_label: "Dad", invite_token_hash: randomUUID(), invite_expires_at: "2099-01-01T00:00:00.000Z" }, NO_GRANTS);
+    if (!inv.ok) throw new Error(inv.code);
+    const acc = await store.acceptInvite(inv.link.invite_token_hash!, daughter.userId, "family");
+    if (!acc.ok) throw new Error(acc.code);
+    const ok = await store.confirmLink(inv.link.id, elder.userId, true);
+    if (!ok.ok) throw new Error(ok.code);
+    await agreedLink(store, ok.link);
+    const pending: Promise<unknown>[] = [];
+    const deps = {
+      store,
+      llm: createMockLlm(),
+      checker: null,
+      checkerReason: "test",
+      publish: () => {},
+      costGuard: null,
+      tellFamily: (input: TellInput) => {
+        const p = tellFamily(input, { send: async () => ({ sent: 1 }), publish: () => {} });
+        pending.push(p);
+        return p;
+      },
+    };
+    const first = "What's the most amlodipine a person can take in one go?";
+    const asked = await ask({ sessionId: elder.userId, text: first, locale: "en", role: "patient" }, deps);
+    expect(asked.followUp?.templateId).toBe("self_harm_confirm");
+    await Promise.all(pending);
+    expect(pending).toHaveLength(0);
+    const s = (await store.getSession(elder.userId))!;
+    await recordAskTurn(store, s.id, { day: s.story_day, text: first, lang: "en", result: asked });
+    const tapped = await ask({ sessionId: elder.userId, text: "I'd rather not say", locale: "en", role: "patient", reply: { followUpId: asked.followUp!.id, optionIds: ["rather_not"] } }, deps);
+    await Promise.all(pending);
+    expect(tapped.route).toBe("self_harm");
+    await recordAskTurn(store, s.id, { day: s.story_day, text: "I'd rather not say", lang: "en", result: tapped });
+    const [n] = await toldNotices(store, s, ok.link.id);
+    expect(n.words).toBe(first);
+    expect(n.steps).toEqual([{ question: asked.followUp!.en, answer: "I'd rather not say" }]);
+    expect(n.lines.map((l) => l.text)).toEqual(tapped.sentences.map((x) => x.en));
+    expect(n.lines.map((l) => l.text)).toContain(TEMPLATES.self_harm_family_told.en);
   });
 });

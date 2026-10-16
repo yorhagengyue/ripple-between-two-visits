@@ -161,8 +161,10 @@ describe("answers that are fixed sentences get no planted sentence", () => {
       expect(r.blocked, text).toEqual([]);
       expect(r.sentences.map((x) => x.templateId), text).toEqual(plain.sentences.map((x) => x.templateId));
       expect(drillLeaked(r.sentences), text).toBe(false);
-      // (a note, and since 10-14 his own chest pain too: it is kept for his doctor as his note, lib/daily/signals.ts)
-      expect(notesAdded, text).toBe(route === "log_only" || route === "emergency" ? 1 : 0);
+      // (a note, and since 10-14 his own chest pain too: it is kept for his doctor as his note, lib/daily/signals.ts. Not
+      // chest pain with his arm heavy: two signs at once keep 995 now (10-14), which the harness's round 2 reads offline from
+      // the rules' frame, a stroke sign going on now; 995 now keeps no note)
+      expect(notesAdded, text).toBe(route === "log_only" ? 1 : 0);
     }
   });
 

@@ -145,6 +145,39 @@ export interface Classification {
  * "anymore" / "like this", which still is ("I don't want to live with this pain anymore").
  */
 const NOT_A_PLACE = String.raw`(?!\s+(?:in|with|at|near|next to|there|here in|somewhere|abroad|overseas|alone|by myself|on my own)\b(?![^.?!]*\b(?:anymore|any more|any longer|like this)\b))`;
+/**
+ * Round 2 of the guided harness (10-16; the eval line's offline run, D:/ripple-c2/tmp/harness-1016/mock-20261016-062644.json):
+ * passive wishes to die and being a burden in the ways the self-harm rules below did not read, by family, not by sentence.
+ * Part of SELF_HARM, and exported so the harness's rules frame (risk/rules-floor.ts) files them as passive ideation.
+ */
+export const PASSIVE_SELF_HARM: RegExp[] = [
+  // English: hoping, wishing or praying not to wake up ("I hope I just don't wake up in the morning", not "I hope I don't
+  // wake up late"), not minding dying in his sleep, wishing God would take him, life
+  // with no meaning ("what for continue", Singlish), better if he were not around, only making trouble for his children
+  /\b(?:hope|hoping|wish|wishing|pray|praying|rather)\b[^.?!]{0,20}\b(?:don'?t|do not|never|not|won'?t|wouldn'?t|will not|would not)\s+(?:wake|get)\s+up\b(?![^.?!]{0,15}\b(?:at night|in the night|to pee|to urinate|early|late|till|until|for|again at)\b)/i,
+  /\b(?:wouldn'?t|don'?t|do not|would not)\s+mind\s+(?:dying|not waking up|if i died|if i don'?t wake up)\b|\bdied?\s+in\s+my\s+sleep\b[^.?!]{0,30}\b(?:fine|okay|ok|good|better|alright|relief)\b/i,
+  /\b(?:wish|hope|pray|praying|asking|ask)\b[^.?!]{0,25}\b(?:god|lord|heaven|jesus|buddha|allah|the gods?|someone up there|the man upstairs)\b[^.?!]{0,20}\btake\s+me\b|\b(?:god|lord|heaven)\b[^.?!]{0,15}\btake\s+me\s+(?:away|home|already|soon|now)\b/i,
+  /\blife\b[^.?!]{0,25}\bno\s+(?:meaning|point|use)\b|\bwhat\s+for\s+(?:continue|continuing|live|living|go on|carry on)\b|\bwhat'?s\s+the\s+(?:point|use)\s+(?:of|in)\s+(?:continuing|carrying on|going on)\b/i,
+  /\bbetter\s+(?:if\s+)?i\s+(?:not|no|never)\s+(?:around|here|alive|exist)\b|\b(?:only|just)\s+(?:make|makes|making|cause|causing|give|giving|bring|bringing)\s+(?:trouble|problems?|headaches?|burden)\s+(?:for|to)\s+(?:my|the)\s+(?:kids|children|family|son|daughter|grandchildren|everyone)\b/i,
+  // Mandarin: 睡着了就不要再醒来, 老天爷早点把我带走, 活着还有什么意思, 没有什么好留恋的了
+  /睡[^，。？！,.?!]{0,4}(?:就|便)?(?:不要|不用|不想|别|別)(?:再)?醒|(?:老天(?:爷|爺)?|上天|阎王|閻王|菩萨|菩薩|佛祖|上帝)[^，。？！,.?!]{0,8}(?:把我|將我|将我)?(?:带走|帶走|收走|收了我|叫走)/,
+  /活(?:着|著)?(?:还|還|又)?有(?:什么|什麼|甚么|啥)(?:意思|意义|意義|用)|活下去(?:还|還)?有(?:什么|什麼|啥)(?:意思|意义|意義)|(?:没有|沒有|没|沒)(?:什么|什麼|啥)?(?:好)?(?:留恋|留戀|牵挂|牽掛)(?:的)?了/,
+  // a burden: 「我现在就是个废人，只会给女儿添麻烦」 (only ever trouble for the children; 我 … 是个累赘 with words between)
+  /(?:只会|只會|只能|净|淨|尽|盡|总是|總是)(?:给|給|幫|帮)?(?:女儿|女兒|儿子|兒子|孩子|子女|儿女|兒女|家人|大家|屋企人|佢哋|他们|他們)?(?:添|带来|帶來|增加)(?:麻烦|麻煩|负担|負擔)|(?:我|自己)[^，。？！,?!]{0,4}(?:就是|只是)(?:个|一个|個)?(?:累赘|累贅|废人|廢人|负担|負擔)/,
+  // Cantonese (words.hk: 瞓 fan3 "睡覺", 唔使 m4 sai2 "不用"): 「瞓咗之後唔使再醒就好」
+  /瞓[^，。？！,.?!]{0,6}(?:唔使|唔駛|唔想|唔好)(?:再)?醒/,
+  // Tamil (Tamil Lexicon: பாரம் "weight, burden", -ஆக adverbial; பிள்ளை "child"): 「நான் என் பிள்ளைகளுக்கு பாரமாக இருக்கிறேன்」 (I am a
+  // burden to my children; not நெஞ்சில் பாரம், a weight on the chest, in EMERGENCY.chest)
+  /(?:பிள்ளை|குடும்ப|எல்லோருக்கும்|எல்லாருக்கும்|அனைவருக்கும்|மகனுக்கு|மகளுக்கு)\S*\s*(?:\S+\s*)?பாரமா(?:க|ய்)|நான்[^.?!]{0,30}(?<!நெஞ்சி\S*\s*)பாரமாக\s*இருக்கிறேன்/u,
+];
+/** Round 2: lethality asked (part of SELF_HARM; exported for risk/rules-floor.ts, which files them as a lethality question). */
+export const LETHALITY_ASKED: RegExp[] = [
+  // lethality asked: 吃多少会出人命 / 丧命 / 致死 (出人命 "someone dies"); Malay (Kamus Dewan: mati "hilang nyawa"; maut "kematian";
+  // sekali gus "pd satu masa"): "Kalau makan banyak ubat ... sekali gus, boleh mati tak?"
+  /(?:吃|服|吞|食)(?:多少|几|幾|幾多)(?:粒|片|颗|顆)?[^，。？！,?!]{0,8}(?:出人命|丧命|喪命|送命|致死|没命|沒命)/,
+  /\b(?:makan|telan|ambil|minum)\b[^.?!]{0,40}\b(?:banyak|semua|sekali\s*gus|berlebihan)\b[^.?!]{0,30}\b(?:boleh\s+mati|mati\s+(?:tak|ke)|akan\s+mati|bawa\s+maut)\b/i,
+];
+
 const SELF_HARM: RegExp[] = [
   new RegExp(String.raw`\b(?:don'?t|do not|dont) want to (?:live|be alive|go on)\b${NOT_A_PLACE}`, "i"),
   // Singlish and casual forms ("dun wan to live liao", "I want to end it", "everyone better if I not around")
@@ -286,6 +319,15 @@ const SELF_HARM: RegExp[] = [
   // Malay (Kamus Dewan via PRPM DBP: makna "erti, maksud"; telan "masukkan ke dlm kerongkong"): "Hidup ni tak ada makna lagi",
   // "Saya nak telan semua ubat"
   /\bhidup\b[^.?!]{0,10}\b(?:tak|tidak|tiada|x)\s+(?:ada\s+)?(?:makna|erti|guna)\b|\b(?:nak|hendak|mahu|ingin)\s+(?:telan|makan|ambil)\s+semua\s+(?:ubat|pil|tablet)\b/i,
+  // round 2 (10-16): these said outright. (Round 3, 10-16, E2's report: PASSIVE_SELF_HARM and LETHALITY_ASKED above are NOT part
+  // of SELF_HARM: the rules' self_harm route is the table's "thoughts" row, and a passive wish or a lethality question is
+  // "possible" first, a confirm question with the helplines visible. The harness's rules frame reads them: risk/rules-floor.ts)
+  // typos and danger said outright: "i wan go die", Tamil 「வாழ விருப்பமில்லை」 (விருப்பம் + இல்லை written as one word, the sandhi the
+  // Tamil Lexicon pattern above does not read), "everything ready ... goodbye", "going to do it today. Goodbye"
+  /\b(?:wan|want|wanna)\s+(?:to\s+)?go\s+die\b|வாழ\s*விருப்பமில்லை/iu,
+  // 结束自己的生命 (结束生命 above has no 自己的)
+  /(?:结束|結束)自己的?(?:生命|性命)/,
+  /\b(?:everything|it all|all)\s+(?:is\s+)?(?:ready|prepared|arranged|settled)\b[\s\S]{0,60}\b(?:goodbye|good bye|farewell|end it|end everything)\b|\b(?:do it|end it|end everything)\s+(?:today|tonight|now)\b[\s\S]{0,12}\b(?:goodbye|good bye|farewell)\b/i,
   // Tamil (Tamil Lexicon: வெறு-த்தல் "to loathe"; வாழ்க்கை life; சா-தல் to die, with the sandhi ப் before போ): 「எனக்கு வாழ்க்கை
   // வெறுத்துவிட்டது」 (I am sick of life), 「நான் சாகப் போகிறேன்」, 「… சாகப் போவதாக சொல்கிறார்」, 「எல்லா மாத்திரைகளையும் ஒரே
   // நேரத்தில் சாப்பிடப் போகிறேன்」 (going to take all the tablets at once)
@@ -403,6 +445,12 @@ const CHILD_INGESTION: RegExp[] = [
   /(?:孙子|孫子|孙女|孫女|外孙|外孫|小孩|孩子|宝宝|寶寶|小朋友|小孙|小孫)[^，。？！]{0,8}(?:吞了|吞下|误食|誤食|偷吃|不小心吃)[^，。？！]{0,8}(?:药|藥|粒|片|颗|顆)/,
   // fix round 3: "My granddaughter put some of my BP pills in her mouth and chewed them", 「孩子把我的降压药当糖吃了」
   /\b(?:grandson|granddaughter|grandchild|grandkid|grand-?child|child|kid|baby|toddler|little boy|little girl|nephew|niece)s?\b[^.?!]{0,30}\b(?:put|popped|stuck)\b[^.?!]{0,30}\b(?:pills?|tablets?|medicines?|capsules?|meds)\b[^.?!]{0,25}\b(?:mouth|chew\w*|swallow\w*|ate|eaten)\b/i,
+  // round 2 (10-16): the child's verb in Singlish present tense ("My grandson eat my BP pill"), a pill box found open and "he
+  // ate some", and Malay (Kamus Dewan: cucu "anak kpd anak"; telan "masukkan ke dlm kerongkong"; termakan "termasuk ke dlm mulut
+  // dgn tidak sengaja"): "Cucu saya telan ubat darah tinggi saya"
+  /\b(?:grandson|granddaughter|grandchild|grandkid|grand-?child|child|kid|baby|toddler|little boy|little girl|nephew|niece)s?\b[^.?!]{0,20}\b(?:eat|eats|swallow|swallows|chew|chews|take|takes)\s+(?:my|our|the|his|her|grandpa'?s|grandma'?s)\s+(?:[\w'’]+\s+){0,2}(?:pills?|tablets?|medicines?|capsules?|meds)\b/i,
+  /\b(?:grandson|granddaughter|grandchild|grandkid|grand-?child|child|kid|baby|toddler|little boy|little girl|nephew|niece)s?\b[^.?!]{0,40}\b(?:pill ?box|pills?|tablets?|medicines?|meds)\b[^.?!]{0,40}\b(?:ate|eaten|swallowed|took|chewed)\s+(?:some|one|a few|them|it|two|a couple)\b/i,
+  /\b(?:cucu|anak kecil|budak kecil|bayi)\b[^.?!]{0,20}\b(?:telan|makan|termakan|tertelan|ambil)\b[^.?!]{0,10}\bubat\b/i,
   /(?:孙子|孫子|孙女|孫女|外孙|外孫|小孩|孩子|宝宝|寶寶|小朋友|小孙|小孫)[^，。？！]{0,4}(?:把|将|將)[^，。？！]{0,8}(?:药|藥)[^，。？！]{0,6}(?:吃了|吞了|吃掉|吞掉|吃下|吞下|当糖吃|當糖吃)/,
 ];
 
@@ -580,7 +628,7 @@ const EMERGENCY: Record<string, RegExp[]> = {
     /\b(?:half|one side|left side|right side)\s+(?:of\s+)?(?:my|his|her|the)?\s*(?:body|face)\b[^.?!]{0,25}\b(?:pins and needles|tingl\w*|numb\w*|no feeling|can'?t feel|cannot feel)\b|\bpins and needles\b[^.?!]{0,25}\b(?:half|one side|left side|right side)\b/i,
     /\b(?:hand|arm|leg|face|foot|side)\b[^.?!]{0,20}\b(?:no feeling|lost (?:all )?(?:the )?feeling|can'?t feel (?:it|anything))\b|\bsudden(?:ly)?\b[^.?!]{0,25}\b(?:no feeling|lost (?:all )?feeling)\b/i,
     /\bworst headache\b|\bthunderclap headache\b|\bheadache\b[^.?!]{0,30}\b(?:came on|come on|started)\s+(?:all of a sudden|suddenly|out of nowhere)\b/i,
-    /\bcan'?t\s+(?:find|get out|say)\s+(?:my|the)\s+words\b|\b(?:words?|speech|talking)\b[^.?!]{0,30}\b(?:muddled|jumbled|garbled|mixed up|all wrong|not making sense|don'?t make sense)\b/i,
+    /\b(?:can'?t|couldn'?t|could not|cannot)\s+(?:find|get out|say)\s+(?:my|the)\s+words\b|\b(?:words?|speech|talking)\b[^.?!]{0,30}\b(?:muddled|jumbled|garbled|mixed up|all wrong|not making sense|don'?t make sense)\b/i,
     /\b(?:one|left|right)\s+eye\b[^.?!]{0,25}\b(?:went dark|gone dark|dark|black|blind|can'?t see|cannot see|lost (?:my |the )?(?:sight|vision))\b|\b(?:vision|sight)\b[^.?!]{0,20}\b(?:went|gone|turned|go)\s+(?:dark|black)\b|\bsudden(?:ly)?\b[^.?!]{0,20}\b(?:double vision|seeing double)\b|\b(?:double vision|seeing double)\b[^.?!]{0,20}\bsudden/i,
     /\b(?:left|right|one)\s+(?:hand|arm|leg)\b[^.?!]{0,20}\b(?:clumsy|useless|not working|won'?t work|doesn'?t work|stopped working|can'?t move|cannot move)\b/i,
     /\b(?:fall(?:ing)?|lean(?:ing)?|tilt(?:ing)?|pull(?:ing|ed)?|veer(?:ing)?)\s+(?:over\s+)?(?:to|towards)\s+one side\b/i,
@@ -654,6 +702,9 @@ const EMERGENCY: Record<string, RegExp[]> = {
     // fix round 3: "My wife suddenly cannot understand what I say"; Cantonese (words.hk 認得 "to recognise"): 「阿媽突然唔認得我」
     /\bsudden(?:ly)?\b[^.?!]{0,20}\b(?:can'?t|cannot|can not|unable to|doesn'?t|does not|didn'?t)\s+(?:understand|recogni[sz]e)\b/i,
     /突然[^，。？！]{0,4}(?:唔認得|唔认得|不认得|不認得|认不出|認不出|唔識人|不认识人|不認識人)/,
+    // round 2 (10-16; referral B1-09 sudden drowsiness, B1-12 an overdose with a change in how he is): slow to respond or not
+    // answering when called, 「叫她反应很慢」「叫他都没反应」, "very slow to respond"
+    /(?:反应|反應)(?:很|好|特别|特別|非常)?(?:慢|迟钝|遲鈍)|叫(?:她|他|佢)?(?:都|也)?(?:没|沒|冇)(?:有)?(?:反应|反應)|\b(?:very|so|really)\s+slow\s+to\s+(?:respond|answer|react)\b|\bnot\s+responding\s+(?:properly|normally)\b/i,
   ],
   breathing: [
     /\bhard to breathe\b|\bcan'?t breathe\b|\bcannot breathe\b|\btrouble breathing\b|\bdifficulty breathing\b|\bshort(?:ness)? of breath\b|\bbreathless\b|\bgasping\b/i,
@@ -681,6 +732,9 @@ const EMERGENCY: Record<string, RegExp[]> = {
     /மூச்சு\s*(?:விட|வாங்க|இழுக்க)\s*(?:முடியவில்லை|சிரமம்|கஷ்டம்)|மூச்சுத்\s*திணற|மூச்சு\s*திணற/u,
     // the fixer's own sweep: "Breathing feels hard, should I take my pill?"
     /\bbreathing\s+(?:feels|felt|is getting|gets|got|has become|became)\s+(?:very\s+|so\s+|really\s+)?(?:hard|difficult|tough|laboured|labored)\b/i,
+    // round 2 (10-16; referral B1-02: too breathless to speak): "can't finish a sentence", 「呼吸很急，一句话都说不完整」
+    /\b(?:can'?t|cannot|couldn'?t|unable to)\s+(?:finish|complete)\s+(?:a|my|his|her|one)\s+sentences?\b|\bpanting\s+(?:so\s+|very\s+)?hard\b/i,
+    /呼吸(?:很|好|非常|特别|特別)?(?:急促|急|困难|困難)|(?:一句话|一句話|句话|句話)(?:都|也)?(?:说|說|讲|講)不(?:完|完整|出来|出來)|(?:说|說|讲|講)(?:话|話)(?:都|也)?(?:说|說|讲|講)?不(?:完|出来)一句/,
   ],
   // more of a medicine than the label says (referral row B1-12). 10-14: one tablet too many with no symptom word, and a
   // hypothetical question about one more, leave this signal in classifyRules (extraDose); everything else stays
@@ -716,6 +770,9 @@ const EMERGENCY: Record<string, RegExp[]> = {
       "i",
     ),
     /(?:吃|吞|食)(?:了|咗|下|掉)(?:一)?整(?:板|盒|瓶|包|排|樽)/,
+    // round 2 (10-16; referral B1-12): a lot of a medicine taken with no count (「吃了很多降压药」「食咗好多藥」), or taken again and
+    // again (「把药吃了好几次」)
+    /(?:吃|吞|服|食)(?:了|咗)(?:很多|好多|一大堆|一堆|一大把|太多)(?:的)?[^，。？！,?!]{0,4}(?:药|藥)|(?:药|藥)[^，。？！,?!]{0,4}(?:吃|服|食)(?:了|咗)(?:好几|好幾|几|幾)(?:次|遍|回)/,
   ],
   allergy: [
     /\b(?:face|lips?|tongue|throat|eyes?) (?:is |are )?(?:swelling|swollen)\b|\bswelling up\b/i,
@@ -724,8 +781,13 @@ const EMERGENCY: Record<string, RegExp[]> = {
     /\b(?:face|lips?|tongue|throat|mouth|eyelids?)\b[^.?!]{0,15}\bswell(?:s|ed|ing)?\b|\bswell(?:s|ed|ing)?\b[^.?!]{0,6}\b(?:face|lips?|tongue|throat|mouth)\b/i,
     /\bthroat\b[^.?!]{0,15}\b(?:tight|tightness|closing|closed up|swollen|swelling)\b|\btight(?:ness)? (?:in|of) (?:my|the|his|her) throat\b/i,
     /(?:嘴唇|舌头|脸|喉咙)(?:有点|很|好)?(?:发)?肿|喉咙(?:有点|很|好)?(?:发)?紧/,
+    // round 2 (10-16; referral B1-08 swelling of the face, lips, tongue or throat). Cantonese (words.hk: 塊面 "臉", 脷 "舌頭", 晒
+    // "all", 喉嚨 "throat"): 「塊面腫晒，喉嚨好緊」「個脷腫咗」; traditional 嘴唇腫 / 喉嚨緊
+    /(?:塊面|块面|個面|个面|成塊面|成块面|嘴唇|脷|舌頭|眼皮)[^，。？！,?!]{0,3}(?:腫|肿)|喉(?:嚨|咙)[^，。？！,?!]{0,3}(?:好|很|有啲|有点)?(?:緊|紧|腫|肿)/,
   ],
   collapse: [
+    // round 2 (10-16): 「怎么叫都不醒」「叫极都唔醒」 (叫 … 不醒 with words between), lying on the floor (「倒在地上」)
+    /叫(?:她|他|佢|极|極|了半天|咗好耐)?(?:都|也)?(?:叫)?(?:不|唔)醒|(?:倒|晕倒|暈倒|跌|摔|昏)(?:倒)?在地(?:上|下)/,
     /\bfaint(?:ed)?\b|\bpassed out\b|\bcollapsed?\b|\bunconscious\b|\bunresponsive\b|\bseizure\b/i,
     /晕倒|昏倒|不省人事|叫不醒|抽搐/,
     // fix round 2: "I feel like I'm going to pass out"
@@ -755,6 +817,37 @@ const BAD_HEADACHE: RegExp[] = [
   /头很痛|剧烈头痛|头痛得厉害|头痛欲裂/,
 ];
 const HIGH_WORDS: RegExp[] = [/\bhigh\b/i, /高/];
+/** Round 2 (10-16): a reading in the 200s said in words. */
+const VERY_HIGH_WORDS = /两百|二百|兩百|\btwo hundred\b/i;
+/**
+ * Round 2: the red-flag symptoms beside a very high reading that are not kept for his doctor (referral B1-05: blurred vision,
+ * vomiting, confusion, a splitting headache, breathlessness). A chest pain or a stroke sign beside a reading above his doctor's
+ * line stays the owner's 10-14 decision (signalFamily: kept for his doctor, 995 if it gets bad), so neither is here.
+ */
+const BP_RED_FLAG: RegExp[] = [
+  /\b(?:blur\w*|can'?t see|cannot see|vision|vomit\w*|throw(?:ing)? up|confus\w*|short of breath|breathless|can'?t breathe|severe headache|worst headache|splitting|pounding)\b/i,
+  /看不清|模糊|呕吐|嘔吐|想吐|吐了|喘|糊涂|糊塗|裂开|裂開|欲裂/,
+];
+
+/**
+ * Round 2 (10-16, the eval line's over-escalation: "What are the signs of a stroke I should watch out for?", 「血压高会不会中风？」,
+ * 「中风之前会有什么征兆？」, "Can amlodipine prevent a heart attack?", "My father died of a stroke when I was young", 「我老豆好多年前
+ * 中風走咗」, "I had a heart attack in 2015", "Last time I got heart attack, now ok already" all got 995): the bare NAME of the
+ * two emergencies (stroke, heart attack, 中风, 心脏病发 ...) in a sentence that asks about signs, risk, causes or prevention, or
+ * tells of a past event or someone's death, is not an emergency happening now. In such a sentence the bare names are taken
+ * out before EMERGENCY is read; the symptoms said in it ("chest pain", "face drooping") still count, and a sentence that says it
+ * is happening ("I think I'm having a stroke", 「是不是中风了」, "suddenly") keeps them.
+ */
+const BARE_EMERGENCY = /\bstrokes?\b|\bheart\s+attacks?\b|\bstrok\b|\bangin\s+ahmar\b|中风|中風|心脏病发作?|心臟病發作?|心肌梗塞|பக்கவாதம்/giu;
+const BARE_EMERGENCY_TEST = new RegExp(BARE_EMERGENCY.source, "iu");
+const KNOWLEDGE_OR_HISTORY =
+  /\b(?:signs?|symptoms?|warning|know if|tell if|recogni[sz]e|risks?|chances?|prevent\w*|avoid\w*|cause[sd]?|causing|lead(?:s)? to|increase[sd]?|lowers?|reduce[sd]?|protect\w*|years? ago|months? ago|weeks? ago|last time|previous(?:ly)?|in (?:19|20)\d\d|when i was|long ago|died|passed away|passed on|recovered|history of|survivor|stent|bypass)\b|会不会|會不會|征兆|徵兆|症状|症狀|先兆|预防|預防|引起|导致|導致|风险|風險|机会|機會|怎么知道|怎樣知道|如何知道|之前|以前|几年前|幾年前|多年前|年前|走咗|过世|過世|去世|死于|死於|中过|中過|得过|得過|恢复|恢復|康复|康復/iu;
+const HAPPENING_NOW = /\b(?:having|i think i'?m|am i having|is having|right now|happening|just now|sudden(?:ly)?)\b|正在|突然|刚刚|剛剛|刚才|剛才|是不是(?:中风|中風)|好像(?:中风|中風)/iu;
+function withoutBareMentions(text: string): string {
+  return text.replace(/[^.?!。？！\n]+[.?!。？！\n]?/gu, (s) =>
+    BARE_EMERGENCY_TEST.test(s) && KNOWLEDGE_OR_HISTORY.test(s) && !HAPPENING_NOW.test(s) ? s.replace(BARE_EMERGENCY, " ") : s,
+  );
+}
 /**
  * C2 track S (the 10-10 decision on 「降压药会不会引起胸口痛」: 995 first, then the leaflet's side-effect line): an emergency
  * symptom asked about as something his medicine might cause. The route stays emergency; the answer adds the leaflet's own
@@ -1150,8 +1243,16 @@ export function classifyRules(text: string, ctx: ClassifyContext): Classificatio
   const unknownName = unknownDrugName(text, { asrLowConfidence: ctx.asrLowConfidence });
 
   const emergencySignals: string[] = [];
-  for (const [signal, res] of Object.entries(EMERGENCY)) if (matchAny(res, text)) emergencySignals.push(signal);
+  // (round 2: the bare name of a stroke or a heart attack in a question about signs or risk, or in a past event, is read out)
+  const emergencyText = withoutBareMentions(text);
+  for (const [signal, res] of Object.entries(EMERGENCY)) if (matchAny(res, emergencyText)) emergencySignals.push(signal);
   if (matchAny(BAD_HEADACHE, text) && (reading || matchAny(HIGH_WORDS, text))) emergencySignals.push("high_bp_symptom");
+  // round 2 (10-16; referral B1-05: a reading of 180 / 110 or more with a severe headache, blurred vision, vomiting, chest pain,
+  // breathlessness, confusion or weakness is an emergency): also said as 两百多 / "two hundred", and not only with a headache
+  const veryHigh = (!!reading && (reading.systolic >= 180 || (reading.diastolic ?? 0) >= 110)) || VERY_HIGH_WORDS.test(text);
+  if (veryHigh && matchAny(BP_RED_FLAG, text) && !emergencySignals.includes("high_bp_symptom")) emergencySignals.push("high_bp_symptom");
+  // round 3: mild, exertional or passed breathlessness with no danger word is the harness's question, not the emergency
+  if (emergencySignals.includes("breathing") && mildOrPassedBreathing(text)) emergencySignals.splice(emergencySignals.indexOf("breathing"), 1);
   if (reading && ctx.doctorThresholdSystolic !== null && reading.systolic > ctx.doctorThresholdSystolic) {
     emergencySignals.push("above_doctor_threshold");
   }
@@ -1161,7 +1262,13 @@ export function classifyRules(text: string, ctx: ClassifyContext): Classificatio
   // Any other emergency signal next to it (a symptom, a reading above the doctor's number) keeps the overdose emergency
   // (「吃了两次药」: 药 right after a counter is the tablets counted, not a medicine named by its use)
   const hisOwnMedicine =
-    !explicitUnknown && !unidentifiable && !unknownName && !knownNonKb && otherSubstances(text.replace(/(?<=[次遍回粒片颗顆])的?[药藥]/gu, "")).medicines.length === 0;
+    !explicitUnknown &&
+    !unidentifiable &&
+    !unknownName &&
+    !knownNonKb &&
+    // (round 3: 「有没有吃过药」 "whether I took my medicine" names no medicine: substances.ts read 「有吃过药」 as one, and 「我不记得今天有没有
+    // 吃过药，好像又吃了一次」 got the overdose emergency instead of the uncertain extra dose it is)
+    otherSubstances(text.replace(/(?<=[次遍回粒片颗顆])的?[药藥]/gu, "").replace(/(?:有没有|有沒有|有冇|有无|有無|有)?(?:吃|服|食)(?:过|過|咗)?(?:了)?[药藥]/gu, "")).medicines.length === 0;
   const extra = emergencySignals.length === 1 && emergencySignals[0] === "overdose" && hisOwnMedicine ? extraDose(text, question) : null;
   if (extra) emergencySignals.length = 0;
   if (emergencySignals.length) {
@@ -1467,7 +1574,7 @@ const CRISIS_CUES: RegExp[] = [
  * 石头, 捏住, 冷汗; mampus, herot, penat hidup, larat, bercakap; இறக்க, உயிர், தூக்கு, தொங்கு, கோண, பேச).
  */
 const MORE_CRISIS_CUES: RegExp[] = [
-  /\b(?:burden|miss me|tired of (?:living|life)|end things|my late (?:wife|husband)|goodbye|letters to my|arranged everything|jump(?:ing)? (?:off|from|down)|charcoal|unalive|kms|pins and needles|tingl\w*|dropping|clumsy|jumbled|muddled|garbled|one eye|pass(?:ing)? out|black(?:ing)? out|swallowed|no feeling|find my words|one side|uneven|worst headache)\b/i,
+  /\b(?:burden|miss me|tired of (?:living|life)|end things|my late (?:wife|husband)(?=[^.?!]{0,30}\b(?:join|be with|see (?:her|him) again|meet|follow|soon|waiting|again)\b)|goodbye|letters to my|arranged everything|jump(?:ing)? (?:off|from|down)|charcoal|unalive|kms|pins and needles|tingl\w*|dropping|clumsy|jumbled|muddled|garbled|one eye|pass(?:ing)? out|black(?:ing)? out|swallowed|no feeling|find my words|one side|uneven|worst headache)\b/i,
   /负担|負擔|拖累|后事|後事|农药|農藥|安眠药|安眠藥|跳下|整瓶|整盒|一黑|重影|打结|打結|口水|站不稳|站不穩|软软|軟軟|冇知覺|冇晒力|揸唔|跌咗|石头|石頭|捏住|冷汗|吞了|活够|活夠|陪老伴/,
   /\b(?:mampus|herot|larat|bercakap|penat hidup)\b/i,
   /இறக்க|உயிர்|தூக்கு|தொங்கு|கோண|பேச/u,
@@ -1479,7 +1586,7 @@ const MORE_CRISIS_CUES: RegExp[] = [
  * talk to, not only 995.
  */
 const SELF_HARM_CUES: RegExp[] = [
-  /\b(?:die|dies|died|dying|dead|death|kill\w*|suicid\w*|overdos\w*|end (?:it|my life|everything|things)|ending it|not (?:be )?(?:here|around|alive) any\s?more|worth living|burden|miss me|tired of (?:living|life)|my late (?:wife|husband)|goodbye|jump(?:ing)? (?:off|from|down)|charcoal|unalive|kms|saving (?:up )?(?:my |all my )?(?:tablets|pills)|disappear forever)\b/i,
+  /\b(?:die|dies|died|dying|dead|death|kill\w*|suicid\w*|overdos\w*|end (?:it|my life|everything|things)|ending it|not (?:be )?(?:here|around|alive) any\s?more|worth living|burden|miss me|tired of (?:living|life)|my late (?:wife|husband)(?=[^.?!]{0,30}\b(?:join|be with|see (?:her|him) again|meet|follow|soon|waiting|again)\b)|goodbye|jump(?:ing)? (?:off|from|down)|charcoal|unalive|kms|saving (?:up )?(?:my |all my )?(?:tablets|pills)|disappear forever)\b/i,
   /死|自杀|自殺|轻生|輕生|不想活(?!在(?!(?:这个|這個)?世界))|活着|活著|解脱|解脫|一了百了|结束这|結束這|跳楼|跳樓|跳下|负担|負擔|拖累|后事|後事|农药|農藥|活够|活夠|陪老伴|(?:毋|無|无)想(?:欲)?活/,
   /\b(?:mati|bunuh|mampus|penat hidup|larat)\b/i,
   /சாக|தற்கொலை|இறக்க|உயிர்|தூக்கு/u,
@@ -1495,6 +1602,15 @@ const CUE_IDIOMS: RegExp[] = [
   // fix round 3: pain "to death" is an intensifier, not a wish to die (Hokkien 疼甲欲死: the wave B comment above; pd-lg-01).
   // Only 死 goes, so the pain word stays for the chest cue (「胸口痛死了」)
   /(?<=(?:疼|痛)(?:甲|到|得)?(?:要|欲)?)死(?:了)?/g,
+  // round 2 of the guided harness (10-16): the same intensifier after any word of heat, cold, tiredness, boredom, hunger,
+  // hurry, waiting or feeling ("无聊死了", "等得要死"; Cantonese 攰 gui6 "tired" and 到死 "to death": words.hk, 「攰到死」「熱到死」).
+  // Only 死 goes; 想死 ("want to die") is never an intensifier and stays
+  /(?<=(?:热|熱|冷|累|攰|饿|餓|渴|忙|闷|悶|烦|煩|无聊|無聊|困|吵|挤|擠|慢|急|气|氣|吓|嚇|笑|懒|懶|穷|窮|贵|貴|辣|咸|鹹|臭|晒|曬|等|痒|癢|晕|暈|尴尬|尷尬|丢脸|丟臉|麻烦|麻煩|难受|難受|开心|開心|高兴|高興|羡慕|羨慕|担心|擔心|紧张|緊張|嬲|顶|頂)(?:得|到|了)?(?:要|欲|快)?)死(?:了|啦|喇|咗|我了|人了|人|佢)?/g,
+  // Singlish "die liao" ("done for": hot, tired, late), not after a verb of wanting ("I want to die liao"); "bored to death"
+  /(?<!\b(?:to|wanna|wan|want|gonna|go|let me|rather|better|should|just|will|i|me)\s)\bdie\s+liao\b|\b(?:bored|scared|frightened|worried|tickled)\s+to\s+death\b/gi,
+  // someone else's death told ("My father died of a stroke when I was young", "my wife passed away ten years ago"): not a wish of
+  // his ("my wife died and I want to die too" keeps its own "want to die")
+  /\b(?:father|dad|daddy|papa|mother|mum|mom|mummy|ma|wife|husband|brother|sister|son|daughter|grandfather|grandmother|grandpa|grandma|uncle|aunt|auntie|aunty|friend|neighbou?r|cousin|he|she|they)\s+(?:has\s+|had\s+)?(?:died|passed away|passed on|passed)\b/gi,
 ];
 
 const withoutIdioms = (text: string): string => CUE_IDIOMS.reduce((t, re) => t.replace(re, " "), text);
@@ -1595,7 +1711,30 @@ export function emergencyCue(text: string): string[] {
   if (!SUDDEN.test(t)) t = NOT_AN_EMERGENCY.reduce((s, re) => s.replace(re, " "), t);
   return Object.entries(EMERGENCY_CUE)
     .filter(([, res]) => matchAny(res, t))
-    .map(([kind]) => kind);
+    .map(([kind]) => kind)
+    .filter((kind) => kind !== "breathing" || !mildOrPassedBreathing(text));
+}
+
+/**
+ * Round 3 (10-16, E2's report: "I feel a bit short of breath", "我有点喘", "Last night I woke up breathless, but I'm okay this
+ * morning" got the fixed 995): breathlessness that is mild, comes with exertion, or has passed, with no sign of danger in the
+ * same words, is a breathing symptom the harness asks about (at rest? lips blue?), not the breathing emergency. Referral B1-02's
+ * emergency is breathlessness at rest, too breathless to speak, blue or grey lips, getting worse; any of these keeps it.
+ */
+const BREATH_DANGER =
+  /\b(?:at rest|resting|sitting|lying|even when|can'?t (?:speak|talk|finish)|cannot (?:speak|talk|finish)|gasping|blue|purple|grey|gray|can'?t breathe|cannot breathe|can not breathe|choking|struggling|getting worse|worse and worse|few steps|walk(?:ing)? to the (?:toilet|bathroom|door|kitchen))\b|坐着|坐著|躺着|躺著|说不完|說不完|说不出话|說不出話|一句话都|一句話都|发紫|發紫|发青|發青|不能呼吸|呼吸不了|越来越|越來越|走几步|走幾步/i;
+const BREATH_MILD_OR_PASSED =
+  /\b(?:a bit|a little|slightly|mild(?:ly)?|abit|climbing|stairs|uphill|walking fast|exercis\w*|last night|yesterday|ago|went away|gone now|(?:i'?m|i am|feel|feeling)\s+(?:ok|okay|fine|better|alright)|(?:ok|okay|fine|better)\s+(?:now|already|this morning)|settled)\b|有点|有點|有一点|有些|一点点|爬楼|爬樓|楼梯|樓梯|上坡|运动|運動|昨晚|昨天|前天|好了|没事了|沒事了|过去了|過去了|冇事/i;
+export function mildOrPassedBreathing(text: string): boolean {
+  return BREATH_MILD_OR_PASSED.test(text) && !BREATH_DANGER.test(text);
+}
+
+/**
+ * Round 3: breathing trouble said at all, mild or passed included (the harness's rules frame still files it as a breathing
+ * symptom, now "no" when it has passed, so the table can ask; only the route leaves it).
+ */
+export function breathingSaid(text: string): boolean {
+  return matchAny(EMERGENCY.breathing, text) || matchAny(EMERGENCY_CUE.breathing, withoutIdioms(text));
 }
 
 /** The emergency kinds a classification names (Classification.signals; emergencyCue gives some of the same names). */

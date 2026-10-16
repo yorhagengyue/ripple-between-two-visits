@@ -177,13 +177,15 @@ describe("a stroke sign, and a reading above his doctor's line", () => {
   it.each([
     ["我右手突然没力，说话也说不清楚", "zh-Hans"],
     ["My face is drooping on one side", "en"],
-  ] as const)("%s: kept, the doctor's line, then 995 now even if it has passed (a stroke sign is never wait and see)", async (text, locale) => {
+  ] as const)("%s: 995 now first, then the doctor's line (a stroke sign is never wait and see)", async (text, locale) => {
     const scope = await example();
     const { res, shown } = await askOn(scope, text, locale);
     expect(res.route).toBe("emergency");
-    expect(ids(res)).toEqual([SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_stroke"]);
-    expect(res.sentences[2].cite?.referralId).toBe("B1-03");
-    expect(shown).toContain(locale === "zh-Hans" ? "一边身体没力、脸歪或说话不清，就算已经好了，也请马上打 995。" : "Weakness on one side, a drooping face or slurred speech: call 995 now, even if it has passed.");
+    // (the harness, 10-16, kb/pathways.json stroke-now: a stroke sign happening now or not said to be over is 995 now first,
+    // no question; the 10-10 probe found "kept for your doctor" said before "call 995 now")
+    expect(ids(res)).toEqual(["emergency_995", "visit:v1:R2"]);
+    expect(res.sentences[0].cite?.referralId).toBe("B1-03");
+    expect(shown).toContain(locale === "zh-Hans" ? TEMPLATES.emergency_995.zh : TEMPLATES.emergency_995.en);
     expect(res.blocked).toEqual([]);
   });
 
@@ -224,10 +226,13 @@ describe("what stays exactly as it was", () => {
     const scope = await example();
     const zh = await askOn(scope, "我不想活了", "zh-Hans");
     expect(zh.res.route).toBe("self_harm");
-    expect(ids(zh.res)).toEqual(selfHarmTemplateIds("zh-Hans"));
+    // (the harness, 10-16: the ladder's thoughts row adds "I'm here ..." and "tell your doctor" after the helplines, which stay as they were)
+    expect(ids(zh.res)).toEqual([...selfHarmTemplateIds("zh-Hans"), "self_harm_here", "self_harm_doctor"]);
     expect(zh.shown).toContain("1767");
-    const en = await askOn(scope, "I don't want to live anymore", "en");
-    expect(ids(en.res)).toEqual(selfHarmTemplateIds("en"));
+    // (a scope of its own: in the same conversation, the danger question the first answer asked and he left unanswered counts
+    // as yes when he says it again, the harness's rule, and the answer would lead with 995 now)
+    const en = await askOn(await example(), "I don't want to live anymore", "en");
+    expect(ids(en.res)).toEqual([...selfHarmTemplateIds("en"), "self_harm_here", "self_harm_doctor"]);
     expect(ids(en.res)).not.toContain(HELPLINES[2]);
     expect(await listDoctorSignals(store, (await store.getSession(scope.id))!, "zh-Hans")).toEqual([]);
   });

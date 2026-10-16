@@ -34,6 +34,7 @@ import { relayDoctorThreshold } from "@/lib/safety/threshold";
 import { storedAnswer } from "@/lib/safety/turns";
 import type { AskResult } from "@/lib/safety/types";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const CTX = { doctorThresholdSystolic: 180, meds: [] };
 const R2 = "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.";
@@ -77,8 +78,11 @@ function liveScreen(crisis: "none" | "emergency" | "self_harm", calls: ChatOpts[
     model: "fake",
     async chat(opts: ChatOpts) {
       calls.push(opts);
-      const task = (JSON.parse(opts.user) as { task: string }).task;
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
       if (task === "crisis") return { content: JSON.stringify({ crisis }), tokens: 3 };
+      // (the harness: the risk screen replaced the crisis screen; it answers with the frame of that word)
+      if (task === "risk_screen") return { content: frameReply(crisis, payload.message ?? ""), tokens: 3 };
       return { content: JSON.stringify({ sentences: [] }), tokens: 1 };
     },
   };
@@ -237,15 +241,22 @@ describe("1b. one tablet too many, already taken, no symptom: not the emergency 
     expect(added).toHaveLength(1);
   });
 
-  it("a live crisis screen that calls tablets already taken an emergency does not undo the rule; its self_harm still raises", async () => {
+  it("with a live risk screen, one tablet too many and no sign stays the dose answer and asks about a sign; a sign or a wish to die raises", async () => {
+    // (the harness, 10-16: the screen reports facts, never a route; the decision table keeps the owner's 10-14 answer for one
+    // extra tablet of his own with no sign, level 2, and asks whether he has a sign now)
     const calls: ChatOpts[] = [];
-    const held = await askAt("我多吃了一粒怎么办", { llm: liveScreen("emergency", calls) });
+    const held = await askAt("我多吃了一粒怎么办", { llm: liveScreen("none", calls) });
     expect(held.res.route).toBe("refuse_route");
     expect(held.res.routeReason).toBe("rule:extra_dose_taken");
     expect(ids(held.res)).toEqual(["visit:v2:R4", "label:med-amlodipine", "extra_dose_taken"]);
-    // the screen was asked, and what it said is on record
-    expect(calls.map((c) => c.purpose)).toEqual(["crisis"]);
-    expect((held.res.events[0].output as { crisisScreen: unknown }).crisisScreen).toMatchObject({ route: "emergency", raisedFrom: null, heldBy: "rule:extra_dose_taken", awaited: true });
+    expect(calls.map((c) => c.purpose)).toEqual(["risk_screen"]);
+    expect(held.res.risk).toMatchObject({ level: 2, frameSource: "model+rules", rows: ["extra-dose-ask-symptoms"] });
+    expect(held.res.followUp).toMatchObject({ pathway: "extra_dose", templateId: "extra_symptoms" });
+    // a sign now in the frame (here chest pain for ten minutes): 995 now, the chest row being the first level-1 row that holds
+    const sign = await askAt("我多吃了一粒怎么办", { llm: liveScreen("emergency") });
+    expect(sign.res.route).toBe("emergency");
+    expect(sign.res.risk?.level).toBe(1);
+    expect(sign.res.sentences[0].templateId).toBe("emergency_995");
     const raised = await askAt("我多吃了一粒怎么办", { llm: liveScreen("self_harm") });
     expect(raised.res.route).toBe("self_harm");
     expect(raised.shown).toContain("1767");
@@ -399,10 +410,18 @@ describe("2. a plain note gets 「记下了。」 and nothing else; the safety l
     expect(res.sentences.map((x) => x.templateId)).toEqual(["noted"]);
   });
 
+  // (harness round 3, 10-16, the coordinator's item 6: 「我有点喘」 is a breathing symptom the harness asks about, so 「今天有点喘」 is
+  // no longer a plain note with the line: below)
+  it("今天有点喘 (harness round 3): a breathing symptom, the breathing question asked, 995 shown, still not the emergency route", async () => {
+    const { res, shown } = await askAt("今天有点喘");
+    expect(res.route).toBe("log_only");
+    expect(res.followUp?.pathway).toBe("breathing");
+    expect(shown).toContain("995");
+  });
+
   it.each([
     ["I feel weak today", "offline"],
     ["我今天没力", "offline"],
-    ["今天有点喘", "offline"],
   ] as const)("%s (a cue word of its own, no crisis screen): the note, then the safety line with its reason", async (text, reason) => {
     expect(crisisCue(text)).toBe(true);
     expect(emergencyCue(text)).toEqual([]);
@@ -431,13 +450,15 @@ describe("2. a plain note gets 「记下了。」 and nothing else; the safety l
     expect((failedCue.res.events[0].output as { safetyLine: unknown }).safetyLine).toEqual({ reason: "error", cue: true });
   });
 
-  it("crisis words in a note are still read as the crisis they may be when no screen ran (unchanged)", async () => {
+  it("crisis words in a note are still read as the crisis they may be when no screen ran (the harness's round 2: asked about)", async () => {
+    // (round 2, 10-16: cue words alone are the ladder's "possible" step, the helplines and the confirm question, never the
+    // self-harm route by themselves; a stroke sign only cue words saw, with no time said, is the safety line under the note)
     const selfHarm = await askAt("Nobody would notice if I died");
-    expect(selfHarm.res.route).toBe("self_harm");
+    expect([selfHarm.res.risk?.ladder, selfHarm.res.followUp?.templateId]).toEqual(["possible", "self_harm_confirm"]);
+    expect(ids(selfHarm.res)).toContain("self_harm_sos");
     const stroke = await askAt("My arm went funny and heavy");
-    expect(stroke.res.route).toBe("emergency");
-    // (the owner's second decision of 10-14: his own stroke sign is kept for his doctor, then 995 if it gets bad)
-    expect(ids(stroke.res)).toEqual([SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_stroke"]);
+    expect(stroke.res.route).toBe("log_only");
+    expect(ids(stroke.res)).toContain("safety_line");
   });
 });
 
@@ -467,21 +488,27 @@ describe("3. a reading above the doctor's own number: his warning line first, th
     expect(headache.res.route).toBe("emergency");
     expect(headache.res.sentences.map((s) => s.sourceId)).toEqual(["referral:B1-10", "visit:v1:R2"]);
     expect(headache.res.sentences[0].templateId).toBe("emergency_995");
-    for (const [text, conditional, row] of [
-      ["今天 185/112，胸口很痛", "signal_995_chest", "B1-01"],
-      ["185/112 and my left arm is weak", "signal_995_stroke", "B1-03"],
-    ] as const) {
+    // (the harness, 10-16: a stroke sign beside a reading is 995 first without a condition (kb/pathways.json stroke-now),
+    // then his doctor's line; the 10-16 probe found 210/125 with the worst headache answered "If your reading is above 180
+    // ..." first. Round 2, 10-16: chest pain beside a reading under 200 keeps the owner's 10-14 rule, kept for his doctor
+    // and 995 if it gets bad, while the chest pathway asks how long; with 200 or more the rules' floor makes it severe)
+    const chest = await askAt("今天 185/112，胸口很痛", { day: 30 });
+    expect([chest.res.route, chest.res.risk?.level, chest.res.followUp?.pathway]).toEqual(["emergency", 3, "chest"]);
+    expect(ids(chest.res)).toEqual([SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_chest"]);
+    for (const text of ["185/112 and my left arm is weak"]) {
       const { res } = await askAt(text, { day: 30 });
       expect(res.route, text).toBe("emergency");
-      expect(ids(res), text).toEqual([SIGNAL_RECORDED.id, "visit:v1:R2", conditional]);
-      expect(res.sentences[2].cite?.referralId, text).toBe(row);
+      expect(ids(res), text).toEqual(["emergency_995", "visit:v1:R2"]);
+      expect(res.sentences[0].cite?.referralId, text).toMatch(/^B1-(10|03)$/);
+      expect(res.risk?.level, text).toBe(1);
     }
   });
 
   it("chest pain and stroke signs with no reading are kept for the doctor; breathing keeps 995 first, exactly as before", async () => {
     for (const [text, sources] of [
       ["我胸口好痛", [SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_chest"]],
-      ["右边身体觉得很重", [SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_stroke"]],
+      // (the harness, 10-16: a stroke sign not said to be over is 995 now first, kb/pathways.json stroke-now)
+      ["右边身体觉得很重", ["emergency_995", "visit:v1:R2"]],
       ["I can't breathe", ["emergency_995"]],
     ] as const) {
       const { res } = await askAt(text);
@@ -492,7 +519,11 @@ describe("3. a reading above the doctor's own number: his warning line first, th
   it("the ask screen draws them in that order on one line: his question, the doctor's entry, Ripple's sentences, one call button", async () => {
     const question = "今天 185/112";
     const { res } = await askAt(question, { locale: "zh-Hans" });
-    const out = renderToStaticMarkup(createElement(AnswerCard, { question, answer: storedAnswer(res), locale: "zh-Hans" }));
+    // (the harness, 10-16: these answers now end on a follow-up question. The owner's order of 10-14 stands with it too (the
+    // coordinator's decision for the owner): his doctor's warning line, then the 995 sentence with its button, then the
+    // question, then the rest. Both orders are checked: without the question here, with it at the end)
+    const asked = storedAnswer(res);
+    const out = renderToStaticMarkup(createElement(AnswerCard, { question, answer: { ...asked, followUp: undefined }, locale: "zh-Hans" }));
     // one stretch of the line and no red card: the 995 is for when he feels very unwell
     expect([...out.matchAll(/data-rp="(timeline|emergency)"/g)].map((m) => m[1])).toEqual(["timeline"]);
     const quoteAt = out.indexOf('data-kind="quote"');
@@ -503,11 +534,29 @@ describe("3. a reading above the doctor's own number: his warning line first, th
     expect((out.match(/href="tel:995"/g) ?? []).length).toBe(1);
     // chest pain: kept, the doctor's entry, then 995 if it gets bad, on the same line
     const chest = await askAt("我胸口好痛", { locale: "zh-Hans" });
-    const chestOut = renderToStaticMarkup(createElement(AnswerCard, { question: "我胸口好痛", answer: storedAnswer(chest.res), locale: "zh-Hans" }));
+    const chestOut = renderToStaticMarkup(createElement(AnswerCard, { question: "我胸口好痛", answer: { ...storedAnswer(chest.res), followUp: undefined }, locale: "zh-Hans" }));
     expect([...chestOut.matchAll(/data-rp="(timeline|emergency)"/g)].map((m) => m[1])).toEqual(["timeline"]);
     expect(chestOut.indexOf('data-kind="ripple"')).toBeLessThan(chestOut.indexOf('data-kind="quote"'));
     expect(chestOut.indexOf('data-kind="quote"')).toBeLessThan(chestOut.indexOf('data-kind="hotlines"'));
     expect((chestOut.match(/href="tel:995"/g) ?? []).length).toBe(1);
+    // with its follow-up question (10-16): the reading: his doctor's warning line, the 995 sentence, then the question
+    expect(asked.followUp).toBeTruthy();
+    const withQ = renderToStaticMarkup(createElement(AnswerCard, { question, answer: asked, locale: "zh-Hans", followUp: { onReply: () => undefined } }));
+    const q = withQ.indexOf('data-testid="ask-followup"');
+    expect(withQ.indexOf('data-kind="quote"')).toBeGreaterThan(-1);
+    expect(withQ.indexOf('data-kind="quote"')).toBeLessThan(withQ.indexOf('data-kind="hotlines"'));
+    expect(withQ.indexOf("above 180 on top")).toBeLessThan(withQ.indexOf(TEMPLATES.signal_995_unwell.zh));
+    expect(withQ.indexOf('href="tel:995"')).toBeLessThan(q);
+    expect((withQ.match(/href="tel:995"/g) ?? []).length).toBe(1);
+    // and chest pain: kept, his doctor's entry, 995 if it gets bad, then the question
+    const chestAsked = storedAnswer(chest.res);
+    expect(chestAsked.followUp).toBeTruthy();
+    const chestQ = renderToStaticMarkup(createElement(AnswerCard, { question: "我胸口好痛", answer: chestAsked, locale: "zh-Hans", followUp: { onReply: () => undefined } }));
+    const cq = chestQ.indexOf('data-testid="ask-followup"');
+    expect(chestQ.indexOf('data-kind="ripple"')).toBeLessThan(chestQ.indexOf('data-kind="quote"'));
+    expect(chestQ.indexOf('data-kind="quote"')).toBeLessThan(chestQ.indexOf('data-kind="hotlines"'));
+    expect(chestQ.indexOf('data-kind="hotlines"')).toBeLessThan(cq);
+    expect(chestQ.lastIndexOf('href="tel:995"')).toBeLessThan(cq);
   });
 
   it("the blood pressure page: relayDoctorThreshold gives the doctor's line first, and ThresholdRelayBlock draws the 995 line after it", async () => {

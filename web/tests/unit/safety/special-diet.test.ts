@@ -87,7 +87,8 @@ describe("the answer", () => {
     expect(zh.added).toBe(0);
     const salt = await askIn(s.id, "I have heart failure, how much salt can I have?", "en");
     expect(salt.r.gloss).toMatchObject({ kind: "general", lang: "en" });
-    expect(JSON.stringify(salt.r)).not.toMatch(/995|change the dose|ONE tablet/);
+    // (what he sees, not the whole result: its random safety-event ids held "995" now and then under load)
+    expect(JSON.stringify({ sentences: salt.r.sentences, gloss: salt.r.gloss, followUp: salt.r.followUp ?? null })).not.toMatch(/995|change the dose|ONE tablet/);
     expect(salt.added).toBe(0);
   });
 

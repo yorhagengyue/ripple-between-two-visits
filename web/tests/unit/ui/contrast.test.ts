@@ -139,8 +139,9 @@ describe("elder colours (the timeline draft)", () => {
 
 describe("red is only for 995, deleting and errors", () => {
   it("every rule that uses --rp-urgent is one of them", () => {
+    // (10-16: the 995 side of a follow-up question's answers, red-edged and never filled: rpu-act danger-outline)
     const allowed =
-      /rpu-emergency|rpu-btn\[data-variant="danger(-outline|-solid)?"\]|rpu-act\[data-variant="danger"\]|rpu-call\[data-urgent|data-node="sos"|data-mk="sos"|rpu-box\[data-variant="red"\]|rpu-f\[data-error="true"\]|rpu-f-error/;
+      /rpu-emergency|rpu-btn\[data-variant="danger(-outline|-solid)?"\]|rpu-act\[data-variant="danger(-outline)?"\]|rpu-call\[data-urgent|data-node="sos"|data-mk="sos"|rpu-box\[data-variant="red"\]|rpu-f\[data-error="true"\]|rpu-f-error/;
     const rules = [...cssNoComments.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter((m) => /var\(--rp-urgent\)/.test(m[2]));
     expect(rules.length).toBeGreaterThan(8);
     for (const [, selector] of rules) expect(selector.trim(), selector.trim()).toMatch(allowed);

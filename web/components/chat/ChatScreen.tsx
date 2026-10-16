@@ -20,6 +20,10 @@
  *                  node: 「医生说 · 9月6日 · 0:37」, the words in the serif face, the checked Chinese under English
  *                  words, 「听原声」, and 「加进问题单」: only when he taps does his note go on the list. Then (04-3b) the
  *                  tick: 「已在下次看诊的问题单里」 and 「看问题单」
+ *   a question     (the guided harness, 2026-10-16) Ripple's follow-up question under an answer, as the ask screen draws it
+ *                  (components/daily/FollowUpQuestion.tsx), read only: answered, with what he chose marked (the turn
+ *                  after it was his tap, its words his words), or closed. He answers it on the ask screen, where it was
+ *                  asked; nothing here sends one (owner's tidy of 10-13: the record has no ask of its own)
  *   today          without a network a grey box says so (「要连上网才能问。」)
  *   nothing yet    one grey entry: 「想说什么，随时说一句。」
  *   other days     a card with a row per day he talked, newest first; such a day is read only
@@ -33,6 +37,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Act, Acts, Bubble, ListCard, ListItem, Said, SaidTranslation, Timeline, TimelineItem } from "@/components/ui";
 import { askCopy } from "@/components/daily/ask-copy";
+import { followUpOf } from "@/components/daily/follow-up";
+import { FollowUpQuestion } from "@/components/daily/FollowUpQuestion";
 import type { ChatDayView, ChatTurnView } from "@/lib/chat/view";
 import { clockWords, shortDay } from "@/lib/daily/i18n";
 import type { Locale } from "@/lib/i18n";
@@ -52,8 +58,25 @@ async function postJson(url: string, body: unknown): Promise<{ ok: boolean; stat
   return { ok: res.ok, status: res.status, data };
 }
 
-/** One turn: his entry, Ripple's entries, the doctor's line under a note. `last`: the day's rule ends with this turn. */
-function Turn({ turn, locale, today, last, onDone }: { turn: ChatTurnView; locale: Locale; today: boolean; last: boolean; onDone: () => void }) {
+/**
+ * One turn: his entry, Ripple's entries, the doctor's line under a note, Ripple's follow-up question. `last`: the day's rule
+ * ends with this turn. `replies`: the follow-up questions he answered that day, and with what.
+ */
+function Turn({
+  turn,
+  locale,
+  today,
+  last,
+  onDone,
+  replies,
+}: {
+  turn: ChatTurnView;
+  locale: Locale;
+  today: boolean;
+  last: boolean;
+  onDone: () => void;
+  replies: ReadonlyMap<string, readonly string[]>;
+}) {
   const w = CHAT_WORDS[locale];
   const copy = askCopy(locale);
   const ui = uiCopy(locale);
@@ -194,6 +217,9 @@ function Turn({ turn, locale, today, last, onDone }: { turn: ChatTurnView; local
             }
           />
         ) : null}
+
+        {/* harness (10-16): Ripple's follow-up question, last, read only (he answers it on the ask screen) */}
+        {turn.answer?.followUp ? <FollowUpQuestion followUp={turn.answer.followUp} locale={turn.answer.locale ?? locale} state={followUpOf(turn.answer, replies)} /> : null}
       </Timeline>
     </article>
   );
@@ -204,6 +230,8 @@ export function ChatScreen({ view, locale }: { view: ChatDayView; locale: Locale
   const w = CHAT_WORDS[locale];
   const list = useRef<HTMLDivElement | null>(null);
   const count = view.turns.length;
+  /** harness (10-16): the follow-up questions he answered that day (a turn that was his tap names the question) */
+  const replies = new Map(view.turns.flatMap((t) => (t.reply ? [[t.reply.followUpId, t.reply.optionIds] as const] : [])));
   /** how many turns the screen showed last (null before the first paint) */
   const shown = useRef<number | null>(null);
 
@@ -230,7 +258,7 @@ export function ChatScreen({ view, locale }: { view: ChatDayView; locale: Locale
         // the turns and nothing else: the day's rule ends with the last of them
         <div ref={list}>
           {view.turns.map((t, i) => (
-            <Turn key={t.id} turn={t} locale={locale} today={view.isToday} last={i === count - 1} onDone={() => router.refresh()} />
+            <Turn key={t.id} turn={t} locale={locale} today={view.isToday} last={i === count - 1} onDone={() => router.refresh()} replies={replies} />
           ))}
         </div>
       ) : (

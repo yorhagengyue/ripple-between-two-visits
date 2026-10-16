@@ -342,8 +342,15 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
   let lastErr: unknown;
   let timedOut = 0;
   let made = 0;
+  /**
+   * the vendor answered 429 (its rate limit: TokenHub 429002 / 429003 / 429005, RPM 60 a model) at least once in this call:
+   * an error thrown after it carries `rateLimited: true`, so a caller can tell a rate limit from a slow model (the harness's
+   * risk.screen.error "rate_limited"). Nothing else changes: the retries and their backoff are as before
+   */
+  let rateLimited = false;
+  const flag = <E>(e: E): E => (rateLimited && e && typeof e === "object" ? Object.assign(e, { rateLimited: true }) : e);
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    if (sig.outer?.aborted) throw stoppedError(cfg, sig, timedOut, made);
+    if (sig.outer?.aborted) throw flag(stoppedError(cfg, sig, timedOut, made));
     made = attempt;
     try {
       // the timeout covers the headers and the body (a vendor may keep a slow request open with blank lines), a streamed
@@ -355,6 +362,7 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
         return { status: resp.status, ok: true, text: read.text, attempts: attempt, timedOut, streamed: true, noUsage: read.noUsage };
       }
       const text = await resp.text();
+      if (resp.status === 429) rateLimited = true;
       if (resp.ok || !RETRYABLE.has(resp.status) || attempt === maxAttempts) {
         return { status: resp.status, ok: resp.ok, text, attempts: attempt, timedOut };
       }
@@ -363,7 +371,7 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
     } catch (e) {
       lastErr = e; // timeout / abort / dropped socket: the next attempt opens a new connection
       if (isTimeout(e) || sig.outer?.aborted) timedOut++;
-      if (sig.outer?.aborted) throw Object.assign(stoppedError(cfg, sig, timedOut, made), tap?.emitted ? { emitted: true } : {});
+      if (sig.outer?.aborted) throw flag(Object.assign(stoppedError(cfg, sig, timedOut, made), tap?.emitted ? { emitted: true } : {}));
       if (tap?.emitted) {
         // words of this reply are on his screen already: another attempt would write them a second time
         const err = isTimeout(e)
@@ -374,15 +382,15 @@ async function postChat(cfg: CompatConfig, payload: object, timeoutMs: number, f
       if (attempt < maxAttempts) await sleep(backoffMs(attempt, null), sig.outer);
     }
   }
-  if (sig.outer?.aborted) throw stoppedError(cfg, sig, timedOut, made);
+  if (sig.outer?.aborted) throw flag(stoppedError(cfg, sig, timedOut, made));
   if (isTimeout(lastErr)) {
     const err = new LlmError("timeout", `${cfg.name} timed out after ${timeoutMs} ms (${maxAttempts} attempt${maxAttempts === 1 ? "" : "s"})`, 504);
     (err as LlmError & { timedOut?: number }).timedOut = timedOut;
-    throw err;
+    throw flag(err);
   }
   const err = new LlmError("unreachable", `${cfg.name} unreachable (${errorKind(lastErr)})`, 504);
   (err as LlmError & { timedOut?: number }).timedOut = timedOut;
-  throw err;
+  throw flag(err);
 }
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
@@ -419,9 +427,11 @@ export function upstreamError(cfg: Pick<CompatConfig, "name">, status: number): 
   if (status === 401 || status === 403) return new LlmError("auth", `${cfg.name} ${status}: API key rejected`, status);
   if (status === 402) return new LlmError("insufficient_balance", `${cfg.name} 402: account balance is used up`, 402);
   if (status === 451) return new LlmError("upstream", `${cfg.name} 451: the vendor's content safety filtered the request or the reply`, 451);
-  // 5xx and a 429 that survived the retries count as "provider down" (failover); other 4xx are our mistake
+  // 5xx and a 429 that survived the retries count as "provider down" (failover); other 4xx are our mistake. A 429 says so
+  // (rateLimited: the harness records it apart from a timeout)
   const mapped = PROVIDER_DOWN.has(status) ? status : status >= 500 || status === 429 ? 503 : status;
-  return new LlmError("upstream", `${cfg.name} ${status}: request failed`, mapped);
+  const err = new LlmError("upstream", `${cfg.name} ${status}: request failed`, mapped);
+  return status === 429 ? Object.assign(err, { rateLimited: true }) : err;
 }
 
 async function chatOnce(cfg: CompatConfig, opts: ChatOpts, fetchImpl: FetchLike, sig: CallSignals = {}): Promise<ChatResult> {

@@ -14,6 +14,7 @@ import { renderText } from "@/lib/safety/render";
 import type { AskResult } from "@/lib/safety/types";
 import { layer3 } from "@/lib/safety/verify";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const CTX = { doctorThresholdSystolic: 180, meds: [] };
 
@@ -144,10 +145,12 @@ describe("the safety line on any answer near crisis words when no crisis screen 
       provider: "fake-live",
       model: "fake",
       async chat(opts: ChatOpts) {
-        const task = JSON.parse(opts.user).task as string;
-        if (task === "crisis") {
+        const payload = JSON.parse(opts.user) as { task: string; message?: string };
+        const task = payload.task;
+        // (the harness: the risk screen replaced the crisis screen; it answers with the frame of the scripted word)
+        if (task === "crisis" || task === "risk_screen") {
           if (crisis instanceof Error) throw crisis;
-          return { content: crisis, tokens: 3 };
+          return { content: task === "risk_screen" ? frameReply(crisis, payload.message ?? "") : crisis, tokens: 3 };
         }
         if (task === "classify") return { content: JSON.stringify({ route: "explain", topic: "other" }), tokens: 1 };
         return { content: JSON.stringify({ sentences: [] }), tokens: 1 };

@@ -16,7 +16,8 @@ import { EmptyBlock, FamilyDock, FamilyHero, FamilyScreen, FamilyTop } from "@/c
 import { logLook } from "@/lib/care/access-log";
 import { hc } from "@/lib/care/her-copy";
 import { herDayClock, herPage, herSwitches } from "@/lib/care/her-page";
-import { toldNotice } from "@/lib/care/told";
+import { toldNotices } from "@/lib/care/told";
+import { latestOfConversation } from "@/lib/care/told-threads";
 import { localDate } from "@/lib/time/clock";
 import { scopeTz } from "@/lib/store/scope";
 import { nowMs } from "@/lib/time/now";
@@ -30,7 +31,16 @@ export default async function FamilyToldPage({ searchParams }: PageProps<"/f/ale
   const { ctx, link, locale, dad, paths } = p;
   const id = typeof sp.id === "string" ? sp.id : "";
   const now = nowMs();
-  const [{ version }, notice] = await Promise.all([herSwitches(ctx.store, ctx.session, link.id), id ? toldNotice(ctx.store, ctx.session, link.id, id).catch(() => null) : Promise.resolve(null)]);
+  // the harness (10-16): an earlier notice of a conversation he went on with (his answers to Ripple's follow-up questions)
+  // opens as its latest, with every step so far (lib/care/told-threads.ts)
+  const [{ version }, notice] = await Promise.all([
+    herSwitches(ctx.store, ctx.session, link.id),
+    id
+      ? toldNotices(ctx.store, ctx.session, link.id)
+          .then((all) => latestOfConversation(all, id))
+          .catch(() => null)
+      : Promise.resolve(null),
+  ]);
   if (notice) await logLook(ctx.store, ctx.session.id, { linkId: link.id, userId: p.userId, label: link.family_label, route: "/f/alert/told", items: ["told"] }, now);
   const today = localDate(now, scopeTz(ctx.session));
   return (

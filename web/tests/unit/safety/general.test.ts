@@ -257,6 +257,9 @@ describe("the 995 and self-harm answers in a person's words (crisis-words.ts)", 
       ["self_harm_sos", "template"],
       ["self_harm_mindline", "template"],
       ["self_harm_care_corner", "template"],
+      // (the harness, 10-16: the ladder's thoughts row adds "I'm here ..." and "tell your doctor" after the helplines, which stay as they were)
+      ["self_harm_here", "template"],
+      ["self_harm_doctor", "template"],
     ]);
     expect(renderText(result, "zh-Hans")).toContain("1767");
   });

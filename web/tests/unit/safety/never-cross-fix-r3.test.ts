@@ -188,7 +188,9 @@ describe("V3: a negated verb with no object, then another sentence (the correctn
     ["Stop taking. Two at night instead.", "Two at night instead.", "How many tablets did the doctor say?", "en"],
     ["Never take. More than one a day.", "More than one a day.", "How many tablets a day did the doctor say?", "en"],
     ["Don't stop. Taking it is not needed when you feel fine.", "Taking it is not needed when you feel fine.", "Do I still need my tablet when I feel fine?", "en"],
-    ["Don't take. Two tablets at once.", "Two tablets at once.", "Can I take two tablets at once?", "en"],
+    // (asked "together", not "at once": offline "at once" is a large amount no model read, the harness's possible step, which
+    // drops every line with an amount before the checks run; this case is about the checks)
+    ["Don't take. Two tablets at once.", "Two tablets at once.", "Can I take two tablets together?", "en"],
     ["不要一次吃。两粒。", "两粒。", "一次可以吃两粒吗？", "zh-Hans"],
   ];
   it.each(SPLIT)("%s: never shown, the part nor the whole", async (line, quote, text, locale) => {

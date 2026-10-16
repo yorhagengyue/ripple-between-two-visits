@@ -149,7 +149,7 @@ export async function readLabel(input: { sessionId: string; path: string }, deps
   }
   // is the reading trustworthy? two reads agree, plausible date and clinic (lib/vision/check.ts)
   // "today" for the label's dispensed date: the scope's day 0 (an account's own, the template's in the demo) + its day
-  const check = assessLabelReading(parsed, second, { today: storyDate(scopeD0(session), session.story_day), knownClinics });
+  const check = assessLabelReading(parsed, second, { today: storyDate(scopeD0(session), session.story_day), knownClinics, secondBy: text.secondBy });
   if (check.reject) {
     pub(sessionId, "med.changed", `Label photo could not be read reliably (${check.reject}); asked for a new photo`, { kind: "label.read_failed", code: check.reject, warnings: check.warnings });
     throw new MedsError("label_unreadable", "the label could not be read reliably", { code: check.reject });
@@ -165,7 +165,8 @@ export async function readLabel(input: { sessionId: string; path: string }, deps
     fields.drug_id
       ? `Label read (${text.provider}): "${fields.drug_text}" -> ${fields.drug_id} (${fields.match} match)`
       : `Label read (${text.provider}): "${fields.drug_text ?? "?"}" -> not identified`,
-    { kind: "label.read", provider: text.provider, cassette: text.cassette, fields, warnings: check.warnings },
+    // reader_error: OCR could not read it for the account's configuration, so a sample photo's recorded reading answered
+    { kind: "label.read", provider: text.provider, cassette: text.cassette, fields, warnings: check.warnings, ...(text.readerError ? { reader_error: text.readerError } : {}) },
   );
   return {
     read_token: readToken,

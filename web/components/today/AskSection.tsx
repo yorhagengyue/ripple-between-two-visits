@@ -46,15 +46,32 @@
  * (「在找医生说过的话……」, then 「正在写……」), all drawn by AnswerCard's draft; then the final answer, drawn exactly as before.
  * A refusal (429) is the plain answer it always was; a stream that breaks off is asked once more without streaming.
  *
+ * The guided harness (2026-10-16, lib/safety/risk/types.ts): an answer may end on one scripted follow-up question with buttons
+ * (AnswerCard draws it last, components/daily/FollowUpQuestion.tsx). The stream's "followup" event is kept with what has come
+ * so far, and the question is drawn once the answer is final (a draft offers nothing to tap). His tap is asked through the
+ * same `ask` as a typed question, with `reply` (the question's id and the chosen options) and his words = the options' words:
+ * while it is on its way the answer he tapped stays on the screen with what he chose marked and the waiting line under it,
+ * until the new answer's first sentence comes; then the new answer is the next turn, drawn as a typed question's is, and
+ * the focus moves to it. A failure opens the question again, with the sentence that says why where a typed question has it.
+ * Only the latest answer's question can be answered; an earlier one is drawn answered (what he chose marked: the turn that
+ * answered it says so, AskTurn.reply) or closed. Typing and speaking work while a question is there: a new ask like any other.
+ * When an answer with a question arrives (or the page opens on one), the screen goes where the question shows with the 995
+ * line still in view (components/daily/follow-up-place.ts); when the two cannot show together it stays on the 995 line and
+ * the chip 「Ripple 想问你一句 ↓」 at the foot of the view takes him to the question (the owner's coordinator's decision,
+ * 10-16). Hook: ask-followup-chip.
+ *
  * Test hooks: ask-section (data-mode, data-turns, data-urgent), ask-input, ask-field, ask-send, ask-to-speak, ask-asking
  * (his sentence while its answer is on the way), ask-pending, ask-error, ask-start, ask-earlier, ask-earlier-turn,
  * ask-earlier-question, ask-no-ai (and ask-no-ai-change), ask-offline, the example sentences ([data-rp="example-asks"],
  * [data-action="example-ask"]), and the microphone's (AskMic.tsx).
  */
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { AnswerCard } from "@/components/daily/AnswerCard";
+import { FollowUpChip } from "@/components/daily/FollowUpQuestion";
+import { placeFollowUp } from "@/components/daily/follow-up-place";
 import { askCopy, limitWords } from "@/components/daily/ask-copy";
+import { answeredFollowUps, followUpOf } from "@/components/daily/follow-up";
 import { useOfflineKit } from "@/components/offline/OfflineProvider";
 import { MicBlocked, MicButton, MicControls, MicNote, MicStage, useAskMic } from "@/components/today/AskMic";
 import { EXAMPLE_ASKS, fillAskBox } from "@/components/today/ExampleBanner";
@@ -63,6 +80,7 @@ import { Icon } from "@/components/ui/icons";
 import { exampleCopy } from "@/lib/profile/copy";
 import { uiCopy } from "@/lib/ui/copy";
 import { fetchSignedIn } from "@/lib/session/client";
+import type { FollowUp, FollowUpReply } from "@/lib/safety/risk/types";
 import type { AskResult, Route, Sentence } from "@/lib/safety/types";
 import type { AskTurn, StoredAnswer } from "@/lib/safety/turns";
 import { postEventStream } from "@/lib/sse/client";
@@ -155,14 +173,15 @@ function followDraft(owner: string | null, value: string): void {
 
 export type AskOutcome = { ok: true; turn: AskTurn } | { ok: false; status: number; code: string | null; retryAt: string | null; limit?: string | null };
 
-/** The kept turn as /p/ask will show it, from the answer the server gave. */
-function turnFrom(text: string, r: AskResult): AskTurn {
+/** The kept turn as /p/ask will show it, from the answer the server gave (`reply`: the ask was his tap on a follow-up). */
+function turnFrom(text: string, r: AskResult, reply?: FollowUpReply): AskTurn {
   return {
     id: `local-${Date.now()}`,
     day: 0,
     at: new Date().toISOString(),
     text,
     lang: null,
+    ...(reply ? { reply } : {}),
     answer: {
       route: r.route,
       sentences: r.sentences,
@@ -174,30 +193,40 @@ function turnFrom(text: string, r: AskResult): AskTurn {
       ...(r.noAiConsent ? { noAiConsent: r.noAiConsent } : {}),
       // 10-14: Ripple's own words under the quotes (lib/safety/gloss.ts), as the kept turn has them
       ...(r.gloss ? { gloss: r.gloss } : {}),
+      // harness (10-16): the follow-up question, as the kept turn has it (never the risk summary)
+      ...(r.followUp ? { followUp: r.followUp } : {}),
     },
   };
 }
 
 /** A plain answer of POST /api/ask (JSON): the turn, or why there is none. */
-async function outcomeFrom(res: Response, text: string): Promise<AskOutcome> {
+async function outcomeFrom(res: Response, text: string, reply?: FollowUpReply): Promise<AskOutcome> {
   const data = (await res.json().catch(() => ({}))) as Partial<AskResult> & { retryAt?: string; limit?: string; error?: unknown };
   if (!res.ok || !data.route || !Array.isArray(data.sentences)) {
     return { ok: false, status: res.status, code: typeof data.error === "string" ? data.error : null, retryAt: data.retryAt ?? null, limit: data.limit ?? null };
   }
-  return { ok: true, turn: turnFrom(text, data as AskResult) };
+  return { ok: true, turn: turnFrom(text, data as AskResult, reply) };
 }
 
-/** POST /api/ask with the device's own cookie; the kept turn as /p/ask will show it. */
-export async function sendAsk(text: string, locale: UiLocale): Promise<AskOutcome> {
+/** The body of POST /api/ask: his words, the screen's language, and his tap on a follow-up question when it is one. */
+export function askBody(text: string, locale: UiLocale, reply?: FollowUpReply): { text: string; locale: UiLocale; reply?: FollowUpReply } {
+  return { text, locale, ...(reply ? { reply } : {}) };
+}
+
+/**
+ * POST /api/ask with the device's own cookie; the kept turn as /p/ask will show it. `reply`: the ask is his tap on a
+ * follow-up question (harness, 2026-10-16), `text` the chosen options' words.
+ */
+export async function sendAsk(text: string, locale: UiLocale, reply?: FollowUpReply): Promise<AskOutcome> {
   // track O: fetchSignedIn, so a sign-in that ended goes to /login?next= and comes back (real-app 2.25)
   const res = await fetchSignedIn("/api/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "same-origin",
-    body: JSON.stringify({ text, locale }),
+    body: JSON.stringify(askBody(text, locale, reply)),
   }).catch(() => null);
   if (!res) return { ok: false, status: 0, code: null, retryAt: null };
-  return outcomeFrom(res, text);
+  return outcomeFrom(res, text, reply);
 }
 
 /**
@@ -214,6 +243,11 @@ export interface AskProgress {
   words: string;
   /** Ripple's own words are still coming (the caret) */
   writing: boolean;
+  /**
+   * harness (2026-10-16): the follow-up question, when its event came (after the answer's sentences). Kept, not drawn: a
+   * draft offers nothing to tap, and the final answer carries the same question.
+   */
+  followUp?: FollowUp;
 }
 
 export const NO_PROGRESS: AskProgress = { stage: "sending", sentences: [], route: null, words: "", writing: false };
@@ -253,9 +287,9 @@ export function stageWords(locale: UiLocale, p: AskProgress | null): string {
  * POST /api/ask as Server-Sent Events: each step of the answer goes to `onProgress` as it comes, and the outcome is the
  * same as sendAsk's (the final event is exactly the plain answer). A refusal (429 and the rest) comes as the plain answer
  * it always was. A stream that breaks off before its end is asked once more without streaming, so he always gets his
- * answer (lib/sse/client.ts).
+ * answer (lib/sse/client.ts). `reply`: the ask is his tap on a follow-up question (harness, 2026-10-16).
  */
-export async function streamAsk(text: string, locale: UiLocale, onProgress: (p: AskProgress) => void): Promise<AskOutcome> {
+export async function streamAsk(text: string, locale: UiLocale, onProgress: (p: AskProgress) => void, reply?: FollowUpReply): Promise<AskOutcome> {
   let p = NO_PROGRESS;
   const set = (next: AskProgress) => {
     p = next;
@@ -265,7 +299,7 @@ export async function streamAsk(text: string, locale: UiLocale, onProgress: (p: 
   const str = (v: unknown): string | null => (typeof v === "string" ? v : null);
   const out = await postEventStream(
     "/api/ask",
-    { text, locale },
+    askBody(text, locale, reply),
     {
       fetchImpl: fetchSignedIn,
       onEvent: ({ event, data }) => {
@@ -276,18 +310,19 @@ export async function streamAsk(text: string, locale: UiLocale, onProgress: (p: 
         else if (event === "delta") set({ ...p, stage: "writing", words: p.words + (str(d.text) ?? ""), writing: true });
         else if (event === "retract") set({ ...p, words: "", writing: false });
         else if (event === "replace" && Array.isArray(d.sentences)) set({ ...p, sentences: d.sentences as Sentence[], route: (str(d.route) as Route | null) ?? p.route });
+        else if (event === "followup" && d.followUp && typeof d.followUp === "object") set({ ...p, followUp: d.followUp as FollowUp });
         else if (event === "final") got.final = d as unknown as AskResult;
         else if (event === "error") got.failed = { ok: false, status: Number(d.status) || 500, code: str(d.error), retryAt: str(d.retryAt), limit: str(d.limit) };
       },
     },
   ).catch(() => null);
   if (!out) return { ok: false, status: 0, code: null, retryAt: null };
-  if (!out.streamed) return outcomeFrom(out.res, text);
+  if (!out.streamed) return outcomeFrom(out.res, text, reply);
   const final = got.final;
-  if (final && final.route && Array.isArray(final.sentences)) return { ok: true, turn: turnFrom(text, final) };
+  if (final && final.route && Array.isArray(final.sentences)) return { ok: true, turn: turnFrom(text, final, reply) };
   if (got.failed) return got.failed;
   // the stream broke off before its end (the network, a proxy): the plain request once
-  return sendAsk(text, locale);
+  return sendAsk(text, locale, reply);
 }
 
 function useAsk(
@@ -296,8 +331,8 @@ function useAsk(
   on: {
     /** the answer is in */
     answered: (turn: AskTurn) => void;
-    /** the question is on its way (his words, trimmed) */
-    started?: (text: string) => void;
+    /** the question is on its way (his words, trimmed; `reply`: it is his tap on a follow-up question) */
+    started?: (text: string, reply?: FollowUpReply) => void;
     /** it did not go through: the screen is what it was, with the sentence that says why */
     failed?: () => void;
     /** SSE: the answer as it stands while it is being made (lib/sse; AskProgress) */
@@ -308,11 +343,11 @@ function useAsk(
   const [error, setError] = useState<string | null>(null);
   const copy = askCopy(locale);
   /**
-   * One question, typed or spoken (the microphone's 「问这句」): the same request, waiting words, 429 sentences and what
-   * follows the answer. `sent` runs once the answer is in, before `on.answered` (the typing field empties itself
-   * there). False when nothing was asked or it did not go through.
+   * One question, typed or spoken (the microphone's 「问这句」), or his tap on a follow-up question (`reply`, harness
+   * 2026-10-16): the same request, waiting words, 429 sentences and what follows the answer. `sent` runs once the answer is
+   * in, before `on.answered` (the typing field empties itself there). False when nothing was asked or it did not go through.
    */
-  async function ask(raw: string, sent?: () => void): Promise<boolean> {
+  async function ask(raw: string, sent?: () => void, reply?: FollowUpReply): Promise<boolean> {
     const text = raw.trim();
     if (!text || pending) return false;
     // track O: no network, nothing is sent and nothing is queued
@@ -322,12 +357,13 @@ function useAsk(
     }
     setPending(true);
     setError(null);
-    on.started?.(text);
-    // kept before it leaves: when his sign-in has ended the page goes to the login as soon as the server says so
-    keepDraft(owner, text);
+    on.started?.(text, reply);
+    // kept before it leaves: when his sign-in has ended the page goes to the login as soon as the server says so (not a
+    // tap on a follow-up question: those words were never in the field)
+    if (!reply) keepDraft(owner, text);
     window.__rpAsk = { text, sentAt: performance.now(), answeredAt: null };
     // SSE (owner 10-15): the answer told as it is made; the outcome is sendAsk's
-    const out = await streamAsk(text, locale, (p) => on.progress?.(p));
+    const out = await streamAsk(text, locale, (p) => on.progress?.(p), reply);
     setPending(false);
     if (!out.ok) {
       // his sign-in ended (401, or no cookie left at all): the page is on its way to the login and his sentence waits
@@ -568,34 +604,72 @@ function AskScreen({
   const [settledId, setSettledId] = useState<string | null>(null);
   const top = useRef<HTMLDivElement | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
+  /**
+   * harness (2026-10-16): the ask on its way is his tap on the latest answer's follow-up question. Until the new answer's
+   * first sentence comes, the answer he tapped keeps the screen (what he chose marked, the waiting line under it).
+   */
+  const [replying, setReplying] = useState<FollowUpReply | null>(null);
+  const replyingNow = useRef(false);
+  /** harness (10-16): the answer (its turn id) whose question could not show with its 995 line on arrival: the chip */
+  const [chipFor, setChipFor] = useState<string | null>(null);
+  const hideChip = useCallback(() => setChipFor(null), []);
+  /** the latest answer's open question, for the chip */
+  const openQuestion = useCallback(() => top.current?.parentElement?.querySelector<HTMLElement>('[data-testid="ask-answer"] [data-testid="ask-followup"][data-state="open"]') ?? null, []);
+  /** the latest answer, placed as its question wants it (follow-up-place.ts); true when the chip is wanted */
+  const placeQuestion = () => {
+    const answer = top.current?.parentElement?.querySelector<HTMLElement>('[data-testid="ask-answer"]');
+    return answer ? placeFollowUp(answer, document.querySelector<HTMLElement>('.rpu-tabs[data-placement="fixed"]')) : false;
+  };
   /** the screen from its header down: his question is the first thing under it (the window scrolls; a phone drawn inside a box scrolls its own page) */
   const toTop = () => {
     window.scrollTo({ top: 0 });
     top.current?.closest<HTMLElement>(".rpu-page")?.scrollTo({ top: 0 });
   };
+  /** after his tap was answered: the focus on the new answer (his words, its heading), where a screen reader reads on */
+  const focusAnswer = () => {
+    const heading = top.current?.parentElement?.querySelector<HTMLElement>('[data-testid="ask-answer"] h1');
+    if (!heading) return;
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+  };
   const { pending, error, submit, ask } = useAsk(locale, owner, {
-    started: (text) => {
+    started: (text, reply) => {
       setAsking(text);
       setProgress(NO_PROGRESS);
       drafted.current = false;
-      requestAnimationFrame(toTop);
+      replyingNow.current = !!reply;
+      setReplying(reply ?? null);
+      // a typed question has the screen from the top at once; a tap stays where he tapped until the answer comes
+      if (!reply) requestAnimationFrame(toTop);
     },
     failed: () => {
       setAsking(null);
       setProgress(null);
+      setReplying(null);
+      replyingNow.current = false;
     },
     progress: (p) => {
-      if (hasProgress(p)) drafted.current = true;
+      if (hasProgress(p)) {
+        // his tap's answer has begun: it is the next turn now, from the top, as a typed question's is
+        if (!drafted.current && replyingNow.current) requestAnimationFrame(toTop);
+        drafted.current = true;
+      }
       setProgress(p);
     },
     answered: (turn) => {
+      const wasReply = replyingNow.current;
+      replyingNow.current = false;
       setTurns((t) => [...t, turn]);
       setAsking(null);
       setProgress(null);
+      setReplying(null);
       setSettledId(drafted.current ? turn.id : null);
       requestAnimationFrame(() => {
         if (window.__rpAsk) window.__rpAsk.answeredAt = performance.now();
         toTop();
+        // harness (10-16): an answer with a question: where the question shows, the 995 line kept in view
+        setChipFor(placeQuestion() ? turn.id : null);
+        if (wasReply) focusAnswer();
       });
     },
   });
@@ -610,6 +684,15 @@ function AskScreen({
     const kept = askDraft(owner);
     if (el && kept && !el.value) el.value = kept;
   }, [owner]);
+  // harness (10-16): the page opens on an answer with an open question (a refresh, the way back from another page)
+  const firstLatest = useRef(initialTurns.filter((t) => t.answer).at(-1)?.id ?? null);
+  useEffect(() => {
+    const id = firstLatest.current;
+    if (!id) return;
+    const raf = requestAnimationFrame(() => setChipFor(placeQuestion() ? id : null));
+    return () => cancelAnimationFrame(raf);
+    // (once, on the first paint)
+  }, []);
   // the microphone was refused or is missing: the box that says so is at the top of the screen
   const blocked = voice && (mic.state === "denied" || mic.state === "unavailable");
   useEffect(() => {
@@ -621,10 +704,20 @@ function AskScreen({
   const answered = turns.filter((t) => t.answer);
   const latest = answered[answered.length - 1];
   const earlier = answered.slice(0, -1).reverse();
+  /** harness: the follow-up questions he answered today, and with what (the turns that answered them say so) */
+  const replies = answeredFollowUps(turns);
+  /** what a tap on the latest answer's question does: asked as a typed question is, with the reply */
+  const onReply = (a: { text: string; reply: FollowUpReply }) => ask(a.text, undefined, a.reply);
   /** the microphone has the screen (the browser is asking for it, listening, turning into words, his words to check) */
   const speaking = voice && (mic.active || mic.state === "starting");
-  /** his question, or the microphone, has the screen: nothing else is on it */
-  const busy = asking !== null || speaking;
+  /** his tap on the latest answer's question is on its way and nothing of its answer has come yet: that answer keeps the screen */
+  const waitingOnTap = asking !== null && replying !== null && !hasProgress(progress) && !!latest;
+  /**
+   * his question, or the microphone, has the screen: nothing else is on it. Not while the answer he tapped is still up: the
+   * screen stays as it was (the dock where it stood, today's earlier questions under it), so nothing moves over the question
+   * he is looking at
+   */
+  const busy = (asking !== null && !waitingOnTap) || speaking;
   const route = latest?.answer?.route;
   const urgent = !busy && (route === "emergency" || route === "self_harm");
   return (
@@ -638,12 +731,12 @@ function AskScreen({
         )}
         {aiOff && <NoAiBox locale={locale} />}
         {voice && <MicBlocked mic={mic} locale={locale} />}
-        {asking !== null && hasProgress(progress) ? (
+        {asking !== null && !waitingOnTap && hasProgress(progress) ? (
           // SSE: what has come of the answer so far, drawn by the answer's own card (its draft), the stage line under it
           <div data-testid="ask-asking">
             <AnswerCard question={asking} answer={draftAnswer(progress, locale)} locale={locale} draft={{ line: stageWords(locale, progress), writing: progress.writing, testId: "ask-pending" }} />
           </div>
-        ) : asking !== null ? (
+        ) : asking !== null && !waitingOnTap ? (
           <Timeline testId="ask-asking">
             <TimelineItem node="me" who={ui.asked}>
               <p className="rpu-bubble" data-rp="bubble" data-rp-role="say">
@@ -659,7 +752,19 @@ function AskScreen({
         ) : speaking ? (
           <MicStage mic={mic} locale={locale} />
         ) : latest ? (
-          <AnswerCard key={latest.id} question={latest.text} answer={latest.answer!} locale={locale} latest noted={latest.noted} aiNote={!aiOff} askedAt={latest.at} settled={latest.id === settledId} />
+          // (the same element while his tap on its question is on its way, so what he chose stays marked)
+          <AnswerCard
+            key={latest.id}
+            question={latest.text}
+            answer={latest.answer!}
+            locale={locale}
+            latest
+            noted={latest.noted}
+            aiNote={!aiOff}
+            askedAt={latest.at}
+            settled={latest.id === settledId}
+            followUp={followUpOf(latest.answer!, replies, waitingOnTap ? replying : null, onReply)}
+          />
         ) : (
           <Start locale={locale} voice={voice} example={example} />
         )}
@@ -681,7 +786,7 @@ function AskScreen({
                     <Chevron />
                   </summary>
                   <div className="rpu-fold-body">
-                    <AnswerCard question={t.text} answer={t.answer!} locale={locale} latest={false} showQuestion={false} noted={t.noted} aiNote={!aiOff} />
+                    <AnswerCard question={t.text} answer={t.answer!} locale={locale} latest={false} showQuestion={false} noted={t.noted} aiNote={!aiOff} followUp={followUpOf(t.answer!, replies)} />
                   </div>
                 </details>
               ))}
@@ -695,6 +800,10 @@ function AskScreen({
       {/* the dock: at the foot of the screen, above the tab bar, while the screen is about asking (the start, his
           sentence on its way, the microphone). Once an answer has the screen, the answer has all of it (the draft's
           answer screens draw no dock): the field stands at the end of the page, under the answer */}
+      {/* harness (10-16): the question could not show with the 995 line: the chip at the foot of the view takes him there */}
+      {chipFor !== null && latest?.id === chipFor && !busy ? (
+        <FollowUpChip locale={latest.answer?.locale ?? locale} question={openQuestion} bottom="calc(var(--rpu-bottom, 0px) + 12px)" onSeen={hideChip} />
+      ) : null}
       <ActionDock bar className="rpu-askdock" data-pinned={latest && !busy ? "false" : "true"}>
         {error && (
           <p className="rpu-cite" role="alert" data-testid="ask-error" style={{ marginTop: 0 }}>

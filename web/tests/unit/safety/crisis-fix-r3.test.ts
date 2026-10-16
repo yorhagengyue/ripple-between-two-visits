@@ -25,6 +25,7 @@ import { SIGNAL_RECORDED, TEMPLATES } from "@/lib/safety/templates";
 import type { AskResult } from "@/lib/safety/types";
 import { getMemoryStore } from "@/lib/store/memory";
 import { loadConfirmedTranscripts } from "@/scripts/eval";
+import { frameReply } from "./live-stand-in";
 
 const CTX = { doctorThresholdSystolic: 180, meds: [] };
 
@@ -47,8 +48,11 @@ const liveScreen = (crisis: string): LlmClient => ({
   provider: "fake-live",
   model: "fake",
   async chat(opts: ChatOpts) {
-    const task = JSON.parse(opts.user).task as string;
+    const payload = JSON.parse(opts.user) as { task: string; message?: string };
+    const task = payload.task;
     if (task === "crisis") return { content: JSON.stringify({ crisis }), tokens: 3 };
+    // (the harness: the risk screen replaced the crisis screen; it answers with the frame of that word)
+    if (task === "risk_screen") return { content: frameReply(crisis, payload.message ?? ""), tokens: 3 };
     if (task === "classify") return { content: JSON.stringify({ route: "explain", topic: "other" }), tokens: 1 };
     return { content: JSON.stringify({ sentences: [] }), tokens: 1 };
   },
@@ -97,6 +101,16 @@ describe("1. with no crisis screen, an emergency asked as a question routes to t
     "Saya susah nak bernafas sejak pagi, patut berhenti ubat?",
     "Breathing feels hard, should I take my pill?",
   ]);
+  /** (the chest ones: kept for his doctor while the harness asks whether the pain is still there) */
+  const CHEST = new Set([
+    "My chest feels like a belt is tightening around it, can I take another tablet?",
+    "Chest very tight like got rope tie, should I eat my pill first?",
+    "胸口像被大石压住一样，可以多吃一粒药吗？",
+    "我心口好翳好痛，仲食唔食得藥？",
+    "Dada saya sakit sangat macam kena hempap, nak makan ubat ke?",
+    "நெஞ்சு வலி இருக்கிறது, மருந்து சாப்பிடலாமா?",
+    "There is pressure in my chest, can I still take amlodipine?",
+  ]);
   it.each(QUESTIONS)("%s", async (text) => {
     const r = await askAt(text);
     expect(r.route).toBe("emergency");
@@ -104,6 +118,12 @@ describe("1. with no crisis screen, an emergency asked as a question routes to t
     expect(ids(r)).not.toContain("noted");
     if (BREATHING.has(text)) {
       expect(r.sentences[0].templateId).toBe("emergency_995");
+    } else if (!CHEST.has(text)) {
+      // the harness, 10-16 (kb/pathways.json stroke-now): a stroke sign a crisis rule found, happening now or not said to be
+      // over, is 995 now first with no question (time-critical), then his doctor's line; never "kept for your doctor" first
+      expect(r.sentences[0]).toMatchObject({ templateId: "emergency_995", cite: { referralId: "B1-03" } });
+      expect(ids(r)).not.toContain(SIGNAL_RECORDED.id);
+      expect(r.followUp).toBeUndefined();
     } else {
       // 10-14 (the owner's decision: 「胸口痛就必须打 995」 was too absolute): his own chest pain or stroke sign is kept for his
       // doctor, his doctor's line, then 995 if it gets bad, cited to the same row (B1-01 chest, B1-03 stroke)
@@ -113,17 +133,19 @@ describe("1. with no crisis screen, an emergency asked as a question routes to t
     }
   });
 
-  it("a description no rule knows, only the emergency cue words: still 995 with no screen, named rule:emergency_cue", async () => {
+  it("a description no rule knows, only the emergency cue words: the safety line, and 995 now only when the frame says it is happening now", async () => {
+    // (the harness's round 2, 10-16: cue words alone never make a sign 995 now by themselves. Here the rules' frame reads the
+    // stroke sign with no time: the answer stays, with the safety line. Said to be going on now it is 995 now, the stroke row)
     const text = "My arm went funny and heavy, can I take the pill?";
     expect(classifyRules(text, CTX)?.route).not.toBe("emergency");
     expect(emergencyCue(text)).toEqual(["stroke"]);
     const r = await askAt(text);
-    expect(r.route).toBe("emergency");
-    expect(r.routeReason).toBe("rule:emergency_cue");
-    // (10-14) a stroke sign of his own: kept for his doctor, then 995 if it gets bad, on the stroke row
-    expect(ids(r)).toEqual([SIGNAL_RECORDED.id, "visit:v1:R2", "signal_995_stroke"]);
-    expect(r.sentences[2]).toMatchObject({ templateId: "signal_995_stroke", cite: { referralId: "B1-03" } });
-    expect((r.events[0].output as { rulesOnlyCue: unknown }).rulesOnlyCue).toMatchObject({ from: "explain", kinds: ["stroke"], gap: "offline" });
+    expect(r.route).toBe("explain");
+    expect(ids(r)).toContain("safety_line");
+    expect(ids(r)).not.toContain("emergency_995");
+    expect((r.events[0].output as { rulesOnlyCue: unknown }).rulesOnlyCue).toBeNull();
+    const now = await askAt("Since lunch my right side is very heavy");
+    expect([now.route, now.risk?.level, ids(now)[0]]).toEqual(["emergency", 1, "emergency_995"]);
   });
 
   it("with a live screen that answered none, the cue words do not override it: the answer stays, with the safety line", async () => {
@@ -289,11 +311,12 @@ describe("4. rule gaps closed; over-escalation reduced without losing a real eme
     (text) => expect(["self_harm", "emergency"]).toContain(classifyRules(text, CTX)?.route),
   );
 
-  it("romanised Cantonese and Hokkien stay cue words: offline a statement gets the helplines", async () => {
+  it("romanised Cantonese and Hokkien stay cue words: offline a statement gets the helplines (and, round 2, the confirm question)", async () => {
     for (const text of ["ngo seung sei", "wa beh tahan liao, wa ai si"]) {
       expect(selfHarmCue(text), text).toBe(true);
       const r = await askAt(text);
-      expect(r.route, text).toBe("self_harm");
+      expect([r.risk?.ladder, r.followUp?.templateId], text).toEqual(["possible", "self_harm_confirm"]);
+      expect(ids(r), text).toEqual(expect.arrayContaining(["self_harm_sos", "self_harm_mindline"]));
     }
   });
 });

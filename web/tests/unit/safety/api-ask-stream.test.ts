@@ -207,11 +207,12 @@ describe("the crisis wording never streams: the fixed lines go out first, then a
     );
     const types = events.map((x) => x.e.type);
     expect(types).toEqual(["stage", "sentence", "replace"]);
-    // the fixed 995 line went out before the model was asked for its words
+    // the fixed 995 line went out before the model was asked for its words (the harness's risk screen, 10-16, starts with the
+    // answer and is never waited for by a crisis's lines: it is the only call before them)
     const first = events[1];
     expect(first.e).toMatchObject({ type: "sentence", sentence: { templateId: "emergency_995" } });
-    expect(first.asked).toBe(0);
-    expect(asked).toEqual(["crisis_words"]);
+    expect(asked.slice(0, first.asked)).toEqual(["risk_screen"]);
+    expect(asked).toEqual(["risk_screen", "crisis_words"]);
     const replaced = events[2].e as Extract<AskStreamEvent, { type: "replace" }>;
     expect(replaced.sentences).toEqual(r.sentences);
     expect(r.sentences[0]).toMatchObject({ templateId: "emergency_995", origin: "voiced", en: "Please call 995 right now and stay with your dad." });

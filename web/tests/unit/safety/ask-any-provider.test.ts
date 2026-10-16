@@ -138,7 +138,8 @@ describe("answered before: the wrist machine on the example account, whatever th
     expect(r.rows.find((x) => x.type === "ask.route")?.sentence).toBe("Sorted as a question Ripple can answer from its sources, by a fixed rule (it repeats a question of his that a clinician answered at a visit).");
     // only the crisis screen and Ripple's own answer (owner 10-15; general.ts: nothing usable from the stand-in here, so the
     // answer is the doctor's alone) saw the words: no classification, and no compose for an ask with no topic
-    expect(calls.map((c) => c.task)).toEqual(["crisis", "general"]);
+    // (the harness, 10-16: the risk screen replaced the crisis screen)
+    expect(calls.map((c) => c.task)).toEqual(["risk_screen", "general"]);
     expect(r.result.llm).toMatchObject({ provider: "hunyuan", calls: 2 });
   });
 
@@ -260,7 +261,8 @@ describe("asked before and still waiting: a question on his list that no rule kn
     const { scope, id } = await withOpenQuestion();
     const calls: NonNullable<StandIn["calls"]> = [];
     expectReused(await askIn(scope, TAI_CHI, liveStandIn({ classify: SORTED_AS_LOGISTICS, calls }), { locale: "zh-Hans" }), scope, id, "listed");
-    expect(calls.map((c) => c.task)).toEqual(["crisis", "general"]);
+    // (the harness, 10-16: the risk screen replaced the crisis screen)
+    expect(calls.map((c) => c.task)).toEqual(["risk_screen", "general"]);
     const more: NonNullable<StandIn["calls"]> = [];
     const other = await askIn(scope, "我可以去游泳吗？", liveStandIn({ classify: '{"route":"uncertain","topic":"other","reason":"x"}', calls: more }), { locale: "zh-Hans" });
     expect(more.map((c) => c.task)).toContain("classify");
@@ -386,7 +388,8 @@ describe("the deadline: what it is, and a call that starts late", () => {
       calls,
     });
     const r = await askIn(s, "Is the clinic open on Sunday?", llm, { deadlineMs: 800 });
-    expect(calls.map((c) => c.task)).toEqual(["crisis", "classify", "compose"]);
+    // (the harness, 10-16: the risk screen replaced the crisis screen)
+    expect(calls.map((c) => c.task)).toEqual(["risk_screen", "classify", "compose"]);
     expect(r.output.generationError).toBeNull();
     expect(r.output.composedBy).toBeNull();
     // the sentence the model picked reached the checks (shown, or stopped by one of them: never lost to the clock)

@@ -23,6 +23,7 @@ import { TEMPLATES } from "@/lib/safety/templates";
 import type { AskResult } from "@/lib/safety/types";
 import { getMemoryStore } from "@/lib/store/memory";
 import type { QuestionRow, Store } from "@/lib/store/types";
+import { frameReply } from "./live-stand-in";
 
 const ABOUT_EN =
   "I'm Ripple. I keep your doctor's own words from your visits, show you what your medicine labels and leaflets say, answer everyday health questions in plain words, and write down the questions to ask your doctor or pharmacist. I never change your medicines, and I don't replace your doctor.";
@@ -38,8 +39,10 @@ function countingModel(): LlmClient & { calls: number } {
     calls: 0,
     async chat(opts: ChatOpts) {
       m.calls++;
-      const task = (JSON.parse(opts.user) as { task: string }).task;
-      return { content: task === "crisis" ? '{"crisis":"none"}' : '{"sentences":[]}', tokens: 1 };
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
+      // (the harness: the risk screen replaced the crisis screen; it answers with an empty frame)
+      return { content: task === "crisis" ? '{"crisis":"none"}' : task === "risk_screen" ? frameReply("none", payload.message ?? "") : '{"sentences":[]}', tokens: 1 };
     },
   };
   return m;

@@ -94,7 +94,7 @@ describe("the privacy notice", () => {
     }
     // 2026-10-14 (the owner's decision of that day): 「谁能看」 names what a linked family member sees as the kinds
     // themselves, in full, not as counts of them (kept in 2026-10-15 and 2026-10-16)
-    expect(NOTICE_VERSION).toBe("2026-10-16");
+    expect(NOTICE_VERSION).toBe("2026-10-16.2");
     expect(zh.updated).toContain("2026年10月16日");
     expect(en.updated).toContain("16 October 2026");
     expect(section(zh, "who")).toContain("每日服药情况（药物名称、服药时间、未服药的原因）、血压读数、待问医生的问题");
@@ -117,7 +117,7 @@ describe("the privacy notice", () => {
     for (const locale of ["zh-Hans", "en"] as const) {
       expect(createHash("sha256").update(JSON.stringify(privacyNotice(locale, "2026-10-14")), "utf8").digest("hex"), locale).toBe(old[locale]);
     }
-    expect(Object.keys(NOTICE_VERSIONS)).toEqual(["2026-10-14", "2026-10-15", "2026-10-16"]);
+    expect(Object.keys(NOTICE_VERSIONS)).toEqual(["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-16.2"]);
     const term = (n: Notice, name: string) => (n.sections.find((s) => s.id === "where")!.terms ?? []).find(([t]) => t === name)?.[1] ?? "";
     const tzh = term(zh, "就诊录音的转写");
     for (const w of ["腾讯云的语音识别服务", "新加坡", "以停顿为界", "每段不超过 100 秒", "转出的文字发回 Ripple", "保留 24 小时", "不需要你同意 AI 处理"]) expect(tzh, w).toContain(w);
@@ -142,7 +142,8 @@ describe("the privacy notice", () => {
   // 「存在哪」 paragraph name Tencent Cloud's Hunyuan and say where and how long in Tencent's words; 2026-10-15 stays word for
   // word (it named DeepSeek).
   it("2026-10-16: the model is Tencent Cloud's Hunyuan, where and how long as Tencent says, no label photos; 2026-10-15 kept as it was", () => {
-    expect(privacyNotice("en")).toBe(privacyNotice("en", "2026-10-16"));
+    // in force until 2026-10-16.2 (the test below); its AI processing line is unchanged there
+    expect(privacyNotice("en", "2026-10-16")).toBe(NOTICE_VERSIONS["2026-10-16"].en);
     const term = (n: Notice, name: string) => (n.sections.find((s) => s.id === "where")!.terms ?? []).find(([t]) => t === name)?.[1] ?? "";
     expect(term(zh, "AI 处理")).toContain("交给腾讯云的混元模型处理。腾讯云写明，处理用的算力按可用情况来自不同的国家或地区，所以不一定在新加坡；一般最多保留 30 天。药袋的照片不交给模型。");
     expect(term(en, "AI processing")).toContain("go to Tencent Cloud's Hunyuan model. Tencent Cloud says the computing resources it uses come from different countries or regions, depending on availability, so not necessarily Singapore, and it generally keeps them for up to 30 days. Label photos are not sent to the model.");
@@ -155,5 +156,30 @@ describe("the privacy notice", () => {
     const s16 = privacyNotice("en", "2026-10-16").sections.filter((s) => s.id !== "where");
     const s15 = privacyNotice("en", "2026-10-15").sections.filter((s) => s.id !== "where");
     expect(s16).toEqual(s15);
+  });
+
+  // The owner's decision of 2026-10-16, later the same day: label photos are read by Tencent Cloud OCR. One more line under
+  // 「存在哪」, right after the AI processing line (which stays as it was: no model sees a photo); everything else as
+  // 2026-10-16, which stays published.
+  it("2026-10-16.2: label photos read by Tencent Cloud OCR in Singapore after his yes, and what Ripple keeps; the rest as 2026-10-16", () => {
+    expect(privacyNotice("en")).toBe(privacyNotice("en", "2026-10-16.2"));
+    expect(privacyNotice("zh-Hans")).toBe(privacyNotice("zh-Hans", "2026-10-16.2"));
+    const terms = (n: Notice) => n.sections.find((s) => s.id === "where")!.terms ?? [];
+    for (const [locale, ai, name] of [["zh-Hans", "AI 处理", "药袋照片的文字识别"], ["en", "AI processing", "Reading label photos"]] as const) {
+      const before = privacyNotice(locale, "2026-10-16");
+      const now = privacyNotice(locale, "2026-10-16.2");
+      const names = terms(now).map(([t]) => t);
+      expect(names.indexOf(name), locale).toBe(names.indexOf(ai) + 1);
+      expect(terms(now).filter(([t]) => t !== name), locale).toEqual(terms(before));
+      expect(now.sections.filter((s) => s.id !== "where"), locale).toEqual(before.sections.filter((s) => s.id !== "where"));
+      expect(now.updated, locale).toBe(before.updated);
+    }
+    const zhOcr = terms(zh).find(([t]) => t === "药袋照片的文字识别")![1];
+    for (const w of ["只在你同意 AI 处理以后", "腾讯云的文字识别服务（OCR）", "在新加坡", "读出的字发回 Ripple", "照片不交给混元模型", "没有写具体天数", "Ripple 不存读出的整段文字", "你确认或改过的内容", "不同意就不读照片"]) expect(zhOcr, w).toContain(w);
+    const enOcr = terms(en).find(([t]) => t === "Reading label photos")![1];
+    for (const w of ["Only after you agree to AI processing", "Tencent Cloud's text recognition service (OCR)", "in Singapore", "the words come back to Ripple", "The photo goes to no Hunyuan model", "without giving a number of days", "Ripple does not keep the whole text it reads", "what you confirm or correct is saved", "If you say no, no photo is read"]) expect(enOcr, w).toContain(w);
+    // the unconfirmed photo's deletion is the one 「留多久」 states
+    expect(section(zh, "how-long")).toContain("拍了没确认的药袋照片");
+    expect(section(en, "how-long")).toMatch(/label photo you did not confirm/);
   });
 });

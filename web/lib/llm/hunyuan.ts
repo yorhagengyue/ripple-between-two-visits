@@ -59,7 +59,8 @@ export const HUNYUAN_CHECKER_MODEL = "hy4-preview";
  * Label photos: no Hunyuan model reads images on this account (10-16). The image-understanding page's model,
  * hy-vision-2.0-instruct, answers 400004 (model not found) and is not in GET /v1/models; hy4-preview says it cannot see an
  * image; hy3 answers as if it had seen one ("Blue." for a white square), which would invent a label. So with Hunyuan there
- * is no model reader unless LLM_VISION_MODEL names one, and lib/vision keeps its offline path (the sample photos' recorded
+ * is no model reader unless LLM_VISION_MODEL names one: lib/vision reads label photos with Tencent Cloud OCR (lib/vision/ocr.ts,
+ * the owner's decision of the same day) when the Tencent Cloud key pair is set, else offline (the sample photos' recorded
  * readings; any other photo is unreadable and he types the label's words).
  */
 export const HUNYUAN_VISION_MODEL: string | null = null;

@@ -246,7 +246,7 @@ export function visionModel(env: Env = process.env): string | null {
 /**
  * The client lib/vision reads label photos with. With LLM_PROVIDER=hunyuan: the same vendor and key with LLM_VISION_MODEL
  * when it names a model that reads images (same spend ledger, its own concurrency queue, no thinking field), else the
- * mock (lib/vision then reads offline: no Hunyuan model reads images on the account, ./hunyuan.ts). OpenAI, replay and
+ * mock (lib/vision then reads with Tencent Cloud OCR, or offline: no Hunyuan model reads images on the account, ./hunyuan.ts). OpenAI, replay and
  * mock: the main client, as before.
  */
 export function createVisionLlm(env: Env = process.env): LlmClient {

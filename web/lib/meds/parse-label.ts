@@ -21,6 +21,7 @@
  */
 import { matchDrug } from "@/lib/kb/match";
 import { extractSlots } from "@/lib/safety/slots";
+import { normalizeForCompare } from "@/lib/safety/text";
 import type { LabelFields, LabelSlots } from "./types";
 
 export interface ParseOptions {
@@ -117,7 +118,8 @@ function titleCase(line: string): string {
 
 export function canonicalClinic(line: string, known: string[] = []): string {
   const plain = line.replace(/\s+/g, " ").trim();
-  const same = known.find((k) => k.replace(/\s+/g, " ").trim().toLowerCase() === plain.toLowerCase());
+  // OCR drops or adds a space next to a bracket ("CLINIC(FICTIONAL)"): the same letters are the same clinic
+  const same = known.find((k) => k.replace(/\s+/g, " ").trim().toLowerCase() === plain.toLowerCase()) ?? known.find((k) => normalizeForCompare(k) === normalizeForCompare(plain));
   if (same) return same;
   const letters = plain.replace(/[^\p{L}]/gu, "");
   return letters && letters === letters.toUpperCase() && /[A-Z]/.test(letters) ? titleCase(plain) : plain;

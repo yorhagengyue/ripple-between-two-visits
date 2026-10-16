@@ -32,7 +32,10 @@
  *   toldNotices(store, scope, linkId)   what her 「留意」 and her home show: the notices sent to her link, newest first,
  *                                 each with his words, the moment he said them and Ripple's lines as he saw them (from
  *                                 the ask's two chat rows, lib/safety/turns.ts; before they are written, from the ask's
- *                                 safety_event output). Read only.
+ *                                 safety_event output). When the answer she is told about came from his answer to one of
+ *                                 Ripple's follow-up questions (the harness, 2026-10-16), his first message and each
+ *                                 question with what he answered come with it (ToldNotice.steps), from the safety records'
+ *                                 harness state: fixed questions and his taps, never a model's words. Read only.
  *
  * The pipeline calls tellFamily after the ask's safety_event is written, and does not wait for it (lib/safety/pipeline.ts:
  * his answer never waits for her phone).
@@ -44,7 +47,7 @@ import { SIGNAL_RECORDED } from "@/lib/safety/templates";
 import { hasHan } from "@/lib/safety/text";
 import type { StoredAnswer } from "@/lib/safety/turns";
 import type { Attribution, Locale, Sentence } from "@/lib/safety/types";
-import type { ChatMessageRow, SessionRow, Store } from "@/lib/store/types";
+import type { ChatMessageRow, SafetyEventRow, SessionRow, Store } from "@/lib/store/types";
 import { dadWord } from "./copy";
 import { hc } from "./her-copy";
 import { familyRecipients } from "./recipients";
@@ -206,6 +209,51 @@ export interface ToldNotice {
   answerLang: Locale;
   /** when she opened the push (ISO), or null */
   openedAt: string | null;
+  /**
+   * The harness (2026-10-16; the owner's 「通知相应的对话」): when what she is told about came from his answer to one of
+   * Ripple's follow-up questions, the conversation before it, in order: `words` is then his first message, and each step is
+   * the question Ripple asked (its fixed words, in the language his answer was shown in) and what he answered (his tap's
+   * words). Never a word a model wrote. Absent for an answer to his message itself.
+   */
+  steps?: ToldStep[];
+}
+
+/** One follow-up question Ripple asked him and what he answered (ToldNotice.steps). */
+export interface ToldStep {
+  question: string;
+  answer: string;
+}
+
+interface HarnessOutput {
+  harness?: { followUp?: { id?: unknown; en?: unknown; zh?: unknown } | null; replied?: { followUpId?: unknown } | null } | null;
+  locale?: unknown;
+}
+
+/**
+ * The conversation a reply belongs to (ToldNotice.steps): from the record she is told about back to his first message,
+ * through each record's `harness.replied` (the follow-up id names the record that asked it: `<record id>:<pathway>:<step>`).
+ * Returns his first message and the steps oldest first, or null when the record is not a reply (or its chain is gone).
+ */
+function conversationOf(eventId: string, events: readonly SafetyEventRow[]): { words: string; lang: string | null; steps: ToldStep[] } | null {
+  const byId = new Map(events.map((e) => [e.id, e]));
+  const steps: ToldStep[] = [];
+  let current = byId.get(eventId);
+  if (!current) return null;
+  for (let hops = 0; hops < 6; hops++) {
+    const out = (current.output ?? {}) as HarnessOutput;
+    const replied = out.harness?.replied;
+    const followUpId = typeof replied?.followUpId === "string" ? replied.followUpId : null;
+    if (!followUpId) break;
+    const asking = byId.get(followUpId.split(":")[0]);
+    if (!asking) return null;
+    const asked = ((asking.output ?? {}) as HarnessOutput).harness?.followUp;
+    const locale = asLocale(((asking.output ?? {}) as HarnessOutput).locale);
+    const question = locale === "zh-Hans" && typeof asked?.zh === "string" ? asked.zh : typeof asked?.en === "string" ? asked.en : "";
+    steps.unshift({ question, answer: current.input });
+    current = asking;
+  }
+  if (steps.length === 0) return null;
+  return { words: current.input, lang: current.lang, steps };
 }
 
 const asLocale = (v: unknown): Locale => (v === "en" ? "en" : "zh-Hans");
@@ -264,22 +312,42 @@ export async function toldNotices(store: Store, scope: Pick<SessionRow, "id" | "
   if (mine.length === 0) return [];
   const days = mine.map((d) => d.day);
   const chats = await store.listChatMessages(scope.id, { fromDay: Math.min(...days), toDay: Math.max(...days) }).catch(() => [] as ChatMessageRow[]);
-  // the safety records only for an ask whose chat rows are not written yet (or could not be): the newest few
-  const kept = (d: { slot: string }) => chats.some((c) => c.safety_event_id === d.slot && c.role === "ripple") && chats.some((c) => c.safety_event_id === d.slot && c.role === "patient");
-  const events = mine.every(kept) ? [] : await store.listSafetyEvents(scope.id, { limit: 50 }).catch(() => []);
+  // his newest safety records: Ripple's lines for an ask whose chat rows are not written yet (or could not be), and whether
+  // a notice came from his answer to a follow-up question (the conversation before it)
+  const events: SafetyEventRow[] = await store.listSafetyEvents(scope.id, { limit: 50 }).catch(() => []);
   const out: ToldNotice[] = [];
   for (const d of mine) {
     const his = chats.find((c) => c.safety_event_id === d.slot && c.role === "patient");
     const ripple = chats.find((c) => c.safety_event_id === d.slot && c.role === "ripple");
     const answer = ripple?.answer && typeof ripple.answer === "object" ? (ripple.answer as StoredAnswer) : null;
+    const before = conversationOf(d.slot, events);
+    const opening = before ? { words: before.words, lang: before.lang, steps: before.steps } : null;
     if (his && answer && Array.isArray(answer.sentences)) {
-      out.push({ id: d.id, at: his.created_at, words: his.text, lang: his.lang, lines: linesOfAnswer(answer), answerLang: asLocale(answer.locale), openedAt: d.opened_at });
+      out.push({
+        id: d.id,
+        at: his.created_at,
+        words: opening?.words ?? his.text,
+        lang: opening ? opening.lang : his.lang,
+        lines: linesOfAnswer(answer),
+        answerLang: asLocale(answer.locale),
+        openedAt: d.opened_at,
+        ...(opening ? { steps: opening.steps } : {}),
+      });
       continue;
     }
     const ev = events.find((e) => e.id === d.slot);
     if (!ev) continue;
     const { lines, locale } = linesOfEvent(ev.output);
-    out.push({ id: d.id, at: ev.created_at, words: ev.input, lang: ev.lang, lines, answerLang: locale, openedAt: d.opened_at });
+    out.push({
+      id: d.id,
+      at: ev.created_at,
+      words: opening?.words ?? ev.input,
+      lang: opening ? opening.lang : ev.lang,
+      lines,
+      answerLang: locale,
+      openedAt: d.opened_at,
+      ...(opening ? { steps: opening.steps } : {}),
+    });
   }
   return out.sort((a, b) => b.at.localeCompare(a.at));
 }

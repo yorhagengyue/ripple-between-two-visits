@@ -20,6 +20,7 @@ import { renderText } from "@/lib/safety/render";
 import { TEMPLATES } from "@/lib/safety/templates";
 import { stripInvisible } from "@/lib/safety/text";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const R4 = "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.";
 const LABEL = "Take ONE tablet every MORNING";
@@ -150,11 +151,14 @@ function liveLlm(o: { crisis?: string | Error; crisisMs?: number; classify?: Rec
     model: "fake",
     async chat(opts) {
       o.calls?.push(opts);
-      const task = (JSON.parse(opts.user) as { task: string }).task;
-      if (task === "crisis") {
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
+      // (the harness: the risk screen replaced the crisis screen; it answers with the frame of the scripted word)
+      if (task === "crisis" || task === "risk_screen") {
         await wait(o.crisisMs, opts.signal);
         if (o.crisis instanceof Error) throw o.crisis;
-        return { content: o.crisis ?? '{"crisis":"none"}', tokens: 7 };
+        const word = o.crisis ?? '{"crisis":"none"}';
+        return { content: task === "risk_screen" ? frameReply(word, payload.message ?? "") : word, tokens: 7 };
       }
       if (task === "classify") return { content: JSON.stringify(o.classify ?? { route: "uncertain" }), tokens: 11 };
       await wait(o.composeMs, opts.signal);
@@ -170,16 +174,17 @@ describe("with a live model, every non-crisis route goes through the crisis scre
     const calls: ChatOpts[] = [];
     const { res, shown, notesAdded, added, published } = await askAt(text, 29, { time: "20:15", llm: liveLlm({ crisis: '{"crisis":"self_harm","reason":"asks for an amount to die"}', calls }) });
     expect(res.route).toBe("self_harm");
-    expect(res.routeReason).toMatch(/^model_crisis:fake-live:self_harm/);
+    // (the harness, 10-16: the risk screen's frame, a wish to die quoted from his words, and the decision table's thoughts row)
+    expect(res.routeReason).toBe("harness:self-harm-thoughts");
     expect(shown).toMatch(/1767/);
     expect(res.sentences.every((x) => x.origin === "template")).toBe(true);
     expect(notesAdded).toBe(0);
     expect(added).toHaveLength(0);
-    expect(calls.filter((c) => c.purpose === "crisis")).toHaveLength(1);
+    expect(calls.filter((c) => c.purpose === "risk_screen")).toHaveLength(1);
     const route = published.filter((e) => e.type === "ask.route");
     expect(route).toHaveLength(1);
     expect((route[0].data as { route: string; reason: string }).route).toBe("self_harm");
-    expect((route[0].data as { reason: string }).reason).toMatch(/raised from explain by the crisis screen/);
+    expect((route[0].data as { reason: string }).reason).toMatch(/raised from explain by the harness \(self-harm-thoughts\)/);
     const out = res.events[0].output as { crisisScreen: { raisedFrom: string; awaited: boolean } };
     expect(out.crisisScreen).toMatchObject({ raisedFrom: "explain", awaited: true });
   });
@@ -209,7 +214,7 @@ describe("with a live model, every non-crisis route goes through the crisis scre
     expect(res.sentences.find((x) => x.sourceId === "visit:v2:R4")?.en).toBe(R4);
     expect(res.sentences.find((x) => x.sourceId === "label:med-amlodipine")?.en).toBe(LABEL);
     expect(res).toMatchObject({ addedQuestionId: "q-extra-tablet", questionReused: true });
-    expect(calls.map((c) => c.purpose).sort()).toEqual(["compose", "crisis"]);
+    expect(calls.map((c) => c.purpose).sort()).toEqual(["compose", "risk_screen"]);
     expect(res.llm.calls).toBe(2);
   });
 
@@ -243,7 +248,8 @@ describe("with a live model, every non-crisis route goes through the crisis scre
       expect(res.route).toBe("log_only");
       expect(notesAdded).toBe(1);
       const data = published.find((e) => e.type === "ask.route")!.data as { reason: string; crisisScreen: { errorCode: string } };
-      expect(data.reason).toBe(`rule:statement; crisis screen unavailable (${code}), rules only`);
+      // (the harness, 10-16: the risk screen; without it the rules' frame decides, and its ladder may still ask him)
+      expect(data.reason).toBe(`rule:statement; risk screen unavailable (${code}), the rules' frame only`);
       expect(data.crisisScreen.errorCode).toBe(code);
       expect(res.routeReason).toBe("rule:statement");
       expect((res.events[0].output as { crisisScreen: { errorCode: string } }).crisisScreen.errorCode).toBe(code);
@@ -273,8 +279,12 @@ describe("with a live model, every non-crisis route goes through the crisis scre
     const calls: ChatOpts[] = [];
     const { res } = await askAt("Should I take all 30 tablets tonight?", 29, { time: "20:15", llm: liveLlm({ calls }) });
     expect(res.route).toBe("self_harm");
-    // no classification, no crisis screen, no generation: one call, the wording of Ripple's 995 line (crisis-words.ts)
-    expect(calls.map((c) => c.purpose)).toEqual(["crisis_words"]);
+    // no classification, no generation: the harness's risk screen (10-16), which starts with the answer and is never waited
+    // for before the fixed lines. (Round 2, 10-16: all his tablets tonight is a plan with a time, the ladder's danger step:
+    // 995 now without a condition, a fixed line crisis-words.ts does not word, so no wording call is made. A self-harm answer
+    // below danger still has its 995 line worded: crisis-statements.test.ts)
+    expect(calls.map((c) => c.purpose).sort()).toEqual(["risk_screen"]);
+    expect(res.sentences[0].templateId).toBe("self_harm_danger_995");
     // this fake words nothing usable: the fixed sentences stand, the helplines among them
     expect(res.sentences.every((x) => x.origin === "template")).toBe(true);
     expect(res.sentences.map((x) => x.templateId)).toContain("self_harm_sos");

@@ -298,6 +298,9 @@ const zh = {
   toldTitle: "{dad}跟 Ripple 说了一件可能要留意的事。",
   toldHeSaid: "{he}说",
   toldRippleSaid: "Ripple 回{him}的",
+  // the harness (10-16): when the notice came from his answer to Ripple's follow-up question, each question and his tap
+  toldRippleAsked: "Ripple 问{him}",
+  toldHeAnswered: "{he}点了",
   toldDoctorSaid: "医生的原话",
   toldDoctorSaidOn: "医生的原话 · {date}",
   toldOpen: "看这段对话",
@@ -575,6 +578,8 @@ const en: Record<HerKey, string | string[]> = {
   toldTitle: "{dad} told Ripple something that may need attention.",
   toldHeSaid: "{He} said",
   toldRippleSaid: "Ripple told {him}",
+  toldRippleAsked: "Ripple asked {him}",
+  toldHeAnswered: "{He} tapped",
   toldDoctorSaid: "{His} doctor's own words",
   toldDoctorSaidOn: "{His} doctor's own words · {date}",
   toldOpen: "See the conversation",

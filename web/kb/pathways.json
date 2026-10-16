@@ -1,0 +1,1437 @@
+{
+  "meta": {
+    "title": "Ripple's decision table for the guided safety harness",
+    "created": "2026-10-16",
+    "purpose": "Code decides, the model only reads (the owner, 2026-10-16: 「995、药、其他询问都应该有工程化的引导的 harness，而不是直接匹配一下就开始回答」; the research report D:/ripple-c2/audit/safety-harness-1016/ and its priority table). Each row says, for a set of facts about one message in its conversation (the risk screen's frame, the rules' floor and his answers to the scripted follow-up questions), which medical level or self-harm ladder step applies, which fixed lines (web/lib/safety/templates.ts TEMPLATES) are shown, which follow-up question is asked next (templates.ts FOLLOW_UPS), whether a question goes on his list and whether his family is told. Ripple never gives clinical advice of its own: every line here is a fixed sentence with its source, his doctor's recorded words or his label.",
+    "how_rows_are_read": "web/lib/safety/risk/table.ts. Two tracks, each read top to bottom, the first row whose `when` holds decides: the self-harm ladder (rows with `ladder`) and the medical levels (rows with `level`). `when` is a conjunction over the facts risk/pathways.ts derives (a value list means any of them). A fact a follow-up question can settle is `unknown` until it is said or answered; an answer of \"Not sure\", \"I'd rather not say\" or no answer is `unsure` and sits with the more dangerous values. A pathway asks at most three questions, never asks again in the same conversation once asked, and a fact it can no longer ask counts as `unsure`.",
+    "ordering": "Most dangerous first. Medical: every level-1 row of every pathway first (995 now: chest, stroke, breathing, a reading with a red flag, more of a medicine than the label, a side effect with a red flag); then the rows that ask (each showing its 995 line above the question) and the level-2 and level-3 rows, pathway by pathway in order of danger; then level 4. Ladder: danger, then thoughts, then the answer \"No\" to the confirm question, then possible. The higher of the two decides what is shown first; 995 and the helplines always come before a follow-up question; the rules' crisis routes (classify.ts) are the floor and are never lowered.",
+    "levels": {
+      "1": "call 995 now (or the nearest A&E); his family is told",
+      "2": "today: his pharmacist or doctor today, with the signs that mean 995 instead",
+      "3": "kept for his doctor, with the signs that mean 995",
+      "4": "an ordinary answer from his sources"
+    },
+    "ladder": {
+      "possible": "something may point to self-harm: the fixed safety line and the helplines first, then the confirm question",
+      "thoughts": "thoughts of dying or self-harm, no immediate danger: the helplines, his family told, Ripple keeps inviting him to talk, the danger question",
+      "danger": "immediate danger (thoughts, a plan, the means and within a day, or he says so): 995 first, the helplines, his family told"
+    },
+    "review": "Every row is \"pending_clinician\" until a pharmacist or doctor has read and signed it; the levels chosen where the task left a choice are on the careful side and say so in their note. Re-read the rows when a referral row or a template changes, and once a year against the sources.",
+    "sources_named": {
+      "B1-xx, B2-xx, B3-xx, B4-xx": "web/kb/referrals.json rows (each with its Singapore source)",
+      "SHF": "https://www.myheart.org.sg/health/heart-conditions/heart-attack/",
+      "ISMP": "https://www.consumermedsafety.org/top-ten-tips-lists/top-10-reasons-to-suspect-a-pharmacy-error",
+      "NHS amlodipine": "https://www.nhs.uk/medicines/amlodipine/how-and-when-to-take-amlodipine/",
+      "SOS": "https://www.sos.org.sg/our-services/"
+    }
+  },
+  "rows": [
+    {
+      "id": "self-harm-someone-else",
+      "pathway": "self_harm_check",
+      "when": {
+        "about": [
+          "other",
+          "child"
+        ],
+        "selfHarm.signal": true
+      },
+      "ladder": "none",
+      "show": [
+        "self_harm_995_other",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "source": "B4-01",
+      "review": "pending_clinician",
+      "note": "Someone else's self-harm signal he reports (round 2, 10-16: 'My father told me he has been hiding his sleeping pills instead of taking them'): the answer for them, as the rules' self-harm answer about someone else gives it (if they might hurt themselves or are in danger now, 995; SOS and mindline for them and for him). His own ladder stays at none: no watch state for him, and his family is not told (he is the one telling)."
+    },
+    {
+      "id": "self-harm-about-someone-else",
+      "pathway": "self_harm_check",
+      "when": {
+        "about": [
+          "other",
+          "child"
+        ]
+      },
+      "ladder": "none",
+      "show": [],
+      "source": "B4-01",
+      "review": "pending_clinician",
+      "note": "Someone else's crisis he reports: the rules' answer for them stands (self_harm_995_other and the helplines); the ladder never asks him about himself for it."
+    },
+    {
+      "id": "self-harm-danger-said",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.danger": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "ladder": "danger",
+      "show": [
+        "self_harm_danger_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told"
+      ],
+      "notifyFamily": true,
+      "source": "B1-15",
+      "review": "pending_clinician",
+      "note": "He says he is thinking of doing it soon or has something ready; \"I'd rather not say\" or no answer counts as yes (the contract: the more dangerous side)."
+    },
+    {
+      "id": "self-harm-danger-plan",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.ideation": [
+          "active",
+          "unclear"
+        ],
+        "selfHarm.plan": "yes",
+        "selfHarm.soon": "yes"
+      },
+      "ladder": "danger",
+      "show": [
+        "self_harm_danger_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told"
+      ],
+      "notifyFamily": true,
+      "source": "B1-15",
+      "review": "pending_clinician",
+      "note": "Immediate danger: a wish to die (or words that may be one) with a plan and a time within a day ('I'm going to end it tonight, I've made up my mind'). Round 2, 10-16: the means are no longer required here (a plan for tonight said in words is enough to call 995; an older person rarely says what he would use). A passive wish needs the means too (self-harm-danger-plan-means): 'if I died in my sleep tonight it would be fine' is a wish with a time, not a plan."
+    },
+    {
+      "id": "self-harm-danger-plan-means",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.ideation": [
+          "active",
+          "passive",
+          "unclear"
+        ],
+        "selfHarm.plan": "yes",
+        "selfHarm.means": "yes",
+        "selfHarm.soon": "yes"
+      },
+      "ladder": "danger",
+      "show": [
+        "self_harm_danger_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told"
+      ],
+      "notifyFamily": true,
+      "source": "B1-15",
+      "review": "pending_clinician",
+      "note": "Crisis Text Line's immediate risk: thoughts (a passive wish too), a specific plan, the means at hand and within 24 hours (the research report)."
+    },
+    {
+      "id": "self-harm-danger-plan-confirmed",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.confirm": [
+          "yes",
+          "unsure"
+        ],
+        "selfHarm.plan": "yes",
+        "selfHarm.soon": "yes"
+      },
+      "ladder": "danger",
+      "show": [
+        "self_harm_danger_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told"
+      ],
+      "notifyFamily": true,
+      "source": "B1-15",
+      "review": "pending_clinician",
+      "note": "His yes (or 'rather not say') to the confirm question, with a plan and a time within a day: as self-harm-danger-plan."
+    },
+    {
+      "id": "self-harm-danger-intent",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.ideation": "active",
+        "selfHarm.soon": "yes"
+      },
+      "ladder": "danger",
+      "show": [
+        "self_harm_danger_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told"
+      ],
+      "notifyFamily": true,
+      "source": "B1-15",
+      "review": "pending_clinician",
+      "note": "An explicit wish to die or kill himself with tonight or today beside it ('I want to end my life tonight', 「今晚就要了结自己」): immediate danger without a plan said (round 2, 10-16; the coordinator's 'tonight/today with intent')."
+    },
+    {
+      "id": "self-harm-thoughts-confirmed",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.confirm": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "He says yes to the confirm question, or would rather not say (counted as yes: the owner's task of 10-16). The helplines (SOS 1767, CareText 9151 1767, mindline 1771; Care Corner in Mandarin), his family told (owner 10-16: 「也通知女儿」), the invitation to keep talking, then the danger question."
+    },
+    {
+      "id": "self-harm-confirm-no",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.confirm": "no"
+      },
+      "ladder": "none",
+      "show": [
+        "self_harm_here"
+      ],
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "He answers No to the confirm question. The watch state (risk/watch.ts) reads this row id as his answer and turns off for low mood alone; a question about how much medicine is too much still triggers the ladder."
+    },
+    {
+      "id": "self-harm-rules",
+      "pathway": "self_harm_check",
+      "when": {
+        "rules.route": "self_harm"
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-01",
+      "review": "pending_clinician",
+      "note": "The rules' self-harm route (classify.ts) is the floor: its answer goes out as it did before (995 if in danger, SOS, mindline), and the ladder adds the invitation to keep talking and the danger question."
+    },
+    {
+      "id": "self-harm-thoughts",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.ideation": "active"
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "He says he wants to die or to end it (the screen's evidence checked: risk/evidence.ts)."
+    },
+    {
+      "id": "self-harm-extra-on-purpose",
+      "pathway": "self_harm_check",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.onPurpose": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-01",
+      "review": "pending_clinician",
+      "note": "Tablets taken on purpose, or he would rather not say whether: the ladder's thoughts beside the overdose's 995 (round 2, 10-16)."
+    },
+    {
+      "id": "self-harm-lethality-watch",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.lethalityQuestion": [
+          "yes",
+          "unclear"
+        ],
+        "watch": true
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "How much medicine would be too much, the most in one go, with the watch state on (low mood earlier, risk/watch.ts): up the ladder, never to the doctor's question list, never an amount or a label line (Crisis Text Line: a specific medicine is the most dangerous word they saw)."
+    },
+    {
+      "id": "self-harm-means-watch",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.means": "yes",
+        "watch": true
+      },
+      "ladder": "thoughts",
+      "show": [
+        "self_harm_995",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner",
+        "self_harm_here",
+        "self_harm_family_told",
+        "self_harm_doctor"
+      ],
+      "ask": "self_harm_danger",
+      "notifyFamily": true,
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "Saving up tablets (\"there are enough now\") with the watch state on. Pharmacists name stopping or hoarding medicines as a warning sign (the research report). Only a clear \"yes\": the rules' frame calls means \"unclear\" beside any other self-harm signal."
+    },
+    {
+      "id": "self-harm-lethality",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.lethalityQuestion": [
+          "yes",
+          "unclear"
+        ]
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "A question about a lethal amount is itself a red flag, whatever came before (RAND, Stanford, Google MUM: the lethality question dressed as looking something up). The confirm question, the safety line and the helplines; no amount and no label line in the answer."
+    },
+    {
+      "id": "self-harm-means",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.means": "yes"
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "Saving up tablets or having them ready, said: the confirm question; no amount and no label line."
+    },
+    {
+      "id": "self-harm-passive",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.ideation": [
+          "passive",
+          "unclear"
+        ]
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "A passive wish to die (seeing his late wife again soon, the children better off without him): older people say it this way more than \"I want to die\" (Raue et al. 2014). Asked directly, never answered as a note."
+    },
+    {
+      "id": "self-harm-means-unclear",
+      "pathway": "self_harm_check",
+      "when": {
+        "selfHarm.means": "unclear"
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "Tablets counted or kept that may be saving up (\"I counted my pills\", even for a refill: the rules' frame cannot tell them apart): the confirm question is cheap. After the passive row: beside any other self-harm signal the rules' frame calls means \"unclear\" by default."
+    },
+    {
+      "id": "self-harm-watch-amount",
+      "pathway": "self_harm_check",
+      "when": {
+        "watch": true,
+        "asks.amount": true
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "Any question about how many tablets, with the watch state on: the confirm question first; no amount and no label line."
+    },
+    {
+      "id": "self-harm-degraded-distress",
+      "pathway": "self_harm_check",
+      "when": {
+        "degraded": true,
+        "distress": [
+          "yes",
+          "unclear"
+        ]
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "No model (offline, the spend cap, no AI consent, a timeout): the rules cannot read a passive or indirect wish to die (offline 2/10 in the 10-16 probe), so low mood is asked about directly, with the helplines visible (the research report's P0; AIHGle 2.0 section 6.7.1)."
+    },
+    {
+      "id": "self-harm-degraded-amount",
+      "pathway": "self_harm_check",
+      "when": {
+        "degraded": true,
+        "asks.largeAmount": true
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "No model, and a question about the most, too many or all at once: asked directly. An ordinary dose question (one more tablet, two tablets, half a tablet) is not this row."
+    },
+    {
+      "id": "self-harm-cue",
+      "pathway": "self_harm_check",
+      "when": {
+        "rules.selfHarmCue": true
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "Self-harm cue words in a statement and nothing else (no SELF_HARM rule, no self-harm field in the frame, no crisis screen that read his words: pipeline.ts applyRulesOnlyCue). Round 2, 10-16: a cue word alone is a reason to ask, never 'thoughts' and never his family told ('die liao' in the heat, 熱到死)."
+    },
+    {
+      "id": "self-harm-question-ignored",
+      "pathway": "self_harm_check",
+      "when": {
+        "ignored.question": "self_harm_confirm"
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_confirm",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "The self-harm question his last answer asked went unanswered: he wrote about something else (round 2, 10-16: sc-sh-ignored-en dropped to none). An unanswered question is the careful side: the helplines stay on his screen and the same question is asked again while asks are left (three today); after that it counts as 'not sure' (the rows above: thoughts for the confirm question, danger for the danger question)."
+    },
+    {
+      "id": "self-harm-danger-question-ignored",
+      "pathway": "self_harm_check",
+      "when": {
+        "ignored.question": "self_harm_danger"
+      },
+      "ladder": "possible",
+      "show": [
+        "safety_line",
+        "self_harm_sos",
+        "self_harm_mindline",
+        "self_harm_care_corner"
+      ],
+      "ask": "self_harm_danger",
+      "source": "B4-02",
+      "review": "pending_clinician",
+      "note": "As self-harm-question-ignored, for the danger question (he had said he has these thoughts, or the rules did)."
+    },
+    {
+      "id": "chest-now-long",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ],
+        "symptoms.chest.long": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "Chest pain or pressure still there (or not said to be gone) for 5 minutes or more, coming and going, or for a time he cannot say: 995 now (Singapore Heart Foundation: pain that goes on or keeps coming back; STCC's \"and still present now\"). The 10-10 audit: \"an elephant on my chest for 10 minutes\" was answered \"noted for your doctor\", Babylon's failure."
+    },
+    {
+      "id": "chest-now-red-flag",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ],
+        "symptoms.chest.redFlag": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "Chest pain now with a cold sweat, breathlessness, pain spreading to the arm, jaw or back, or very bad (B1-01's own list)."
+    },
+    {
+      "id": "stroke-now",
+      "pathway": "general",
+      "when": {
+        "symptoms.stroke": true,
+        "symptoms.stroke.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-03",
+      "review": "pending_clinician",
+      "note": "A stroke sign happening now or not said to be over: 995 with no question first (time-critical; HealthHub and SCDF: one F.A.S.T. sign is enough). The 10-16 probe: a drooping face got \"noted for your doctor\" before \"call 995 now\"."
+    },
+    {
+      "id": "stroke-passed",
+      "pathway": "general",
+      "when": {
+        "symptoms.stroke": true,
+        "symptoms.stroke.now": "no"
+      },
+      "level": 1,
+      "show": [
+        "signal_995_stroke",
+        "signal_recorded"
+      ],
+      "notifyFamily": true,
+      "source": "B1-03",
+      "review": "pending_clinician",
+      "note": "A stroke sign that has passed (a TIA) is 995 now: B1-03 and the NNI/SNSA BE FAST advice say call 995 even if the signs went away (round 2, 10-16; it was level 3, kept for his doctor). The fixed line says so and stands first; the sign is still kept for his doctor with its date and time after it. Chest pain that passed keeps the owner's 10-14 order (chest-gone, level 3)."
+    },
+    {
+      "id": "breathing-blue",
+      "pathway": "breathing",
+      "when": {
+        "symptoms.breathing": true,
+        "symptoms.breathing.blue": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-02",
+      "review": "pending_clinician",
+      "note": "Lips or face turning blue or grey (SCDF; B1-02)."
+    },
+    {
+      "id": "breathing-at-rest",
+      "pathway": "breathing",
+      "when": {
+        "symptoms.breathing": true,
+        "symptoms.breathing.atRest": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-02",
+      "review": "pending_clinician",
+      "note": "Short of breath now even while resting (SCDF names breathlessness among its 995 examples)."
+    },
+    {
+      "id": "collapse-now",
+      "pathway": "general",
+      "when": {
+        "symptoms.consciousness": true,
+        "symptoms.consciousness.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-04",
+      "review": "pending_clinician",
+      "note": "Collapsed, cannot be woken, not responding, fainting or a fit, now or not said to be over (B1-04, B1-06, B1-09). The rules send these to 995 already; this row raises a phrasing only the risk screen understood (the old crisis screen's job)."
+    },
+    {
+      "id": "allergy-now",
+      "pathway": "general",
+      "when": {
+        "symptoms.allergy": true,
+        "symptoms.allergy.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-05",
+      "review": "pending_clinician",
+      "note": "Swelling of the face, lips, tongue or throat, a tight throat (B1-05)."
+    },
+    {
+      "id": "bleeding-now",
+      "pathway": "general",
+      "when": {
+        "symptoms.bleeding": true,
+        "symptoms.bleeding.now": [
+          "yes",
+          "unknown",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-07",
+      "review": "pending_clinician",
+      "note": "Vomiting or coughing up blood, black stools, bleeding that will not stop (B1-07)."
+    },
+    {
+      "id": "headache-sudden-worst",
+      "pathway": "general",
+      "when": {
+        "symptoms.headache.worst": true
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-03",
+      "review": "pending_clinician",
+      "note": "A sudden, very severe headache (B1-03 lists it among the stroke signs)."
+    },
+    {
+      "id": "reading-red-flag",
+      "pathway": "reading_high",
+      "when": {
+        "reading.aboveLine": true,
+        "reading.redFlag": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-10",
+      "review": "pending_clinician",
+      "note": "A reading above his doctor's own line together with the worst headache, blurred vision, chest pain, breathlessness, weakness on one side or confusion: the 995 line first and without a condition, then his doctor's line (MOH, B1-10). The 10-16 probe: 210/125 with the worst headache got \"If your reading is above 180 ...\" first."
+    },
+    {
+      "id": "extra-dose-child",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.who": [
+          "child",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "A child took the tablets, or he cannot say who: 995 now (webPOISONCONTROL refers children under six months and anyone it cannot screen; B1-12). Someone else's crisis: his family is not told (lib/care/told.ts)."
+    },
+    {
+      "id": "extra-dose-someone-else",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.who": "other"
+      },
+      "level": 1,
+      "show": [
+        "emergency_overdose_other"
+      ],
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "Another adult took more than the label says: get them medical help straight away (as the rules decided before, fix round 3)."
+    },
+    {
+      "id": "extra-dose-on-purpose",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.onPurpose": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_overdose"
+      ],
+      "notifyFamily": true,
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "More than the label taken on purpose, or he would rather not say (round 2, 10-16: the pathway's last question, extra_purpose): 995 now (B1-12), and the self-harm ladder's thoughts beside it (self-harm-extra-on-purpose)."
+    },
+    {
+      "id": "extra-dose-symptoms",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.symptoms": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_overdose"
+      ],
+      "notifyFamily": true,
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "A sign now (very dizzy or faint, a very slow heartbeat, chest pain, vomiting, unusually sleepy): webPOISONCONTROL sends anyone with a symptom straight on (B1-12)."
+    },
+    {
+      "id": "extra-dose-two-or-more",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.amount": [
+          "more",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_overdose"
+      ],
+      "notifyFamily": true,
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "Two or more extra, or an amount he cannot say (NHS Pathways was criticised by two coroners for ignoring the drug, the amount and the time)."
+    },
+    {
+      "id": "extra-dose-several-medicines",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.several": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_overdose"
+      ],
+      "notifyFamily": true,
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "More than one of his medicines, or he cannot say which (webPOISONCONTROL refers more than one substance)."
+    },
+    {
+      "id": "side-effect-red-flag",
+      "pathway": "side_effect",
+      "when": {
+        "side_effect": true,
+        "side_effect.redFlag": [
+          "yes",
+          "unsure"
+        ]
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "B1-05",
+      "review": "pending_clinician",
+      "note": "With the side effect: swelling of the face, lips or throat, chest pain, breathlessness, fainting or weakness on one side (B1-05, B1-01, B1-03)."
+    },
+    {
+      "id": "rules-995-now",
+      "pathway": "general",
+      "when": {
+        "rules.now995": true
+      },
+      "level": 1,
+      "show": [
+        "emergency_995"
+      ],
+      "notifyFamily": true,
+      "source": "classify.ts EMERGENCY rules (the B1 row of each sign; owner 10-14: only chest pain, a stroke sign and a reading are kept for his doctor)",
+      "review": "pending_clinician",
+      "note": "The floor (round 2, 10-16): a crisis rule fired on his words and its answer is the fixed 'call 995 now' (breathing, collapse, confusion, a swelling face or throat, bleeding, a high reading with a symptom, someone else's emergency, chest pain or a stroke sign with words that say it is bad now, an overdose). That is level 1 whatever the frame holds, so the record says what his screen shows; the rows above it name the sign when the frame does. A sign only cue words saw is not this row: it goes to its pathway's question."
+    },
+    {
+      "id": "collapse-passed",
+      "pathway": "general",
+      "when": {
+        "symptoms.consciousness": true,
+        "symptoms.consciousness.now": "no"
+      },
+      "level": 2,
+      "show": [
+        "fainted_see_doctor",
+        "signal_995_unwell"
+      ],
+      "source": "B2-07",
+      "review": "pending_clinician",
+      "note": "He fainted or passed out and has come round ('I fainted this morning, feel okay now'): checked by a doctor today to find out why, with the 995 signs (round 2, 10-16; B2-07 says soon, today is the careful side). Someone still unconscious, or not said to have come round, is collapse-now (995)."
+    },
+    {
+      "id": "chest-ask-now",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_chest"
+      ],
+      "ask": "chest_now",
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "Chest pain, not said whether it is still there: the owner's 10-14 answer (kept for his doctor, his doctor's line, 995 if it is bad or does not go away) and the first question."
+    },
+    {
+      "id": "chest-gone",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": "no",
+        "symptoms.chest.redFlag": [
+          "no",
+          "unknown"
+        ]
+      },
+      "level": 3,
+      "show": [
+        "signal_recorded",
+        "signal_995_chest"
+      ],
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "\"No, it's gone\" and nothing else with it: the owner's 10-14 conditional wording (his words kept for his doctor; 995 if it comes back or gets worse)."
+    },
+    {
+      "id": "chest-ask-how-long",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": [
+          "yes",
+          "unsure"
+        ],
+        "symptoms.chest.long": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_chest"
+      ],
+      "ask": "chest_long",
+      "source": "B1-01",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "chest-ask-with",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.now": [
+          "yes",
+          "unsure"
+        ],
+        "symptoms.chest.long": "no",
+        "symptoms.chest.redFlag": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_chest"
+      ],
+      "ask": "chest_with",
+      "source": "B1-01",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "chest-short-nothing-else",
+      "pathway": "chest",
+      "when": {
+        "symptoms.chest": true,
+        "symptoms.chest.long": "no",
+        "symptoms.chest.redFlag": "no"
+      },
+      "level": 3,
+      "show": [
+        "signal_recorded",
+        "signal_995_chest"
+      ],
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "Still there for under 5 minutes, nothing with it: kept for his doctor with \"call 995 if it is bad or does not go away\". Level 3 rather than 2 is a choice for a clinician to confirm."
+    },
+    {
+      "id": "breathing-ask-at-rest",
+      "pathway": "breathing",
+      "when": {
+        "symptoms.breathing": true,
+        "symptoms.breathing.atRest": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_breathing"
+      ],
+      "ask": "breathing_rest",
+      "source": "B1-02",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "breathing-ask-blue",
+      "pathway": "breathing",
+      "when": {
+        "symptoms.breathing": true,
+        "symptoms.breathing.atRest": "no",
+        "symptoms.breathing.blue": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_breathing"
+      ],
+      "ask": "breathing_blue",
+      "source": "B1-02",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "breathing-not-at-rest",
+      "pathway": "breathing",
+      "when": {
+        "symptoms.breathing": true,
+        "symptoms.breathing.atRest": "no",
+        "symptoms.breathing.blue": "no"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_breathing",
+        "side_effect_noted"
+      ],
+      "question": "doctor",
+      "source": "B1-02",
+      "review": "pending_clinician",
+      "note": "Breathless only when moving, lips not blue: for his doctor, with 995 if it happens at rest. Level 3 rather than 2 is a choice for a clinician to confirm."
+    },
+    {
+      "id": "reading-ask-red-flags",
+      "pathway": "reading_high",
+      "when": {
+        "reading.aboveLine": true,
+        "reading.redFlag": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_unwell"
+      ],
+      "ask": "reading_redflags",
+      "source": "B1-10",
+      "review": "pending_clinician",
+      "note": "A reading above his doctor's line and no sign said: his doctor's line first, kept, 995 if very unwell (the owner's 10-14 order), and the red-flag question."
+    },
+    {
+      "id": "reading-alone",
+      "pathway": "reading_high",
+      "when": {
+        "reading.aboveLine": true,
+        "reading.redFlag": "no"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_unwell"
+      ],
+      "source": "B2-01",
+      "review": "pending_clinician",
+      "note": "Above his doctor's line and no sign with it: the existing answer."
+    },
+    {
+      "id": "extra-dose-ask-who",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.who": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "ask": "extra_who",
+      "question": "doctor",
+      "source": "B1-12",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "extra-dose-ask-symptoms",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.symptoms": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "ask": "extra_symptoms",
+      "question": "doctor",
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "The owner's 10-14 answer to one tablet too many (his doctor's words, his label, ask today, 995 if very unwell) and the question about a sign now."
+    },
+    {
+      "id": "extra-dose-ask-amount",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.amount": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "ask": "extra_amount",
+      "question": "doctor",
+      "source": "B1-12",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "extra-dose-ask-which",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.several": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "ask": "extra_which",
+      "question": "doctor",
+      "source": "B1-12",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "extra-dose-ask-purpose",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.onPurpose": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "ask": "extra_purpose",
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "Whether it was taken on purpose, asked last and only when his words do not say it was a mistake (by mistake, 不小心, forgot he had taken it): the contract's intent question, which webPOISONCONTROL asks too. Round 2, 10-16."
+    },
+    {
+      "id": "extra-dose-one-own",
+      "pathway": "extra_dose",
+      "when": {
+        "extra_dose": true,
+        "extra_dose.who": "self",
+        "extra_dose.amount": "one",
+        "extra_dose.symptoms": "no",
+        "extra_dose.several": "no",
+        "extra_dose.onPurpose": "no"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "question": "doctor",
+      "source": "https://www.nhs.uk/medicines/amlodipine/how-and-when-to-take-amlodipine/",
+      "review": "pending_clinician",
+      "note": "One extra of his own medicine, no sign now, not on purpose: the owner's 10-14 answer, not 995. Its line keeps \"if you feel very unwell, call 995\": the amlodipine leaflet says some effects of too much appear 24 to 48 hours later."
+    },
+    {
+      "id": "looks-different-ask-which",
+      "pathway": "looks_different",
+      "when": {
+        "looks_different": true,
+        "looks_different.medicine": "unknown"
+      },
+      "level": 2,
+      "show": [
+        "looks_different_pharmacist",
+        "added_for_pharmacist"
+      ],
+      "ask": "looks_which",
+      "question": "pharmacist",
+      "source": "https://www.consumermedsafety.org/top-ten-tips-lists/top-10-reasons-to-suspect-a-pharmacy-error",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "looks-different",
+      "pathway": "looks_different",
+      "when": {
+        "looks_different": true
+      },
+      "level": 2,
+      "show": [
+        "looks_different_pharmacist",
+        "added_for_pharmacist"
+      ],
+      "question": "pharmacist",
+      "source": "https://www.consumermedsafety.org/top-ten-tips-lists/top-10-reasons-to-suspect-a-pharmacy-error",
+      "review": "pending_clinician",
+      "note": "Tablets of a new colour, shape or marking that nobody explained: ISMP's first reason to suspect a dispensing error; check with the pharmacist before taking them (referrals.json B3-05). Never \"stop taking it\" as Ripple's own instruction."
+    },
+    {
+      "id": "stop-change-ask-stopped",
+      "pathway": "stop_change",
+      "when": {
+        "stop_change": true,
+        "stop_change.stopped": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "refer_doctor"
+      ],
+      "ask": "stop_already",
+      "question": "doctor",
+      "source": "B3-02",
+      "review": "pending_clinician",
+      "note": "Someone else told him to stop (\"my son says I should stop the cholesterol pill\"): his doctor's \"don't change the dose\" line and his label (the dose-change answer), a question for his doctor, and whether he has stopped already."
+    },
+    {
+      "id": "stop-change-ask-since",
+      "pathway": "stop_change",
+      "when": {
+        "stop_change": true,
+        "stop_change.stopped": [
+          "yes",
+          "unsure"
+        ],
+        "stop_change.since": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "refer_doctor"
+      ],
+      "ask": "stop_since",
+      "question": "doctor",
+      "source": "B3-02",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "stop-change-stopped-bp",
+      "pathway": "stop_change",
+      "when": {
+        "stop_change": true,
+        "stop_change.stopped": [
+          "yes",
+          "unsure"
+        ],
+        "stop_change.since": [
+          "days",
+          "longer",
+          "unsure"
+        ],
+        "stop_change.bpMedicine": [
+          "yes",
+          "unclear"
+        ]
+      },
+      "level": 2,
+      "show": [
+        "stopped_ask_today",
+        "signal_995_unwell"
+      ],
+      "question": "doctor",
+      "source": "B3-02",
+      "review": "pending_clinician",
+      "note": "A blood pressure medicine (or one nobody can name) stopped for days: ask his doctor today, 995 if very unwell. Decided on the careful side while no clinician has signed it; stopped today is level 3."
+    },
+    {
+      "id": "stop-change",
+      "pathway": "stop_change",
+      "when": {
+        "stop_change": true
+      },
+      "level": 3,
+      "show": [],
+      "source": "B3-02",
+      "review": "pending_clinician",
+      "note": "Asked about (\"can I stop?\"), not stopped yet, or stopped today: the existing dose-change answer (his doctor's \"don't change the dose\" line, his label, \"questions about changing your medicine are for your doctor\" and the question on his list), nothing added."
+    },
+    {
+      "id": "side-effect-ask-red-flags",
+      "pathway": "side_effect",
+      "when": {
+        "side_effect": true,
+        "side_effect.redFlag": "unknown"
+      },
+      "level": 3,
+      "show": [
+        "side_effect_995",
+        "side_effect_noted"
+      ],
+      "ask": "side_redflags",
+      "question": "doctor",
+      "source": "B2-08",
+      "review": "pending_clinician",
+      "note": "A possible side effect (ankles swollen since the new pill): his doctor's words and the leaflet's side-effect line where his sources have them, the question for his doctor, the safety-net line, and the red-flag question."
+    },
+    {
+      "id": "side-effect",
+      "pathway": "side_effect",
+      "when": {
+        "side_effect": true,
+        "side_effect.redFlag": "no"
+      },
+      "level": 3,
+      "show": [
+        "side_effect_995",
+        "side_effect_noted"
+      ],
+      "question": "doctor",
+      "source": "B2-08",
+      "review": "pending_clinician"
+    },
+    {
+      "id": "missed-dose-ask-which",
+      "pathway": "missed_dose",
+      "when": {
+        "missed_dose": true,
+        "missed_dose.medicine": "unknown"
+      },
+      "level": 4,
+      "show": [],
+      "ask": "missed_which",
+      "source": "B3-01",
+      "review": "pending_clinician",
+      "note": "A missed dose and more than one medicine it could be: which one, then that leaflet's own missed-dose line. Never Ripple's own instruction."
+    },
+    {
+      "id": "missed-dose",
+      "pathway": "missed_dose",
+      "when": {
+        "missed_dose": true
+      },
+      "level": 4,
+      "show": [],
+      "source": "B3-01",
+      "review": "pending_clinician",
+      "note": "The leaflet's own missed-dose line for that medicine (the existing answer)."
+    },
+    {
+      "id": "chest-question-ignored",
+      "pathway": "general",
+      "when": {
+        "ignored": "chest"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_chest"
+      ],
+      "source": "B1-01",
+      "review": "pending_clinician",
+      "note": "The question his last answer asked about this sign went unanswered: he wrote about something else (round 2, 10-16: sc-chest-ignored-en lost the 995 line). No answer is the careful side: the pathway's 995 signs stay on his next answer, kept for his doctor, with no question (a new message about the sign asks again)."
+    },
+    {
+      "id": "breathing-question-ignored",
+      "pathway": "general",
+      "when": {
+        "ignored": "breathing"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_breathing"
+      ],
+      "source": "B1-02",
+      "review": "pending_clinician",
+      "note": "The question his last answer asked about this sign went unanswered: he wrote about something else (round 2, 10-16: sc-chest-ignored-en lost the 995 line). No answer is the careful side: the pathway's 995 signs stay on his next answer, kept for his doctor, with no question (a new message about the sign asks again)."
+    },
+    {
+      "id": "reading-question-ignored",
+      "pathway": "general",
+      "when": {
+        "ignored": "reading_high"
+      },
+      "level": 3,
+      "show": [
+        "signal_995_unwell"
+      ],
+      "source": "B1-10",
+      "review": "pending_clinician",
+      "note": "The question his last answer asked about this sign went unanswered: he wrote about something else (round 2, 10-16: sc-chest-ignored-en lost the 995 line). No answer is the careful side: the pathway's 995 signs stay on his next answer, kept for his doctor, with no question (a new message about the sign asks again)."
+    },
+    {
+      "id": "side-effect-question-ignored",
+      "pathway": "general",
+      "when": {
+        "ignored": "side_effect"
+      },
+      "level": 3,
+      "show": [
+        "side_effect_995"
+      ],
+      "source": "B1-05",
+      "review": "pending_clinician",
+      "note": "The question his last answer asked about this sign went unanswered: he wrote about something else (round 2, 10-16: sc-chest-ignored-en lost the 995 line). No answer is the careful side: the pathway's 995 signs stay on his next answer, kept for his doctor, with no question (a new message about the sign asks again)."
+    },
+    {
+      "id": "extra-dose-question-ignored",
+      "pathway": "general",
+      "when": {
+        "ignored": "extra_dose"
+      },
+      "level": 2,
+      "show": [
+        "extra_dose_taken"
+      ],
+      "source": "B1-12",
+      "review": "pending_clinician",
+      "note": "As chest-question-ignored, for one tablet too many: 'ask today', with the 995 signs in the same line."
+    },
+    {
+      "id": "general",
+      "pathway": "general",
+      "when": {},
+      "level": 4,
+      "show": [],
+      "source": "B3-01",
+      "review": "pending_clinician",
+      "note": "Nothing above holds: the ordinary answer from his sources."
+    }
+  ]
+}

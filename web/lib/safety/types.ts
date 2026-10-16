@@ -2,6 +2,7 @@
  * Safety-layer types (docs/plan/spec.md section 4). Spec fields keep their names; extensions are marked.
  */
 import type { SafetyEventRow } from "@/lib/store/types";
+import type { FollowUp, RiskSummary } from "./risk/types";
 import type { Slots, SlotMismatch } from "./slots";
 
 export type Route =
@@ -298,6 +299,14 @@ export interface AskResult {
    * same as without it)
    */
   gloss?: Gloss;
+  /**
+   * The guided harness (2026-10-16, lib/safety/risk/types.ts): one scripted follow-up question with buttons, when the decision
+   * table needs a fact he has not said. Drawn under the answer's lines; 995 and the helplines, when they may apply, are among
+   * the sentences above it. His tap comes back as a new ask with `reply`.
+   */
+  followUp?: FollowUp;
+  /** what the harness decided (level, ladder, table rows, frame codes, watch state): the record and the eval, never his screen */
+  risk?: RiskSummary;
 }
 
 /**
@@ -314,10 +323,13 @@ export interface AskResult {
  *             model failed): what stands instead comes with the final answer
  *   replace   the answer's sentences as they now stand (the 995 or self-harm lines in a person's words passed their checks
  *             and stand where the fixed lines stood)
+ *   followup  the scripted follow-up question (harness), last
  */
 export type AskStreamEvent =
   | { type: "stage"; stage: "reading" | "writing"; locale?: Locale }
   | { type: "sentence"; index: number; sentence: Sentence; route: Route }
   | { type: "delta"; text: string }
   | { type: "retract"; why: string }
-  | { type: "replace"; sentences: Sentence[]; route: Route };
+  | { type: "replace"; sentences: Sentence[]; route: Route }
+  /** the follow-up question (harness, 2026-10-16): sent after the answer's sentences, never before a 995 or helpline line */
+  | { type: "followup"; followUp: FollowUp };

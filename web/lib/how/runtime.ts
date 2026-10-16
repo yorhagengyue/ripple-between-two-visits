@@ -1,8 +1,8 @@
 /**
  * What this server is actually running, box by box, for /how (real-status: "数据库一格写「Supabase 在用」，这台其实是内存
  * 存储"; real-app 12: every box from the runtime config, no file paths, no ports). lib/how/stack.ts says what was decided;
- * this says what answers on this server right now: the main model, the checker, the store and sign-in, speech, voice,
- * and the kind of build. Names and models only: never a key, an address, a port or a path. Server-only.
+ * this says what answers on this server right now: the main model, the checker, the store and sign-in, speech, the label
+ * reader, voice, and the kind of build. Names and models only: never a key, an address, a port or a path. Server-only.
  */
 import { effectiveAuthProvider, isDeployed, type Env } from "@/lib/dev/enabled";
 import { speechProviderName } from "@/lib/asr";
@@ -10,6 +10,8 @@ import { tencentAsrConfig } from "@/lib/asr/tencent";
 import { checkerConfig, hunyuanSettings, mainModel, mainProviderKind } from "@/lib/llm";
 import { storeKind } from "@/lib/store";
 import { realVoiceReady, ttsProviderName } from "@/lib/tts";
+import { visionMode } from "@/lib/vision";
+import { OCR_REGION } from "@/lib/vision/ocr";
 import type { StackBox } from "./stack";
 
 const VENDOR_NAMES: Record<string, string> = { tencent: "Tencent Cloud Hunyuan", openai: "OpenAI", anthropic: "Anthropic" };
@@ -66,6 +68,15 @@ export function runtimeStack(env: Env = process.env): RuntimeStack {
           : speech === "trtc"
             ? "TRTC (not wired: no transcripts)"
             : "recorded replays of the sample visits; a visit recorded here waits for transcription";
+
+  // who reads label photos (lib/vision visionMode)
+  const reader = visionMode(env);
+  out.ocr =
+    reader === "ocr"
+      ? `Tencent Cloud OCR in ${OCR_REGION}: two engines read each label photo, after his yes to AI processing`
+      : reader === "model"
+        ? `${main === "replay" ? "recorded answers of a model" : "the model"} reads label photos (not OCR)`
+        : "no reader here: the sample labels show their recorded readings, any other label is typed in";
 
   // C2 track F, round three: what actually speaks (lib/tts realVoiceReady), not what is merely chosen
   out.tts = realVoiceReady(env) ? "Tencent TRTC TTS" : ttsProviderName(env) === "trtc" ? "Tencent TRTC TTS is chosen but cannot speak (a setting is missing, or the service refused it): read-aloud is off" : "a placeholder test voice";

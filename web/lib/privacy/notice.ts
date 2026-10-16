@@ -57,8 +57,10 @@ export interface Notice {
  * not wait for his consent to AI processing (without it there is no visit record); 「AI 处理」 names the summary among
  * what the visit transcript is sent for; 「存什么」 and 「留多久」 name the summary. Everything else is the 2026-10-14
  * words. The 2026-10-14 version is kept word for word (NOTICE_VERSIONS): it is what was published until this one.
+ * "2026-10-16" (Hunyuan) and "2026-10-16.2" (label photos read by Tencent Cloud OCR, later the same day): at their
+ * entries below.
  */
-export const NOTICE_VERSION = "2026-10-16";
+export const NOTICE_VERSION = "2026-10-16.2";
 
 const zh1014: Notice = {
   title: "隐私说明",
@@ -336,11 +338,32 @@ const en1016: Notice = withSections(en1015, "Last updated: 16 October 2026", {
   },
 });
 
+/**
+ * 2026-10-16.2 (in force; the owner's decision later on 16 October): label photos are read by Tencent Cloud OCR in
+ * Singapore (lib/vision/ocr.ts), still only after his yes to AI processing. 「存在哪」 gets one more line after the AI
+ * processing one (which already says label photos go to no model, and stays as it was): who reads the photo, where, what
+ * Tencent's OCR module says about keeping it (no number of days: none is given), what Ripple keeps (the fields he confirms
+ * or corrects; never the whole transcription; the photo in the private storage, an unconfirmed one deleted as 「留多久」
+ * says) and what a no means. The ai_processing consent text of the same version gives the pages. Everything else is the
+ * 2026-10-16 text.
+ */
+const OCR_TERM = { "zh-Hans": "药袋照片的文字识别", en: "Reading label photos" } as const;
+
+const withOcrTerm = (base: Notice, aiTerm: string, term: string, value: string): Notice =>
+  withSections(base, base.updated, {
+    where: { terms: section(base, "where").terms!.flatMap(([t, v]): [string, string][] => (t === aiTerm ? [[t, v], [term, value]] : [[t, v]])) },
+  });
+
+const zh10162: Notice = withOcrTerm(zh1016, "AI 处理", OCR_TERM["zh-Hans"], "只在你同意 AI 处理以后：照片交给腾讯云的文字识别服务（OCR），在新加坡读出上面的字，读出的字发回 Ripple；照片不交给混元模型。腾讯云写明，这些照片只为提供这项服务而保留，保留到用完为止，没有写具体天数。Ripple 不存读出的整段文字：药名、规格、用法、配药日期和诊所拿给你一项项核对，存下的是你确认或改过的内容；照片存在上面说的私有空间里，拍了没确认的照片按「留多久」里写的删掉。不同意就不读照片，药品标签上的字由你自己输入。");
+
+const en10162: Notice = withOcrTerm(en1016, "AI processing", OCR_TERM.en, "Only after you agree to AI processing: the photo goes to Tencent Cloud's text recognition service (OCR), in Singapore, which reads the words on it; the words come back to Ripple. The photo goes to no Hunyuan model. Tencent Cloud says it keeps such images only as long as it needs them for the service, without giving a number of days. Ripple does not keep the whole text it reads: the medicine, strength, directions, dispensing date and clinic are shown to you to check one by one, and what you confirm or correct is saved; the photo is kept in the private storage above, and a photo you never confirm is deleted as How long says. If you say no, no photo is read and you type the label's words yourself.");
+
 /** Every published version of these words, both languages: the one in force is NOTICE_VERSION; the older ones word for word. */
 export const NOTICE_VERSIONS: Readonly<Record<string, { "zh-Hans": Notice; en: Notice }>> = {
   "2026-10-14": { "zh-Hans": zh1014, en: en1014 },
   "2026-10-15": { "zh-Hans": zh1015, en: en1015 },
   "2026-10-16": { "zh-Hans": zh1016, en: en1016 },
+  "2026-10-16.2": { "zh-Hans": zh10162, en: en10162 },
 };
 
 export function privacyNotice(locale: NoticeLocale, version: string = NOTICE_VERSION): Notice {

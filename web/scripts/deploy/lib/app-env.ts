@@ -18,6 +18,8 @@
  *   --tts mock         no read-aloud on accounts (the app hides the button), the demo keeps its labelled test voice
  *   --tts trtc         Tencent RTC's TextToSpeech: TRTC_SDK_APP_ID, TENCENT_SECRET_ID, TENCENT_SECRET_KEY
  * The Tencent Cloud key pair (TENCENT_SECRET_*) is one pair for both: it goes into the file when either switch needs it.
+ * The app also reads label photos with it (Tencent Cloud OCR, lib/vision: chosen by the app when the pair is there and
+ * the main model reads no images), so a deployment with neither switch reads only the sample photos, from their cassettes.
  * Values are never printed: only names, and what is wrong with them.
  */
 import { tencentAsrConfig, type TencentAsrProblem } from "@/lib/asr/tencent";

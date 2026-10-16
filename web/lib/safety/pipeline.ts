@@ -54,18 +54,52 @@
  *                 when no topic, reading, medicine, symptom or crisis word is in it: the fixed 「这个我帮不上，要我记下来吗？」,
  *                 no model call (no crisis screen either: the rules found no crisis word), no question, nothing saved (C2
  *                 track S, routed from track K)
- * Crisis screen (live models only; 10-09 round 2 widened it from statements to every route): every input the rules
- * did not route to emergency or self_harm also goes to the main model's crisis screen (screenCrisisWithModel). It is
- * started at once and runs alongside classification and generation, so an answer waits for it only when it has no
- * model call of its own (a statement, an unknown medicine, an injection refusal, a template). It can only raise the
+ * The guided harness (2026-10-16; the owner: 「伤害性的言论检索仅仅靠文字匹配是远远不够的……995、药、其他询问都应该有工程化的引导的
+ * harness」; the contract lib/safety/risk/types.ts, the decision table web/kb/pathways.json, its reading risk/table.ts and
+ * risk/pathways.ts). It replaced the single-message crisis screen (screenCrisisWithModel is no longer called):
+ *   - his words are read again normalised (risk/normalize.ts: "k i l l myself", "kil myslef", 「自殺」); the rules run on
+ *     every reading and a crisis on any of them counts (rulesOnVariants: it only raises);
+ *   - the risk screen (risk/screen.ts: one model call over his message, his last 10 turns of today as askTurns keeps them,
+ *     his medicines on the day, his watch state, his language) starts at once and runs beside classification and
+ *     generation. Its frame's quotes are checked asymmetrically (risk/evidence.ts) and merged onto the rules' own frame
+ *     (risk/rules-floor.ts, risk/merge.ts: the higher wins). An answer waits for it no longer than its own time
+ *     (RISK_SCREEN_TIMEOUT_MS, inside the deadline); late, failed, offline, over a limit, at the spend cap or without his
+ *     consent the rules' frame decides alone (frameSource "rules"), and crisisScreen records what the screen did, so the
+ *     rules-only cue words below work as they did. Two adjustments to the rules' floor before the merge: a wish to die only
+ *     the rules' frame calls "active" while classify.ts's own self-harm rules (with their reviewed exceptions) did not route
+ *     it is "unclear" (asked about), and an urgent sign only cue words saw (no crisis rule, not the model's) fires no 995-now
+ *     row of its own (cueOnly: the rules-only cue words raise it offline, as before; online the safety line stays);
+ *   - code decides (decideNow): the medical level 1-4 and the self-harm ladder (none, possible, thoughts, danger), the
+ *     table's rows, its fixed lines and at most one follow-up question (AskResult.followUp). The rules' crisis routes are
+ *     the floor: never lowered, never waiting for a model before their 995 and helpline lines, which go out first; the
+ *     screen's frame then raises them only (a sign kept for his doctor becomes 995 now when the frame says so; the
+ *     self-harm answer's 995 line becomes 995 now at danger: raiseCrisisLate, a "replace" of the sentences), waited for
+ *     beside the crisis wording and no longer than its own time. Level 1: the emergency route, the 995 line first (on the
+ *     row's own B1 source), his doctor's warning line after it for his own chest pain, stroke sign or reading. The ladder at
+ *     thoughts or danger: the self-harm route, the helplines as before, then "I'm here ...", "I've let your family know"
+ *     (only when lib/care/told.ts tells someone: an account with an active care link) and "tell your doctor"; at danger 995
+ *     now first. "possible": the route stays, the safety line and the helplines come first and the confirm question last;
+ *     for a lethality question, saved-up tablets or any amount with the watch state on nothing of the composed answer stays
+ *     (no label, no dose line, no amount, nothing on his list). Levels 2 and 3: the route's own answer and the row's lines
+ *     it does not carry yet (a 995 line first for chest pain, breathing and a reading), the row's question on his list; a
+ *     statement whose pathway is at level 2 or 3 is answered on that pathway's route ("Noted." alone is below level 3).
+ *     Level 4: as before;
+ *   - a reply (AskInput.reply, or typed words that are one of the waiting question's buttons or whose frame fills its fact)
+ *     continues the pathway from the state the asking answer kept on its safety record (risk/state.ts: output.harness),
+ *     never older than 30 minutes or answered already; no rule, model or note reads a button's words. His family is told
+ *     again only when a reply raises what was decided when the question was asked;
+ *   - the safety record keeps output.risk (codes only: the watch state, risk/watch.ts, reads it) and output.harness; the
+ *     backstage's ask.route and ask.answered events carry the level, the ladder step, the rows and where the frame came
+ *     from; the stream sends the follow-up question last.
+ * The crisis screen as it was (kept as the record of what the risk screen did): every input the rules did not route to
+ * emergency or self_harm also went to the main model's crisis screen. It was
+ * started at once and ran alongside classification and generation, so an answer waited for it only when it had no
+ * model call of its own (a statement, an unknown medicine, an injection refusal, a template). It could only raise the
  * route to emergency or self_harm (the composed answer is then dropped for the crisis templates); "none", an invalid
  * answer, an error, the spend cap or the deadline keep the rules' route, and the ask.route event says the screen was
  * unavailable (rules only). Offline (mock) there is no screen: the rules are the crisis screen.
- * 10-14 (the owner's decision on one tablet too many): the screen's prompt calls any tablets already taken an emergency,
- * so for the one case the rules took out of it (classify.ts rule:extra_dose_taken: one tablet too many, no symptom or
- * danger word, his own medicine) the screen's "emergency" does not raise the route (crisisScreen.heldBy says so); its
- * "self_harm" still does, and the answer's own fixed sentence still says 995 or A&E if he feels very unwell. The rules
- * already kept every such message with a symptom, a danger word or a larger amount an emergency.
+ * 10-14 (the owner's decision on one tablet too many) holds in the table: one tablet too many of his own with no sign is
+ * level 2, the dose answer and its "995 if very unwell", and the harness asks whether he has a sign now.
  * Fix round 3: whenever no crisis screen vouched for the answer, the rules are the only screen, so crisis words route too:
  * an emergency described in words no rule knows (classify.ts emergencyCue) goes to the 995 template whatever the sentence
  * form, and a statement with self-harm words (selfHarmCue) to the helplines instead of "Noted." (applyRulesOnlyCue,
@@ -132,7 +166,23 @@ import { publish as busPublish, type BusEventType } from "@/lib/bus";
 import { createChecker, createMainLlm, createMockLlm } from "@/lib/llm";
 import type { CheckerIndependence } from "@/lib/llm";
 import type { LlmClient } from "@/lib/llm/types";
+import type { FollowUp, FollowUpReply, Frame, FrameSource, LadderStep, MedicalLevel, RiskScreenInput, RiskSummary } from "./risk/types";
+import { normalizedVariants } from "./risk/normalize";
+import { missedDoseQuote, rulesFrame } from "./risk/rules-floor";
+import { RISK_SCREEN_TIMEOUT_MS, screenRisk as screenRiskModel, type ScreenResult } from "./risk/screen";
+import { checkEvidence, type EvidenceMiss } from "./risk/evidence";
+import { mergeFrames } from "./risk/merge";
+import { watchState } from "./risk/watch";
+import { amountQuestion, chosenMedicines, isQuestionId, messageFrame, oneMedicinePerWord, optionsForFact, QUESTION_FACT, typedOption, type Answers, type DecideContext, type MedChoice } from "./risk/pathways";
+import { decide, followUpFor, type Decision } from "./risk/table";
+import { findPending, frameCodes, harnessHistory, latestPending, type HarnessRecord, type PathwayState, type PendingLookup } from "./risk/state";
+import { askTurns } from "./turns";
+import { renderText } from "./render";
+import { scopeNowMs } from "@/lib/time/clock";
+import { nowMs as appNowMs } from "@/lib/time/now";
+import type { SafetyEventRow } from "@/lib/store/types";
 import { medsOnDayAt, prescribingLines } from "@/lib/meds/on-day";
+import { zhGenericName } from "@/lib/meds/zh-names";
 import { DOSE_SLOT, isDue, medName } from "@/lib/session/today";
 import { signalMoment, signalMomentWords, signalReply } from "@/lib/daily/signals";
 import { cachedTranslation, translateDoctorLine, translateOwnWords } from "@/lib/translate";
@@ -161,13 +211,11 @@ import {
   emergencyCue,
   isThirdPersonReport,
   namedDrugs,
-  screenCrisisWithModel,
   selfHarmCue,
   signalFamily,
   targetDrugs,
   type Classification,
   type ClassifyContext,
-  type CrisisScreen,
   type SignalFamily,
 } from "./classify";
 import { CostLimitError, storeCostGuard, type AskGuard } from "./cost-guard";
@@ -186,10 +234,13 @@ import { emergencyReferralFor, selfHarmTemplateIds, SIGNAL_995, SIGNAL_RECORDED,
 import { detectLang, hasHan, normalizeForCompare, stripInvisible } from "./text";
 import { dietCondition } from "./special-diet";
 import { warningLine, warningLineFor } from "./threshold";
-import { detectTopics, facetsOf, findReading, refersToMedicine, sameFacet } from "./topics";
+import { detectTopics, facetsOf, findReading, isQuestion, refersToMedicine, sameFacet } from "./topics";
 import type { AskResult, AskStreamEvent, Attribution, BlockedSentence, Candidate, Gloss, Locale, Route, Sentence, SentenceVerdict } from "./types";
 import { originOf, relevanceReasons, sourceWords, verifySentences } from "./verify";
 import { zhFromSlots } from "./zh";
+
+/** How many of his newest safety records are read for the harness (the watch state's week, risk/watch.ts, with room). */
+const WATCH_RECORDS = 500;
 
 export interface AskInput {
   sessionId: string;
@@ -206,6 +257,11 @@ export interface AskInput {
   asrLowConfidence?: boolean;
   /** override the session's story day */
   storyDay?: number;
+  /**
+   * His answer to the follow-up question of an earlier answer (harness, 2026-10-16; lib/safety/risk/types.ts FollowUp): the
+   * pending pathway it names continues from there. `text` is then the chosen option's words.
+   */
+  reply?: FollowUpReply;
 }
 
 type Publisher = (sessionId: string, type: BusEventType, say: string, data: unknown) => void;
@@ -259,6 +315,18 @@ export interface AskDeps {
    * default tellFamily. Tests pass a spy.
    */
   tellFamily?: (input: TellInput) => Promise<unknown>;
+  /**
+   * The guided harness (2026-10-16): the risk screen (default risk/screen.ts screenRisk: one model call over his message and
+   * his last turns). A seam for tests, which hand it frames; never called offline, without his consent, at the spend cap or
+   * over the question limit.
+   */
+  screenRisk?: (input: RiskScreenInput, llm: LlmClient, opts: { signal?: AbortSignal; timeoutMs?: number }) => Promise<ScreenResult>;
+  /**
+   * The harness: whether his family is told of a self-harm answer of his (lib/care/told.ts: an account with at least one active
+   * care link), so the answer may say "I've let your family know". Default: his active care links (family-link.ts). Tests
+   * pass their own.
+   */
+  hasFamily?: (session: SessionRow) => Promise<boolean>;
 }
 
 /**
@@ -707,6 +775,157 @@ const NOT_A_MEDICINE = "rule:not_a_medicine";
  */
 const READING_ONLY_SIGNALS = ["above_doctor_threshold", "medicine_cause"];
 
+/** How far a route is a crisis (the rules' order: self-harm, then an emergency). */
+const crisisRank = (r: Route | undefined | null) => (r === "self_harm" ? 2 : r === "emergency" ? 1 : 0);
+
+/**
+ * The rules on every reading of his words (the harness, 2026-10-16; risk/normalize.ts): his words as typed decide, unless
+ * a normalised reading is a crisis they are not ("k i l l myself", "i wanna kil myslef", 「我想自殺」), which then counts
+ * (signal "normalized"). Never lowers: a reading that is less of a crisis is ignored.
+ */
+export function rulesOnVariants(text: string, variants: readonly string[], ctx: ClassifyContext): Classification | null {
+  let ruled = classifyRules(text, ctx);
+  for (const v of variants) {
+    if (v === text) continue;
+    const c = classifyRules(v, ctx);
+    if (c && crisisRank(c.route) > crisisRank(ruled?.route)) ruled = { ...c, signals: [...c.signals, "normalized"] };
+  }
+  return ruled;
+}
+
+/** The emergency kind a level-1 row's source names (referrals.json B1 rows), for the 995 template's referral and his family's notice. */
+const B1_SIGNAL: Record<string, string> = {
+  "B1-01": "chest",
+  "B1-02": "breathing",
+  "B1-03": "stroke",
+  "B1-04": "collapse",
+  "B1-05": "allergy",
+  "B1-07": "bleeding",
+  "B1-10": "high_bp_symptom",
+  "B1-12": "overdose",
+};
+
+/** The emergency signals a level-1 decision stands for (classify.ts's signal names, so the emergency answer is composed as the rules' would be). */
+export function levelOneSignals(d: Pick<Decision, "medicalRow" | "facts">): string[] {
+  const kind = B1_SIGNAL[d.medicalRow.source];
+  const out = kind ? [kind] : [];
+  if (d.medicalRow.pathway === "reading_high") out.push("above_doctor_threshold");
+  if (d.medicalRow.pathway === "extra_dose" || kind === "overdose") {
+    if (d.facts["extra_dose.who"] === "child" || d.facts["extra_dose.who"] === "unsure") out.push("child", "third_person");
+    else if (d.facts["extra_dose.who"] === "other") out.push("third_person");
+  } else if (d.facts.about === "other" || d.facts.about === "child") {
+    out.push("third_person");
+  }
+  return out;
+}
+
+/**
+ * A reply's classification (the harness): the route its decision calls for (the ladder's helplines, 995 now), else the route
+ * the pathway's first answer went out on (a sign kept for his doctor stays the emergency route it was: the floor). No rule
+ * and no model reads the button's words.
+ */
+export function replyClassification(d: Decision, st: Pick<PathwayState, "origin">): Classification {
+  const o = st.origin;
+  const ladderUp = d.ladder === "thoughts" || d.ladder === "danger";
+  const route: Route = ladderUp ? "self_harm" : d.level === 1 ? "emergency" : o.route;
+  const signals = ladderUp
+    ? ["self_harm", "harness"]
+    : d.level === 1
+      ? ["harness", ...levelOneSignals(d), ...o.signals.filter((sg) => sg === "third_person" || sg === "child")]
+      : o.signals;
+  return { route, reason: "harness:reply", signals: [...new Set(signals)], topics: o.topics, drugs: o.drugs, reading: null, questionFor: "doctor", injection: false, conflict: false };
+}
+
+const NOT_YET = Symbol("not yet");
+/**
+ * Whether a promise that never rejects has settled already (never waits: a settled promise is first in the race, so its
+ * reaction runs before the already-resolved marker's).
+ */
+async function settledNow(p: Promise<unknown>): Promise<boolean> {
+  return (await Promise.race([p, Promise.resolve(NOT_YET)])) !== NOT_YET;
+}
+
+/** classify.ts signal names -> the risk frame's symptom kinds (for telling a crisis rule's sign from a cue word's). */
+const SIGNAL_KIND: Record<string, string> = {
+  chest: "chest",
+  stroke: "stroke",
+  breathing: "breathing",
+  collapse: "consciousness",
+  confusion: "consciousness",
+  allergy: "allergy",
+  bleeding: "bleeding",
+  high_bp_symptom: "headache",
+};
+/**
+ * A very high reading in his words (B1-10; round 2, 10-16): 180 or more on top or 110 or more below (topics.ts findReading),
+ * or said in words beside a blood-pressure word ("two hundred", 两百多, 一百八十几), which findReading does not read
+ */
+const VERY_HIGH_WORDS: RegExp[] = [
+  /\b(?:blood pressure|bp|pressure|reading|systolic|top number)\b[^.?!]{0,25}\b(?:two hundred|one (?:hundred )?(?:and )?(?:eighty|ninety))\b|\b(?:two hundred|one (?:hundred )?(?:and )?(?:eighty|ninety))\b[^.?!]{0,25}\b(?:blood pressure|bp|pressure|reading)\b/i,
+  /(?:血压|血壓|上压|上壓|高压|高壓)[^，。？！,?!]{0,8}(?:两百|兩百|二百|一百八|一百九)/,
+];
+export function veryHighReading(text: string): boolean {
+  const r = findReading(text);
+  if (r && (r.systolic >= 180 || (r.diastolic !== null && r.diastolic >= 110))) return true;
+  return VERY_HIGH_WORDS.some((re) => re.test(text));
+}
+/** B1-10's signs no frame kind holds: trouble seeing, confusion (the coordinator's list, round 2; weakness is a stroke sign). */
+const READING_SIGN_WORDS: RegExp[] = [
+  /\b(?:blurr\w*|vision|can'?t see|cannot see|seeing double|double vision|confus\w*)\b/i,
+  /看不清|看唔清|视力模糊|視力模糊|眼花|重影|糊涂|糊塗/,
+];
+
+/**
+ * A symptom said to have come since a new or changed medicine (round 2, 10-16: "Since I started the new pill I've had a dry
+ * cough", 「换药以后晚上睡不好」 and the Tamil "since I started the new medicine, my head spins" were notes): with a symptom
+ * in the frame, the side-effect pathway. Never on its own: the first live run filed the reading of the hero question as a
+ * symptom with his medicine, and those words are not in it.
+ */
+const SINCE_MEDICINE_WORDS: RegExp[] = [
+  /\b(?:since|after|ever since)\b[^.?!]{0,30}\b(?:pills?|tablets?|medicines?|medications?|meds|dose)\b|\b(?:new|changed|switched)\s+(?:pills?|tablets?|medicines?|medication|meds)\b/i,
+  /换药|換藥|换了(?:新)?药|換了(?:新)?藥|新药|新藥|(?:吃|服)(?:了)?[^，。？！,?!]{0,8}(?:药|藥)[^，。？！,?!]{0,3}(?:以后|之后|以後|之後|后|後)/,
+  /\bubat baru\b|\bsejak\s+(?:makan|ambil|mula)\s+ubat\b/i,
+  /புதிய மருந்து|மருந்து[^.?!]{0,30}(?:பிறகு|முதல்|ஆரம்பித்த)/u,
+];
+
+/** A dose taken by mistake, in his words (the extra-dose pathway then does not ask whether it was on purpose). */
+const ACCIDENTAL = /\bby (?:mistake|accident)\b|\baccident(?:al)?ly\b|\bwrongly\b|\bdidn'?t mean\b|\bforgot (?:i|that i)(?:'d| had)?(?: already)?\b|\bnot sure\b|\bi think i (?:took|had|ate)\b|\bconfused\b|不小心|不留神|搞错|搞錯|弄错|弄錯|糊里糊涂|糊裡糊塗|不记得|不記得|忘了(?:已经)?吃过|好像|不确定|不確定|唔小心|唔记得|\btak sengaja\b|\bterlupa\b/i;
+
+/** A medicine, a dose or taking one, in his words (the missed-dose pathway's topic needs it). */
+const MEDICINE_OR_DOSE = /\b(?:pills?|tablets?|medicines?|medications?|meds|doses?|capsules?|take|took|taken|taking|amlodipine|losartan|ibuprofen)\b|药|藥|吃|服|\bubat\b|மருந்து/i;
+
+/** An amount in a line (a number of tablets, or a strength), for an answer that shows none (Decision.noAmounts). */
+const AMOUNT_WORDS: RegExp[] = [
+  /\b(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|half an?|half)\s*(?:x\s*)?(?:tablets?|tabs?|pills?|capsules?)\b|\b\d+(?:\.\d+)?\s*(?:mg|milligrams?)\b/i,
+  /[\d一二两三四五六七八九十百半]+\s*(?:粒|片|颗|顆|毫克)/,
+];
+
+/** The urgent kinds with no question of their own: a cue word alone never makes them 995 now (DecideContext.cueOnly). */
+const CUE_DEMOTED_KINDS = ["stroke", "consciousness", "allergy", "bleeding", "headache"];
+
+const LADDER_ORDER: Record<LadderStep, number> = { none: 0, possible: 1, thoughts: 2, danger: 3 };
+
+/** A decision above what was decided before (a higher ladder step, or a more urgent level). */
+export function raisesOver(d: { level: MedicalLevel; ladder: LadderStep }, before: { level: MedicalLevel; ladder: LadderStep }): boolean {
+  return LADDER_ORDER[d.ladder] > LADDER_ORDER[before.ladder] || d.level < before.level;
+}
+
+/** His turns of today as the risk screen reads them (oldest first, the last 10): his words, and what Ripple showed him. */
+export function screenTurns(turns: readonly AskTurnLike[], locale: Locale): RiskScreenInput["turns"] {
+  const out: RiskScreenInput["turns"] = [];
+  for (const t of turns) {
+    out.push({ role: "patient", text: t.text });
+    if (t.answer) {
+      const followUp = (t.answer as { followUp?: FollowUp }).followUp;
+      const shown = renderText(t.answer, t.answer.locale ?? locale);
+      const asked = followUp ? (locale === "zh-Hans" ? followUp.zh : followUp.en) : "";
+      out.push({ role: "ripple", text: [shown, asked].filter(Boolean).join("\n") });
+    }
+  }
+  return out.slice(-10);
+}
+type AskTurnLike = { text: string; answer: (Pick<AskResult, "sentences" | "gloss"> & { locale?: Locale }) | null };
+
 function fromCandidate(c: Candidate, speechAct: Sentence["speechAct"] = "restate"): Sentence {
   return { speechAct, sourceId: c.sourceId, span: c.span, slots: {}, en: c.restatement ? c.restatement.en : c.span, attribution: c.attribution };
 }
@@ -774,7 +993,21 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   pub(sid, "ask.received", `${who} asked: "${short(text)}"`, { text, locale, day, role: input.role ?? "patient" });
 
   // ---- 1. classify (rules first)
-  const [visitsAll, medsAll] = await Promise.all([store.listVisits(sid), store.listMeds(sid)]);
+  // (his recent safety records come with the same round trip: a reply to a follow-up question is looked up among them, and
+  // today's conversation tells the harness which pathways asked already; the harness, 2026-10-16)
+  // (the app's clock when no test clock is given: the store stamps its records by the same one)
+  const nowMs = scopeNowMs(session, deps.now ? deps.now() : appNowMs());
+  // his turns of today and his watch state (risk/watch.ts), read beside them too: the risk screen needs both
+  const turnsP: Promise<RiskScreenInput["turns"]> = askTurns(store, sid, day)
+    .then((t) => screenTurns(t, locale))
+    .catch(() => []);
+  // (one read of his safety records serves both: the watch state reads them through this store, risk/watch.ts)
+  const recentP: Promise<SafetyEventRow[]> = store.listSafetyEvents(sid, { limit: WATCH_RECORDS }).catch((): SafetyEventRow[] => []);
+  const watchStore = new Proxy(store, { get: (target, key, receiver) => (key === "listSafetyEvents" ? () => recentP : Reflect.get(target, key, receiver)) });
+  const watchP: Promise<{ on: boolean; since?: string; reason?: string }> = Promise.resolve()
+    .then(() => watchState(watchStore, sid, nowMs))
+    .catch(() => ({ on: false }));
+  const [visitsAll, medsAll, recent] = await Promise.all([store.listVisits(sid), store.listMeds(sid), recentP]);
   // the story moment (gap 7.5): the session's clock time on its own story day; another day asked for counts as a whole day.
   // A visit counts once it has happened (line-state.ts visitHappened): R2 is not the warning line before Dr Lim says it.
   const moment: StoryMoment = { day, time: input.storyDay === undefined || input.storyDay === session.story_day ? session.story_time : null };
@@ -795,7 +1028,70 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   let llmTokens = 0;
   let llmCalls = 0;
   let crisisScreen: CrisisScreenRecord | null = null;
-  const ruled = classifyRules(text, ctx);
+  // the harness (2026-10-16): the rules also read his words normalised (risk/normalize.ts: spaced letters, digits for letters,
+  // misspelled crisis phrases, traditional characters); a crisis found on any reading counts, and only ever raises
+  const variants = normalizedVariants(text);
+  /**
+   * A reply to an earlier follow-up question (the harness): a tap that names a follow-up still waiting (not older than 30
+   * minutes, not answered since: risk/state.ts findPending), or typed words that are one of the waiting question's buttons
+   * ("yes", 「没有」, "not sure": risk/pathways.ts typedOption). The pathway then continues from his answers; the rules never
+   * read a button's words. An unknown or stale follow-up id: `text` is read as a new message.
+   */
+  let reply: { lookup: Extract<PendingLookup, { ok: true }>; optionIds: string[]; typed: boolean } | null = null;
+  let replyRefused: string | null = null;
+  if (input.reply) {
+    const found = findPending(recent, input.reply.followUpId, nowMs);
+    if (found.ok) reply = { lookup: found, optionIds: input.reply.optionIds, typed: false };
+    else replyRefused = found.why;
+  } else {
+    const waiting = latestPending(recent, nowMs);
+    const ids = waiting?.ok ? typedOption(waiting.record.followUp, text) : null;
+    if (waiting?.ok && ids) reply = { lookup: waiting, optionIds: ids, typed: true };
+  }
+  const ruled = reply ? null : rulesOnVariants(text, variants, ctx);
+  // his medicines on the day as the harness names them, his turns of today, his watch state: read side by side, now
+  const medChoices: MedChoice[] = ctx.meds
+    .filter((m) => !!m.drug_id || !!m.label?.drug)
+    .map((m) => ({ id: m.id, name: medName(m), nameZh: zhGenericName(m.drug_id), drugId: m.drug_id }));
+  /** The harness's decision for this answer (risk/table.ts), once it is made: at once for a reply, after the frame otherwise. */
+  let decision: Decision | null = null;
+  let frameSource: FrameSource = "rules";
+  let harnessFrame: Frame | null = null;
+  let evidenceMisses: EvidenceMiss[] = [];
+  let screenResult: ScreenResult | null = null;
+  /** the risk screen's frame after the evidence check (risk/evidence.ts), before it is merged onto the rules' */
+  let modelFrame: Frame | null = null;
+  let watch: { on: boolean; since?: string; reason?: string } = { on: false };
+  let decideCtx: DecideContext | null = null;
+  let decideAnswers: Answers = {};
+  let continuing: PathwayState | null = null;
+  if (reply) {
+    // a reply continues its pathway from the frame and the context it was asked with, plus his answer (risk/state.ts)
+    const st = reply.lookup.record.state;
+    continuing = st;
+    watch = await watchP;
+    decideAnswers = { ...st.answers, [st.questionId]: reply.optionIds };
+    harnessFrame = st.frame;
+    frameSource = st.frameSource;
+    decideCtx = {
+      watch: st.context.watch || watch.on,
+      frameSource: st.frameSource,
+      rules: { route: st.origin.rulesRoute, reason: st.origin.reason, signals: st.origin.signals, topics: st.origin.topics },
+      readingAboveLine: st.context.readingAboveLine,
+      meds: medChoices,
+      fits: st.context.fits,
+      asksAmount: st.context.asksAmount,
+      asksLargeAmount: st.context.asksLargeAmount,
+      sideEffect: st.context.sideEffect,
+      missedDose: st.context.missedDose,
+      history: harnessHistory(recent, day, { continuing: st.pathway, answering: reply.lookup.record.followUp.id }),
+      cueOnly: st.context.cueOnly ?? [],
+      accidental: st.context.accidental ?? false,
+      continuing: st.pathway,
+      ignored: null,
+    };
+    decision = decide(st.frame, decideAnswers, decideCtx, st.values);
+  }
   // Cost guard (fix round 2: the hourly limit used to come before any crisis check but the rules', so "I have written
   // letters to my children and arranged everything." over the limit got HTTP 429 and no 995). Over the limit, a
   // statement and any input near crisis words (crisisCue) are still answered, by the rules alone with no model call
@@ -804,9 +1100,10 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   // call, so it is still answered over the limit.
   let costLimited: CostLimitError | null = null;
   try {
-    await guard?.admit(sid, { exempt: !!ruled && CRISIS_ROUTES.includes(ruled.route) });
+    // (a reply to a follow-up question is fixed lines and code, never refused: the pathway it continues may be a crisis)
+    await guard?.admit(sid, { exempt: !!reply || (!!ruled && CRISIS_ROUTES.includes(ruled.route)) });
   } catch (e) {
-    if (!(e instanceof CostLimitError) || (!(ruled?.route === "log_only" || crisisCue(text)) && ruled?.reason !== EXTRA_DOSE_TAKEN)) throw e;
+    if (!(e instanceof CostLimitError) || (!reply && !(ruled?.route === "log_only" || crisisCue(text)) && ruled?.reason !== EXTRA_DOSE_TAKEN)) throw e;
     costLimited = e;
     console.warn(`[safety] cost guard: ${e.limit} reached; answering by the rules alone`);
   }
@@ -848,12 +1145,30 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
               const made = createChecker();
               return { ...made, client: paid(made.client) };
             })();
-  // the crisis screen starts now, alongside classification and generation (see the header)
-  // (not for chit-chat either: cant_help calls no model, and its rule already found no crisis word: classify.ts; nor for a
-  // question about Ripple itself, 10-14, whose rule found no medicine, symptom or crisis word)
-  const screenP: Promise<CrisisScreen> | null =
-    llm.provider !== "mock" && !(ruled && (SCREEN_SKIP.includes(ruled.route) || ruled.route === "cant_help" || ruled.reason === ABOUT_RIPPLE))
-      ? screenCrisisWithModel(text, llm, { signal: modelSignal() })
+  // ---- the harness (2026-10-16; see the header): the risk screen starts now, alongside classification and generation. It
+  // reads his message with his last turns of today and his watch state (risk/screen.ts) and replaces the single-message
+  // crisis screen. Not for a reply to a follow-up question (code continues the pathway), chit-chat or a question about Ripple
+  // itself (their rules found no medicine, symptom or crisis word), and never with no model allowed for him (the mock)
+  let screenInput: RiskScreenInput | null = null;
+  // (a crisis the rules found is admitted whatever his limits, but over a limit or at the spend cap no model reads or words it:
+  // the same check the crisis wording makes, made once here for both)
+  let crisisModelBlocked: string | undefined;
+  if (!reply && ruled && CRISIS_ROUTES.includes(ruled.route) && guard && llm.provider !== "mock") {
+    if (await guard.overLimit?.(sid)) crisisModelBlocked = "rate_limited";
+    else if (await guard.spendCapped?.()) crisisModelBlocked = "spend_cap";
+  }
+  const riskP: Promise<ScreenResult> | null =
+    !reply && !crisisModelBlocked && llm.provider !== "mock" && !(ruled && (ruled.route === "cant_help" || ruled.reason === ABOUT_RIPPLE))
+      ? (async () => {
+          try {
+            const [turns, watch] = await Promise.all([turnsP, watchP]);
+            const input: RiskScreenInput = { message: text, turns, meds: medChoices.map(({ id, name }) => ({ id, name })), watch: watch.on, locale };
+            screenInput = input;
+            return await (deps.screenRisk ?? screenRiskModel)(input, llm, { signal: modelSignal(), timeoutMs: RISK_SCREEN_TIMEOUT_MS });
+          } catch {
+            return { frame: null, provider: llm.provider, model: llm.model, ms: 0, tokens: 0, error: "error" };
+          }
+        })()
       : null;
   /** The candidates the list rule built, kept for step 2 when its route stands (the same route and topics). */
   const listed: { cands: CandidateSet | null } = { cands: null };
@@ -891,9 +1206,11 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     if (asked) return { ...base, route: "uncertain", reason: "rule:asked_before", signals: ["asked_before"], questionFor: asked.for };
     return null;
   };
-  const fromList = ruled ? null : await ownListRule();
+  const fromList = ruled || reply ? null : await ownListRule();
   let cls: Classification;
-  if (ruled) {
+  if (reply && decision && continuing) {
+    cls = replyClassification(decision, continuing);
+  } else if (ruled) {
     cls = ruled;
   } else if (fromList) {
     cls = fromList;
@@ -931,39 +1248,270 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     guard?.addTokens(sid, res.tokens);
   }
 
-  /** Wait for the screen and apply it. True when it raised the route to a crisis. */
-  const settleScreen = async (): Promise<boolean> => {
-    if (!screenP || crisisScreen) return false;
-    if (SCREEN_SKIP.includes(cls.route)) {
-      // the model's own classification is already a crisis: 995 and the helplines do not wait for the screen
-      crisisScreen = { route: null, reason: "not awaited: already a crisis", error: null, errorCode: null, raisedFrom: null, awaited: false };
-      // the call was made (and is billed): it counts as a call here; its tokens reach the cost guard when it ends
+  /**
+   * The harness (2026-10-16; see the header). The frame of his message: the risk screen's (its quotes checked
+   * asymmetrically: risk/evidence.ts) merged onto the rules' (risk/rules-floor.ts), or the rules' alone when the screen did
+   * not run, failed, or did not answer within its own time (RISK_SCREEN_TIMEOUT_MS, inside the answer's deadline). It
+   * replaces the single-message crisis screen; the crisis screen's record (crisisScreen) now says what the risk screen did,
+   * so screenGap and the rules-only cue words work as before when no model read his words.
+   */
+  let rFrame: Frame | null = null;
+  const rulesFrameNow = async (): Promise<Frame> => {
+    if (!rFrame) rFrame = rulesFrame(text, { meds: medChoices.map(({ id, name }) => ({ id, name })), turns: await turnsP });
+    return rFrame;
+  };
+  let riskSettled = false;
+  /** Wait for the risk screen (no longer than its own time) and settle the frame. */
+  const settleRisk = async (): Promise<void> => {
+    if (reply || riskSettled) return;
+    riskSettled = true;
+    const rules = await rulesFrameNow();
+    let res: ScreenResult | null = null;
+    if (riskP) {
+      try {
+        res = await riskP;
+      } catch {
+        res = { frame: null, provider: llm.provider, model: llm.model, ms: 0, tokens: 0, error: "error" };
+      }
+    }
+    screenResult = res;
+    if (res) {
+      llmTokens += res.tokens;
       llmCalls++;
-      void screenP.then((sc) => {
-        void guard?.addTokens(sid, sc.tokens);
-        void guard?.settle?.();
-      });
-      return false;
+      guard?.addTokens(sid, res.tokens);
+      const failed = res.frame ? null : (res.error ?? "error");
+      crisisScreen = { route: null, reason: `risk_screen:${res.provider}`, error: failed, errorCode: failed, raisedFrom: null, awaited: true };
+      if (failed) console.warn(`[safety] risk screen unavailable (${failed}); the rules' frame for this answer`);
     }
-    const screen = await screenP;
-    llmTokens += screen.tokens;
-    llmCalls++;
-    guard?.addTokens(sid, screen.tokens);
-    crisisScreen = { route: screen.route, reason: screen.reason, error: screen.error ?? null, errorCode: screen.errorCode ?? null, raisedFrom: null, awaited: true };
-    if (screen.errorCode) console.warn(`[safety] crisis screen unavailable (${screen.errorCode}); rules only for this answer`);
-    if (!screen.route) return false;
-    // 10-14 (the owner's decision): one tablet too many that he says he took, with no symptom or danger word, is not the
-    // emergency route. The screen's prompt calls any tablets already taken an emergency, so its "emergency" would undo the
-    // rule every time; it is recorded and not applied. Its "self_harm" still raises the route (see the header)
-    if (screen.route === "emergency" && cls.reason === EXTRA_DOSE_TAKEN) {
-      crisisScreen.heldBy = cls.reason;
-      return false;
+    if (res?.frame && screenInput) {
+      const checked = checkEvidence(res.frame, screenInput);
+      evidenceMisses = checked.misses;
+      modelFrame = checked.frame;
+      frameSource = "model+rules";
+    } else {
+      modelFrame = null;
+      frameSource = "rules";
     }
-    crisisScreen.raisedFrom = cls.route;
-    // someone else's crisis: "if they might hurt themselves"; an emergency of someone else gets no R2 line (fix round 3)
-    const someoneElse = (screen.route === "self_harm" ? isThirdPersonReport(text) : aboutSomeoneElse(text)) ? ["third_person"] : [];
-    cls = { ...cls, route: screen.route, reason: screen.reason, signals: ["model_crisis_screen", ...someoneElse, ...cls.signals], questionFor: "doctor", injection: false, conflict: false };
+    harnessFrame = mergedFrame(rules);
+  };
+  /**
+   * The rules' frame as a floor, merged with the model's. One adjustment first: a wish to die that only the rules' frame calls
+   * "active" while classify.ts's own self-harm rules (with their reviewed exceptions: "doesn't want to live in a nursing
+   * home", "with my son") did not route it there is a cue, not a statement: "unclear", so the ladder asks him (the confirm
+   * question, the helplines visible) instead of answering as if he had said it. And one medicine per word he said (risk/
+   * pathways.ts oneMedicinePerWord: 降压药 is one medicine he did not name, not both of his blood-pressure medicines), before
+   * the frame is decided on or stored
+   */
+  const mergedFrame = (rules: Frame): Frame => {
+    const floor: Frame =
+      rules.selfHarm.ideation === "active" && rulesRouteNow() !== "self_harm" ? { ...rules, selfHarm: { ...rules.selfHarm, ideation: "unclear" } } : rules;
+    return oneMedicinePerWord(modelFrame ? mergeFrames(floor, modelFrame) : floor);
+  };
+  /**
+   * The urgent signs only cue words saw (risk/pathways.ts DecideContext.cueOnly): in the rules' frame, but neither among the
+   * crisis rules' signals nor in the model's frame
+   */
+  const cueOnlyKinds = (frame: Frame): string[] => {
+    const ruleKinds = new Set((ruled?.signals ?? []).map((sg) => SIGNAL_KIND[sg]).filter(Boolean));
+    // (round 2: with no model frame, a kind the rules' frame says is happening now stands: "Since lunch my right side is
+    // very heavy" is 995 now offline, "my arm went funny" is the safety line. A model that read his words and named no
+    // such sign has the last word: a tingly face is not 995 now)
+    const saysNow = (k: string) => !modelFrame && frame.symptoms.some((sy) => sy.kind === k && sy.now === "yes");
+    return [...new Set(frame.symptoms.map((sy) => sy.kind))].filter(
+      (k) => CUE_DEMOTED_KINDS.includes(k) && !ruleKinds.has(k) && !(modelFrame?.symptoms.some((sy) => sy.kind === k) ?? false) && !saysNow(k),
+    );
+  };
+  /** The rules' frame now, for an answer the rules already made a crisis (995 and the helplines never wait for a model). */
+  const provisionalRisk = async (): Promise<void> => {
+    if (reply || harnessFrame) return;
+    harnessFrame = mergedFrame(await rulesFrameNow());
+    frameSource = "rules";
+  };
+  /** The rules' own route: what they found (on any reading of his words), or what crisis words raised with no model. */
+  const rulesRouteNow = (): Route | null => (rulesOnlyCue ? cls.route : (ruled?.route ?? null));
+  /** Decide with the frame as it stands (risk/table.ts). */
+  const decideNow = async (): Promise<Decision | null> => {
+    if (reply) return decision;
+    // (the floor is read again now: the rules-only cue words may have raised the route since the frame settled)
+    const frame = mergedFrame(await rulesFrameNow());
+    harnessFrame = frame;
+    watch = await watchP;
+    const reading = findReading(text);
+    const asked = amountQuestion(variants, isQuestion(text) || /[?？]/.test(text));
+    const named = targetDrugs(text, ctx);
+    // a side effect he describes: his words name the symptom (SYMPTOM_WORDS), the frame files it as one of the everyday kinds
+    // and names a medicine. (The first live run, 10-16: the screen filed the reading in 「今天 150/95，我能不能多吃一粒？」 as a
+    // symptom "other" with his medicine, and the hero question got the side-effect lines and question)
+    const mild = SYMPTOM_WORDS.test(text) && frame.symptoms.some((sy) => ["dizziness", "swelling", "headache"].includes(sy.kind));
+    // (or any everyday symptom, a cough, poor sleep, his head spinning, said to have come since a new or changed medicine)
+    const since = SINCE_MEDICINE_WORDS.some((re) => re.test(text)) && frame.symptoms.some((sy) => ["dizziness", "swelling", "headache", "other"].includes(sy.kind));
+    decideCtx = {
+      watch: watch.on,
+      frameSource,
+      rules: {
+        route: rulesRouteNow(),
+        reason: ruled?.reason ?? null,
+        signals: ruled?.signals ?? [],
+        topics: ruled?.topics ?? cls.topics,
+        // (round 2, 10-16: the rules' own answer is the fixed "call 995 now": a crisis rule fired on his words, not cue words
+        // alone, and its sign is not one kept for his doctor, or it is an overdose. The table says level 1 then (row
+        // rules-995-now), so the record says what his screen shows; the harness never lowers the rules' 995)
+        now995:
+          (ruled?.route === "emergency" && (ruled.signals.includes("overdose") || signalFamily(ruled.signals, text) === null)) ||
+          (!!rulesOnlyCue && cls.route === "emergency" && cls.signals.includes("overdose")),
+        selfHarmCue: selfHarmCueOnly,
+      },
+      readingAboveLine:
+        (ruled?.signals ?? []).includes("above_doctor_threshold") || (!!reading && ctx.doctorThresholdSystolic !== null && reading.systolic > ctx.doctorThresholdSystolic),
+      // (a reading he only supposes, "if it is two hundred", is a question about it, not one he has)
+      readingVeryHigh: frame.when !== "hypothetical" && veryHighReading(text),
+      readingSignWords: READING_SIGN_WORDS.some((re) => re.test(text)),
+      meds: medChoices,
+      fits: ctx.meds.filter((m) => m.drug_id && named.includes(m.drug_id)).map((m) => m.id),
+      due: ctx.meds.filter((m) => isDue(m, day)).map((m) => m.id),
+      asksAmount: asked.any,
+      asksLargeAmount: asked.large,
+      sideEffect:
+        SIDE_EFFECT_ASK.test(text) ||
+        (cls.topics.includes("side_effects") && SYMPTOM_WORDS.test(text)) ||
+        ((mild && frame.medicines.length > 0) || since) && frame.when !== "hypothetical",
+      // (round 2: the topic table's "missed" is any "forget" or "miss"; for the pathway it needs a medicine, a dose or taking
+      // it in his words, as "Siao liao, I forget where I put my spectacles" shows. rules-floor.ts missedDoseQuote reads the
+      // missed dose itself)
+      missedDose: (cls.topics.includes("missed") && MEDICINE_OR_DOSE.test(text)) || !!missedDoseQuote(text),
+      history: harnessHistory(recent, day),
+      cueOnly: cueOnlyKinds(frame),
+      accidental: ACCIDENTAL.test(text),
+      continuing: null,
+      // (round 2: the question his last answer left waiting, which this message does not answer as a tap; typed words that
+      // answer it make this a reply below, typedFill)
+      ignored: (() => {
+        const waiting = latestPending(recent, nowMs);
+        return waiting?.ok ? { pathway: waiting.record.state.pathway, question: waiting.record.followUp.templateId } : null;
+      })(),
+    };
+    decideAnswers = {};
+    decision = decide(frame, {}, decideCtx);
+    return decision;
+  };
+  /**
+   * Typed or spoken words that answer the question still waiting (risk/pathways.ts optionsForFact): this message's frame fills
+   * that question's fact, and the rules did not make the words a crisis of their own (the floor). The pathway then continues
+   * as for a tap, with the waiting frame raised by this one (risk/merge.ts: the higher wins).
+   */
+  const typedFill = (): boolean => {
+    if (reply || !harnessFrame || !decideCtx || crisisRank(cls.route) > 0) return false;
+    const waiting = latestPending(recent, nowMs);
+    if (!waiting?.ok) return false;
+    const st = waiting.record.state;
+    const q = waiting.record.followUp.templateId;
+    if (!isQuestionId(q)) return false;
+    const merged = mergeFrames(st.frame, harnessFrame);
+    const probe = decide(merged, st.answers, { ...decideCtx, continuing: st.pathway }, st.values);
+    const ids = optionsForFact(q, probe.facts[QUESTION_FACT[q]]);
+    if (!ids) return false;
+    reply = { lookup: waiting, optionIds: ids, typed: true };
+    continuing = st;
+    decideAnswers = { ...st.answers, [q]: ids };
+    harnessFrame = merged;
+    decideCtx = {
+      ...decideCtx,
+      rules: { route: st.origin.rulesRoute, reason: st.origin.reason, signals: st.origin.signals, topics: st.origin.topics },
+      readingAboveLine: st.context.readingAboveLine,
+      fits: st.context.fits,
+      watch: st.context.watch || watch.on,
+      history: harnessHistory(recent, day, { continuing: st.pathway, answering: waiting.record.followUp.id }),
+      cueOnly: st.context.cueOnly ?? [],
+      accidental: st.context.accidental ?? false,
+      continuing: st.pathway,
+      ignored: null,
+    };
+    decision = decide(merged, decideAnswers, decideCtx, st.values);
+    cls = replyClassification(decision, st);
     return true;
+  };
+  /** Who raised the route, and from what (the record and the backstage). */
+  let harnessRaise: { from: Route; row: string } | null = null;
+  /**
+   * The decision's route (never lower than the rules' or the classification's): the ladder's thoughts or danger -> the
+   * self-harm route (the helplines); a level-1 row -> the emergency route (995 now), also for a sign the rules kept for his
+   * doctor (the conditional answer becomes 995 now: the owner's 10-14 rule depends on "now" and "how long", the table's
+   * chest rows); a statement whose pathway is at level 2 or 3 -> the route of that pathway's answer ("Noted." alone is below
+   * level 3: the research report). An emergency answer keeps its route when the ladder is up too (its 995 line stays first;
+   * the helplines are added: applyDecision). True when the answer must be composed again.
+   */
+  const applyRaise = (): boolean => {
+    const raised = raiseFor();
+    // (the backstage reads who raised the route from the crisis screen's record: it says so for the harness too)
+    if (raised && harnessRaise && crisisScreen) crisisScreen = { ...crisisScreen, route: cls.route === "self_harm" || cls.route === "emergency" ? cls.route : null, raisedFrom: harnessRaise.from };
+    return raised;
+  };
+  const raiseFor = (): boolean => {
+    const d = decision;
+    if (!d || reply) return false;
+    const ladderUp = d.ladder === "thoughts" || d.ladder === "danger";
+    // (round 2: someone else's self-harm signal he reports, row self-harm-someone-else: the self-harm answer about someone
+    // else, as the rules give it; his own ladder stays at none, so no watch state for him and no notice to his family)
+    if (d.ladderRow?.show.includes("self_harm_995_other") && crisisRank(cls.route) === 0) {
+      harnessRaise = { from: cls.route, row: d.ladderRow.id };
+      cls = { ...cls, route: "self_harm", reason: `harness:${d.ladderRow.id}`, signals: ["self_harm", "harness", "third_person"], questionFor: "doctor", injection: false, conflict: false };
+      return true;
+    }
+    if (ladderUp && cls.route !== "self_harm" && cls.route !== "emergency") {
+      harnessRaise = { from: cls.route, row: d.ladderRow?.id ?? "" };
+      cls = {
+        ...cls,
+        route: "self_harm",
+        reason: `harness:${d.ladderRow?.id}`,
+        signals: ["self_harm", "harness", ...cls.signals.filter((sg) => sg !== "third_person")],
+        questionFor: "doctor",
+        injection: false,
+        conflict: false,
+      };
+      return true;
+    }
+    if (d.level === 1 && crisisRank(cls.route) === 0) {
+      harnessRaise = { from: cls.route, row: d.medicalRow.id };
+      cls = {
+        ...cls,
+        route: "emergency",
+        reason: `harness:${d.medicalRow.id}`,
+        signals: ["harness", ...levelOneSignals(d), ...cls.signals.filter((sg) => sg !== "overdose")],
+        questionFor: "doctor",
+        injection: false,
+        conflict: false,
+      };
+      return true;
+    }
+    if (d.level === 1 && cls.route === "emergency" && !cls.signals.includes("overdose") && signalFamily(cls.signals, text)) {
+      harnessRaise = { from: cls.route, row: d.medicalRow.id };
+      const more = d.medicalRow.pathway === "reading_high" ? ["high_bp_symptom"] : [];
+      cls = { ...cls, signals: [...new Set([...cls.signals, ...more, "harness"])] };
+      return true;
+    }
+    if (cls.route === "log_only" && !ladderUp && d.level >= 2 && d.level <= 3) {
+      const from = cls.route;
+      const reroute = (route: Route, reason: string, more: Partial<Classification>): boolean => {
+        harnessRaise = { from, row: d.medicalRow.id };
+        cls = { ...cls, route, reason, questionFor: "doctor", injection: false, conflict: false, ...more, signals: [...(more.signals ?? cls.signals), "harness"] };
+        return true;
+      };
+      switch (d.pathway) {
+        case "extra_dose":
+          return reroute("refuse_route", EXTRA_DOSE_TAKEN, { topics: [...new Set([...cls.topics, "dose_change"])], signals: ["extra_dose_taken"] });
+        case "stop_change":
+          return reroute("refuse_route", "harness:stop_change", { topics: [...new Set([...cls.topics, "stopping"])], signals: ["stopping"] });
+        case "side_effect":
+          return reroute("explain", "harness:side_effect", { topics: [...new Set([...cls.topics, "side_effects"])], signals: ["explain"] });
+        case "looks_different":
+          return reroute("uncertain", "harness:looks_different", { topics: [], drugs: cls.drugs, signals: ["looks_different"], questionFor: "pharmacist" });
+        case "chest":
+          return reroute("emergency", "harness:chest", { signals: ["chest", ...cls.signals.filter((sg) => sg === "third_person")] });
+        default:
+          return false;
+      }
+    }
+    return false;
   };
   /**
    * Why no crisis screen vouched for this answer, or null when one did: "offline" (mock: the rules are the only
@@ -987,20 +1535,29 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
    * gets the safety line with the helplines (below). Never lowers a route. True when it raised the route.
    */
   let rulesOnlyCue: { from: Route; kinds: string[]; gap: string } | null = null;
+  /**
+   * Round 2 (10-16, the eval line's offline run: "Wah today so hot, die liao", 「熱到死」 and "Today is my late husband's
+   * birthday" reached "thoughts" and told his family): cue words alone never reach "thoughts", never tell his family and
+   * never make a sign 995 now by themselves. Self-harm cue words in a statement keep its route and give the ladder's
+   * "possible" step (DecideContext.rules.selfHarmCue, row self-harm-cue: the safety line, the helplines, the confirm
+   * question); about someone else, the answer for them (row self-harm-someone-else). A body sign the cue words name is in
+   * the rules' frame too (rules-floor.ts reads the same words): its pathway asks its question (chest pain, breathlessness),
+   * and a stroke sign, a collapse or bleeding is 995 now when the frame says it is happening now (DecideContext.cueOnly).
+   * Only the word "overdose" still raises the route itself: an overdose said is one taken (B1-12), and it has no question
+   * before its 995 line.
+   */
+  let selfHarmCueOnly = false;
   const applyRulesOnlyCue = (): boolean => {
-    if (SCREEN_SKIP.includes(cls.route)) return false;
+    // (never on a reply: a button's words, "Chest pain, or short of breath", are his answer, not a new message)
+    if (reply || SCREEN_SKIP.includes(cls.route)) return false;
     const gap = screenGap();
     if (!gap) return false;
-    const kinds = emergencyCue(text);
-    const selfHarmNote = cls.route === "log_only" && selfHarmCue(text);
-    if (!selfHarmNote && kinds.length === 0) return false;
+    if (cls.route === "log_only" && selfHarmCue(text)) selfHarmCueOnly = true;
+    const kinds = emergencyCue(text).filter((k) => k === "overdose");
+    if (kinds.length === 0) return false;
     rulesOnlyCue = { from: cls.route, kinds, gap };
-    if (selfHarmNote) {
-      cls = { ...cls, route: "self_harm", reason: "rule:self_harm_cue", signals: ["self_harm_cue", ...(isThirdPersonReport(text) ? ["third_person"] : []), ...cls.signals], questionFor: "doctor", injection: false, conflict: false };
-    } else {
-      const someoneElse = aboutSomeoneElse(text) ? ["third_person"] : [];
-      cls = { ...cls, route: "emergency", reason: "rule:emergency_cue", signals: ["emergency_cue", ...kinds, ...someoneElse, ...cls.signals], questionFor: "doctor", injection: false, conflict: false };
-    }
+    const someoneElse = aboutSomeoneElse(text) ? ["third_person"] : [];
+    cls = { ...cls, route: "emergency", reason: "rule:emergency_cue", signals: ["emergency_cue", ...kinds, ...someoneElse, ...cls.signals], questionFor: "doctor", injection: false, conflict: false };
     console.warn(`[safety] no crisis screen (${gap}); crisis words raised ${rulesOnlyCue.from} to ${cls.route}`);
     return true;
   };
@@ -1011,12 +1568,18 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
       : spendCapped
         ? "; per-person model spend cap reached, rules only"
         : crisisScreen?.errorCode
-        ? `; crisis screen unavailable (${crisisScreen.errorCode}), rules only`
-        : crisisScreen?.raisedFrom
-          ? `; raised from ${crisisScreen.raisedFrom} by the crisis screen`
+        ? `; risk screen unavailable (${crisisScreen.errorCode}), the rules' frame only`
+        : harnessRaise
+          ? `; raised from ${harnessRaise.from} by the harness (${harnessRaise.row})`
           : "";
     const cueNote = rulesOnlyCue ? `; raised from ${rulesOnlyCue.from} by crisis words, no crisis screen (${rulesOnlyCue.gap})` : "";
-    pub(sid, "ask.route", `Route: ${cls.route} (${cls.reason}${note}${cueNote})`, {
+    // (the harness's decision as codes: level, ladder step, the table rows, where the frame came from; never a word of the
+    // model's or of his)
+    const harness = decision
+      ? { level: decision.level, ladder: decision.ladder, rows: decision.rows, frameSource, raisedFrom: harnessRaise?.from ?? null, reply: reply ? (reply.typed ? "typed" : "tap") : null }
+      : null;
+    const harnessNote = decision ? `; harness level ${decision.level}, ladder ${decision.ladder} (${decision.rows.join(", ")}; ${frameSource})` : "";
+    pub(sid, "ask.route", `Route: ${cls.route} (${cls.reason}${note}${cueNote}${harnessNote})`, {
       route: cls.route,
       reason: `${cls.reason}${note}${cueNote}`,
       signals: cls.signals,
@@ -1024,23 +1587,64 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
       drugs: cls.drugs,
       crisisScreen,
       rulesOnlyCue,
+      harness,
     });
   };
 
-  // no crisis screen at all (offline mock, the question limit): the rules are the only screen from the start
-  if (!screenP) applyRulesOnlyCue();
+  // no model reads his words at all (offline mock, the question limit, no consent, the spend cap): the rules are the only
+  // screen from the start
+  if (!riskP) applyRulesOnlyCue();
+  /**
+   * The harness: whether his family is told, so the answer may say so (an account with an active care link: lib/care/told.ts),
+   * for his own answer on the ladder (thoughts, danger), and on a reply only when it raises what was decided before (his
+   * family heard about the first answer already)
+   */
+  let tellLine = false;
+  const prepareTell = async (): Promise<void> => {
+    const d = decision;
+    tellLine = false;
+    if (!d || !(d.ladder === "thoughts" || d.ladder === "danger")) return;
+    if (session.kind !== "account" || !session.owner_user_id || (input.role && input.role !== "patient") || cls.signals.includes("third_person")) return;
+    if (continuing && !raisesOver(d, continuing.decided)) return;
+    try {
+      tellLine = await (deps.hasFamily ?? (async (s: SessionRow) => (await hisCareLinks(store, s)).length > 0))(session);
+    } catch {
+      tellLine = false;
+    }
+  };
+  /**
+   * An answer already a crisis (the rules' emergency or self-harm route, or the model's classification) never waits for the
+   * risk screen before its lines: it is composed from the rules' frame and its 995 and helpline lines go out at once. The
+   * screen's frame comes in beside the crisis wording (below): it settles the record and the follow-up question, and it can
+   * only raise (a sign kept for his doctor becomes 995 now; the self-harm answer's 995 line becomes 995 now at danger)
+   */
+  const crisisAlready = !reply && (cls.route === "self_harm" || cls.route === "emergency");
   // an answer with a model call of its own composes alongside the screen; any other waits for the screen first
   // (a statement's note is written only when it is not a crisis; one tablet too many and Ripple's words about itself are fixed
-  // lines, no generator)
+  // lines, no generator; a reply to a follow-up question is fixed lines)
   const generates =
-    cls.route === "explain" ||
-    cls.route === "uncertain" ||
-    (cls.route === "refuse_route" && !cls.injection && cls.reason !== EXTRA_DOSE_TAKEN) ||
-    (cls.route === "logistics" && !cls.topics.includes("recording") && !cls.topics.includes("refill") && cls.reason !== ABOUT_RIPPLE);
+    !reply &&
+    (cls.route === "explain" ||
+      cls.route === "uncertain" ||
+      (cls.route === "refuse_route" && !cls.injection && cls.reason !== EXTRA_DOSE_TAKEN) ||
+      (cls.route === "logistics" && !cls.topics.includes("recording") && !cls.topics.includes("refill") && cls.reason !== ABOUT_RIPPLE));
   if (!generates) {
-    await settleScreen();
+    if (crisisAlready) await provisionalRisk();
+    else await settleRisk();
     applyRulesOnlyCue();
+    await decideNow();
+    if (!typedFill()) applyRaise();
+    await prepareTell();
     publishRoute();
+  }
+
+  // the harness, for an answer with a model call of its own: a first decision from the rules' frame now (the screen's frame
+  // settles it after composing). A side effect he describes brings his sources' side-effect lines with it, as a question
+  // with the words "side effect" does (「吃了药以后头有点晕，正常吗」: the leaflet's line, his doctor's words about it, the question for
+  // his doctor)
+  if (generates) {
+    await decideNow();
+    if (decision?.pathway === "side_effect" && !cls.topics.includes("side_effects")) cls = { ...cls, topics: [...cls.topics, "side_effects"] };
   }
 
   // ---- 2. candidates
@@ -1075,7 +1679,8 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
       }
     : undefined;
   const generalP: Promise<GeneralOutcome> | null =
-    !offlineWhy && !cls.injection && generalRoute(cls.route)
+    // (never under the harness's pharmacist referral for a medicine that looks different: that answer is the referral)
+    !offlineWhy && !cls.injection && generalRoute(cls.route) && cls.reason !== "harness:looks_different"
       ? writeGeneral({
           locale,
           question: text,
@@ -1134,7 +1739,42 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     const zh = signalRecordedText("zh-Hans", signalMomentWords("zh-Hans", when));
     const c: Candidate = { sourceId: `signal:${signalNote.id}`, kind: "log", span: en, spanZh: zh, topics: ["signal"], cite: { day, date: when.date } };
     byId.set(c.sourceId, c);
+    keptLine = { sourceId: c.sourceId, en, zh, day, date: when.date };
     return { speechAct: "logistics", sourceId: c.sourceId, span: en, slots: {}, en, zh, templateId: SIGNAL_RECORDED.id, cite: c.cite };
+  };
+  /** The "kept for your doctor" line as it was shown (the harness keeps it with a waiting question: a reply shows it again). */
+  let keptLine: PathwayState["kept"] | null = continuing?.kept ?? null;
+
+  /**
+   * One fixed line a decision-table row shows (kb/pathways.json `show`), as a sentence of this answer, or null when it does
+   * not apply here: Care Corner only in the Mandarin UI; "I've let your family know" only when his family is told
+   * (prepareTell); the plain 995 line cites the row's own B1 source (else the referral for the answer's signals); the
+   * self-harm 995 line speaks of "them" for someone else's crisis; "kept for your doctor" only as it was shown.
+   */
+  const harnessLine = (id: string, d: Decision): Sentence | null => {
+    if (id === SIGNAL_RECORDED.id) {
+      if (!keptLine) return null;
+      const k = keptLine;
+      const c: Candidate = { sourceId: k.sourceId, kind: "log", span: k.en, spanZh: k.zh, topics: ["signal"], cite: { day: k.day, date: k.date } };
+      byId.set(c.sourceId, c);
+      return { speechAct: "logistics", sourceId: c.sourceId, span: k.en, slots: {}, en: k.en, zh: k.zh, templateId: SIGNAL_RECORDED.id, cite: c.cite };
+    }
+    if (!(id in TEMPLATES)) return null;
+    const tid = id as TemplateId;
+    if (tid === "self_harm_care_corner" && locale !== "zh-Hans") return null;
+    if (tid === "self_harm_family_told" && !tellLine) return null;
+    if (tid === "emergency_995") return tpl("emergency_995", /^B1-\d+$/.test(d.medicalRow.source) ? d.medicalRow.source : emergencyReferralFor(cls.signals));
+    if (tid === "self_harm_995" && cls.signals.includes("third_person")) return tpl("self_harm_995_other", TEMPLATES.self_harm_995_other.referralId);
+    return tpl(tid, TEMPLATES[tid].referralId);
+  };
+  /** The lines of a list of row line ids (harnessLine), in order, each once. */
+  const harnessLines = (ids: readonly string[], d: Decision): Sentence[] => {
+    const out: Sentence[] = [];
+    for (const id of ids) {
+      const line = harnessLine(id, d);
+      if (line && !out.some((o) => o.templateId === line.templateId)) out.push(line);
+    }
+    return out;
   };
 
   // ---- 3. compose
@@ -1199,6 +1839,30 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     safetyLine = null;
     answeredBefore = null;
     ledBy = null;
+    // the harness: a reply to a follow-up question is the decision's own lines (kb/pathways.json `show`), nothing composed
+    // from his sources and no question added: 995 now (with his doctor's warning line for his own chest pain, stroke sign or
+    // reading, as the emergency answer has it), the helplines, a level's fixed lines, the leaflet's missed-dose line for the
+    // medicine he picked, or "Noted." when the row adds nothing
+    if (reply && decision) {
+      const d = decision;
+      const lines = harnessLines(d.show, d);
+      const someoneElse = cls.signals.includes("third_person");
+      if (d.level === 1 && !someoneElse && warn && clinicianAttribution(warn.speaker) && (d.pathway === "chest" || d.pathway === "reading_high" || d.medicalRow.id === "stroke-now")) {
+        const w = warningLine(session, warn, locale);
+        byId.set(w.candidate.sourceId, w.candidate);
+        lines.splice(Math.min(1, lines.length), 0, w.sentence);
+      }
+      if (d.pathway === "missed_dose" && continuing) {
+        const picked = chosenMedicines(reply.optionIds, continuing.values)
+          .map((id) => ctx.meds.find((m) => m.id === id)?.drug_id)
+          .filter((x): x is string => !!x);
+        for (const c of cands.list) {
+          if (c.kind === "patient_text" && c.topics?.includes("missed") && (c.drugs ?? []).some((dg) => picked.includes(dg))) lines.push(fromCandidate(c));
+        }
+      }
+      content = lines.length ? lines : [tpl("noted")];
+      return;
+    }
     // C2: a question of his that the doctor (or pharmacist) already answered, asked again: their answer comes first
     // (10-14: not for one tablet too many. That is something that happened, for his doctor to hear: never "answered
     // before", always on the list. Nor for what X is for, X none of his medicines: matchAnswered would compare his
@@ -1234,7 +1898,13 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     };
     switch (route) {
       case "self_harm":
-        content = selfHarmTemplateIds(locale, cls.signals.includes("third_person")).map((id) => tpl(id, TEMPLATES[id].referralId));
+        // the harness's ladder at thoughts or danger: its lines (the helplines as before, then "I'm here", his family told, his
+        // doctor; at danger 995 first without a condition); the rules' self-harm answer is the first lines of the thoughts row,
+        // so nothing it showed is ever dropped
+        content =
+          decision && (decision.ladder === "thoughts" || decision.ladder === "danger")
+            ? harnessLines(decision.show, decision)
+            : selfHarmTemplateIds(locale, cls.signals.includes("third_person")).map((id) => tpl(id, TEMPLATES[id].referralId));
         break;
       case "emergency": {
         // an overdose: his own gets "If you took more ..." (B1-12); a child who swallowed his tablets "Call 995 now" with the
@@ -1246,9 +1916,21 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
         // (templates.ts SIGNAL_995): a symptom: kept, the doctor's line, 995 if ...; a reading alone: the doctor's line
         // first (as on the blood pressure page), kept, 995 if very unwell. No question: it is something to tell the doctor.
         // Everything else, and a sign whose note could not be written, keeps the fixed 995 sentence as before
-        const family = cls.signals.includes("overdose") ? null : signalFamily(cls.signals, text);
+        // (the harness: a level-1 decision makes the sign kept for his doctor 995 now: chest pain still there for minutes, a
+        // stroke sign not over, a reading above his doctor's line with a red flag)
+        // (round 2, 10-16: a level-1 row that also keeps the sign for his doctor, a stroke sign that has passed: its own lines
+        // in its order, the 995-now line first, then the note with its time, then his doctor's warning line)
+        const keepsAt1 = decision?.level === 1 && decision.medicalRow.show.includes(SIGNAL_RECORDED.id);
+        const family = cls.signals.includes("overdose") || (decision?.level === 1 && !keepsAt1) ? null : signalFamily(cls.signals, text);
         const kept = family ? await keepSignal(family) : null;
-        if (family && kept) {
+        if (decision && keepsAt1 && kept) {
+          content = harnessLines(decision.medicalRow.show, decision);
+          if (warn && clinicianAttribution(warn.speaker)) {
+            const w = warningLine(session, warn, locale);
+            byId.set(w.candidate.sourceId, w.candidate);
+            content.push(w.sentence);
+          }
+        } else if (family && kept) {
           content = [kept];
           if (warn && clinicianAttribution(warn.speaker)) {
             const w = warningLine(session, warn, locale);
@@ -1277,7 +1959,7 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
           // 10-14 (the owner's decision): a reading above the doctor's own number and nothing else (no chest pain, no stroke
           // sign, no other emergency signal): his doctor's words and their recording come first, the 995 template after
           // them (the blood pressure page shows the same order: threshold.ts). Every other emergency keeps 995 first
-          const readingAlone = cls.signals.includes("above_doctor_threshold") && cls.signals.every((sg) => READING_ONLY_SIGNALS.includes(sg));
+          const readingAlone = decision?.level !== 1 && cls.signals.includes("above_doctor_threshold") && cls.signals.every((sg) => READING_ONLY_SIGNALS.includes(sg));
           if (readingAlone) content.unshift(w.sentence);
           else content.push(w.sentence);
         }
@@ -1434,6 +2116,15 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
         break;
       }
       case "uncertain": {
+        if (cls.reason === "harness:looks_different") {
+          // the harness (level 2; ISMP): a medicine that looks different from before, said as a statement. Check with the
+          // pharmacist before taking them, and the question goes on his pharmacist's list; nothing composed from his sources
+          // (the leaflet's words about the medicine are not about this tablet's look)
+          content = [tpl("looks_different_pharmacist")];
+          tail = [tpl("added_for_pharmacist")];
+          question = { for: "pharmacist", origin: "own" };
+          break;
+        }
         content = await runGenerator(cls.topics);
         tail.push(tpl(cls.conflict ? "uncertain_conflict" : aiAllowed ? "uncertain_no_source" : "no_ai_consent"));
         question = { for: cls.questionFor, origin: "refused_question" };
@@ -1467,14 +2158,98 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
     }
   };
 
+  /**
+   * The harness's decision on a composed answer that is not a reply (the route itself was raised by applyRaise):
+   *   - ladder "possible": the fixed safety line and the helplines before anything else, and the confirm question after the
+   *     answer; for a lethality question, saved-up tablets or any amount with the watch state on (decision.noAmounts) the
+   *     composed lines go entirely (no label, no dose line, no number of tablets, no referral) and nothing goes on his list;
+   *   - an emergency answer with the ladder at thoughts or danger: the ladder's lines after its 995 line;
+   *   - level 2 or 3 below a crisis: the row's lines the answer does not carry yet. A line with 995 in it stands first for
+   *     chest pain, breathing and a reading (a body sign), else last among the answer's own lines; a referral line ("I've
+   *     added this ...") at the end; and the row's question for his doctor or pharmacist when the answer adds none of its own.
+   * Level 4 adds nothing: the ordinary answer stands.
+   */
+  const applyDecision = () => {
+    const d = decision;
+    if (!d || reply) return;
+    const has = (id: string) => [...content, ...tail].some((s) => s.templateId === id);
+    // no amount on his screen (decision.noAmounts, round 2: whatever the route). A lethality question, saved-up tablets, or
+    // any amount asked with the watch state on: nothing composed stays (no label, no dose line, no number of tablets, no
+    // referral, nothing on his list). Anything else on the ladder (a large amount asked with no model to read it, low mood,
+    // cue words): the composed answer stays without its label lines and any line with an amount in it (the doctor's dose
+    // line among them). A crisis answer's fixed lines carry no amount
+    let cleared = false;
+    if (d.noAmounts && crisisRank(route) === 0) {
+      const lethal = ["yes", "unclear"];
+      const aboutAmount =
+        lethal.includes(String(d.facts["selfHarm.lethalityQuestion"])) || lethal.includes(String(d.facts["selfHarm.means"])) || (d.facts.watch === true && d.facts["asks.amount"] === true);
+      if (aboutAmount) {
+        cleared = true;
+        content = [];
+        tail = [];
+        question = null;
+        refusedRequest = undefined;
+        answeredBefore = null;
+        ledBy = null;
+      } else {
+        const amountLine = (s: Sentence) => byId.get(s.sourceId)?.kind === "label" || AMOUNT_WORDS.some((re) => re.test(s.en) || (!!s.zh && re.test(s.zh)));
+        content = content.filter((s) => !amountLine(s));
+        tail = tail.filter((s) => !amountLine(s));
+      }
+    }
+    if (d.ladder === "possible") {
+      const lines = harnessLines(d.ladderRow?.show ?? [], d);
+      const ids = new Set(lines.map((s) => s.templateId));
+      content = [...lines, ...content.filter((s) => !ids.has(s.templateId))];
+      tail = tail.filter((s) => !ids.has(s.templateId));
+      safetyLine = { reason: "harness_possible", helplines: true };
+    }
+    if (route === "emergency" && (d.ladder === "thoughts" || d.ladder === "danger")) {
+      for (const line of harnessLines(d.ladderRow?.show ?? [], d)) {
+        if (line.templateId === "self_harm_danger_995" && content.some((s) => s.templateId === "emergency_995" || s.templateId === "emergency_overdose")) continue;
+        if (!has(line.templateId ?? "")) content.push(line);
+      }
+    }
+    if (crisisRank(route) === 0 && (d.level === 2 || d.level === 3) && d.ladder !== "thoughts" && d.ladder !== "danger" && !cleared) {
+      const body = d.pathway === "chest" || d.pathway === "breathing" || d.pathway === "reading_high";
+      // (a sign that has passed, a row of no pathway of its own that names a symptom: collapse-passed. Its lines are the
+      // answer, in their order, before the note: "see a doctor today", then the 995 signs)
+      const passed = d.medicalRow.pathway === "general" && Object.keys(d.medicalRow.when).some((k) => k.startsWith("symptoms."));
+      if (passed) {
+        const lines = harnessLines(d.medicalRow.show.filter((id) => id !== SIGNAL_RECORDED.id && !has(id)), d);
+        content = [...lines, ...content];
+      }
+      for (const id of passed ? [] : d.medicalRow.show) {
+        if (id === SIGNAL_RECORDED.id || has(id)) continue;
+        // (the dose-change referral belongs to a refused request; on any other route it would say a question was refused)
+        if (id === "refer_doctor" && route !== "refuse_route") continue;
+        const line = harnessLine(id, d);
+        if (!line) continue;
+        if (line.en.includes("995")) {
+          if (body) content.unshift(line);
+          else content.push(line);
+        } else {
+          tail.push(line);
+        }
+      }
+      if (d.question) question ??= { for: d.question, origin: "own" };
+    }
+  };
+
   await compose();
   if (generates) {
-    // the screen ran alongside the generator; a crisis (the screen's, or crisis words with no screen) drops the composed
-    // answer for the crisis templates
-    const raised = await settleScreen();
-    if (raised || applyRulesOnlyCue()) await compose();
+    // the screen ran alongside the generator; a crisis (the harness's decision, or crisis words with no model) drops the
+    // composed answer for the crisis templates, and a statement's pathway, or typed words that answer the waiting question,
+    // compose it again
+    await settleRisk();
+    const cue = applyRulesOnlyCue();
+    await decideNow();
+    const raised = typedFill() || applyRaise();
+    await prepareTell();
+    if (raised || cue) await compose();
     publishRoute();
   }
+  applyDecision();
   // The demo's check drill (AskDeps.plant): the one sentence no source says joins the composed answer here, whoever
   // composed it, citing the answer's first source (else the first candidate) the way a careless model would. From here on
   // it is a sentence like any other: enriched as a model's wording, then the three checks. Only an answer made from his
@@ -1482,10 +2257,13 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   // and the app's own answers about sharing, refills and itself are fixed sentences and stay as they are.
   let planted = false;
   const composes =
-    route === "explain" ||
+    !reply &&
+    cls.reason !== "harness:looks_different" &&
+    !(decision?.noAmounts && decision.ladder !== "none") &&
+    (route === "explain" ||
     route === "uncertain" ||
     (route === "refuse_route" && !cls.injection && !cls.signals.includes("special_diet") && cls.reason !== EXTRA_DOSE_TAKEN) ||
-    (route === "logistics" && !cls.topics.includes("recording") && !cls.topics.includes("refill") && cls.reason !== ABOUT_RIPPLE);
+      (route === "logistics" && !cls.topics.includes("recording") && !cls.topics.includes("refill") && cls.reason !== ABOUT_RIPPLE));
   if (deps.plant && composes) {
     const first = content.find((s) => s.origin !== "template" && byId.has(s.sourceId));
     const source = first ? byId.get(first.sourceId) : cands.list.find((c) => !c.topics?.includes("template") && !c.topics?.includes("referral"));
@@ -1512,7 +2290,7 @@ async function answer(input: AskInput, deps: AskDeps, used: { guard: AskGuard | 
   // SSE: the route is final now (the crisis screen settled, the answer composed, the safety tail added). Ripple's own words
   // may be shown while they are written only on an answer that takes them: no crisis, no helplines, a route of that kind,
   // and offline only where no quote answers it (the mock's canned words never stand next to his sources)
-  if (sink && generalP && !generalWords.released) {
+  if (sink && generalP && !generalWords.released && !reply) {
     const helplines = [...content, ...tail].some((s) => HELPLINE_IDS.includes(s.templateId ?? ""));
     const offlineQuotes = llm.provider === "mock" && content.some((s) => s.origin !== "template" && !s.templateId);
     if (!CRISIS_ROUTES.includes(route) && generalRoute(route) && !helplines && !offlineQuotes) {
@@ -1651,7 +2429,8 @@ ${s.zh ?? ""}`).length === 0);
     // (offline, the mock's one canned answer stands only where nothing of his answers the question: an answer that quotes
     // his sources stays exactly as it was; a live model judges for itself whether its words add anything)
     const offlineQuoted = llm.provider === "mock" && shown.some((s) => s.origin !== "template" && !s.templateId);
-    if (out.answer && (crisisNow || !generalRoute(route))) {
+    // (a reply to a follow-up question is the decision's fixed lines: never with Ripple's own general words)
+    if (out.answer && (crisisNow || !generalRoute(route) || !!reply)) {
       generalRecord = { ...out.record, shown: false, why: "gate" };
     } else if (out.answer && offlineQuoted) {
       generalRecord = { ...out.record, shown: false, why: "offline_quoted" };
@@ -1675,17 +2454,49 @@ ${s.zh ?? ""}`).length === 0);
   // ---- owner 10-15: the 995 and self-harm answers in a person's words (crisis-words.ts). The fixed sentences above are
   // the answer already (and its record, fixedText); with a live model they are worded for what he said, within
   // CRISIS_WORDS_TIMEOUT_MS, keeping 995 and every number; the helplines and his doctor's line stay as they are
-  const fixedShown = shown;
+  /**
+   * The harness, after a crisis answer's lines went out: the lines it raises to, or null when the screen's frame raises
+   * nothing. A sign kept for his doctor whose decision is now level 1: the plain 995 line on the row's own B1 source, then his
+   * doctor's warning line for his own chest pain, stroke sign or reading (the emergency answer's order). The self-harm answer
+   * at danger: 995 now without a condition in place of its conditional 995 line. Fixed lines only (the words a model gave the
+   * lines before are dropped with them), each through the three checks.
+   */
+  const raiseCrisisLate = async (before: Decision | null): Promise<Sentence[] | null> => {
+    const d = decision;
+    if (!d) return null;
+    let lines: Sentence[] | null = null;
+    if (route === "emergency" && d.level === 1 && before && before.level !== 1 && shown.some((s) => s.templateId === SIGNAL_RECORDED.id)) {
+      lines = [harnessLine("emergency_995", d)!];
+      if (warn && clinicianAttribution(warn.speaker) && !cls.signals.includes("third_person")) {
+        const w = warningLine(session, warn, locale);
+        byId.set(w.candidate.sourceId, w.candidate);
+        lines.push(w.sentence);
+      }
+    } else if (route === "self_harm" && d.ladder === "danger" && before?.ladder !== "danger") {
+      const at = shown.findIndex((s) => s.templateId === "self_harm_995");
+      if (at >= 0) lines = [...shown.slice(0, at), tpl("self_harm_danger_995", TEMPLATES.self_harm_danger_995.referralId), ...shown.slice(at + 1)];
+    }
+    if (!lines) return null;
+    const { verdicts: checked } = await verifySentences(lines, { candidates: byId, checker: null, checkerReason: null });
+    return checked.map((v) => v.sentence);
+  };
+  let fixedShown = shown;
   let crisisWords: CrisisWordsRecord | null = null;
   if (route === "emergency" || route === "self_harm") {
     // (a crisis the rules found is admitted whatever his limits: answered always, but over a limit or at the spend cap no
     // model words it)
-    let crisisOffline: string | undefined = offlineWhy;
-    if (!crisisOffline && ruled && CRISIS_ROUTES.includes(ruled.route) && guard && llm.provider !== "mock") {
-      if (await guard.overLimit?.(sid)) crisisOffline = "rate_limited";
-      else if (await guard.spendCapped?.()) crisisOffline = "spend_cap";
-    }
-    const v = await voiceCrisis({ route, locale, message: text, shown, someoneElse: cls.signals.includes("third_person"), llm, offline: crisisOffline, signal: answerDeadline });
+    const crisisOffline: string | undefined = offlineWhy ?? crisisModelBlocked;
+    // (the harness: when the screen's frame may still raise this answer, a sign kept for his doctor or the self-harm answer
+    // below danger, it is waited for beside the wording, never longer than its own time)
+    const frameMayRaise =
+      crisisAlready &&
+      !!riskP &&
+      !!decision &&
+      (route === "emergency" ? decision.level !== 1 && shown.some((s) => s.templateId === SIGNAL_RECORDED.id) : decision.ladder !== "danger");
+    const [v] = await Promise.all([
+      voiceCrisis({ route, locale, message: text, shown, someoneElse: cls.signals.includes("third_person"), llm, offline: crisisOffline, signal: answerDeadline }),
+      frameMayRaise ? riskP : null,
+    ]);
     shown = v.sentences;
     crisisWords = v.record;
     // SSE: the fixed lines went out above; the person's words passed their checks and stand where they stood
@@ -1693,6 +2504,33 @@ ${s.zh ?? ""}`).length === 0);
     llmCalls += v.record.calls;
     llmTokens += v.record.tokens;
     guard?.addTokens(sid, v.record.tokens);
+  }
+  // ---- the harness: an answer already a crisis (the rules' 995 now, an overdose, the helplines; or the model's
+  // classification) went out without waiting for the risk screen (crisisAlready). If the screen's frame came in meanwhile (it
+  // started with the answer and ran beside the crisis wording), it settles the decision for the record and the follow-up
+  // question, and it only ever raises: at danger the self-harm 995 line becomes 995 now (a replacement of the sentences says
+  // so). If not, the rules' frame stands for this answer and the screen's tokens are counted when it ends, as the crisis
+  // screen's were
+  if (crisisAlready && riskP) {
+    if (await settledNow(riskP)) {
+      const before = decision;
+      await settleRisk();
+      await decideNow();
+      const raised = await raiseCrisisLate(before);
+      if (raised) {
+        shown = raised;
+        fixedShown = raised;
+        emit({ type: "replace", sentences: shown, route });
+      }
+    } else {
+      crisisScreen = { route: null, reason: "not awaited: already a crisis", error: null, errorCode: null, raisedFrom: null, awaited: false };
+      // the call was made (and is billed): it counts as a call here; its tokens reach the cost guard when it ends
+      llmCalls++;
+      void riskP.then((sc) => {
+        void guard?.addTokens(sid, sc.tokens);
+        void guard?.settle?.();
+      });
+    }
   }
 
   // ---- 7. question list
@@ -1807,7 +2645,76 @@ ${s.zh ?? ""}`).length === 0);
   const fixedTextZh =
     route === "unknown_med" ? TEMPLATES.unknown_med.zh : route === "self_harm" || route === "emergency" ? fixedShown.filter((s) => s.origin === "template").map((s) => s.zh ?? s.en).join("") : undefined;
 
+  // ---- the harness's record (risk/state.ts): output.risk, the summary in codes (the watch state reads it), and
+  // output.harness, the follow-up question this answer asks and what a reply needs to continue it. His family is told (below)
+  // on his own 995 answer and on the ladder's thoughts or danger, never on "possible"; on a reply only when it raises what
+  // was decided when the question was asked
+  const eventId = `safety-${crypto.randomUUID()}`;
+  const alarmBase = familyAlarm({ route, signals: cls.signals, role: input.role, sentences: shown });
+  const alarm = alarmBase && continuing && decision && !raisesOver(decision, continuing.decided) ? null : alarmBase;
+  const familyTold = !!alarm && session.kind === "account" && !!session.owner_user_id;
+  let followUp: FollowUp | null = null;
+  let harnessRecord: HarnessRecord | null = null;
+  let riskSummary: RiskSummary | undefined;
+  if (decision) {
+    const made = decision.ask
+      ? followUpFor(decision, { id: `${eventId}:${decision.ask.pathway}:${decision.ask.step}`, meds: medChoices, fits: decideCtx?.fits ?? continuing?.context.fits ?? [] })
+      : null;
+    const frameNow = messageFrame(harnessFrame ?? (await rulesFrameNow()));
+    let state: PathwayState | null = null;
+    if (made) {
+      followUp = made.followUp;
+      const sameSequence = !!continuing && continuing.pathway === made.followUp.pathway;
+      const reading = findReading(text);
+      state = {
+        pathway: made.followUp.pathway,
+        questionId: made.followUp.templateId,
+        answers: sameSequence ? decideAnswers : {},
+        values: made.values,
+        frame: frameCodes(frameNow),
+        frameSource,
+        originEventId: continuing?.originEventId ?? eventId,
+        origin: continuing?.origin ?? { rulesRoute: rulesRouteNow(), route, reason: cls.reason, signals: cls.signals, topics: cls.topics, drugs: cls.drugs },
+        context: continuing?.context ?? {
+          readingAboveLine: decideCtx?.readingAboveLine ?? (!!reading && ctx.doctorThresholdSystolic !== null && reading.systolic > ctx.doctorThresholdSystolic),
+          fits: decideCtx?.fits ?? [],
+          asksAmount: decideCtx?.asksAmount ?? false,
+          asksLargeAmount: decideCtx?.asksLargeAmount ?? false,
+          sideEffect: decideCtx?.sideEffect ?? false,
+          missedDose: decideCtx?.missedDose ?? false,
+          watch: watch.on,
+          cueOnly: decideCtx?.cueOnly ?? [],
+          accidental: decideCtx?.accidental ?? false,
+        },
+        decided: { level: decision.level, ladder: decision.ladder },
+        ...(keptLine ? { kept: keptLine } : {}),
+      };
+    }
+    // (set inside settleRisk: read through a cast, as TypeScript does not follow assignments made in a closure)
+    const sr = screenResult as ScreenResult | null;
+    harnessRecord = {
+      v: 1,
+      day,
+      followUp,
+      replied: reply ? { followUpId: reply.lookup.record.followUp.id, optionIds: reply.optionIds, typed: reply.typed } : null,
+      state,
+    };
+    riskSummary = {
+      level: decision.level,
+      ladder: decision.ladder,
+      rows: decision.rows,
+      frameSource,
+      ...(sr ? { screen: { provider: sr.provider, model: sr.model, ms: sr.ms, ...(sr.error ? { error: sr.error } : {}) } } : {}),
+      frame: frameCodes(frameNow),
+      ...(evidenceMisses.length ? { evidenceMisses: evidenceMisses.map((m) => ({ field: m.field, effect: m.effect })) } : {}),
+      watch: { on: watch.on, ...(watch.since ? { since: watch.since } : {}), ...(watch.reason ? { reason: watch.reason } : {}) },
+      ...(familyTold ? { familyTold: true } : {}),
+      ...(followUp ? { followUp: { pathway: followUp.pathway, step: followUp.step } } : {}),
+    };
+  }
+
   const event = await store.addSafetyEvent(sid, {
+    id: eventId,
     input: text,
     lang: inputLang,
     route,
@@ -1862,6 +2769,11 @@ ${s.zh ?? ""}`).length === 0);
       general: generalRecord,
       // owner 10-15: the 995 or self-harm lines in a person's words (crisis-words.ts), or why the fixed sentences stood
       crisisWords,
+      // the harness (2026-10-16; risk/state.ts): the decision in codes (the watch state reads it) and the pathway state a
+      // reply continues
+      ...(riskSummary ? { risk: riskSummary } : {}),
+      ...(harnessRecord ? { harness: harnessRecord } : {}),
+      ...(replyRefused ? { replyRefused } : {}),
     },
     blocked: blocked.map((b) => ({ text: b.sentence.en, sourceId: b.sentence.sourceId, layer: b.layer, reasons: b.reasons, replacedBy: b.replacedBy })),
     latency_ms: latencyMs,
@@ -1873,7 +2785,6 @@ ${s.zh ?? ""}`).length === 0);
   // family member bound to him is told, with this conversation. THE BASELINE: whatever his sharing switches say. Never
   // someone else's crisis (third_person), only on his account.
   // Not waited for: his answer never waits for her phone, and a failure never costs him the answer
-  const alarm = familyAlarm({ route, signals: cls.signals, role: input.role, sentences: shown });
   if (alarm && session.kind === "account" && session.owner_user_id) {
     void (deps.tellFamily ?? tellFamily)({ store: deps.store, scope: { ...session, story_day: day }, eventId: event.id, kind: alarm }).catch(() => undefined);
   }
@@ -1911,7 +2822,13 @@ ${s.zh ?? ""}`).length === 0);
     // the backstage says so in words (components/backstage/sentences.ts)
     ...(composedByRules ? { composedBy: "rules_after_generation_failed" } : {}),
     ...(gloss ? { gloss } : {}),
+    // the harness's decision in codes (the backstage): level, ladder step, rows, where the frame came from, the question asked
+    ...(riskSummary
+      ? { risk: { level: riskSummary.level, ladder: riskSummary.ladder, rows: riskSummary.rows, frameSource: riskSummary.frameSource, followUp: riskSummary.followUp ?? null, familyTold: !!riskSummary.familyTold } }
+      : {}),
   });
+  // SSE: the follow-up question goes last, after every line of the answer (995 and the helplines before any question)
+  if (followUp) emit({ type: "followup", followUp });
 
   return {
     route,
@@ -1937,5 +2854,7 @@ ${s.zh ?? ""}`).length === 0);
     // to say about them)
     ...(!aiAllowed && route !== "cant_help" && cls.reason !== ABOUT_RIPPLE ? { noAiConsent: true as const } : {}),
     ...(gloss ? { gloss } : {}),
+    ...(followUp ? { followUp } : {}),
+    ...(riskSummary ? { risk: riskSummary } : {}),
   };
 }

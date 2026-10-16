@@ -14,6 +14,7 @@
 import { clipTime, dateWords, shortDay } from "@/lib/daily/i18n";
 import type { Locale } from "@/lib/i18n";
 import { questionKey } from "@/lib/profile/questions";
+import type { FollowUpReply } from "@/lib/safety/risk/types";
 import { askTurns, type AskTurn, type StoredAnswer } from "@/lib/safety/turns";
 import { scopeD0, scopeTz } from "@/lib/store/scope";
 import type { QuestionRow, SessionRow, Store } from "@/lib/store/types";
@@ -56,6 +57,11 @@ export interface ChatTurnView {
   added: { questionId: string } | null;
   /** Ripple's check-in question 「今天的药吃了吗？」 is in the answer (its reply buttons lead to Today) */
   checkIn: boolean;
+  /**
+   * the guided harness (2026-10-16): this turn was his tap on an earlier answer's follow-up question (S's AskTurn.reply), so
+   * the record draws that question answered, with what he chose
+   */
+  reply?: FollowUpReply;
 }
 
 export interface ChatDayRef {
@@ -104,6 +110,7 @@ export function turnsOf(turns: AskTurn[], tz: string): Omit<ChatTurnView, "relat
     answer: t.answer,
     noted: t.noted === true,
     checkIn: !!t.answer?.sentences.some((s) => s.templateId === "check_in_dose"),
+    ...(t.reply ? { reply: t.reply } : {}),
   }));
 }
 

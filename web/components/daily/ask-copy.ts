@@ -68,6 +68,13 @@ export interface AskCopy {
    * confirmed the speaker)
    */
   glossFrom: { doctor: string; inferredDoctor: string; pharmacist: string; dispenser: string; label: string; leaflet: string };
+  /**
+   * the guided harness (2026-10-16): under a follow-up question where more than one answer may be chosen, the button that
+   * sends what he ticked (the question and its options are lib/safety's own words, templates.ts)
+   */
+  followUpDone: string;
+  /** 10-16: when the question cannot show on arrival with the 995 line, the chip that takes him to it */
+  followUpChip: string;
 }
 
 const ZH: AskCopy = {
@@ -111,6 +118,8 @@ const ZH: AskCopy = {
   offerAdded: "已加到问题单。",
   offerFailed: "没加上，请再试一次。",
   glossFrom: { doctor: "医生", inferredDoctor: "好像是医生", pharmacist: "药剂师", dispenser: "柜台", label: "药品标签", leaflet: "单张" },
+  followUpDone: "好了",
+  followUpChip: "Ripple 想问你一句 ↓",
 };
 
 const EN: AskCopy = {
@@ -153,6 +162,8 @@ const EN: AskCopy = {
   offerAdded: "Added to your questions.",
   offerFailed: "That did not work. Please try again.",
   glossFrom: { doctor: "Doctor", inferredDoctor: "Probably the doctor", pharmacist: "Pharmacist", dispenser: "Counter staff", label: "Label", leaflet: "Leaflet" },
+  followUpDone: "Done",
+  followUpChip: "Ripple has a question for you ↓",
 };
 
 export function askCopy(locale: UiLocale): AskCopy {

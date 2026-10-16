@@ -55,6 +55,7 @@ describe("healthReport", () => {
       jobs: false,
       deployed: false,
       push: false,
+      label_reader: "cassette",
     });
   });
 
@@ -72,7 +73,18 @@ describe("healthReport", () => {
       jobs: true,
       deployed: true,
       push: true,
+      // no Tencent key pair in this environment (--speech mock --tts mock): the sample photos' recorded readings
+      label_reader: "cassette",
     });
+  });
+
+  it("says who reads label photos: Tencent Cloud OCR on a deployment with the speech key pair, without a value of it", () => {
+    const env = deployedEnv({ SPEECH_PROVIDER: "tencent", TENCENT_SECRET_ID: "AKIDfakesecretid0000", TENCENT_SECRET_KEY: "FAKE-tencent-key-0123456789" });
+    const report = healthReport(env);
+    expect(report.label_reader).toBe("ocr");
+    expect(JSON.stringify(report)).not.toMatch(/AKIDfakesecretid0000|FAKE-tencent-key/);
+    expect(healthReport({ ...env, LLM_VISION_MODEL: "some-vision" }).label_reader).toBe("model");
+    expect(healthReport({ ...env, LABEL_READER: "cassette" }).label_reader).toBe("cassette");
   });
 
   it("carries no value of the environment, only names", () => {
@@ -139,9 +151,11 @@ describe("healthReport", () => {
     expect(healthReport(deployedEnv({ VAPID_PRIVATE_KEY: generateVapidKeys().privateKey })).push).toBe(false);
   });
 
-  it("compares a deployment on every field except whether the voice answers right now", () => {
+  it("compares a deployment on every field except whether the voice answers right now and who reads label photos", () => {
     const fields = Object.keys(healthReport({})).sort();
-    expect([...HEALTH_COMPARED, "tts_ready"].sort()).toEqual(fields);
+    expect([...HEALTH_COMPARED, "tts_ready", "label_reader"].sort()).toEqual(fields);
+    // a version from before label_reader answers without it: the expectation push-env stages must not ask for it
+    expect(HEALTH_COMPARED).not.toContain("label_reader");
   });
 });
 

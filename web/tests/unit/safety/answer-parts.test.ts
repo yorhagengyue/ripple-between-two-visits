@@ -51,7 +51,9 @@ describe("answerParts", () => {
   it("self-harm: one hotlines part, each line with its numbers as buttons; 995 urgent, CareText by WhatsApp", async () => {
     const r = await answerAt("我觉得活着没什么意思，只会拖累孩子");
     const parts = answerParts(r.sentences, "zh-Hans");
-    expect(parts).toHaveLength(1);
+    // (the harness, 10-16: after the helplines, Ripple's own fixed lines of the ladder: "I'm here ...", "tell your doctor")
+    expect(parts.map((p) => p.kind)).toEqual(["hotlines", "ripple", "ripple"]);
+    expect(parts.slice(1).map((p) => (p.kind === "ripple" ? p.text : ""))).toEqual([TEMPLATES.self_harm_here.zh, TEMPLATES.self_harm_doctor.zh]);
     const hot = parts[0];
     expect(hot.kind).toBe("hotlines");
     if (hot.kind !== "hotlines") return;

@@ -20,6 +20,8 @@ import { familyHome, shownSections } from "@/lib/care/home";
 import { herRecord } from "@/lib/care/record";
 // owner 10-16 (only add): what he told Ripple that may need attention, sent to her link whatever his switches
 import { toldNotices } from "@/lib/care/told";
+// the harness (10-16): one card per conversation, the latest of it (his answers to Ripple's follow-up questions)
+import { latestPerConversation } from "@/lib/care/told-threads";
 import { bindEntryStore } from "@/lib/subject/bind";
 import { nowMs } from "@/lib/time/now";
 
@@ -35,7 +37,9 @@ export default async function FamilyAlertPage({ searchParams }: PageProps<"/f/al
     familyHome(ctx.store, ctx.session, { link, grants, version, acknowledged, consent: ctx.subject.consent }, now),
     herRecord(ctx.store, ctx.session, { link, userId: p.userId, grants, version, locale: p.locale, acknowledged }, now),
     // the baseline: read under no switch (lib/care/told.ts); a read that fails leaves the rest of the page as it was
-    toldNotices(ctx.store, ctx.session, link.id).catch(() => []),
+    toldNotices(ctx.store, ctx.session, link.id)
+      .then(latestPerConversation)
+      .catch(() => []),
   ]);
   // one row for the look: every switch something of his was shown under, in the open block or in the record
   const items = [...new Set<string>([...shownSections(home), ...record.shown])];

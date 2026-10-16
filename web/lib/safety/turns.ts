@@ -10,18 +10,27 @@
  * His own record: rows go through the subject's scoped store (an account's come back with session_id ""), and nothing
  * here is shared with his family (her view is built elsewhere, from her switches). What is kept of an answer is what was on
  * his screen, never the safety layer's inner record (candidates, the three checks, blocked sentences: safety_event).
+ *
+ * The guided harness (2026-10-16, lib/safety/risk/types.ts): an answer may end on one scripted follow-up question with
+ * buttons (AskResult.followUp); it is kept with the answer, so a refreshed page draws it again. His tap is a new ask whose
+ * `text` is the option's words and whose `reply` names the question and the options he chose; that reply is kept on his
+ * own row (the patient row's `answer` slot, which held nothing: { reply }), so the page can tell the question was
+ * answered, and with what, and draws it that way. The risk summary (AskResult.risk) is never kept here: it never reaches
+ * his screen.
  */
 import type { ChatMessageRow, Store } from "@/lib/store/types";
+import type { FollowUpReply } from "./risk/types";
 import { renderText } from "./render";
 import type { AskResult, Locale } from "./types";
 
 /**
  * An answer as his screen showed it (AskResult without the safety record, timings or model details). Ripple's own
- * explanation of the quotes (gloss.ts) is kept as it was shown, so a re-read draws the same words in the same place.
+ * explanation of the quotes (gloss.ts) is kept as it was shown, so a re-read draws the same words in the same place; so is
+ * the harness's follow-up question (2026-10-16), and never its risk summary.
  */
 export type StoredAnswer = Pick<
   AskResult,
-  "route" | "sentences" | "addedQuestionId" | "questionReused" | "reusedQuestion" | "fixedText" | "fixedTextZh" | "locale" | "answeredBefore" | "noAiConsent" | "costLimited" | "gloss"
+  "route" | "sentences" | "addedQuestionId" | "questionReused" | "reusedQuestion" | "fixedText" | "fixedTextZh" | "locale" | "answeredBefore" | "noAiConsent" | "costLimited" | "gloss" | "followUp"
 >;
 
 /** One ask: his words and Ripple's answer (null when the answer row is missing). */
@@ -39,6 +48,11 @@ export interface AskTurn {
    * 「记下了。」 instead of offering 「记下来」 again (askTurns sets it; a turn just answered has none)
    */
   noted?: boolean;
+  /**
+   * harness (2026-10-16): this ask was his tap on an earlier answer's follow-up question (the question's id and the options
+   * he chose; `text` is their words). The earlier answer's question is drawn answered, with these options marked.
+   */
+  reply?: FollowUpReply;
 }
 
 export function storedAnswer(r: AskResult): StoredAnswer {
@@ -55,7 +69,20 @@ export function storedAnswer(r: AskResult): StoredAnswer {
     ...(r.noAiConsent ? { noAiConsent: r.noAiConsent } : {}),
     ...(r.costLimited ? { costLimited: r.costLimited } : {}),
     ...(r.gloss ? { gloss: r.gloss } : {}),
+    ...(r.followUp ? { followUp: r.followUp } : {}),
   };
+}
+
+/** What his own row keeps beside his words: the follow-up he answered with this ask (harness, 2026-10-16). */
+interface StoredAsk {
+  reply: FollowUpReply;
+}
+
+function storedReply(v: unknown): FollowUpReply | undefined {
+  const r = v && typeof v === "object" ? (v as Partial<StoredAsk>).reply : undefined;
+  if (!r || typeof r.followUpId !== "string" || !Array.isArray(r.optionIds)) return undefined;
+  const optionIds = r.optionIds.filter((id): id is string => typeof id === "string");
+  return optionIds.length ? { followUpId: r.followUpId, optionIds } : undefined;
 }
 
 /**
@@ -66,13 +93,15 @@ export function storedAnswer(r: AskResult): StoredAnswer {
 export async function recordAskTurn(
   store: Store,
   sessionId: string,
-  ask: { day: number; text: string; lang: string | null; result: AskResult },
+  ask: { day: number; text: string; lang: string | null; result: AskResult; reply?: FollowUpReply },
 ): Promise<AskTurn> {
   const safetyEventId = ask.result.events[0]?.id ?? null;
   const answer = storedAnswer(ask.result);
   const locale: Locale = ask.result.locale;
+  // his tap on a follow-up question: kept on his own row, so the question it answered is drawn answered on a re-read
+  const kept: StoredAsk | null = ask.reply ? { reply: { followUpId: ask.reply.followUpId, optionIds: [...ask.reply.optionIds] } } : null;
   const [mine] = await Promise.all([
-    store.addChatMessage(sessionId, { day: ask.day, role: "patient", text: ask.text, lang: ask.lang, safety_event_id: safetyEventId }),
+    store.addChatMessage(sessionId, { day: ask.day, role: "patient", text: ask.text, lang: ask.lang, safety_event_id: safetyEventId, ...(kept ? { answer: kept } : {}) }),
     store.addChatMessage(sessionId, {
       day: ask.day,
       role: "ripple",
@@ -82,7 +111,7 @@ export async function recordAskTurn(
       answer,
     }),
   ]);
-  return { id: mine.id, day: mine.day, at: mine.created_at, text: mine.text, lang: mine.lang, answer };
+  return { id: mine.id, day: mine.day, at: mine.created_at, text: mine.text, lang: mine.lang, answer, ...(kept ? { reply: kept.reply } : {}) };
 }
 
 function isStoredAnswer(v: unknown): v is StoredAnswer {
@@ -102,7 +131,8 @@ export function pairTurns(rows: ChatMessageRow[]): AskTurn[] {
     if (m.safety_event_id) reply = rows.find((r) => r.role === "ripple" && r.safety_event_id === m.safety_event_id && !used.has(r.id));
     else if (rows[i + 1]?.role === "ripple" && !rows[i + 1].safety_event_id) reply = rows[i + 1];
     if (reply) used.add(reply.id);
-    turns.push({ id: m.id, day: m.day, at: m.created_at, text: m.text, lang: m.lang, answer: reply && isStoredAnswer(reply.answer) ? reply.answer : null });
+    const answered = storedReply(m.answer);
+    turns.push({ id: m.id, day: m.day, at: m.created_at, text: m.text, lang: m.lang, answer: reply && isStoredAnswer(reply.answer) ? reply.answer : null, ...(answered ? { reply: answered } : {}) });
   });
   return turns;
 }

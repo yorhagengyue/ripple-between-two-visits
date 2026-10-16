@@ -171,7 +171,7 @@ for (const locale of ["zh-Hans", "en"] as const) {
       expect(await consents.evaluateAll((els) => els.map((e) => e.getAttribute("data-consent")))).toEqual(["terms_privacy", "ai_processing", "example_data", "visit_recording", "retention_keep_forever", "family_accept", "family_share", "family_reset_helper"]);
       // what a family member sees whatever the six switches say (the morning reminder's time) is said in the notice
       await expect(page.locator('[data-section="who"]')).toContainText(locale === "en" ? "not governed by the six switches" : "不归这六个开关管");
-      await expect(page.getByTestId("page-privacy")).toHaveAttribute("data-version", "2026-10-16");
+      await expect(page.getByTestId("page-privacy")).toHaveAttribute("data-version", "2026-10-16.2");
       for (const sha of await consents.evaluateAll((els) => els.map((e) => e.getAttribute("data-sha256")))) expect(sha).toMatch(/^[0-9a-f]{64}$/);
       await page.getByTestId("privacy-consents").locator("summary").first().click();
       await expectPageChecks(page, { side: "elder" });

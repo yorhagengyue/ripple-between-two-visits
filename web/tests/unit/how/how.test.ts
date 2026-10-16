@@ -38,6 +38,7 @@ import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { GET as sessionGET } from "@/app/api/session/route";
 import { AIHGLE, ARCHITECTURE_ROWS, STACK, STATUS_TEXT, stackText } from "@/lib/how/stack";
+import { OCR_ACCURATE, OCR_BASIC, OCR_REGION } from "@/lib/vision/ocr";
 import { replayFallbackAllowed } from "@/lib/asr/whisper";
 import type { BusEvent } from "@/lib/bus";
 import { createFamilyStream, FAMILY_SESSION_FIELDS, familyEvent } from "@/lib/family/events";
@@ -99,6 +100,13 @@ describe("the architecture config", () => {
     expect(TENCENT_ASR_DEFAULTS).toMatchObject({ region: "ap-singapore", engine: "16k_zh_en", pieceMs: 100_000 });
     expect(STACK.main_model.note).toContain("writes short notes of what was said at a visit (shown as Ripple's and not confirmed, never a source)");
     expect(STACK.tts).toMatchObject({ product: "Tencent TRTC TTS", status: "mock_until_keys" });
+    // the owner's decision of 10-16: label photos are read by Tencent Cloud OCR (lib/vision/ocr.ts), no model sees them
+    expect(STACK.ocr).toMatchObject({ product: "Tencent Cloud OCR", model: "GeneralAccurateOCR, checked against GeneralBasicOCR", status: "in_use" });
+    for (const w of ["in Singapore", "only after Mr Tan agrees to AI processing", "No model sees the photo", "Two engines read it side by side", "when the two name different medicines he is asked for a new photo", "left out for him to fill in", "never the whole text"]) expect(STACK.ocr.note, w).toContain(w);
+    expect(STACK.main_model.note).toContain("label photos go to no model: Tencent Cloud OCR reads their words");
+    expect(STACK.main_model.note).not.toContain("he types the words of any other label");
+    // what the note says is the code's: the region, the two engines
+    expect([OCR_REGION, OCR_ACCURATE, OCR_BASIC]).toEqual(["ap-singapore", "GeneralAccurateOCR", "GeneralBasicOCR"]);
     expect(STACK.hosting).toMatchObject({ product: "Tencent Cloud Lighthouse + EdgeOne", status: "planned" });
     expect(STATUS_TEXT.planned).toBe("decided, not running yet");
     expect(STACK.hosting.note).toContain("next start");
@@ -507,7 +515,8 @@ describe("the trust boundary says what the code does", () => {
     // the code behind the two limits and the exemption
     const pipeline = src("lib", "safety", "pipeline.ts");
     expect(pipeline).toContain('const CRISIS_ROUTES: Route[] = ["emergency", "self_harm", "unknown_med"];');
-    expect(pipeline).toContain("guard?.admit(sid, { exempt: !!ruled && CRISIS_ROUTES.includes(ruled.route) });");
+    // (the harness, 10-16: a reply to a follow-up question is fixed lines and code, exempt as well)
+    expect(pipeline).toContain("guard?.admit(sid, { exempt: !!reply || (!!ruled && CRISIS_ROUTES.includes(ruled.route)) });");
     expect(pipeline).toContain('!(ruled?.route === "log_only" || crisisCue(text))');
     expect(src("lib", "safety", "cost-guard.ts")).toMatch(/requestsPerHour: num\(env\.COST_REQ_PER_HOUR, 60\), tokensPerDay: num\(env\.COST_TOKENS_PER_DAY, 200_000\)/);
     expect(src("app", "api", "ask", "route.ts")).toMatch(/if \(e instanceof CostLimitError\)[\s\S]*?status: 429, headers: \{ "Retry-After"/);
@@ -539,7 +548,7 @@ describe("the trust boundary says what the code does", () => {
 
   it("with no crisis screen the rules act on symptom words and self-harm statements (classify.ts emergencyCue, pipeline.ts applyRulesOnlyCue)", async () => {
     const crisis = serverLine("Emergency and self-harm:");
-    expect(crisis).toContain('goes to the emergency route (one of the 995 answers above) whatever the sentence form, a statement with words of self-harm goes to the helpline templates instead of "Noted."');
+    expect(crisis).toContain('goes to the emergency route whatever the sentence form: since 16 October a sign the rules read as happening now (heaviness or numbness on one side, for instance) is "call 995 now", and any other sign gets the follow-up question of the guided harness for it, with the safety line; a statement with words of self-harm gets the safety line, the helplines and the question "Are you having thoughts of ending your life or hurting yourself?" instead of "Noted."');
     const store = getMemoryStore();
     const s = await store.createSession({ story_day: 30, story_time: "20:15", ttl_hours: 1 });
     const deps = { store, llm: createMockLlm(), checker: null, checkerReason: "test", publish: () => {}, costGuard: null };
@@ -551,18 +560,21 @@ describe("the trust boundary says what the code does", () => {
       expect(emergencyCue(text), text).not.toEqual([]);
       const res = await ask({ sessionId: s.id, text, role: "patient", locale: "en" }, deps);
       expect(res.route, text).toBe("emergency");
-      expect(res.routeReason, text).toBe("rule:emergency_cue");
-      // (10-14, the owner's decision: his own stroke sign is kept for his doctor, and its 995 sentence says call now, even if it has passed)
-      expect(res.sentences.map((x) => x.templateId), text).toContain("signal_995_stroke");
-      expect((res.events[0].output as { rulesOnlyCue: { gap: string } }).rulesOnlyCue.gap, text).toBe("offline");
+      // (the harness, 10-16: one-sided heaviness or numbness read as happening now is a stroke sign now: 995 first, level 1)
+      expect(res.routeReason, text).toBe("harness:stroke-now");
+      expect(res.sentences.map((x) => x.templateId), text).toContain("emergency_995");
+      expect(res.risk?.level, text).toBe(1);
     }
     // a statement with self-harm words: the helplines, not "Noted."
     const goodbye = "I keep saying goodbye to everyone.";
     expect(classifyRules(goodbye, { doctorThresholdSystolic: 180, meds: [] })?.route).toBe("log_only");
     const sh = await ask({ sessionId: s.id, text: goodbye, role: "patient", locale: "en" }, deps);
-    expect(sh.route).toBe("self_harm");
-    expect(sh.routeReason).toBe("rule:self_harm_cue");
-    expect(sh.sentences.map((x) => x.templateId)).toEqual(["self_harm_995", "self_harm_sos", "self_harm_mindline"]);
+    // (the harness, 10-16: cue words alone are "possible": the safety line and the helplines first, then the confirm
+    // question; no family notice until he answers)
+    expect(sh.risk?.ladder).toBe("possible");
+    expect(sh.sentences.map((x) => x.templateId).slice(0, 3)).toEqual(["safety_line", "self_harm_sos", "self_harm_mindline"]);
+    expect(sh.followUp?.pathway).toBe("self_harm_check");
+    expect(sh.risk?.familyTold ?? false).toBe(false);
     await store.deleteSession(s.id);
   });
 
@@ -572,7 +584,24 @@ describe("the trust boundary says what the code does", () => {
     const store = getMemoryStore();
     const s = await store.createSession({ story_day: 30, ttl_hours: 1 });
     // a live-looking model whose crisis screen answers "none" (and whose other answers are unusable)
-    const live = { provider: "fake-live", model: "fake", chat: async () => ({ content: '{"crisis":"none"}', tokens: 1 }) } as unknown as LlmClient;
+    // (the harness, 10-16: the risk screen replaced the crisis screen; it answers with an empty frame, risk/screen.ts)
+    const NONE_FRAME = JSON.stringify({
+      about: "self",
+      acts: ["question"],
+      medicines: [],
+      amount: { relation: "none", evidence: [] },
+      when: "unclear",
+      symptoms: [],
+      looksDifferent: "no",
+      stopOrChange: "none",
+      selfHarm: { ideation: "none", plan: "no", means: "no", soon: "no", lethalityQuestion: "no", evidence: [] },
+      distress: "no",
+    });
+    const live = {
+      provider: "fake-live",
+      model: "fake",
+      chat: async (o: { user: string }) => ({ content: (JSON.parse(o.user) as { task: string }).task === "risk_screen" ? NONE_FRAME : '{"crisis":"none"}', tokens: 1 }),
+    } as unknown as LlmClient;
     const res = await ask(
       { sessionId: s.id, text: "My arm feels a bit weak after the gym, can I take my tablet later?", role: "patient", locale: "en" },
       { store, llm: live, checker: null, checkerReason: "test", publish: () => {}, costGuard: null },
@@ -854,6 +883,17 @@ describe("what this server runs, box by box (lib/how/runtime.ts)", () => {
     expect(runtimeStack({ NODE_ENV: "production", SPEECH_PROVIDER: "tencent" }).stt).toBe(
       "Tencent Cloud speech recognition is chosen but a setting is missing or wrong: a visit recorded here waits for transcription",
     );
+  });
+
+  it("who reads label photos: Tencent Cloud OCR on the deployment's settings, else what reads them here; never a key", () => {
+    const keys = { TENCENT_SECRET_ID: "AKIDsecretvalue", TENCENT_SECRET_KEY: "tencent-secret-value" };
+    const hy = { NODE_ENV: "production", LLM_PROVIDER: "hunyuan", HUNYUAN_API_KEY: "sk-secret-value" };
+    const r = runtimeStack({ ...hy, SPEECH_PROVIDER: "tencent", ...keys });
+    expect(r.ocr).toBe("Tencent Cloud OCR in ap-singapore: two engines read each label photo, after his yes to AI processing");
+    expect(JSON.stringify(r)).not.toMatch(/AKIDsecretvalue|tencent-secret-value|sk-secret/);
+    expect(runtimeStack(hy).ocr).toBe("no reader here: the sample labels show their recorded readings, any other label is typed in");
+    expect(runtimeStack({ NODE_ENV: "development", LLM_PROVIDER: "mock" }).ocr).toBe("no reader here: the sample labels show their recorded readings, any other label is typed in");
+    expect(runtimeStack({ ...hy, ...keys, LLM_VISION_MODEL: "some-vision" }).ocr).toBe("the model reads label photos (not OCR)");
   });
 });
 

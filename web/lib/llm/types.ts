@@ -19,7 +19,22 @@ export interface ChatImage {
 }
 
 /** What a call is for: written to the spend ledger (never the prompt itself). */
-export type LlmPurpose = "classify" | "crisis" | "compose" | "support" | "vision" | "extract" | "explain" | "gloss" | "summary" | "general" | "crisis_words" | "probe" | "other";
+export type LlmPurpose =
+  | "classify"
+  | "crisis"
+  | "compose"
+  | "support"
+  | "vision"
+  | "extract"
+  | "explain"
+  | "gloss"
+  | "summary"
+  | "general"
+  | "crisis_words"
+  /** the guided safety harness's risk screen (lib/safety/risk/screen.ts, 10-16) */
+  | "risk_screen"
+  | "probe"
+  | "other";
 
 export interface ChatOpts {
   system: string;

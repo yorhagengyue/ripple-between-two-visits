@@ -11,6 +11,7 @@ import { LlmError, type ChatOpts, type LlmClient } from "@/lib/llm/types";
 import { classifyWithModel, screenCrisisWithModel } from "@/lib/safety/classify";
 import { ask } from "@/lib/safety/pipeline";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const PLANTED = ["he can safely have 2 of the white ones tonight", "doubling up tonight is fine for him"];
 
@@ -20,9 +21,12 @@ function planting(answers: { classify?: object | Error; crisis?: object | Error 
     provider: "fake-live",
     model: "fake",
     async chat(opts: ChatOpts) {
-      const task = (JSON.parse(opts.user) as { task: string }).task;
-      const a = task === "classify" ? answers.classify : task === "crisis" ? answers.crisis : undefined;
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
+      const a = task === "classify" ? answers.classify : task === "crisis" || task === "risk_screen" ? answers.crisis : undefined;
       if (a instanceof Error) throw a;
+      // (the harness: the risk screen replaced the crisis screen; it answers with the frame of the scripted word)
+      if (a && task === "risk_screen") return { content: frameReply(JSON.stringify(a), payload.message ?? ""), tokens: 3 };
       if (a) return { content: JSON.stringify(a), tokens: 3 };
       return { content: JSON.stringify({ sentences: [] }), tokens: 1 };
     },
@@ -72,16 +76,17 @@ describe("through ask(): nothing the model wrote in a reason field is in the res
   ];
   it.each(cases)("%s", async (_name, answers) => {
     const { res, published, events } = await askWith(NO_RULE, planting(answers));
-    expect(res.routeReason).toMatch(/^model(_crisis)?:fake-live(:(emergency|self_harm))?$/);
+    // (a route the harness raised, 10-16, names the decision table's row: still a code)
+    expect(res.routeReason).toMatch(/^(model(_crisis)?:fake-live(:(emergency|self_harm))?|harness:[a-z0-9-]+)$/);
     const everything = JSON.stringify({ res, published, events });
     for (const p of PLANTED) expect(everything).not.toContain(p);
     const route = published.find((e) => e.type === "ask.route")!;
     expect(route.say).not.toMatch(/white ones|doubling/);
   });
 
-  it("the raised crisis keeps the screen's code as the route reason", async () => {
+  it("the raised crisis names the decision table's row as the route reason (the harness, 10-16)", async () => {
     const { res } = await askWith(NO_RULE, planting({ classify: { route: "uncertain", topic: "other", reason: PLANTED[0] }, crisis: { crisis: "self_harm", reason: PLANTED[1] } }));
     expect(res.route).toBe("self_harm");
-    expect(res.routeReason).toBe("model_crisis:fake-live:self_harm");
+    expect(res.routeReason).toBe("harness:self-harm-thoughts");
   });
 });

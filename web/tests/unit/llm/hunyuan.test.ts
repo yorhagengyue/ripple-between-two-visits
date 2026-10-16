@@ -234,6 +234,9 @@ describe("content safety and errors inside a stream", () => {
     await expect(client.chat({ system: "s", user: "u" })).rejects.toMatchObject({ code: "upstream", status: 451 });
     expect(n).toBe(1);
     expect(upstreamError({ name: "hunyuan" }, 451).message).toBe("hunyuan 451: the vendor's content safety filtered the request or the reply");
+    // (E2, 10-16: a 429 that survived the retries says it was the rate limit; the harness records it apart from a timeout)
+    expect((upstreamError({ name: "hunyuan" }, 429) as { rateLimited?: boolean }).rateLimited).toBe(true);
+    expect((upstreamError({ name: "hunyuan" }, 500) as { rateLimited?: boolean }).rateLimited).toBeUndefined();
   });
 
   it("streams the pieces; reasoning_content is never a piece of the answer", async () => {

@@ -25,6 +25,7 @@ import { ask } from "@/lib/safety/pipeline";
 import { renderText } from "@/lib/safety/render";
 import { emergencyReferralFor, TEMPLATES } from "@/lib/safety/templates";
 import { getMemoryStore } from "@/lib/store/memory";
+import { frameReply } from "./live-stand-in";
 
 const CTX = { doctorThresholdSystolic: 180, meds: [] };
 const route = (t: string) => classifyRules(t, CTX)?.route ?? null;
@@ -140,10 +141,12 @@ function screening(answer: string | Error): LlmClient {
     provider: "fake-live",
     model: "fake",
     async chat(opts: ChatOpts) {
-      const task = (JSON.parse(opts.user) as { task: string }).task;
-      if (task === "crisis") {
+      const payload = JSON.parse(opts.user) as { task: string; message?: string };
+      const task = payload.task;
+      // (the harness: the risk screen replaced the crisis screen; it answers with the frame of the scripted word)
+      if (task === "crisis" || task === "risk_screen") {
         if (answer instanceof Error) throw answer;
-        return { content: answer, tokens: 3 };
+        return { content: task === "risk_screen" ? frameReply(answer, payload.message ?? "") : answer, tokens: 3 };
       }
       return { content: JSON.stringify({ sentences: [] }), tokens: 1 };
     },
@@ -212,9 +215,9 @@ describe("the fixed safety line on a note: only with a crisis cue word of its ow
     [new LlmError("budget", "model spend cap reached", 402), "budget"],
     [new LlmError("timeout", "deepseek timed out", 504), "timeout"],
     [new Error("socket hang up"), "error"],
-    ['{"crisis":"maybe"}', "invalid_answer"],
-    // a reply that is not JSON at all is an error of the screen call
-    ["not json", "error"],
+    // (the harness, 10-16: a risk-screen reply that is not a frame, JSON or not, is bad_response, risk/screen.ts)
+    ['{"crisis":"maybe"}', "bad_response"],
+    ["not json", "bad_response"],
   ] as const) {
     it(`the screen was unavailable (${reason}): a plain note is still only the note; a note with a cue word carries the line and says why`, async () => {
       const plain = await note(NOTE, screening(answer));

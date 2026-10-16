@@ -157,12 +157,14 @@ describe("the demo story, D29 (the seed)", () => {
     for (const text of ["右手拿的袋子很重", "左边口袋很重"]) expect(classifyRules(text, ctx)?.route, text).not.toBe("emergency");
   });
 
-  it("one side heavy: kept for his doctor, the doctor's warning line, then 995 if it gets bad (stroke row), no model call", async () => {
+  it("one side heavy: 995 now first, then the doctor's warning line (the harness's stroke row), no model call", async () => {
     const { result } = await askIn(await sessionAt(29, "20:15"), "右边身体觉得很重", { locale: "zh-Hans" });
     expect(result.route).toBe("emergency");
-    // (10-14, the owner's decision: his own stroke sign is kept for his doctor; the 995 sentence is for when it gets bad)
-    expect(ids(result).map(kept)).toEqual(["signal:<his note>", "visit:v1:R2", "referral:B1-03"]);
-    expect(tpls(result)).toEqual([SIGNAL_RECORDED.id, "signal_995_stroke"]);
+    // (the harness, 10-16, kb/pathways.json stroke-now: a stroke sign happening now or not said to be over is 995 now with no
+    // question, time-critical. The 10-14 wording that kept it for his doctor first stays for a sign said to be over)
+    expect(ids(result).map(kept)).toEqual(["referral:B1-03", "visit:v1:R2"]);
+    expect(tpls(result)).toEqual(["emergency_995"]);
+    expect(result.risk).toMatchObject({ level: 1, rows: ["stroke-now"] });
     expect(result.llm.calls).toBe(0);
   });
 
@@ -194,7 +196,9 @@ describe("the demo story, D29 (the seed)", () => {
     expect(a.result.route).toBe("explain");
     expect(first(a.result)).toMatchObject({ sourceId: "visit:v2:v2-u07", en: ANKLE, attribution: "doctor" });
     expect(ids(a.result)).toContain("hh-amlodipine:amlodipine.common_side_effects");
-    expect(tpls(a.result)).toEqual(["side_effect_noted"]);
+    // (the harness, 10-16, kb/pathways.json side-effect rows: level 3, the safety-net line and the red-flag question)
+    expect(tpls(a.result)).toEqual(["side_effect_995", "side_effect_noted"]);
+    expect(a.result.followUp).toMatchObject({ pathway: "side_effect", templateId: "side_redflags" });
     const q = (await store.getQuestion(s.id, a.result.addedQuestionId!))!;
     expect(q).toMatchObject({ for: "doctor", origin: "own", text: "脚踝肿是不是副作用？" });
     const again = await askIn(s, "我的脚踝肿了，是药的副作用吗？", { locale: "zh-Hans" });
@@ -211,7 +215,7 @@ describe("the demo story, D29 (the seed)", () => {
     const { result } = await askIn(s, "My ankles are a bit swollen, is that from the amlodipine?", { locale: "en" });
     expect(result.route).toBe("explain");
     expect(ids(result).slice(0, 2)).toEqual(["visit:v2:v2-u07", "hh-amlodipine:amlodipine.common_side_effects"]);
-    expect(tpls(result)).toEqual(["side_effect_noted"]);
+    expect(tpls(result)).toEqual(["side_effect_995", "side_effect_noted"]);
     expect(result.addedQuestionId).toBeDefined();
     // a swollen ankle after a walk, with no medicine in it, stays a note
     const walk = await askIn(s, "今天在大巴窑中心走了一圈，脚踝有点肿", { locale: "zh-Hans" });

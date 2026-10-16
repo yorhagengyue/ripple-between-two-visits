@@ -5,8 +5,10 @@
  * safety_event and pushed to GET /api/events; the ask and its answer are kept as today's two chat rows (lib/safety/turns.ts:
  * GET /api/ask/history and /p/ask read them back after a refresh).
  *
- * Body: { text: string, locale?: "en" | "zh-Hans", medIds?: string[] }. There is no `role` field (C2 round 2, real-app 6.11
- * 「去掉请求体里的 role」): an older client that still sends one has it dropped unread, like any other unknown key.
+ * Body: { text: string, locale?: "en" | "zh-Hans", medIds?: string[], reply?: { followUpId, optionIds } }. There is no `role`
+ * field (C2 round 2, real-app 6.11 「去掉请求体里的 role」): an older client that still sends one has it dropped unread, like any
+ * other unknown key. `reply` (the guided harness, 2026-10-16): his tap on an answer's follow-up question; `text` is then the
+ * chosen options' words. It is kept on his own chat row (lib/safety/turns.ts), so the question is drawn answered on a re-read.
  * 200 AskResult | 400 bad body or no session | 401 not signed in | 403 patient_only (Wei Ling's phone) | 404 unknown
  * session | 429 cost guard | 500
  *
@@ -74,6 +76,8 @@ const bodySchema = z.object({
   text: z.string().trim().min(1).max(1000),
   locale: z.enum(["en", "zh-Hans"]).optional(),
   medIds: z.array(z.string().max(100)).max(10).optional(),
+  /** his tap on a follow-up question (harness, 2026-10-16): the question's id and the chosen options; `text` is their words */
+  reply: z.object({ followUpId: z.string().min(1).max(200), optionIds: z.array(z.string().min(1).max(40)).min(1).max(6) }).optional(),
 });
 
 /** How often a quiet stream says it is still there (a comment line). */
@@ -155,13 +159,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     void costGuard.prepare().catch(() => undefined);
     const [role, aiAllowed] = await Promise.all([askerRole(req, subject), aiConsent(ro, session)]);
     const result = await ask(
-      { sessionId, text: body.text, locale: body.locale, role, medIds: body.medIds },
+      { sessionId, text: body.text, locale: body.locale, role, medIds: body.medIds, ...(body.reply ? { reply: body.reply } : {}) },
       { store: ro, aiAllowed, session, costGuard, ...(plant ? { plant } : {}), ...(stream ? { stream } : {}) },
     );
     if (plant && drillLeaked(result.sentences)) throw new DrillLeak();
     // today's conversation, kept for him before the answer goes out, so /p/ask and the chat show it on the next read (a
     // failure to keep it never costs him the answer)
-    await recordAskTurn(ro, sessionId, { day: session.story_day, text: body.text, lang: detectLang(body.text), result }).catch((e: unknown) => {
+    await recordAskTurn(ro, sessionId, { day: session.story_day, text: body.text, lang: detectLang(body.text), result, ...(body.reply ? { reply: body.reply } : {}) }).catch((e: unknown) => {
       console.error("[api/ask] could not keep the turn", (e as Error).message);
     });
     return result;
