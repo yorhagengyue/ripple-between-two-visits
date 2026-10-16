@@ -1,0 +1,120 @@
+{
+ "note": "Version 6 cut (owner 16 Oct: nothing in the film about family seeing his content only when he allows it): edl-v5.json without c10 B5 'family, on his terms' (291.5-300.5) and c11 EXP 04 'who sees what' (1365.6-1373.2); part 3 re-rendered (out/frames-t6) with the privacy slide's family card removed (three cards); agenda re-rendered (out/frames-a7) with part 3 at 5:04. The c07 frames are the --clip cache out/clip-c07_clinic-1127-1201.2 (a --clip --fresh run renames it aside: re-point the dir). Captions: captions-v6.json (out/frames-v6-raw -> out/frames-v6-final).",
+ "fps": 30,
+ "segments": [
+  {
+   "name": "agenda",
+   "a": 800,
+   "b": 807,
+   "dir": "out/frames-a7"
+  },
+  {
+   "name": "story c01-c02",
+   "a": 0,
+   "b": 27,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "story c03-c06",
+   "a": 27,
+   "b": 127,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c07 clinic",
+   "a": 1127,
+   "b": 1201.2,
+   "dir": "out/clip-c07_clinic-1127-1201.2"
+  },
+  {
+   "name": "c08 evening",
+   "a": 187,
+   "b": 205,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c09 fly-in and lights",
+   "a": 205,
+   "b": 209.4,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 1 (cannot read English)",
+   "a": 210,
+   "b": 215.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 2 (forgotten)",
+   "a": 218.0,
+   "b": 227.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 3 (between two visits)",
+   "a": 230.6,
+   "b": 237,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c10 curtain opens",
+   "a": 237,
+   "b": 239,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 B6 management and prevention",
+   "a": 305.5,
+   "b": 315.1,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 curtain closes",
+   "a": 319.6,
+   "b": 322,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c11 intro",
+   "a": 1322,
+   "b": 1323.5,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 01 can I take one more",
+   "a": 1324,
+   "b": 1343.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 02 unknown box",
+   "a": 1344.5,
+   "b": 1353.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 03 chest pain",
+   "a": 1354.6,
+   "b": 1363.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "t sober technical and safety summary",
+   "a": 600,
+   "b": 738.5,
+   "dir": "out/frames-t6"
+  },
+  {
+   "name": "t BUILD slide end and 08 next",
+   "a": 744.5,
+   "b": 753,
+   "dir": "out/frames-t6"
+  },
+  {
+   "name": "c14 try it",
+   "a": 430,
+   "b": 440,
+   "dir": "out/frames-c14v5"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "ripple-promo",
+  "private": true,
+  "type": "module",
+  "description": "Ripple promo video: 3D blocky characters with a comic halftone look, rendered frame by frame in headless Chrome",
+  "scripts": {},
+  "dependencies": {
+    "@fontsource/bangers": "^5.1.0",
+    "puppeteer-core": "^23.11.1",
+    "qrcode": "^1.5.4",
+    "three": "^0.169.0"
+  }
+}

@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ripple caption post</title>
+<link rel="icon" href="data:,">
+<style>
+  @font-face { font-family: "Bangers"; src: url("node_modules/@fontsource/bangers/files/bangers-latin-400-normal.woff2") format("woff2"); font-display: block; }
+  html, body { margin: 0; background: #17131f; }
+</style>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<script type="module">
+// The caption post-process (version 4): draws an assembled film frame and burns the explanatory captions and the part
+// markers onto it, in the film's comic lettering. Driven by post.mjs; every frame is a pure function of its inputs
+// (the source JPEG, the captions active on it, and how many frames into / before the end of each caption it is).
+const W = 1920, H = 1080;
+const INK = "#1a1030", YEL = "#ffd94a", CAP_YEL = "#ffe14d";
+const BANG = '"Bangers", "Impact", sans-serif';
+const SANS = '"Segoe UI", "Microsoft YaHei", system-ui, sans-serif';
+const out = document.getElementById("out"), ctx = out.getContext("2d");
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const backOut = (k, s = 1.70158) => 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
+const easeOut = (k) => 1 - (1 - k) * (1 - k) * (1 - k);
+
+// ---- the caption: Bangers in bright yellow, a thick ink outline, a small ink offset shadow, a soft dark band ----
+function wrap(c, text, maxW) {
+  if (text.includes("\n")) return text.split("\n");
+  const words = text.split(" ");
+  if (c.measureText(text).width <= maxW) return [text];
+  // two lines, as balanced as possible (the longer line as short as it can be)
+  let best = null;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(" "), b = words.slice(i).join(" ");
+    const m = Math.max(c.measureText(a).width, c.measureText(b).width);
+    if (m <= maxW && (!best || m < best.m)) best = { m, lines: [a, b] };
+  }
+  if (best) return best.lines;
+  const lines = []; let line = "";   // fall back to greedy (the check then reports more than two lines)
+  for (const w of words) { const t = line ? line + " " + w : w; if (c.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+  if (line) lines.push(line);
+  return lines;
+}
+
+/** Lay out a caption: lines, sizes and the band rectangle [x0, y0, x1, y1] that it occupies on the 1920 x 1080 frame. */
+function layout(c, cap) {
+  const p = cap.pos, S = p.size ?? 52;
+  c.font = `${S}px ${BANG}`;
+  const lines = wrap(c, cap.text, p.maxW ?? 1400);
+  const capH = c.measureText("H").actualBoundingBoxAscent;   // cap height of Bangers at this size
+  const lh = S * 1.04, widths = lines.map((l) => c.measureText(l).width);
+  const tw = Math.max(...widths), th = capH + lh * (lines.length - 1);
+  const padX = S * 0.5, padY = S * 0.3;
+  const bw = tw + padX * 2, bh = th + padY * 2;
+  const align = p.align ?? "center", anchor = p.anchor ?? "bottom";
+  const x0 = align === "left" ? p.x : align === "right" ? p.x - bw : p.x - bw / 2;
+  const y0 = anchor === "top" ? p.y : p.y - bh;
+  return { S, lines, widths, capH, lh, rect: [x0, y0, x0 + bw, y0 + bh], padX, padY, align };
+}
+
+function drawCaption(c, cap, kin, kout) {
+  const L = layout(c, cap), [x0, y0, x1, y1] = L.rect, S = L.S;
+  const top = (cap.pos.anchor ?? "bottom") === "top";
+  const a = clamp(kin * 1.8) * clamp(kout * 1.4);
+  const s = kin < 1 ? lerp(0.62, 1, backOut(clamp(kin), 2.0)) : lerp(0.86, 1, easeOut(clamp(kout)));
+  const dy = (1 - easeOut(clamp(kin))) * S * 0.5 * (top ? -1 : 1);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  c.save();
+  c.globalAlpha = a;
+  c.translate(cx, cy + dy); c.scale(s, s); c.translate(-cx, -cy);
+  // the soft band
+  if (cap.pos.band !== false) {
+    c.save();
+    c.shadowColor = "rgba(14,6,36,0.55)"; c.shadowBlur = S * 0.6;
+    c.fillStyle = "rgba(14,6,36,0.42)";
+    c.beginPath(); c.roundRect(x0, y0, x1 - x0, y1 - y0, S * 0.4); c.fill();
+    c.restore();
+  }
+  c.font = `${S}px ${BANG}`; c.textBaseline = "alphabetic"; c.lineJoin = "round"; c.miterLimit = 2;
+  c.textAlign = L.align === "left" ? "left" : L.align === "right" ? "right" : "center";
+  const tx = L.align === "left" ? x0 + L.padX : L.align === "right" ? x1 - L.padX : cx;
+  const lw = S * 0.2, ox = S * 0.06, oy = S * 0.08;
+  L.lines.forEach((line, i) => {
+    const by = y0 + L.padY + L.capH + i * L.lh;           // the baseline of line i
+    c.fillStyle = INK; c.strokeStyle = INK; c.lineWidth = lw;
+    c.strokeText(line, tx + ox, by + oy); c.fillText(line, tx + ox, by + oy);   // the offset shadow
+    c.strokeText(line, tx, by);                                                // the ink outline
+    c.fillStyle = cap.pos.fill ?? CAP_YEL; c.fillText(line, tx, by);
+  });
+  c.restore();
+}
+
+// ---- the part marker: the agenda row again (ink badge with PART and the number, name in Bangers, subtitle) ----
+function partLayout(c, cap) {
+  const p = cap.pos, h = 134;
+  c.font = `78px ${BANG}`; const hw = c.measureText(cap.head).width;
+  c.font = `800 33px ${SANS}`; const sw = c.measureText(cap.sub.toUpperCase()).width;
+  const w = 140 + Math.max(hw, sw) + 44;
+  const x0 = (p.align ?? "left") === "right" ? p.x - w : (p.align === "center" ? p.x - w / 2 : p.x);
+  const y0 = (p.anchor ?? "top") === "top" ? p.y : p.y - h;
+  return { w, h, rect: [x0 - 12, y0, x0 + w + 12, y0 + h + 10] };   // the skew and the shadow included
+}
+function drawPart(c, cap, kin, kout) {
+  const L = partLayout(c, cap), { w, h } = L, x0 = L.rect[0] + 12, y0 = L.rect[1];
+  const slide = (1 - backOut(clamp(kin), 1.3)) * -(x0 + w + 80) + (1 - easeOut(clamp(kout))) * -(x0 + w + 80);
+  c.save(); c.translate(x0 + slide, y0); c.transform(1, 0, -0.08, 1, 0, 0);
+  c.fillStyle = INK; c.fillRect(9, 9, w, h);
+  c.fillStyle = YEL; c.fillRect(0, 0, w, h);
+  c.lineWidth = 5; c.strokeStyle = INK; c.strokeRect(0, 0, w, h);
+  c.fillStyle = INK; c.fillRect(10, 10, 100, h - 20);
+  c.textAlign = "center"; c.textBaseline = "middle"; c.lineJoin = "round";
+  c.font = `26px ${BANG}`; c.fillStyle = "#cfc6ff"; c.fillText("PART", 60, 32);
+  c.font = `92px ${BANG}`; c.lineWidth = 12; c.strokeStyle = INK; c.strokeText(cap.n, 60, h / 2 + 18);
+  const g = c.createLinearGradient(0, h / 2 - 26, 0, h / 2 + 62); g.addColorStop(0, "#ffe37a"); g.addColorStop(1, "#ff9a2e");
+  c.fillStyle = g; c.fillText(cap.n, 60, h / 2 + 18);
+  c.textAlign = "left"; c.fillStyle = INK;
+  c.font = `78px ${BANG}`; c.fillText(cap.head, 140, h * 0.37 + 4);
+  c.font = `800 33px ${SANS}`; c.fillText(cap.sub.toUpperCase(), 142, h * 0.78);
+  c.restore();
+}
+
+const rectOf = (cap) => (cap.style === "part" ? partLayout(ctx, cap).rect : layout(ctx, cap).rect);
+
+/** Validate every caption's geometry: at most maxLines lines, and the whole band inside its allowed box. */
+window.check = (caps) => caps.map((cap) => {
+  const r = rectOf(cap).map((v) => Math.round(v)), b = cap.pos.box, errs = [];
+  if (cap.style !== "part") { const n = layout(ctx, cap).lines.length; if (n > (cap.pos.maxLines ?? 2)) errs.push(`${n} lines`); }
+  if (b && (r[0] < b[0] || r[1] < b[1] || r[2] > b[2] || r[3] > b[3])) errs.push(`rect ${r} outside box ${b}`);
+  return { id: cap.id, rect: r, lines: cap.style === "part" ? [cap.head, cap.sub] : layout(ctx, cap).lines, errs };
+});
+
+const imgCache = new Map();
+function load(src) {
+  return new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error("cannot load " + src)); i.src = src; });
+}
+
+/** Paint one frame: the source image, then each active caption [{cap, kin, kout}]; optional debug boxes. */
+async function paint(src, active, debug = false) {
+  const img = await load(src);
+  ctx.drawImage(img, 0, 0, W, H);
+  for (const { cap, kin, kout } of active) {
+    if (debug && cap.pos.box) { const b = cap.pos.box; ctx.save(); ctx.setLineDash([12, 8]); ctx.lineWidth = 3; ctx.strokeStyle = "#00ff88"; ctx.strokeRect(b[0], b[1], b[2] - b[0], b[3] - b[1]); ctx.restore(); }
+    (cap.style === "part" ? drawPart : drawCaption)(ctx, cap, kin, kout);
+  }
+}
+window.burn = async (src, active, q = 0.95) => { await paint(src, active); return out.toDataURL("image/jpeg", q); };
+
+/** A contact sheet of burned frames: items [{src, active, label}] */
+window.sheet = async (items, cols = 3, w = 640, debug = false) => {
+  const h = Math.round((w * H) / W), rows = Math.ceil(items.length / cols);
+  const sh = document.createElement("canvas"); sh.width = cols * w; sh.height = rows * (h + 24);
+  const s = sh.getContext("2d"); s.fillStyle = "#111"; s.fillRect(0, 0, sh.width, sh.height);
+  for (let i = 0; i < items.length; i++) {
+    await paint(items[i].src, items[i].active, debug);
+    const x = (i % cols) * w, y = Math.floor(i / cols) * (h + 24);
+    s.imageSmoothingQuality = "high"; s.drawImage(out, x, y + 24, w, h);
+    s.fillStyle = "#ffd94a"; s.font = "bold 16px system-ui"; s.fillText(items[i].label, x + 6, y + 17);
+  }
+  return sh.toDataURL("image/jpeg", 0.9);
+};
+
+await document.fonts.load('64px "Bangers"');
+await document.fonts.ready;
+window.ready = true;
+</script>
+</body>
+</html>

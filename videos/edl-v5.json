@@ -1,0 +1,27 @@
+{
+  "note": "Version 5 cut (owner 16 Oct: every speech bubble is one complete voiced line; figures instead of lists in part 3; Ripple's own logo at the start and end). The agenda card first (a_agenda.js, source 800-807, re-rendered with the v5 part times), the voice-synced chapters c03-c06, c07 (moved to 1127-1201.2), c09 and c11 (moved to 1322-1373.2), the redesigned part 3 (frames-t5) and c14 with the logo. The BUILD placeholder slide is shortened (738.5-744.5 cut; it is static there) so the film stays under 8:00; if the owner fills BUILD, re-render t and put that time back. Captions are burned afterwards by post.mjs from captions-v5.json (out/frames-v5-raw -> out/frames-v5-final).",
+  "fps": 30,
+  "segments": [
+    {"name": "agenda", "a": 800, "b": 807, "dir": "out/frames-a6"},
+    {"name": "story c01-c02", "a": 0, "b": 27, "dir": "out/frames-v2"},
+    {"name": "story c03-c06", "a": 27, "b": 127, "dir": "out/frames-v5"},
+    {"name": "c07 clinic", "a": 1127, "b": 1201.2, "dir": "out/clip-c07_clinic-1127-1201.2"},
+    {"name": "c08 evening", "a": 187, "b": 205, "dir": "out/frames-v2"},
+    {"name": "c09 fly-in and lights", "a": 205, "b": 209.4, "dir": "out/frames-v5"},
+    {"name": "c09 card 1 (cannot read English)", "a": 210, "b": 215.6, "dir": "out/frames-v5"},
+    {"name": "c09 card 2 (forgotten)", "a": 218.0, "b": 227.6, "dir": "out/frames-v5"},
+    {"name": "c09 card 3 (between two visits)", "a": 230.6, "b": 237, "dir": "out/frames-v5"},
+    {"name": "c10 curtain opens", "a": 237, "b": 239, "dir": "out/frames-v2"},
+    {"name": "c10 B5 family, on his terms", "a": 291.5, "b": 300.5, "dir": "out/frames-v2"},
+    {"name": "c10 B6 management and prevention", "a": 305.5, "b": 315.1, "dir": "out/frames-v2"},
+    {"name": "c10 curtain closes", "a": 319.6, "b": 322, "dir": "out/frames-v2"},
+    {"name": "c11 intro", "a": 1322, "b": 1323.5, "dir": "out/frames-v5"},
+    {"name": "c11 EXP 01 can I take one more", "a": 1324, "b": 1343.2, "dir": "out/frames-v5"},
+    {"name": "c11 EXP 02 unknown box", "a": 1344.5, "b": 1353.2, "dir": "out/frames-v5"},
+    {"name": "c11 EXP 03 chest pain", "a": 1354.6, "b": 1363.2, "dir": "out/frames-v5"},
+    {"name": "c11 EXP 04 who sees what", "a": 1365.6, "b": 1373.2, "dir": "out/frames-v5"},
+    {"name": "t sober technical and safety summary", "a": 600, "b": 738.5, "dir": "out/frames-t5"},
+    {"name": "t BUILD slide end and 08 next", "a": 744.5, "b": 753, "dir": "out/frames-t5"},
+    {"name": "c14 try it", "a": 430, "b": 440, "dir": "out/frames-c14v5"}
+  ]
+}

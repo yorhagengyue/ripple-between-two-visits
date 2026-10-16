@@ -1,0 +1,715 @@
+{
+ "c03-tan": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "早上打完太极，还没吃早餐。",
+  "bubble": [
+   "Did tai chi this morning, no breakfast yet.",
+   "早上打完太极，还没吃早餐。"
+  ],
+  "file": "audio/voices-v5/c03-tan.wav",
+  "duration": 2.56,
+  "phrases": [
+   [
+    0.03,
+    2.53
+   ]
+  ],
+  "heard": "早上打完太极还没吃早餐。",
+  "match": 1.0,
+  "source_take": "s2-his-words-gy-s23.wav",
+  "new_takes": []
+ },
+ "c04-wei": {
+  "speaker": "family",
+  "voice": "qsy",
+  "spoken": "Dad, I'll come with you to Dr Lim at ten thirty!",
+  "bubble": [
+   "Dad, I'll come with you to Dr Lim at 10:30!"
+  ],
+  "file": "audio/voices-v5/c04-wei.wav",
+  "duration": 4.56,
+  "phrases": [
+   [
+    -0.07,
+    -0.06
+   ],
+   [
+    0.06,
+    0.48
+   ],
+   [
+    0.85,
+    4.38
+   ]
+  ],
+  "heard": "Dad, I'll come with you to Dr. Lim at 10.30.",
+  "match": 1.0,
+  "source_take": "c04-wei-qsy-s7.wav",
+  "new_takes": [
+   {
+    "seed": 23,
+    "file": "c04-wei-qsy-s23.wav",
+    "heard": "Instead, I will come with you to Dr. Lim at 10.30.",
+    "score": 0.879
+   },
+   {
+    "seed": 7,
+    "file": "c04-wei-qsy-s7.wav",
+    "heard": "Dad, I'll come with you to Dr. Lim at 10.30.",
+    "score": 1.0
+   }
+  ]
+ },
+ "c05-lim-a": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Over the years, high pressure damages the heart, the brain and the kidneys.",
+  "bubble": [
+   "Over the years, high pressure damages",
+   "the heart, the brain and the kidneys."
+  ],
+  "file": "audio/voices-v5/c05-lim-a.wav",
+  "duration": 4.14,
+  "phrases": [
+   [
+    -0.16,
+    0.7
+   ],
+   [
+    0.99,
+    3.87
+   ]
+  ],
+  "heard": "Over the years, high pressure damages the heart, the brain, and the kidneys.",
+  "match": 1.0,
+  "source_take": "s3-doctor-a-lim-s23.wav",
+  "new_takes": []
+ },
+ "c05-lim-b": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "So you take it every day, even when you feel fine.",
+  "bubble": [
+   "So you take it every day,",
+   "even when you feel fine."
+  ],
+  "file": "audio/voices-v5/c05-lim-b.wav",
+  "duration": 2.8,
+  "phrases": [
+   [
+    -0.24,
+    2.21
+   ],
+   [
+    2.39,
+    2.45
+   ]
+  ],
+  "heard": "So you take it every day even when you feel fine.",
+  "match": 1.0,
+  "source_take": "s3-doctor-b-lim-s23.wav",
+  "new_takes": []
+ },
+ "c06-passenger": {
+  "speaker": "passenger",
+  "voice": "kuang",
+  "spoken": "Morning, uncle!",
+  "bubble": [
+   "Morning, uncle!"
+  ],
+  "file": "audio/voices-v5/c06-passenger.wav",
+  "duration": 0.98,
+  "phrases": [
+   [
+    -0.02,
+    0.85
+   ]
+  ],
+  "heard": "Morning, Uncle.",
+  "match": 1.0,
+  "source_take": "c06-passenger-kuang-s23.wav",
+  "new_takes": [
+   {
+    "seed": 23,
+    "file": "c06-passenger-kuang-s23.wav",
+    "heard": "Morning, Uncle.",
+    "score": 1.0
+   }
+  ]
+ },
+ "c06-tan": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "早啊！",
+  "bubble": [
+   "Morning!",
+   "早啊！"
+  ],
+  "file": "audio/voices-v5/c06-tan.wav",
+  "duration": 0.48,
+  "phrases": [
+   [
+    0.03,
+    0.45
+   ]
+  ],
+  "heard": "早啊",
+  "match": 1.0,
+  "source_take": "c06-tan-gy-s23.wav",
+  "new_takes": [
+   {
+    "seed": 23,
+    "file": "c06-tan-gy-s23.wav",
+    "heard": "早啊",
+    "score": 1.0
+   }
+  ]
+ },
+ "c07-lim-hello": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Good morning, Mr Tan. Please have a seat. Your daughter came with you today.",
+  "bubble": [
+   "Good morning, Mr Tan. Please have a seat.",
+   "Your daughter came with you today."
+  ],
+  "file": "audio/voices-v5/c07-lim-hello.wav",
+  "duration": 3.46,
+  "phrases": [
+   [
+    -0.15,
+    1.66
+   ],
+   [
+    1.81,
+    3.2
+   ]
+  ],
+  "heard": "Good morning, Mr. Tan. Please have a seat. Your daughter came with you today.",
+  "match": 1.0,
+  "source_take": "conv00-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-wei-intro": {
+  "speaker": "family",
+  "voice": "qsy",
+  "spoken": "Good morning, doctor. I'm his daughter, and Dad has been getting headaches in the morning this week.",
+  "bubble": [
+   "Good morning, doctor. I'm his daughter,",
+   "and Dad has been getting headaches",
+   "in the morning this week."
+  ],
+  "file": "audio/voices-v5/c07-wei-intro.wav",
+  "duration": 6.35,
+  "phrases": [
+   [
+    0.03,
+    1.27
+   ],
+   [
+    1.63,
+    2.69
+   ],
+   [
+    2.93,
+    3.8
+   ],
+   [
+    3.92,
+    6.27
+   ]
+  ],
+  "heard": "Good morning doctor, I'm his daughter and dad has been getting headaches in the morning this week.",
+  "match": 1.0,
+  "source_take": "conv01-qsy-s23.wav",
+  "new_takes": []
+ },
+ "c07-tan-headache": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "医生，我这几天早上起来头有点痛，晚上也睡不好。",
+  "bubble": [
+   "Doctor, my head aches in the mornings",
+   "and I don't sleep well at night.",
+   "医生，我这几天早上起来头有点痛，晚上也睡不好。"
+  ],
+  "file": "audio/voices-v5/c07-tan-headache.wav",
+  "duration": 5.37,
+  "phrases": [
+   [
+    0.03,
+    0.49
+   ],
+   [
+    1.17,
+    3.65
+   ],
+   [
+    4.17,
+    5.31
+   ]
+  ],
+  "heard": "医生,我这几天早上起来头有点痛,晚上也睡不好。",
+  "match": 1.0,
+  "source_take": "conv02-gy-s23.wav",
+  "new_takes": []
+ },
+ "c07-lim-bp": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Let me check your blood pressure. It is one hundred and fifty two over ninety four, higher than last time.",
+  "bubble": [
+   "Let me check your blood pressure.",
+   "It is 152 over 94, higher than last time."
+  ],
+  "file": "audio/voices-v5/c07-lim-bp.wav",
+  "duration": 5.69,
+  "phrases": [
+   [
+    -0.01,
+    1.51
+   ],
+   [
+    1.84,
+    5.57
+   ]
+  ],
+  "heard": "Let me check your blood pressure. It is 152 over 94 higher than last time.",
+  "match": 1.0,
+  "source_take": "conv03-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-tan-amlo": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "医生，amlodipine 我每天早上都有吃，没有忘记。",
+  "bubble": [
+   "Doctor, I take amlodipine every morning.",
+   "I haven't forgotten!",
+   "医生，amlodipine 我每天早上都有吃，没有忘记。"
+  ],
+  "file": "audio/voices-v5/c07-tan-amlo.wav",
+  "duration": 4.53,
+  "phrases": [
+   [
+    0.03,
+    0.53
+   ],
+   [
+    0.89,
+    1.87
+   ],
+   [
+    2.0,
+    4.48
+   ]
+  ],
+  "heard": "医生,I'm Lord Ping,我每天早上都有吃,没有忘记。",
+  "match": 0.875,
+  "source_take": "conv04-gy-s47.wav",
+  "new_takes": []
+ },
+ "c07-wei-sunday": {
+  "speaker": "family",
+  "voice": "qsy",
+  "spoken": "Dad, you missed it on Sunday, remember? You went to the market early.",
+  "bubble": [
+   "Dad, you missed it on Sunday, remember?",
+   "You went to the market early."
+  ],
+  "file": "audio/voices-v5/c07-wei-sunday.wav",
+  "duration": 4.62,
+  "phrases": [
+   [
+    0.03,
+    0.37
+   ],
+   [
+    0.53,
+    4.54
+   ]
+  ],
+  "heard": "Dad, you missed it on Sunday. Remember you went to the market early.",
+  "match": 1.0,
+  "source_take": "conv05-qsy-s23.wav",
+  "new_takes": []
+ },
+ "c07-lim-10mg": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Mister Tan, we will increase the amlodipine to ten milligrams, every morning.",
+  "bubble": [
+   "Mr Tan, we will increase the amlodipine",
+   "to 10 milligrams every morning."
+  ],
+  "file": "audio/voices-v5/c07-lim-10mg.wav",
+  "duration": 4.93,
+  "phrases": [
+   [
+    0.03,
+    3.61
+   ],
+   [
+    4.21,
+    4.88
+   ]
+  ],
+  "heard": "Mr. Tan, we will increase the M-load pin to 10mg every morning.",
+  "match": 0.959,
+  "source_take": "conv06-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-tan-10mg": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "十毫克，每天早上吃一粒，对吗？",
+  "bubble": [
+   "Ten milligrams, one tablet every morning, right?",
+   "十毫克，每天早上吃一粒，对吗？"
+  ],
+  "file": "audio/voices-v5/c07-tan-10mg.wav",
+  "duration": 3.88,
+  "phrases": [
+   [
+    -0.25,
+    0.61
+   ],
+   [
+    1.26,
+    2.69
+   ],
+   [
+    3.18,
+    3.52
+   ]
+  ],
+  "heard": "10毫克 每天早上吃一粒 对吗",
+  "match": 1.0,
+  "source_take": "conv07-gy-s23.wav",
+  "new_takes": []
+ },
+ "c07-lim-yes": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Yes, that's right. Please measure your blood pressure at home every morning.",
+  "bubble": [
+   "Yes, that's right. Please measure",
+   "your blood pressure at home every morning."
+  ],
+  "file": "audio/voices-v5/c07-lim-yes.wav",
+  "duration": 4.56,
+  "phrases": [
+   [
+    0.03,
+    4.53
+   ]
+  ],
+  "heard": "Yes, that's right. Please measure your blood pressure at home every morning.",
+  "match": 1.0,
+  "source_take": "conv08-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-tan-taichi": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "医生，我打太极的早上没吃早餐，血压就比较高，要怎么安排？",
+  "bubble": [
+   "On tai chi mornings I skip breakfast",
+   "and my pressure is higher. What should I do?",
+   "医生，我打太极的早上没吃早餐，血压就比较高，要怎么安排？"
+  ],
+  "file": "audio/voices-v5/c07-tan-taichi.wav",
+  "duration": 6.66,
+  "phrases": [
+   [
+    0.03,
+    0.49
+   ],
+   [
+    1.17,
+    3.48
+   ],
+   [
+    3.97,
+    5.27
+   ],
+   [
+    5.72,
+    6.6
+   ]
+  ],
+  "heard": "医生,我打太极的早上没吃早餐,血压就比较高,要怎么安排?",
+  "match": 1.0,
+  "source_take": "conv09-gy-s23.wav",
+  "new_takes": []
+ },
+ "c07-lim-answer": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "On tai chi mornings, have a small breakfast first, then rest five minutes before you measure. Write it down and show me in two weeks.",
+  "bubble": [
+   "On tai chi mornings, have a small breakfast first,",
+   "then rest five minutes before you measure.",
+   "Write it down and show me in two weeks."
+  ],
+  "file": "audio/voices-v5/c07-lim-answer.wav",
+  "duration": 8.48,
+  "phrases": [
+   [
+    0.03,
+    0.17
+   ],
+   [
+    0.36,
+    3.08
+   ],
+   [
+    3.4,
+    5.52
+   ],
+   [
+    5.78,
+    5.79
+   ],
+   [
+    6.15,
+    8.16
+   ],
+   [
+    8.34,
+    8.43
+   ]
+  ],
+  "heard": "On Tai Chi mornings, have a small breakfast first, then rest 5 minutes before you measure. Write it down and show me in 2 weeks.",
+  "match": 1.0,
+  "source_take": "conv10-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-wei-help": {
+  "speaker": "family",
+  "voice": "qsy",
+  "spoken": "I can help him record it on his phone. Should we worry about the headaches?",
+  "bubble": [
+   "I can help him record it on his phone.",
+   "Should we worry about the headaches?"
+  ],
+  "file": "audio/voices-v5/c07-wei-help.wav",
+  "duration": 5.28,
+  "phrases": [
+   [
+    0.03,
+    0.04
+   ],
+   [
+    0.3,
+    2.5
+   ],
+   [
+    2.63,
+    2.9
+   ],
+   [
+    3.27,
+    5.24
+   ]
+  ],
+  "heard": "I can help him record it on his phone. Should we worry about the headaches?",
+  "match": 1.0,
+  "source_take": "conv11-qsy-s59.wav",
+  "new_takes": []
+ },
+ "c07-lim-worse": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "If they get worse, bring him back earlier. Otherwise, come back in two weeks.",
+  "bubble": [
+   "If they get worse, bring him back earlier.",
+   "Otherwise, come back in two weeks."
+  ],
+  "file": "audio/voices-v5/c07-lim-worse.wav",
+  "duration": 5.27,
+  "phrases": [
+   [
+    0.03,
+    0.04
+   ],
+   [
+    0.49,
+    2.57
+   ],
+   [
+    3.49,
+    4.08
+   ],
+   [
+    4.25,
+    5.21
+   ]
+  ],
+  "heard": "If they get worse bring him back earlier, otherwise come back in two weeks",
+  "match": 1.0,
+  "source_take": "conv12-lim-s23.wav",
+  "new_takes": []
+ },
+ "c07-tan-ok": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "好的医生，那我两个星期以后再来。谢谢医生。",
+  "bubble": [
+   "OK, doctor, I'll come back in two weeks. Thank you!",
+   "好的医生，那我两个星期以后再来。谢谢医生。"
+  ],
+  "file": "audio/voices-v5/c07-tan-ok.wav",
+  "duration": 4.46,
+  "phrases": [
+   [
+    -0.23,
+    0.54
+   ],
+   [
+    1.03,
+    2.8
+   ],
+   [
+    3.39,
+    4.18
+   ]
+  ],
+  "heard": "好的医生 那我两个星期以后再来 谢谢医生",
+  "match": 1.0,
+  "source_take": "conv13-gy-s23.wav",
+  "new_takes": []
+ },
+ "c07-wei-remind": {
+  "speaker": "family",
+  "voice": "qsy",
+  "spoken": "Okay, Dad, I will remind you every morning.",
+  "bubble": [
+   "Okay, Dad, I will remind you every morning."
+  ],
+  "file": "audio/voices-v5/c07-wei-remind.wav",
+  "duration": 3.08,
+  "phrases": [
+   [
+    -0.03,
+    0.81
+   ],
+   [
+    0.94,
+    2.94
+   ]
+  ],
+  "heard": "Okay dad, I will remind you every morning.",
+  "match": 1.0,
+  "source_take": "conv14-qsy-s23.wav",
+  "new_takes": []
+ },
+ "c09-lim": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Mister Tan, we will increase the amlodipine to ten milligrams, every morning.",
+  "bubble": [
+   "Mr Tan, we will increase the amlodipine",
+   "to 10 milligrams every morning."
+  ],
+  "file": "audio/voices-v5/c09-lim.wav",
+  "duration": 4.93,
+  "phrases": [
+   [
+    0.03,
+    3.61
+   ],
+   [
+    4.21,
+    4.88
+   ]
+  ],
+  "heard": "Mr. Tan, we will increase the M-load pin to 10mg every morning.",
+  "match": 0.959,
+  "source_take": "conv06-lim-s23.wav",
+  "new_takes": []
+ },
+ "c11-tan-q": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "今天血压一百五十二，九十六，我能不能多吃一粒？",
+  "bubble": [
+   "My blood pressure is 152/96 today,",
+   "can I take one more tablet?",
+   "今天血压一百五十二，九十六，我能不能多吃一粒？"
+  ],
+  "file": "audio/voices-v5/c11-tan-q.wav",
+  "duration": 5.31,
+  "phrases": [
+   [
+    0.03,
+    2.18
+   ],
+   [
+    2.36,
+    3.03
+   ],
+   [
+    3.57,
+    5.25
+   ]
+  ],
+  "heard": "今天血压152,96,我能不能多吃一粒?",
+  "match": 1.0,
+  "source_take": "s4-his-words-gy-s23.wav",
+  "new_takes": []
+ },
+ "c11-lim-dose": {
+  "speaker": "doctor",
+  "voice": "lim",
+  "spoken": "Please don't change the dose yourself.",
+  "bubble": [
+   "Please don't change the dose yourself."
+  ],
+  "file": "audio/voices-v5/c11-lim-dose.wav",
+  "duration": 1.95,
+  "phrases": [
+   [
+    -0.01,
+    1.83
+   ]
+  ],
+  "heard": "Please don't change the dose yourself.",
+  "match": 1.0,
+  "source_take": "s4-doctor-lim-s23.wav",
+  "new_takes": []
+ },
+ "c11-tan-chest": {
+  "speaker": "patient",
+  "voice": "gy",
+  "spoken": "爬完楼梯，胸口有点闷。",
+  "bubble": [
+   "My chest feels tight after climbing the stairs.",
+   "爬完楼梯，胸口有点闷。"
+  ],
+  "file": "audio/voices-v5/c11-tan-chest.wav",
+  "duration": 2.74,
+  "phrases": [
+   [
+    -0.51,
+    0.39
+   ],
+   [
+    0.92,
+    2.19
+   ]
+  ],
+  "heard": "爬完楼梯,胸口有点闷。",
+  "match": 1.0,
+  "source_take": "c11-tan-chest-gy-s23.wav",
+  "new_takes": [
+   {
+    "seed": 23,
+    "file": "c11-tan-chest-gy-s23.wav",
+    "heard": "爬完楼梯 胸口有点闷",
+    "score": 1.0
+   }
+  ]
+ }
+}

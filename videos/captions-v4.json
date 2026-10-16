@@ -1,0 +1,487 @@
+{
+ "note": "Version 4 captions, burned by post.mjs onto out/frames-v4-raw -> out/frames-v4. start/end are FINAL film seconds (the v3 output time + 7.0 s for the agenda); a caption is visible on frames round(start*30) to round(end*30)-1, popping in over the first 5 frames and out over the last 5. position names a preset (pos overrides it); each preset's box is the area the caption may occupy (post.mjs --check fails if it leaves it or wraps to more than two lines).",
+ "fps": 30,
+ "inFrames": 5,
+ "outFrames": 5,
+ "presets": {
+  "br": {
+   "align": "center",
+   "x": 1332,
+   "anchor": "bottom",
+   "y": 1056,
+   "maxW": 1060,
+   "box": [
+    770,
+    850,
+    1895,
+    1068
+   ],
+   "note": "bottom right of the time card"
+  },
+  "bc": {
+   "align": "center",
+   "x": 960,
+   "anchor": "bottom",
+   "y": 1056,
+   "maxW": 1300,
+   "box": [
+    250,
+    850,
+    1670,
+    1068
+   ],
+   "note": "bottom centre, no card on screen"
+  },
+  "bl_panel": {
+   "align": "center",
+   "x": 600,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1080,
+   "box": [
+    25,
+    760,
+    1180,
+    975
+   ],
+   "note": "left of the c03/c05 app panel, above the time card"
+  },
+  "bl_panel4": {
+   "align": "center",
+   "x": 620,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1120,
+   "box": [
+    25,
+    760,
+    1222,
+    975
+   ],
+   "note": "left of the c04 app panel, above the time card"
+  },
+  "tl_panel": {
+   "align": "center",
+   "x": 600,
+   "anchor": "top",
+   "y": 22,
+   "maxW": 1080,
+   "box": [
+    25,
+    12,
+    1180,
+    260
+   ],
+   "note": "top, left of the app panel"
+  },
+  "gap": {
+   "align": "center",
+   "x": 962,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 930,
+   "box": [
+    462,
+    760,
+    1462,
+    975
+   ],
+   "note": "between the two c07 panels, above the time card"
+  },
+  "c11": {
+   "align": "center",
+   "x": 640,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 1150,
+   "box": [
+    25,
+    760,
+    1255,
+    975
+   ],
+   "note": "left of the c11 panel, above the EXP card"
+  },
+  "bl_exp": {
+   "align": "center",
+   "x": 520,
+   "anchor": "bottom",
+   "y": 968,
+   "maxW": 900,
+   "box": [
+    25,
+    760,
+    1000,
+    975
+   ],
+   "note": "bottom left above the EXP card, clear of the c11 warning card and the SAFE stamp"
+  },
+  "tl": {
+   "align": "left",
+   "x": 40,
+   "anchor": "top",
+   "y": 30,
+   "maxW": 620,
+   "box": [
+    20,
+    15,
+    720,
+    280
+   ],
+   "note": "top left, where c11's own caption box then lands"
+  },
+  "part": {
+   "align": "left",
+   "x": 110,
+   "anchor": "top",
+   "y": 96,
+   "box": [
+    0,
+    60,
+    1500,
+    330
+   ],
+   "note": "a part marker in the agenda's row style, top left"
+  }
+ },
+ "captions": [
+  {
+   "id": "s01",
+   "start": 12.2,
+   "end": 16.6,
+   "v3": [
+    5.2,
+    9.6
+   ],
+   "position": "br",
+   "text": "MEET MR TAN, 67. HIS BLOOD PRESSURE NEEDS WATCHING."
+  },
+  {
+   "id": "s02",
+   "start": 17.5,
+   "end": 21.8,
+   "v3": [
+    10.5,
+    14.8
+   ],
+   "position": "br",
+   "text": "BETWEEN DOCTOR VISITS, HE MANAGES ON HIS OWN."
+  },
+  {
+   "id": "s03",
+   "start": 24.3,
+   "end": 32.4,
+   "v3": [
+    17.3,
+    25.4
+   ],
+   "position": "br",
+   "text": "ON TAI CHI MORNINGS, HE SKIPS BREAKFAST. REMEMBER THIS."
+  },
+  {
+   "id": "s04",
+   "start": 35.0,
+   "end": 37.6,
+   "v3": [
+    28.0,
+    30.6
+   ],
+   "position": "br",
+   "text": "HE CHECKS HIS BLOOD PRESSURE AT HOME."
+  },
+  {
+   "id": "s05",
+   "start": 43.6,
+   "end": 51.4,
+   "v3": [
+    36.6,
+    44.4
+   ],
+   "position": "tl_panel",
+   "text": "HE LOGS 152/96 IN RIPPLE. IT'S ABOVE THE TARGET DR LIM SET."
+  },
+  {
+   "id": "s06",
+   "start": 52.4,
+   "end": 55.3,
+   "v3": [
+    45.4,
+    48.3
+   ],
+   "position": "tl_panel",
+   "text": "HE HOLDS THE BUTTON AND SAYS WHY."
+  },
+  {
+   "id": "s07",
+   "start": 59.8,
+   "end": 63.0,
+   "v3": [
+    52.8,
+    56.0
+   ],
+   "position": "bl_panel",
+   "text": "RIPPLE KEEPS HIS OWN WORDS."
+  },
+  {
+   "id": "s08",
+   "start": 63.4,
+   "end": 68.0,
+   "v3": [
+    56.4,
+    61.0
+   ],
+   "position": "bl_panel",
+   "text": "AND ADDS A QUESTION FOR HIS NEXT VISIT."
+  },
+  {
+   "id": "s09",
+   "start": 74.0,
+   "end": 78.6,
+   "v3": [
+    67.0,
+    71.6
+   ],
+   "position": "br",
+   "text": "HIS DAUGHTER WEI LING, AT WORK."
+  },
+  {
+   "id": "s10",
+   "start": 79.4,
+   "end": 86.0,
+   "v3": [
+    72.4,
+    79.0
+   ],
+   "position": "bl_panel4",
+   "text": "SHE SEES DAD'S READING AND HIS REASON, BECAUSE HE ALLOWS HER TO."
+  },
+  {
+   "id": "s11",
+   "start": 92.8,
+   "end": 96.8,
+   "v3": [
+    85.8,
+    89.8
+   ],
+   "position": "br",
+   "text": "FOUR BOXES. HOW MANY OF EACH? BEFORE OR AFTER FOOD?"
+  },
+  {
+   "id": "s12",
+   "start": 99.4,
+   "end": 106.0,
+   "v3": [
+    92.4,
+    99.0
+   ],
+   "position": "bl_panel",
+   "text": "HE SCANS THE BOX. RIPPLE READS HIS PHARMACY LABEL."
+  },
+  {
+   "id": "s13",
+   "start": 108.5,
+   "end": 116.0,
+   "v3": [
+    101.5,
+    109.0
+   ],
+   "position": "bl_panel",
+   "text": "THEN IT PLAYS DR LIM'S OWN RECORDED WORDS, WITH WHO SAID IT AND WHEN."
+  },
+  {
+   "id": "s14",
+   "start": 123.5,
+   "end": 133.0,
+   "v3": [
+    116.5,
+    126.0
+   ],
+   "position": "br",
+   "text": "WITH WEI LING, ON THE WAY TO HIS FOLLOW-UP VISIT."
+  },
+  {
+   "id": "s15",
+   "start": 135.0,
+   "end": 143.5,
+   "v3": [
+    128.0,
+    136.5
+   ],
+   "position": "gap",
+   "text": "HE ASKS DR LIM IF HE MAY RECORD. THE DOCTOR AGREES."
+  },
+  {
+   "id": "s16",
+   "start": 144.5,
+   "end": 150.0,
+   "v3": [
+    137.5,
+    143.0
+   ],
+   "position": "gap",
+   "text": "LIVE CAPTIONS ON BOTH PHONES, MARKED WITH WHO IS SPEAKING."
+  },
+  {
+   "id": "s17",
+   "start": 151.2,
+   "end": 159.0,
+   "v3": [
+    144.2,
+    152.0
+   ],
+   "position": "gap",
+   "text": "A LIVE SUMMARY BUILDS AS THEY TALK."
+  },
+  {
+   "id": "s18",
+   "start": 173.0,
+   "end": 182.0,
+   "v3": [
+    166.0,
+    175.0
+   ],
+   "position": "gap",
+   "text": "HE ASKS THIS MORNING'S QUESTION. THE ANSWER COMES FROM HIS DOCTOR."
+  },
+  {
+   "id": "s19",
+   "start": 182.4,
+   "end": 190.4,
+   "v3": [
+    175.4,
+    183.4
+   ],
+   "position": "gap",
+   "text": "HE CHECKS RIPPLE'S SUMMARY AGAINST WHAT THE DOCTOR SAID."
+  },
+  {
+   "id": "s20",
+   "start": 195.5,
+   "end": 205.5,
+   "v3": [
+    188.5,
+    198.5
+   ],
+   "position": "br",
+   "text": "TODAY'S READINGS, QUESTIONS AND THE DOCTOR'S WORDS ARE KEPT FOR NEXT TIME."
+  },
+  {
+   "id": "p2",
+   "start": 212.0,
+   "end": 214.6,
+   "v3": [
+    205.0,
+    207.6
+   ],
+   "position": "part",
+   "style": "part",
+   "text": "PART 2 · RIPPLE IN ACTION",
+   "n": "2",
+   "head": "RIPPLE IN ACTION",
+   "sub": "The problem and the trust lab"
+  },
+  {
+   "id": "s21",
+   "start": 233.9,
+   "end": 236.9,
+   "v3": [
+    226.9,
+    229.9
+   ],
+   "position": "bc",
+   "text": "TWO THINGS THE STORY DIDN'T SHOW"
+  },
+  {
+   "id": "s22",
+   "start": 258.967,
+   "end": 261.967,
+   "v3": [
+    251.95,
+    254.95
+   ],
+   "position": "c11",
+   "text": "THE TRUST LAB: RIPPLE'S SAFETY RULES, PUT TO THE TEST"
+  },
+  {
+   "id": "s23",
+   "start": 262.2,
+   "end": 266.6,
+   "v3": [
+    255.2,
+    259.6
+   ],
+   "position": "c11",
+   "text": "ONE MORE TABLET? RIPPLE LEAVES THAT TO HIS DOCTOR."
+  },
+  {
+   "id": "s24",
+   "start": 267.2,
+   "end": 272.867,
+   "v3": [
+    260.2,
+    265.85
+   ],
+   "position": "c11",
+   "text": "IT PLAYS DR LIM'S OWN WORDS AND SAVES THE QUESTION FOR HIS NEXT VISIT."
+  },
+  {
+   "id": "s25",
+   "start": 274.967,
+   "end": 278.567,
+   "v3": [
+    267.95,
+    271.55
+   ],
+   "position": "tl",
+   "text": "AN UNKNOWN BOX: IT SAYS SO, AND SENDS HIM TO THE PHARMACIST."
+  },
+  {
+   "id": "s26",
+   "start": 283.667,
+   "end": 287.1,
+   "v3": [
+    276.65,
+    280.1
+   ],
+   "position": "tl",
+   "text": "CHEST TIGHT AFTER THE STAIRS? RIPPLE SAVES IT FOR HIS DOCTOR."
+  },
+  {
+   "id": "s26b",
+   "start": 289.0,
+   "end": 292.0,
+   "v3": [
+    282.0,
+    285.0
+   ],
+   "position": "bl_exp",
+   "text": "RIPPLE'S ANSWER ENDS WITH WHEN TO CALL 995."
+  },
+  {
+   "id": "s27",
+   "start": 292.2,
+   "end": 295.567,
+   "v3": [
+    285.2,
+    288.55
+   ],
+   "position": "tl",
+   "text": "HIS SWITCHES DECIDE WHAT WEI LING'S PHONE CAN SHOW."
+  },
+  {
+   "id": "p3",
+   "start": 299.867,
+   "end": 303.5,
+   "v3": [
+    292.85,
+    296.5
+   ],
+   "position": "part",
+   "style": "part",
+   "text": "PART 3 · ARCHITECTURE AND SAFETY",
+   "n": "3",
+   "head": "ARCHITECTURE AND SAFETY",
+   "sub": "How it works, results and limits"
+  }
+ ]
+}

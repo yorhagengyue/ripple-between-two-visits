@@ -1,0 +1,108 @@
+{
+  "note": "Version 4 cut (owner 16 Oct night): the 7.0 s agenda card first (a_agenda.js, source 800-807 in out/frames-a), then every segment of edl-v3.json unchanged. Captions are burned afterwards by post.mjs from captions-v4.json (out/frames-v4-raw -> out/frames-v4).",
+  "fps": 30,
+  "segments": [
+    {
+      "name": "agenda",
+      "a": 800,
+      "b": 807,
+      "dir": "out/frames-a"
+    },
+    {
+      "name": "story c01-c08",
+      "a": 0,
+      "b": 205,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c09 fly-in and lights",
+      "a": 205,
+      "b": 209.4,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c09 card 1 (cannot read English)",
+      "a": 210,
+      "b": 215.6,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c09 card 2 (forgotten)",
+      "a": 220.4,
+      "b": 226.4,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c09 card 3 (between two visits)",
+      "a": 230.6,
+      "b": 237,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c10 curtain opens",
+      "a": 237,
+      "b": 239,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c10 B5 family, on his terms",
+      "a": 291.5,
+      "b": 300.5,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c10 B6 management and prevention",
+      "a": 305.5,
+      "b": 315.1,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c10 curtain closes",
+      "a": 319.6,
+      "b": 322,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c11 intro",
+      "a": 322,
+      "b": 323.5,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c11 EXP 01 can I take one more",
+      "a": 324,
+      "b": 340,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c11 EXP 02 unknown box",
+      "a": 341.3,
+      "b": 350,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c11 EXP 03 chest pain",
+      "a": 351.4,
+      "b": 360,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "c11 EXP 04 who sees what",
+      "a": 362.4,
+      "b": 370,
+      "dir": "out/frames-v2"
+    },
+    {
+      "name": "t sober technical and safety summary",
+      "a": 600,
+      "b": 753,
+      "dir": "out/frames-t"
+    },
+    {
+      "name": "c14 try it",
+      "a": 430,
+      "b": 440,
+      "dir": "out/frames-v2"
+    }
+  ]
+}

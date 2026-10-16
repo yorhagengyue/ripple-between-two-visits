@@ -1,0 +1,114 @@
+{
+ "note": "Version 7 cut (owner 16 Oct): v6 plus part 3 reworked (out/frames-t7, 600-755: results slide removed, 'Web app / mobile app', the web app is a demo for the challenge and the product ships as an iOS app, the emergency row notifies his daughter, a visit step by step and 'can I take one more tablet?' with real recordings, next steps with the iOS app in review and Singapore-accented Mandarin), the c08 end card and c14 URL card with the demo note (out/frames-c08v7, out/frames-c14v7), the agenda's part 3 subline 'How it works, safety and next steps' (out/frames-a8). c07 frames are the --clip cache out/clip-c07_clinic-1127-1201.2. Captions: captions-v7.json (out/frames-v7-raw -> out/frames-v7-final).",
+ "fps": 30,
+ "segments": [
+  {
+   "name": "agenda",
+   "a": 800,
+   "b": 807,
+   "dir": "out/frames-a8"
+  },
+  {
+   "name": "story c01-c02",
+   "a": 0,
+   "b": 27,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "story c03-c06",
+   "a": 27,
+   "b": 127,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c07 clinic",
+   "a": 1127,
+   "b": 1201.2,
+   "dir": "out/clip-c07_clinic-1127-1201.2"
+  },
+  {
+   "name": "c08 evening",
+   "a": 187,
+   "b": 205,
+   "dir": "out/frames-c08v7"
+  },
+  {
+   "name": "c09 fly-in and lights",
+   "a": 205,
+   "b": 209.4,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 1 (cannot read English)",
+   "a": 210,
+   "b": 215.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 2 (forgotten)",
+   "a": 218.0,
+   "b": 227.6,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c09 card 3 (between two visits)",
+   "a": 230.6,
+   "b": 237,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c10 curtain opens",
+   "a": 237,
+   "b": 239,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 B6 management and prevention",
+   "a": 305.5,
+   "b": 315.1,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c10 curtain closes",
+   "a": 319.6,
+   "b": 322,
+   "dir": "out/frames-v2"
+  },
+  {
+   "name": "c11 intro",
+   "a": 1322,
+   "b": 1323.5,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 01 can I take one more",
+   "a": 1324,
+   "b": 1343.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 02 unknown box",
+   "a": 1344.5,
+   "b": 1353.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "c11 EXP 03 chest pain",
+   "a": 1354.6,
+   "b": 1363.2,
+   "dir": "out/frames-v5"
+  },
+  {
+   "name": "t sober technical and safety summary",
+   "a": 600,
+   "b": 755,
+   "dir": "out/frames-t7"
+  },
+  {
+   "name": "c14 try it",
+   "a": 430,
+   "b": 440,
+   "dir": "out/frames-c14v7"
+  }
+ ]
+}
