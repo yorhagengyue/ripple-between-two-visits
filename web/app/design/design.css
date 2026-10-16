@@ -1,0 +1,181 @@
+/*
+ * /design gallery chrome only: the board around the specimens, the cells, the phone frames and their fake status
+ * bar. Classes are .rpd-*; the components themselves are styled by app/ripple-ui.css. Chrome text is 18px or more
+ * on the elder board and 16px or more on the daughter board, so the page checks need no exceptions except the fake
+ * status bar (.rpd-sys), which is phone hardware, not app UI.
+ */
+
+.rpd-board {
+  background: #E7E2D8;
+  min-height: 100vh;
+  padding: 44px 44px 96px;
+  color: var(--rp-ink);
+  font-family: var(--rp-font-sans);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+/* the daughter board keeps its light ground with dark chrome text; the specimens sit on her dark ground (.rpd-cell) */
+.rpd-board[data-rp-side="family"] { background: #E6EBED; color: #15181C; font-family: var(--rpf-font); }
+@media (max-width: 640px) {
+  .rpd-board { padding: 24px 12px 72px; }
+}
+
+.rpd-head { display: grid; gap: 10px; max-width: 1100px; }
+.rpd-eyebrow { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: .1em; color: var(--rp-accent-ink); }
+.rpd-board[data-rp-side="family"] .rpd-eyebrow { color: #1E5E5C; }
+.rpd-title { margin: 0; font-size: 38px; line-height: 1.22; font-weight: 800; letter-spacing: .01em; }
+.rpd-lede { margin: 0; font-size: 20px; line-height: 1.6; color: var(--rp-ink-2); max-width: 70ch; }
+.rpd-board[data-rp-side="family"] .rpd-lede { color: #3D4347; }
+.rpd-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 8px 28px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 18px; line-height: 1.5; color: var(--rp-ink-2); }
+.rpd-board[data-rp-side="family"] .rpd-rules { color: #3D4347; }
+.rpd-rules li { display: flex; gap: 10px; }
+.rpd-rules li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--rp-accent); margin-top: .6em; flex: none; }
+
+.rpd-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+.rpd-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 2px solid var(--rp-edge);
+  background: #FFFFFF;
+  color: var(--rp-ink);
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.rpd-nav a[aria-current="page"] { background: var(--rp-accent); border-color: var(--rp-accent); color: #FFFFFF; }
+
+.rpd-section { margin-top: 64px; }
+.rpd-h2 { margin: 0; font-size: 28px; line-height: 1.3; font-weight: 800; }
+.rpd-h3 { margin: 0; font-size: 23px; line-height: 1.3; font-weight: 800; }
+.rpd-note { margin: 8px 0 0; font-size: 18px; line-height: 1.6; color: var(--rp-ink-2); max-width: 980px; }
+.rpd-board[data-rp-side="family"] .rpd-note { color: #3D4347; }
+.rpd-code { font-family: var(--rp-font-mono); font-weight: 500; font-size: 18px; color: var(--rp-ink); overflow-wrap: anywhere; }
+
+.rpd-component { margin-top: 48px; scroll-margin-top: 24px; }
+
+/* specimen cells: the page ground at phone width (390 max), three across at 1440 */
+.rpd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 390px));
+  gap: 22px 40px;
+  margin-top: 18px;
+  align-items: start;
+}
+.rpd-cell {
+  background: var(--rp-paper);
+  border-radius: 20px;
+  padding: 16px var(--rp-gutter) 22px;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.rpd-board[data-rp-side="family"] .rpd-cell { background: var(--rpf-bg); padding: 16px 20px 22px; }
+.rpd-cell[data-bleed="true"] { padding-left: 0; padding-right: 0; padding-bottom: 0; overflow: hidden; }
+.rpd-cell[data-bleed="true"] > .rpd-cap { padding: 0 var(--rp-gutter); }
+.rpd-cap {
+  display: block;
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--rp-ink-3);
+}
+.rpd-board[data-rp-side="family"] .rpd-cap { font-size: 16px; color: var(--rpf-ink-3); }
+
+/* colour swatches */
+.rpd-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 16px; margin-top: 18px; }
+.rpd-swatch { background: var(--rp-paper); border-radius: 16px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.rpd-board[data-rp-side="family"] .rpd-swatch { background: #FFFFFF; }
+.rpd-chip { height: 48px; border-radius: 10px; border: 1px solid rgba(23, 25, 27, .12); margin-bottom: 6px; }
+.rpd-swatch-name { font-family: var(--rp-font-mono); font-weight: 500; font-size: 18px; color: var(--rp-ink); overflow-wrap: anywhere; }
+.rpd-swatch-meta { font-size: 18px; line-height: 1.45; color: var(--rp-ink-2); font-variant-numeric: tabular-nums; }
+.rpd-board[data-rp-side="family"] .rpd-swatch-meta { font-size: 16px; color: #3D4347; }
+
+/* type scale */
+.rpd-scale { display: grid; gap: 12px; margin-top: 18px; background: var(--rp-paper); border-radius: 20px; padding: 18px 24px; }
+.rpd-scale-row { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.rpd-scale-px { font-family: var(--rp-font-mono); font-weight: 500; font-size: 18px; color: var(--rp-ink-3); min-width: 80px; }
+
+/* phones */
+.rpd-phones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 390px), 390px));
+  gap: 40px 44px;
+  margin-top: 22px;
+  padding: 9px;
+}
+.rpd-phone-col { display: grid; gap: 14px; min-width: 0; align-content: start; }
+.rpd-phone {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  height: 844px;
+  background: var(--rp-paper);
+  overflow: hidden;
+  border-radius: 46px;
+  box-shadow: 0 0 0 9px #15191C, 0 34px 60px -24px rgba(21, 25, 28, .5);
+  display: flex;
+  flex-direction: column;
+}
+.rpd-phone[data-side="family"] { background: var(--rpf-bg); }
+.rpd-phone-cap { margin: 0; font-size: 18px; line-height: 1.6; color: var(--rp-ink-2); }
+.rpd-phone-cap b { display: block; color: var(--rp-ink); font-size: 19px; margin-bottom: 2px; }
+.rpd-open {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--rp-accent-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* one phone filling the viewport: /design/screens/<name> and /design/today/m1|m2|m3 (screenshots at 390x844) */
+.rpd-phone-full {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 640px;
+  background: var(--rp-paper);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.rpd-phone-full[data-side="family"] { background: var(--rpf-bg); }
+
+.rpd-phone > .rpu-screen,
+.rpd-phone-full > .rpu-screen,
+.rpd-phone > .rpf-screen,
+.rpd-phone-full > .rpf-screen { flex: 1; min-height: 0; height: auto; }
+
+/* the fake system bar of the mock (time, signal, battery): phone hardware, not app UI */
+.rpd-sys {
+  height: var(--rp-statusbar-h);
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 32px 8px 38px;
+  font: 600 16px/1 var(--rp-font-sans);
+  color: var(--rp-ink);
+  background: var(--rp-paper);
+}
+.rpd-phone[data-side="family"] .rpd-sys,
+.rpd-phone-full[data-side="family"] .rpd-sys { background: var(--rpf-bg); color: var(--rpf-ink); }
+.rpd-sys-ic { display: flex; gap: 6px; align-items: center; }
+.rpd-sys svg { display: block; }
+
+.rpd-demo-note { margin: 12px 0 0; font-size: 18px; color: var(--rp-ink-2); min-height: 1.6em; }
+
+/* a frame's stub map */
+.rpd-table { width: 100%; max-width: 1100px; border-collapse: collapse; margin-top: 16px; font-size: 18px; line-height: 1.5; background: var(--rp-paper); border-radius: 16px; overflow: hidden; }
+.rpd-table th, .rpd-table td { text-align: left; padding: 10px 14px; border-bottom: 1.5px solid var(--rp-line); vertical-align: top; }
+.rpd-table th { font-weight: 800; }
+.rpd-table code { font-family: var(--rp-font-mono); font-size: 18px; }

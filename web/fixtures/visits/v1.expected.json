@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "visit": "v1",
+    "use": "tests only; app code must not import this file"
+  },
+  "answers": [
+    {
+      "id": "v1-u01",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "同意（consent）",
+      "required_line": null
+    },
+    {
+      "id": "v1-u02",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "同意（consent）",
+      "required_line": null
+    },
+    {
+      "id": "v1-u03",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "读数（诊室）152/94",
+      "required_line": null
+    },
+    {
+      "id": "v1-u04",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v1-u05",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "指示：在家量一周，早晚各一次",
+      "required_line": null
+    },
+    {
+      "id": "v1-u06",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "指示：量法",
+      "required_line": null
+    },
+    {
+      "id": "v1-u07",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "生活方式：少盐；继续散步",
+      "required_line": null
+    },
+    {
+      "id": "v1-u08",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "目标：家测 < 135/85",
+      "required_line": "R1"
+    },
+    {
+      "id": "v1-u09",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "警示线：> 180 收缩压或胸痛、单侧无力、说话不清 → A&E / 995",
+      "required_line": "R2"
+    },
+    {
+      "id": "v1-u10",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "复诊：约一周后",
+      "required_line": null
+    },
+    {
+      "id": "v1-u11",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题",
+      "required_line": null
+    },
+    {
+      "id": "v1-u12",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答：用上臂式血压计",
+      "required_line": null
+    }
+  ]
+}

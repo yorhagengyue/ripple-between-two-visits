@@ -1,0 +1,1474 @@
+{
+  "meta": {
+    "generated_from": [
+      "Ripple 规则库资料 · 新加坡药物单张转述与差异 v1.1（2026-10-01）.json",
+      "Ripple 规则库资料出处表 v1.1 新加坡版（2026-10-01）.md"
+    ],
+    "author_of_research": "Zicheng (v1.1, 2026-10-01)",
+    "rules": [
+      "Patient-facing text is our paraphrase with a citation; never copy HealthHub/HPB/MOH sentences.",
+      "US label text is reference only and never shown to the patient.",
+      "Numbers marked do-not-display in the B4 notes must never appear in output.",
+      "zh fields must be human-reviewed before zh_status becomes 'reviewed'."
+    ]
+  },
+  "drugs": [
+    {
+      "id": "amlodipine",
+      "display_name": "amlodipine",
+      "aliases": [
+        "amlodipine besylate",
+        "amlodipine besilate",
+        "norvasc",
+        "氨氯地平"
+      ],
+      "source_id": "hh-amlodipine",
+      "fields": {
+        "indication": {
+          "en": "The leaflet describes amlodipine as a medicine that brings blood pressure down; it does this by letting the blood vessels loosen and open wider. Lowering blood pressure is the only purpose the page gives - chest pain (angina) is not mentioned, and the words 'high blood pressure' or 'hypertension' do not appear in the leaflet text itself.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        "how_to_take": {
+          "en": "Food makes no difference: the leaflet allows it either alongside a meal or on an empty stomach. People are told to check with their healthcare professional first instead of stopping it on their own. The page gives no dose, no number of times a day, no time of day and nothing about swallowing it whole; for those details the app can only point to the pharmacy label or the prescriber (that pointer is ours - the leaflet itself is silent).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        "missed_dose": {
+          "en": "Someone who forgets a dose should have it once they realise, and the following dose then goes ahead at its normal time. Doubling up to cover the forgotten one is ruled out. The leaflet sets no hour limit after which the late dose should be skipped, and has no 'skip it if the next one is nearly due' wording.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        "stop_or_see_doctor": {
+          "en": "(1) Under precautions, the leaflet asks people to let their healthcare professional know about: an allergy to amlodipine or to anything else in the product; being pregnant, trying for a baby, or breastfeeding; and every other medicine in use, with supplements, traditional medicines and herbal products counted. No timing (before or during treatment) is spelled out. (2) Stopping the medicine is something to clear with a healthcare professional first. (3) Under the heading for rare but serious effects that need medical advice at once - signs of a drug allergy, any one or more of: puffiness of the face, eyes, lips or tongue, trouble breathing, or an itchy rash spread across the entire body: stop the medicine and get seen by a healthcare professional straight away. (4) Same heading - liver injury, described as very rare (it may settle by itself but can sometimes be serious): dark urine, pale stools, feeling or being sick, poor appetite, tummy pain, or a yellow tinge to the skin or eyes: stop the medicine and get seen by a doctor at once. The page adds that the odds of this are very small and that most people have no trouble with the medicine. (5) Any worry about the medicine, or any other effect the person believes it is causing: speak to a doctor or pharmacist. (6) Having had more than the recommended amount: get medical advice straight away (closing disclaimer; see overdose). (7) The common effects (swollen legs, headache, a flushed warm face, feeling dizzy or light-headed on standing up) are listed with no instruction to stop or to see anyone. The leaflet names no emergency number and does not mention 995, A&E, a GP or a polyclinic.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        "overdose": {
+          "en": "Only the closing disclaimer covers this: a person who has had more than the recommended amount should get medical advice straight away. It does not say whom to call or where to go (no 995, A&E or poisons line is named) and lists no overdose symptoms.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        }
+      },
+      "other_points": [
+        {
+          "key": "amlodipine-op1",
+          "topic": "Food/drink to avoid",
+          "en": "Grapefruit should be left out while on amlodipine; the leaflet says the fruit can interact with the medicine and make side effects more likely. No amount or cut-off is given, and the leaflet says 'grapefruit' only (juice is not singled out).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op2",
+          "topic": "Other medicines to tell the doctor about",
+          "en": "The healthcare professional should be told about all other medicines being used, and the leaflet counts supplements, traditional medicines and herbal products in that. No specific interacting medicine is named.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op3",
+          "topic": "Pregnancy / breastfeeding",
+          "en": "Pregnancy, plans for pregnancy and breastfeeding are all things to raise with the healthcare professional; the leaflet gives no further detail.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op4",
+          "topic": "Common side effects (no action attached)",
+          "en": "Listed as common: swollen legs, headache, and a face that looks flushed and feels warm. The leaflet adds that a person may also feel dizzy or light-headed when standing up after sitting or lying down.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op5",
+          "topic": "Storage (child safety)",
+          "en": "Keep it somewhere cool and dry, out of direct sun, and where children cannot get at it.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op6",
+          "topic": "Disposal",
+          "en": "To discard it, seal it tightly inside a black rubbish bag and then put it down the chute or in the bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        },
+        {
+          "key": "amlodipine-op7",
+          "topic": "Disclaimer / other languages",
+          "en": "The page states that its side-effect list is incomplete and that it is no substitute for what a person's own healthcare professional tells them. It also embeds or links YouTube video playlists about the medicine and about drug allergy, with Chinese, Malay and Tamil versions offered through a link.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-amlodipine"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "Indication",
+          "sg_says": "Blood-pressure lowering only (vessels loosen and open wider); no angina or heart-disease use is listed, and the drug class is not named in the leaflet text.",
+          "us_label_says": "High blood pressure plus coronary artery disease uses: chronic stable angina, vasospastic angina, and angiography-documented CAD; also notes that lowering BP cuts stroke and heart-attack risk, calls it a calcium channel blocker, and says it may be used alone or with other medicines.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take - food",
+          "sg_says": "Can be taken whether or not the person has eaten.",
+          "us_label_says": "With or without food.",
+          "kind": "same"
+        },
+        {
+          "item": "How to take - frequency / time of day",
+          "sg_says": "Silent - no frequency or time of day on the page.",
+          "us_label_says": "Once a day; suggests the same time each day (e.g. with breakfast or dinner, or at bedtime); use only the way the doctor said.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take - not stopping",
+          "sg_says": "Check with a healthcare professional before stopping amlodipine itself.",
+          "us_label_says": "Row only says not to stop OTHER prescription / blood-pressure medicines (or nitroglycerin for angina) without talking to the doctor; no explicit line about stopping amlodipine.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Missed dose",
+          "sg_says": "Take the forgotten dose on remembering, carry on with the following dose at its normal time, never double. No hour cut-off.",
+          "us_label_says": "Take it as soon as remembered, but if more than 12 hours have passed since the missed dose, skip it and take the next dose at the regular time; never more than one dose at a time.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - allergy",
+          "sg_says": "Asks people to tell the healthcare professional about an allergy; lists three allergy signs (facial/tongue swelling, breathing trouble, widespread itchy rash) and says stop and be seen straight away.",
+          "us_label_says": "Do not use if allergic to amlodipine or the inactive ingredients (stronger wording than the SG 'tell your healthcare professional'); the row lists no allergy symptoms and no stop-and-be-seen instruction.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - liver injury",
+          "sg_says": "Warns of very rare liver injury and lists its signs (dark urine, pale stools, nausea, vomiting, poor appetite, tummy pain, yellow eyes or skin): stop and get seen by a doctor at once.",
+          "us_label_says": "Only asks the patient to tell the doctor about past liver problems; no liver-injury warning signs in the row.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Stop / see doctor - heart attack or worse angina after starting / dose increase",
+          "sg_says": "Not mentioned.",
+          "us_label_says": "Rare heart attack or worsening angina when first starting or increasing the dose: call the doctor right away or go directly to a hospital emergency room.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Precautions - pregnancy, breastfeeding, other medicines",
+          "sg_says": "Tell the healthcare professional about pregnancy, pregnancy plans, breastfeeding and all other medicines including supplements, traditional and herbal products.",
+          "us_label_says": "Tell the doctor about all medicines incl. herbal, pregnancy or plans, breast-feeding.",
+          "kind": "same"
+        },
+        {
+          "item": "Precautions - starting new medicines or supplements",
+          "sg_says": "Not mentioned (the page only asks people to report what they are already taking).",
+          "us_label_says": "Check with the doctor before starting any new prescription or non-prescription medicine or supplement.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Precautions - past heart disease / liver problems",
+          "sg_says": "Not asked about.",
+          "us_label_says": "Tell the doctor if there has ever been heart disease or liver problems.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Food interaction - grapefruit",
+          "sg_says": "Avoid grapefruit - may interact and raise the chance of side effects.",
+          "us_label_says": "The prescriber-facing clinical pharmacology section of the US label says co-administered grapefruit juice has no impact on exposure to amlodipine; the US patient leaflet does not mention grapefruit.",
+          "kind": "conflict"
+        },
+        {
+          "item": "Other side effects / concerns",
+          "sg_says": "Raise any worry or suspected side effect with a doctor or pharmacist; the list on the page is not complete.",
+          "us_label_says": "Tell the doctor about worrying side effects; the list is not complete, ask doctor or pharmacist.",
+          "kind": "same"
+        },
+        {
+          "item": "Common side effects",
+          "sg_says": "Names leg swelling, headache, facial flushing with warmth, and dizziness or light-headedness on standing up; no action attached.",
+          "us_label_says": "The US patient leaflet also lists side effects (swelling of legs or ankles, tiredness, stomach pain, nausea, dizziness, flushing, palpitations and others); they were not in the v1 summary row.",
+          "kind": "both"
+        },
+        {
+          "item": "Storage / disposal",
+          "sg_says": "Cool dry place out of sunlight, away from children; throw away sealed in a black rubbish bag via chute or bin.",
+          "us_label_says": "The US patient leaflet has storage instructions too (away from children, out of the light, in a dry place); disposal is not covered.",
+          "kind": "both"
+        },
+        {
+          "item": "Overdose",
+          "sg_says": "More than the recommended amount: get medical advice straight away. No place or number named.",
+          "us_label_says": "Took too much: call the doctor or Poison Control Center (a US body), or go to the nearest hospital emergency room right away.",
+          "kind": "us_adds"
+        }
+      ]
+    },
+    {
+      "id": "losartan",
+      "display_name": "losartan",
+      "aliases": [
+        "losartan potassium",
+        "cozaar",
+        "氯沙坦"
+      ],
+      "source_id": "hh-losartan",
+      "fields": {
+        "indication": {
+          "en": "Losartan brings blood pressure down. The leaflet explains that a substance called angiotensin II narrows blood vessels and so pushes pressure up, and that losartan stops it from acting on the vessel walls. It adds that the medicine may also be given to people with protein in the urine and for some other heart conditions (not named).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        "how_to_take": {
+          "en": "It can be taken together with a meal or on an empty stomach. Do not stop it by yourself: check with your healthcare provider first. Those two points are the whole 'how to take' section. The leaflet gives no dose, no time of day and no number of times per day, and says nothing about swallowing whole, so for the amount and timing follow the label / take it as prescribed (that phrase is ours, not the leaflet's).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        "missed_dose": {
+          "en": "Take the forgotten dose once you remember it. When the next dose is nearly due, just take that one usual dose instead. Never take a double amount or any extra medicine to catch up.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        "stop_or_see_doctor": {
+          "en": "(1) Pregnancy: let the doctor know about a current or planned pregnancy; the leaflet tells the patient to stop the medicine as early as possible once a pregnancy is discovered, because it can injure or kill the developing baby. (2) Signs of a drug allergy, listed under rare but serious effects needing immediate medical advice (any one or more of: swelling of the face, eyes, lips or tongue; trouble breathing; itchy rash all over the body): stop the medicine at once and see your doctor. (3) Very rare liver injury (the leaflet says it may get better by itself but can sometimes become serious): dark urine, pale stools, nausea, vomiting, poor appetite, stomach pain, or yellow eyes or skin: stop taking it and get seen by a doctor straight away. (4) Monitoring: the doctor may need to check potassium levels and kidney function during treatment. (5) Common side effects listed without a specific action: dizziness, and feeling light-headed on getting up. (6) Any other suspected side effect, or any worry about the medicine: ask a doctor or pharmacist. (7) Do not stop the medicine on your own; check with a healthcare provider first. The leaflet does not mention 995, an ambulance, or the A&E / Emergency Department; its most urgent wording is to stop and see a doctor immediately.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        "overdose": {
+          "en": "One line in the disclaimer: if you have taken more than the dose recommended for you, get medical advice straight away. No symptoms, phone number or place to go are given.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        }
+      },
+      "other_points": [
+        {
+          "key": "losartan-op1",
+          "topic": "Food or drink to avoid",
+          "en": "The leaflet names no food or drink to avoid; its only food statement is that the medicine can be taken with a meal or without one.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op2",
+          "topic": "Other medicines to tell the doctor about",
+          "en": "The leaflet has no list of interacting medicines or supplements to tell the doctor about.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op3",
+          "topic": "Pregnancy / breastfeeding",
+          "en": "Pregnancy is covered (tell the doctor if pregnant or planning; stop as soon as possible once pregnant; risk of injury or death to the developing baby). Breastfeeding is not mentioned anywhere on the page.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op4",
+          "topic": "Monitoring",
+          "en": "While on losartan the doctor may need to keep an eye on blood potassium and on how the kidneys are working.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op5",
+          "topic": "Liver injury — context given",
+          "en": "On the rare liver injury, the leaflet adds context: the chance is very low, most people take this medicine without problems, and anyone worried about their medicines should check with a doctor or pharmacist.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op6",
+          "topic": "Storage (safety-relevant)",
+          "en": "Keep it somewhere cool and dry, protected from heat, damp and direct sun, and where children cannot get at it. Expired medicine should be thrown away.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op7",
+          "topic": "Disposal",
+          "en": "To discard it, put the medicine in a black rubbish bag, seal the bag well, then drop it in the rubbish chute or a bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        },
+        {
+          "key": "losartan-op8",
+          "topic": "Disclaimer / authorship / languages",
+          "en": "The leaflet says its side-effect list is incomplete and that the page is no substitute for what your own healthcare professional tells you. It was produced jointly by the National Medication Information workgroup (public healthcare clusters NHG Health, NUHS and SingHealth; the pharmacy chains Guardian, Unity and Watsons; and the Pharmaceutical Society of Singapore). A video playlist about the medicine is embedded, with a link for Chinese, Malay and Tamil versions.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-losartan"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "indication — blood pressure",
+          "sg_says": "Lowers blood pressure; no age range given and nothing about combining it with other blood-pressure medicines.",
+          "us_label_says": "High blood pressure in adults and in children aged 6 and over, alone or with other blood-pressure medicines. (Core use is the same; the age range and the 'alone or with others' detail are US-only.)",
+          "kind": "same"
+        },
+        {
+          "item": "indication — extra uses (specificity)",
+          "sg_says": "Only a general line: may also be used when there is protein in the urine and for unnamed other heart conditions. Stroke risk, left ventricular hypertrophy, diabetes and kidney disease are not named.",
+          "us_label_says": "Names two further uses precisely: lowering stroke risk in people with high blood pressure plus left ventricular hypertrophy (with a note that it may not help Black patients), and slowing diabetic kidney disease in type 2 diabetes with high blood pressure now or in the past.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "indication — 'other heart conditions' / protein in urine (scope)",
+          "sg_says": "Protein in the urine is given as a use with no link to diabetes, and 'other heart conditions' (plural, unnamed) are mentioned.",
+          "us_label_says": "The only heart problem in the US row is left ventricular hypertrophy (for stroke-risk reduction); the kidney use is limited to diabetic kidney disease in type 2 diabetes. No general 'other heart conditions' wording. The SG line is broader but names nothing, so it supports no specific extra indication.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "how_to_take — food",
+          "sg_says": "Can be taken with a meal or without one.",
+          "us_label_says": "With or without food.",
+          "kind": "same"
+        },
+        {
+          "item": "how_to_take — do not stop on your own",
+          "sg_says": "Tells the patient to check with a healthcare provider before stopping the medicine.",
+          "us_label_says": "Row says take exactly as prescribed and that the doctor may change the dose; no explicit 'do not stop without checking' line recorded.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "how_to_take — reading patient information / frequency",
+          "sg_says": "Nothing about reading patient information at refills or about how often per day.",
+          "us_label_says": "Read the Patient Information at the start and at each refill; frequency only stated alongside mg doses (treated as 'as prescribed').",
+          "kind": "us_adds"
+        },
+        {
+          "item": "missed_dose",
+          "sg_says": "Take it when remembered; if the next dose is nearly due take only the usual one; explicitly forbids doubling up or adding extra medicine.",
+          "us_label_says": "Take as soon as remembered; if close to the next dose, skip the missed one and take the next at the regular time. (No explicit 'do not double' in the row.) Consistent with v1 Appendix A.2, which already marks losartan as 'Same'.",
+          "kind": "same"
+        },
+        {
+          "item": "stop_or_see_doctor — pregnancy (who is told to stop)",
+          "sg_says": "Addressed to the patient: tell the doctor if pregnant or planning, and stop the medicine as soon as possible once pregnancy is discovered; reason given is injury or death to the developing baby.",
+          "us_label_says": "Patient-facing text: can harm or cause death to an unborn baby; tell the doctor right away if pregnant, talk to the doctor if planning. 'Discontinue as soon as possible when pregnancy is detected' appears only in the boxed warning addressed to prescribers, and the v1 note tells the AI not to present it as a self-stop instruction. Both sources agree the medicine should be discontinued once pregnancy is detected; the conflict is that the SG leaflet gives that instruction directly to the patient, which the v1 note forbids the AI from saying on the US basis.",
+          "kind": "conflict"
+        },
+        {
+          "item": "stop_or_see_doctor — allergic reaction (urgency and signs)",
+          "sg_says": "Swelling of face, eyes, lips or tongue, trouble breathing, or an itchy rash over the whole body: stop at once and see your doctor. No mention of emergency services.",
+          "us_label_says": "Swelling of face, lips, throat or tongue: get emergency medical help right away and stop taking it. (US lists throat; SG lists eyes, breathing difficulty and whole-body itchy rash.)",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "stop_or_see_doctor — liver injury",
+          "sg_says": "Describes very rare liver injury and lists warning signs (dark urine, pale stools, nausea, vomiting, poor appetite, stomach pain, yellow eyes or skin) with the instruction to stop and get seen by a doctor straight away.",
+          "us_label_says": "No liver-injury warning signs in the row; liver problems appear only as something to tell the doctor about beforehand.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor — dizziness / low blood pressure",
+          "sg_says": "Dizziness and light-headedness on getting up are listed only as common side effects, with no instruction attached.",
+          "us_label_says": "If you feel faint or dizzy (low blood pressure): lie down and call the doctor right away.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "stop_or_see_doctor — kidney symptoms to watch",
+          "sg_says": "Gives no kidney symptoms to watch for; kidneys appear only in the monitoring line.",
+          "us_label_says": "With existing kidney problems, swelling of feet, ankles or hands or unexplained weight gain: call the doctor.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "monitoring — potassium and kidney function",
+          "sg_says": "Says blood potassium and kidney function may need checking by the doctor while the patient is on losartan.",
+          "us_label_says": "The US label tells prescribers to monitor kidney function and potassium (prescriber-facing); it was not in the v1 summary row.",
+          "kind": "both"
+        },
+        {
+          "item": "stop_or_see_doctor — who must not take it / medicines to declare",
+          "sg_says": "No contraindications, no interacting-medicine list, nothing on breastfeeding, vomiting/diarrhoea or liver problems as things to tell the doctor.",
+          "us_label_says": "Do not take if allergic, or if diabetic and taking aliskiren. Tell the doctor about all medicines, especially potassium supplements, potassium salt substitutes, diuretics, lithium, NSAIDs including COX-2 inhibitors and other blood-pressure medicines; also pregnancy, breastfeeding, heavy vomiting or diarrhoea, liver or kidney problems.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "other side effects — who to ask",
+          "sg_says": "Says the side-effect list is not complete; for other effects thought to come from the medicine, or any concern about it, consult a doctor or pharmacist.",
+          "us_label_says": "Tell the doctor about any side effect that bothers you or does not go away; the label also says its list is not complete and to ask a doctor or pharmacist.",
+          "kind": "same"
+        },
+        {
+          "item": "overdose",
+          "sg_says": "Get medical advice straight away after taking more than the dose recommended; no named service or place.",
+          "us_label_says": "Took too much: contact the doctor, the US Poison Control Center, or go to the nearest emergency room right away. (Poison Control Center is a US service and is not named on the Singapore page.)",
+          "kind": "us_adds"
+        }
+      ]
+    },
+    {
+      "id": "metformin",
+      "display_name": "metformin",
+      "aliases": [
+        "metformin hydrochloride",
+        "glucophage",
+        "二甲双胍"
+      ],
+      "source_id": "hh-metformin",
+      "fields": {
+        "indication": {
+          "en": "The leaflet presents metformin as a medicine for keeping diabetes under control. It explains that the drug lets the body make better use of insulin and cuts down how much sugar the liver produces, so blood sugar comes down. It is described as working alongside lifestyle changes such as healthy eating and regular exercise. The page does not name a type of diabetes or an age range.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        "how_to_take": {
+          "en": "The leaflet says it can be taken with food or after food, and that doing so makes stomach discomfort, feeling sick or loose stools less likely. On a day with a fasting blood test, the medicine is held back until the blood sample is drawn and you have eaten. The page gives no time of day and does not say whether the medicine must be swallowed whole. It refers to a 'usual dose' and a 'next dose' and describes no as-needed use. The page gives no amount or frequency: as on the label / as prescribed.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        "missed_dose": {
+          "en": "Once you realise a dose was forgotten, take it then, and have it with food. When the next dose is nearly due, take just the usual dose at that time. The leaflet says not to double up or add extra medicine to compensate for the one that was forgotten.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        "stop_or_see_doctor": {
+          "en": "(1) Things the leaflet says to tell a healthcare professional about: an allergy to this medicine or to anything else in it; pregnancy, trying for a baby, or breastfeeding; a heart condition; trouble with the kidneys or liver; drinking alcohol often; an upcoming scan or X-ray (the leaflet says metformin might have to be stopped for a couple of days); an upcoming operation; diabetic ketoacidosis in the past. (2) Common effects are diarrhoea, nausea, vomiting and stomach discomfort; speak to a healthcare professional when a side effect turns severe and bothersome. (3) Drug-allergy signs (one or more of: swelling of the face, eyes, lips or tongue; trouble breathing; an itchy rash covering the whole body): stop the medicine and see a healthcare professional at once. (4) Lactic acidosis, described as very rare but serious and more likely when the kidneys are not working well: consult a healthcare professional immediately. Signs listed: poorer appetite; vomiting and tummy pain that carry on for a while; feeling generally unwell together with feeling cold or extremely tired; quick, shallow breaths. The leaflet does not tell the reader to stop the medicine for these signs. (5) Any other worry about the medicine, or another effect you suspect it is causing: ask a doctor or pharmacist. The leaflet does not mention 995, an ambulance, a hospital or an A&E / Emergency Department, and gives no day-limits.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        "overdose": {
+          "en": "The closing disclaimer says that anyone who has taken above the recommended dose should get medical advice straight away. Nothing more is given: no symptoms, no poison-information number, no mention of 995 or an A&E / Emergency Department.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        }
+      },
+      "other_points": [
+        {
+          "key": "metformin-op1",
+          "topic": "Alcohol",
+          "en": "Alcohol is the only item in the food-and-medicine interactions section: the leaflet says to avoid it while on metformin because drinking makes lactic acid more likely to accumulate. Separately, drinking often is on the list of things to tell a healthcare professional.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op2",
+          "topic": "Food tips for nausea",
+          "en": "Under the nausea, vomiting and stomach discomfort entry the leaflet suggests having the medicine with food or after food, and steering clear of dishes that are very rich, spicy or strong-smelling.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op3",
+          "topic": "Other medicines / low blood sugar",
+          "en": "No other medicines are named as interacting, and the page does not ask the reader to tell the doctor about other medicines. Low blood sugar is not mentioned anywhere on the leaflet.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op4",
+          "topic": "Pregnancy / breastfeeding",
+          "en": "Being pregnant, planning a pregnancy or breastfeeding is on the list of things to tell a healthcare professional; the leaflet gives no further guidance on it.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op5",
+          "topic": "Scans, X-rays and surgery",
+          "en": "A scan or X-ray, or an operation, is on the list of things to tell a healthcare professional; for scans or X-rays the leaflet adds that metformin might have to be stopped for a couple of days. It does not say who decides when to stop or restart, and it does not mention contrast dye.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op6",
+          "topic": "Fasting blood tests",
+          "en": "Before a fasting blood test, the medicine is delayed until after the blood draw and a meal.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op7",
+          "topic": "Storage and disposal",
+          "en": "Keep it somewhere cool and dry, out of direct sunlight, and away from children. To discard it, put it in a black rubbish bag and seal the bag tightly before it goes down the chute or into a bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        },
+        {
+          "key": "metformin-op8",
+          "topic": "Leaflet's own limits",
+          "en": "The page states its side-effect list is incomplete and that it is no substitute for information from the reader's own healthcare professional. It is described as a joint product of a national workgroup on medication information, made up of three healthcare cluster partners, three community pharmacies and the Pharmaceutical Society of Singapore. The page also points readers to two government websites for more medication information (not opened in this task).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-metformin"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "Indication",
+          "sg_says": "Says it controls diabetes and works alongside lifestyle changes such as healthy eating and exercise; explains how it acts (better insulin use, less sugar from the liver). No diabetes type, no age range.",
+          "us_label_says": "With diet and exercise for type 2 diabetes in adults and children from age 10; not for type 1 diabetes or diabetic ketoacidosis.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take - food",
+          "sg_says": "With food or after food, to lessen stomach discomfort, nausea and diarrhoea.",
+          "us_label_says": "With meals, to lessen stomach upset; says diarrhoea, nausea and upset stomach generally ease after a while on the medicine.",
+          "kind": "same"
+        },
+        {
+          "item": "How to take - swallowing / tablet remnant / self-monitoring",
+          "sg_says": "Silent on swallowing whole, on tablet-like remains in stools, and on checking blood sugar. (Healthy eating and exercise are mentioned only in the uses section.)",
+          "us_label_says": "Swallow whole; a soft tablet-like mass may show up in stools; check blood sugar as the provider instructs and keep to the prescribed diet and exercise programme.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take - fasting blood test",
+          "sg_says": "Delay the dose until blood has been drawn and you have eaten.",
+          "us_label_says": "Not mentioned in the US rows.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Missed dose",
+          "sg_says": "Take the forgotten dose on remembering, with food; if the next one is nearly due take only the usual dose; never double up.",
+          "us_label_says": "Carry on with the next dose as prescribed unless the provider says otherwise; no extra dose the following day (no instruction to take the missed one late).",
+          "kind": "conflict"
+        },
+        {
+          "item": "Stop / see doctor - lactic acidosis",
+          "sg_says": "Consult a healthcare professional immediately; not told to stop, not called an emergency, no 995, hospital or A&E. Signs: less appetite, prolonged vomiting and stomach pain, unwell with feeling cold or great tiredness, fast shallow breathing. Risk higher when the kidneys are not working well.",
+          "us_label_says": "Patient leaflet: rare but serious, can cause death; a medical emergency that must be treated in hospital; stop the medicine and call the provider right away. Boxed warning: discontinue immediately if suspected. Longer sign list incl. feeling very weak, unusual muscle pain, trouble breathing, unusual sleepiness, unexplained stomach problems, cold arms and legs, dizziness, slow or irregular heartbeat.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - allergic reaction",
+          "sg_says": "Lists signs (swollen face, eyes, lips or tongue; trouble breathing; itchy rash all over): stop and see a healthcare professional at once. Allergy is also on the tell-your-healthcare-professional list.",
+          "us_label_says": "Rows only say do not take if allergic to metformin or any ingredient; no sign list.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Stop / see doctor - scan, X-ray, surgery",
+          "sg_says": "Tell the healthcare professional about any upcoming scan or X-ray (may need to stop for a couple of days) and about surgery. No mention of contrast dye.",
+          "us_label_says": "For an X-ray with injected dye or contrast, or surgery with little eating or drinking: the medicine is stopped for a short time; ask the provider when to stop and restart. Also: tell the doctor before any surgical or radiological procedure.",
+          "kind": "same"
+        },
+        {
+          "item": "Stop / see doctor - alcohol",
+          "sg_says": "Avoid alcohol with this medicine; tell the healthcare professional if you drink often.",
+          "us_label_says": "Do not drink a lot of alcohol, whether regularly or as a binge; tell the provider if you drink very often or binge.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - stomach side effects",
+          "sg_says": "See a healthcare professional when a side effect turns severe and bothersome; no time limit given.",
+          "us_label_says": "Tell the doctor if they bother a lot, go on beyond a few weeks, come back or begin later in treatment.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - kidney problems",
+          "sg_says": "Something to tell the healthcare professional about; lactic acidosis is said to be more likely when the kidneys are not working well. No mention of kidney blood tests.",
+          "us_label_says": "Do not take with kidney problems; kidney blood tests before and during treatment.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - low blood sugar",
+          "sg_says": "Not mentioned.",
+          "us_label_says": "Rare with metformin alone; possible when eating too little, with alcohol, or with other glucose-lowering medicines (sulfonylureas, insulin).",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor - other US-only precautions",
+          "sg_says": "Not mentioned: fever, injury, infection; dehydration; vitamin B12; age over 80; type 1 diabetes; MELAS/MIDD; telling the provider about all other medicines.",
+          "us_label_says": "Tell the provider right away about fever, trauma, infection or surgery; dehydration raises lactic acidosis risk; may lower vitamin B12; tell provider about age over 80, type 1 diabetes, insulin use, MELAS/MIDD and all medicines taken.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor - pregnancy, breastfeeding, heart, liver, past ketoacidosis",
+          "sg_says": "All on the tell-your-healthcare-professional list.",
+          "us_label_says": "All on the tell-your-provider list.",
+          "kind": "same"
+        },
+        {
+          "item": "Overdose",
+          "sg_says": "Get medical advice straight away; no named service.",
+          "us_label_says": "Call the provider or the local Poison Control Center, or go to the nearest hospital emergency room, right away.",
+          "kind": "us_adds"
+        }
+      ]
+    },
+    {
+      "id": "atorvastatin",
+      "display_name": "atorvastatin",
+      "aliases": [
+        "atorvastatin calcium",
+        "lipitor",
+        "阿托伐他汀"
+      ],
+      "source_id": "hh-atorvastatin",
+      "fields": {
+        "indication": {
+          "en": "Atorvastatin is a statin (an HMG-CoA reductase inhibitor). According to the leaflet, statins bring down LDL ('bad') cholesterol and triglycerides ('fat') in the blood and raise HDL ('good') cholesterol. Because a high LDL cholesterol level can clog blood vessels and result in angina (chest pain), a heart attack or a stroke, a statin may lower a person's risk of heart attack and stroke.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        "how_to_take": {
+          "en": "It can be taken either with a meal or on an empty stomach. The leaflet asks patients to keep taking it and to check with a healthcare professional before stopping, because LDL cholesterol can climb back up once the medicine is stopped. The leaflet does not state a time of day, how often to take it, or whether to swallow it whole; for those points follow the label / what was prescribed.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        "missed_dose": {
+          "en": "A forgotten dose should be taken once the person remembers it. When the next scheduled dose is nearly due, take just the normal dose (not the forgotten one as well). Never take a double dose or extra medicine to catch up.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        "stop_or_see_doctor": {
+          "en": "Under precautions, the leaflet says to tell a healthcare professional about: an allergy to atorvastatin or anything else in the product; an allergy to another statin or to other medicines; being pregnant, trying for a baby or breastfeeding; liver or kidney problems. Possible side effects listed as common (mild muscle ache or weakness, tiredness; stomach upset such as tummy pain, constipation or diarrhoea; headache, joint pain, back pain): tell a healthcare professional if they persist and become a nuisance. Stop the medicine and see a doctor at once for signs of muscle breakdown (severe muscle pain with no clear cause that will not settle, muscle weakness or cramps throughout the body, dark brown urine) or of liver injury (dark brown urine, pale grey or clay-coloured stools, nausea, vomiting, poor appetite, yellow skin or eyes); the leaflet says statins cause such muscle or liver problems very rarely. Stop the medicine and see a healthcare professional at once if any drug-allergy sign appears: swelling of the face, eyes, lips or tongue; trouble breathing; an itchy rash covering the whole body. Outside those stop-and-seek-help situations, the leaflet's standing instruction is to check with a healthcare professional before stopping the medicine. Tell a healthcare professional about other medicines being taken, and ask if unsure whether they can be combined with a statin. For any other suspected side effect or worry about the medicine, ask a doctor or pharmacist. Anyone who has taken more than the recommended dose should get medical advice straight away. The leaflet does not mention 995, the A&E / Emergency Department, a GP or a polyclinic; it refers only to a doctor, a healthcare professional and a pharmacist.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        "overdose": {
+          "en": "The disclaimer says that anyone who has taken more than the recommended dose should get medical advice straight away. Nothing more specific is given (no poison-information number and no instruction to call 995 or go to the A&E).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        }
+      },
+      "other_points": [
+        {
+          "key": "atorvastatin-op1",
+          "topic": "Food: grapefruit",
+          "en": "Grapefruit and grapefruit juice should be avoided; the leaflet says they can interact with the medicine and make side effects more likely. No permitted quantity is given.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op2",
+          "topic": "Supplement: red yeast rice",
+          "en": "The supplement red yeast rice should be avoided because it can make side effects more likely.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op3",
+          "topic": "Alcohol",
+          "en": "Alcohol should be avoided or kept below three drinks per day; the leaflet says drinking too much can make liver disease more likely.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op4",
+          "topic": "Other medicines to tell the healthcare professional about",
+          "en": "Some medicines interact with statins, changing how well they work or making side effects more likely, although those medicines may still be an important part of treatment. Patients should tell a healthcare professional what else they take. Examples named: warfarin (a blood thinner); antibiotics such as clarithromycin and erythromycin; antifungals such as itraconazole and ketoconazole.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op5",
+          "topic": "Pregnancy / breastfeeding",
+          "en": "Pregnancy, planning a pregnancy and breastfeeding are listed only as things to tell a healthcare professional about; the leaflet gives no further instruction for them.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op6",
+          "topic": "Liver or kidney problems",
+          "en": "Liver or kidney problems are listed as something to tell a healthcare professional about.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op7",
+          "topic": "Storage (safety-relevant part)",
+          "en": "Keep it somewhere cool and dry, out of direct sunlight and out of children's reach; expired medicine should be thrown away.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op8",
+          "topic": "Disposal",
+          "en": "To discard it, put the medicine in a black rubbish bag, seal the bag tightly and drop it in the bin or rubbish chute.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op9",
+          "topic": "Disclaimer / limits of the leaflet",
+          "en": "The side-effect list is stated to be incomplete, and the page says it is not a substitute for information from the patient's own healthcare professional.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op10",
+          "topic": "Other languages",
+          "en": "The page links to videos about the medicine and about drug allergies, with versions in Chinese, Malay and Tamil.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        },
+        {
+          "key": "atorvastatin-op11",
+          "topic": "Authorship",
+          "en": "Besides the named contributor, the page says the leaflet was produced jointly by the National Medication Information workgroup, whose members are three healthcare clusters (SingHealth, NHG Health, National University Health System), three community pharmacies (Watsons, Guardian, Unity) and the Pharmaceutical Society of Singapore.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-atorvastatin"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "Indication",
+          "sg_says": "General statement only: a statin that lowers LDL cholesterol and triglycerides, raises HDL cholesterol, and may reduce heart-attack and stroke risk. (The HDL point is not in the US row.)",
+          "us_label_says": "Lists specific groups and outcomes: adults with several risk factors, adults with type 2 diabetes, adults with heart disease (heart attack, stroke, certain heart surgery, chest pain, heart-failure admission); plus use alongside diet for named lipid disorders, including inherited forms in children aged 10 and over.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take: food, timing, frequency",
+          "sg_says": "With or without food. No frequency or time of day stated.",
+          "us_label_says": "Once a day, any time of day, with or without food, exactly as the provider directs.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take: grapefruit",
+          "sg_says": "Avoid grapefruit and grapefruit juice altogether (no quantity given).",
+          "us_label_says": "Avoid drinking more than 1.2 litres of grapefruit juice a day (a drink volume, not a dose).",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Missed dose",
+          "sg_says": "Take the forgotten dose when remembered; if the next dose is nearly due, take only the normal dose; never double up.",
+          "us_label_says": "Do not take the missed dose at all; wait and take the next one at the usual time; never two doses together.",
+          "kind": "conflict"
+        },
+        {
+          "item": "Stop / see doctor: muscle symptoms",
+          "sg_says": "Severe unexplained muscle pain that will not settle, body-wide muscle weakness or cramps, or dark brown urine: stop the medicine and see a doctor at once (the patient is told to stop).",
+          "us_label_says": "Unexplained muscle pain, tenderness or weakness, especially with fever or unusual tiredness: tell the provider right away. The row gives no self-stop instruction for these symptoms and separately says not to stop without the provider; it mentions rare kidney damage and death.",
+          "kind": "conflict"
+        },
+        {
+          "item": "Stop / see doctor: liver symptoms",
+          "sg_says": "Dark brown urine, pale grey or clay-coloured stools, nausea, vomiting, poor appetite, yellow skin or eyes: stop the medicine and see a doctor at once (the patient is told to stop).",
+          "us_label_says": "Tired or weak, nausea or vomiting, poor appetite, upper belly pain, dark amber urine, yellow skin or eyes: call the provider right away. No self-stop instruction for these symptoms in the row, which separately says not to stop without the provider; no pale stools.",
+          "kind": "conflict"
+        },
+        {
+          "item": "Stop / see doctor: allergy signs",
+          "sg_says": "Swollen face, eyes, lips or tongue; trouble breathing; itchy rash over the whole body: stop the medicine and see a healthcare professional at once.",
+          "us_label_says": "Stop and get medical help right away; the sign list is longer (also throat swelling, trouble swallowing, fainting or dizziness, very fast heartbeat, flu-like symptoms) but does not name the eyes.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor: pregnancy and breastfeeding",
+          "sg_says": "Tell a healthcare professional if pregnant, planning a baby or breastfeeding; nothing further.",
+          "us_label_says": "If pregnant: stop and call the provider right away. Breastfeeding: decide with the provider (not both).",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor: liver and kidney conditions",
+          "sg_says": "Tell a healthcare professional about liver or kidney problems.",
+          "us_label_says": "Do not take with acute liver failure or decompensated cirrhosis, or if allergic; tell the provider about all conditions (the verbatim label text behind the row lists kidney problems among them).",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor: allergy to other statins or other medicines",
+          "sg_says": "Tell a healthcare professional about an allergy to any other statin or to other medicines, as well as to this medicine or its ingredients.",
+          "us_label_says": "Do not take if allergic to atorvastatin or its ingredients; other statins are not mentioned in the row.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Stop / see doctor: not stopping on one's own",
+          "sg_says": "Do not stop without checking with a healthcare professional, since LDL cholesterol may go back up.",
+          "us_label_says": "Do not change the dose or stop without the provider.",
+          "kind": "same"
+        },
+        {
+          "item": "Stop / see doctor: bothersome side effects",
+          "sg_says": "If the listed common side effects persist and become a nuisance, tell a healthcare professional; other concerns go to a doctor or pharmacist.",
+          "us_label_says": "Bothersome side effects: provider or pharmacist.",
+          "kind": "same"
+        },
+        {
+          "item": "Stop / see doctor: other medicines and supplements",
+          "sg_says": "Tell a healthcare professional about other medicines; names warfarin, clarithromycin, erythromycin, itraconazole, ketoconazole, and says to avoid red yeast rice.",
+          "us_label_says": "The US patient leaflet also names interacting medicines, including erythromycin, clarithromycin, itraconazole and ketoconazole; warfarin is named only in the Singapore leaflet.",
+          "kind": "both"
+        },
+        {
+          "item": "Alcohol",
+          "sg_says": "Avoid alcohol or keep it below three drinks per day because of liver disease risk.",
+          "us_label_says": "The v1 summary row does not mention alcohol. The verbatim label text behind it (the v1 file atorvastatin label table, line 30) lists drinking more than 2 glasses of alcohol daily among the things to tell the provider before taking it; it sets no limit.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Low-fat diet",
+          "sg_says": "Not mentioned.",
+          "us_label_says": "Stay on the low-fat diet if the provider started one.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Overdose",
+          "sg_says": "Took more than the recommended dose: get medical advice straight away. No poison-information number, 995 or A&E route named.",
+          "us_label_says": "Took too much: contact the provider or Poison Control (US service), or go to the nearest emergency room.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Storage and disposal",
+          "sg_says": "Cool, dry place out of direct sunlight and away from children; discard expired medicine; throw away in a tightly sealed black rubbish bag via bin or rubbish chute.",
+          "us_label_says": "The US patient leaflet has a storage section too; it was not in the v1 summary row.",
+          "kind": "both"
+        }
+      ]
+    },
+    {
+      "id": "aspirin",
+      "display_name": "aspirin",
+      "aliases": [
+        "low-dose aspirin",
+        "acetylsalicylic acid",
+        "cardiprin",
+        "阿司匹林"
+      ],
+      "source_id": "hh-aspirin",
+      "fields": {
+        "indication": {
+          "en": "Per the leaflet, aspirin (another name: acetylsalicylic acid) is given to stop clots developing; it does this by making blood less sticky, and fewer clots means a lower chance of a heart attack or a stroke. It may be given to someone with a blocked blood vessel, or following an operation on the heart. Other uses the leaflet lists: after Kawasaki disease (for some weeks, or longer when the doctor judges it necessary because of abnormalities in the vessels feeding the heart); in some pregnant women, to help prevent pre-eclampsia; and, at higher doses, to ease pain, fever or inflammation. Anyone who wants to use it for pain or fever is asked to tell their healthcare professional first.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        "how_to_take": {
+          "en": "Take it after a meal; the leaflet gives the reason as less irritation of the stomach. The way to take a tablet depends on which kind of aspirin it is: some kinds are chewed or sucked, some are dissolved in a set quantity of water (with the needed portion drawn up using a syringe), and some are swallowed whole, neither chewed nor dissolved. If unsure which applies, ask a pharmacist. Keep taking it unless a healthcare professional has been consulted about stopping. When used in pregnancy against pre-eclampsia, the leaflet says the usual time is at night. Amounts: as on the label / as prescribed (the leaflet gives no dose figures).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        "missed_dose": {
+          "en": "Take the forgotten dose once you remember it. If the next dose is nearly due, take just the normal dose. Never take a double amount or any extra to catch up.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        "stop_or_see_doctor": {
+          "en": "BEFORE TAKING - tell a healthcare professional if: you have an allergy to aspirin or to any NSAID painkiller (ibuprofen and naproxen are the examples given); you are pregnant, plan a pregnancy, or breastfeed; you have ever had an ulcer or bleeding in the stomach or bowel, or a bleeding problem; a medical procedure, operation or dental procedure is planned; you take other medicines, supplements, or traditional / herbal remedies. COMMON SIDE EFFECTS - stomach discomfort or irritation (pain, heartburn) and mild bleeding (nosebleeds with no clear cause, gums that bleed during toothbrushing, small cuts that keep bleeding for 10-15 minutes despite pressure, heavier periods). Check with a doctor if a small cut is still bleeding once 15 minutes have passed, or if you are feeling unwell (also if periods are heavier and you are feeling unwell; the leaflet notes heavy periods can have other causes). Tell a healthcare professional if the common effects persist and bother you. SERIOUS BLEEDING - stop the medicine and tell a healthcare professional at once if there is: blood in urine; black, sticky stools (when no iron supplement is being taken); large bruises with no explanation; blood coughed up, or vomit that looks like coffee grounds; a sudden, severe headache together with nausea or passing out. ALLERGY - stop the medicine and see a healthcare professional at once for: swelling of the face, eyes, lips or tongue; trouble breathing; an itchy rash covering the whole body. REYE'S SYNDROME (very rare; brain and liver; the leaflet says it was mostly seen in children under 5 after a viral illness such as chickenpox or flu, or on long-term high-dose aspirin) - see a doctor at once if you or your child has severe vomiting alongside viral symptoms (fever and aches are the examples), confusion and tiredness, a change in behaviour, or a blackout. The leaflet gives no day-limit for pain or fever, and does not mention 995 or the A&E; its wording is to see or inform a doctor / healthcare professional immediately.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        "overdose": {
+          "en": "Only one line, in the disclaimer: a person who has taken more than the recommended dose should get medical advice straight away. No symptoms of overdose, no poison-centre contact and no emergency number are given.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        }
+      },
+      "other_points": [
+        {
+          "key": "aspirin-op1",
+          "topic": "Food and drink",
+          "en": "Nothing about foods, drinks or alcohol to avoid; the only food instruction is to take it after eating.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op2",
+          "topic": "Other medicines to mention",
+          "en": "Tell a healthcare professional about every other medicine, including supplements and traditional or herbal remedies. NSAID painkillers (ibuprofen, naproxen) are named only in the allergy point. Iron supplements are mentioned as another reason stools can turn black.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op3",
+          "topic": "Pregnancy and breastfeeding",
+          "en": "Pregnancy, planning a pregnancy and breastfeeding are all things to tell a healthcare professional about. Separately, the leaflet says aspirin may be started in certain pregnant women to prevent pre-eclampsia, usually taken at night.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op4",
+          "topic": "Procedures, surgery, dental work",
+          "en": "A planned medical procedure, operation or dental procedure should be mentioned to a healthcare professional beforehand.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op5",
+          "topic": "Storage and disposal",
+          "en": "Keep it somewhere cool and dry, out of direct sunlight and out of children's reach; discard expired medicine. For disposal the leaflet says to seal it in a black rubbish bag before putting it in the chute or bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op6",
+          "topic": "Limits of the leaflet",
+          "en": "The page says its side-effect list is not complete and that the information does not replace what a healthcare professional tells you; anyone worried, or with other suspected side effects, should ask a doctor or pharmacist.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        },
+        {
+          "key": "aspirin-op7",
+          "topic": "Videos and other languages",
+          "en": "The page points to explainer videos about the medicine and about drug allergies, with Chinese, Malay and Tamil versions linked.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-aspirin"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "Indication - main use",
+          "sg_says": "Leads with clot prevention to lower the chance of heart attack or stroke (not limited to repeat events); pain and fever relief is a secondary, higher-dose use that should be raised with a healthcare professional first.",
+          "us_label_says": "Leads with temporary relief of minor aches and pains (purpose: pain reliever); prevention of a recurrent heart attack or stroke is listed only as a doctor-directed use. Notes that, because of its delayed action, the tablet does not give fast relief.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Indication - extra uses",
+          "sg_says": "Also names use for a blocked blood vessel, after heart surgery, after Kawasaki disease, and in some pregnant women to prevent pre-eclampsia.",
+          "us_label_says": "None of these uses appear on the label.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "How to take - food and tablet type",
+          "sg_says": "Take after food to limit stomach irritation; the way to take it (chew or suck, dissolve and measure with a syringe, or swallow whole) depends on the kind of tablet; ask a pharmacist if unsure.",
+          "us_label_says": "No food instruction and no chew / dissolve / swallow-whole instruction in the v1 row.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "How to take - water, daily preventive use, children",
+          "sg_says": "No instruction about how much water to drink with a dose; no separate directions for children (children appear only in the Reye's syndrome paragraph).",
+          "us_label_says": "Drink a full glass of water with each dose; the timing directions are for pain relief only, and daily preventive use is left to the doctor's direction; children under 12 should consult a doctor.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "How to take - not stopping",
+          "sg_says": "Do not stop the medicine without first checking with a healthcare professional.",
+          "us_label_says": "No equivalent statement; the label only has a list of situations in which to stop use and ask a doctor.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Missed dose",
+          "sg_says": "Take it once remembered; if the next dose is nearly due take only the normal dose; never double up.",
+          "us_label_says": "Not stated on the label (v1 table says to ask a pharmacist).",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Allergy - before use",
+          "sg_says": "Tell a healthcare professional beforehand about an allergy to aspirin or to any NSAID painkiller.",
+          "us_label_says": "Do not use at all if allergic to aspirin or any other pain reliever / fever reducer.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Allergy - reaction signs and action",
+          "sg_says": "Signs listed: swelling of face, eyes, lips or tongue; trouble breathing; an itchy whole-body rash. Stop the medicine and be seen by a healthcare professional at once.",
+          "us_label_says": "Signs listed: hives, facial swelling, asthma (wheezing), shock. Stop use and get medical help right away.",
+          "kind": "same"
+        },
+        {
+          "item": "Stop / see doctor - serious bleeding signs",
+          "sg_says": "Stop and tell a healthcare professional at once: blood in urine; black, sticky stools; big bruises with no explanation; blood coughed up, or vomit resembling coffee grounds; a sudden bad headache accompanied by nausea or passing out.",
+          "us_label_says": "Stop use and ask a doctor for signs of stomach bleeding: feeling faint, vomiting blood, bloody or black stools, stomach pain that does not improve. (Black stools and vomited blood overlap; feeling faint and persistent stomach pain are US-only.)",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Stop / see doctor - minor bleeding time limit",
+          "sg_says": "A small cut may bleed for 10-15 minutes; check with a doctor when it has not stopped by the 15-minute mark, or when you are feeling unwell.",
+          "us_label_says": "No time limit for minor bleeding.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Before use - planned procedures",
+          "sg_says": "Tell a healthcare professional when a medical procedure, operation or dental procedure is planned.",
+          "us_label_says": "Not mentioned in the v1 row.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "Before use - risk factors and conditions",
+          "sg_says": "Names only past stomach or bowel ulcer or bleeding, bleeding problems, pregnancy / breastfeeding, and other medicines, supplements or herbal remedies in general.",
+          "us_label_says": "Adds age 60 or over, blood thinners or steroids, other NSAIDs, three or more alcoholic drinks a day, using more or longer than directed; plus heartburn or stomach problems, high blood pressure, heart disease, liver cirrhosis, kidney disease, diuretics, asthma, and prescription medicines for gout, diabetes or arthritis.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor - day limit and other stop signs",
+          "sg_says": "No day limit for pain or fever; no mention of ringing in the ears, hearing loss, redness or swelling.",
+          "us_label_says": "Stop and ask a doctor if pain worsens or lasts more than 10 days, if redness or swelling appears, if new symptoms occur, or if there is ringing in the ears or loss of hearing.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Stop / see doctor - Reye's syndrome, who is flagged",
+          "sg_says": "Says it was mostly seen in children under 5 with a viral illness or on long-term high-dose aspirin; see a doctor at once for severe vomiting with viral symptoms, confusion and tiredness, behaviour change, or blackout. Does not tell any age group to avoid aspirin.",
+          "us_label_says": "Children and teenagers who have, or are recovering from, chickenpox or flu-like symptoms should not use it; behaviour change with nausea and vomiting means consult a doctor.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "Stop / see doctor - pregnancy and breastfeeding",
+          "sg_says": "Tell a healthcare professional if pregnant, planning pregnancy or breastfeeding; no trimester cut-off is given. (The leaflet also says aspirin may be started in some pregnant women to prevent pre-eclampsia; see the extra-uses row.)",
+          "us_label_says": "Ask a health professional if pregnant or breast-feeding; do not use in the last 3 months of pregnancy unless a doctor specifically directs it. (Not a direct conflict, since both defer to the doctor, but the two read very differently side by side.)",
+          "kind": "us_adds"
+        },
+        {
+          "item": "Overdose",
+          "sg_says": "If more than the recommended dose is taken, get medical advice immediately; no contact number given.",
+          "us_label_says": "In case of overdose, get medical help or contact a Poison Control Center right away (US number on the label; not applicable in Singapore).",
+          "kind": "us_adds"
+        }
+      ]
+    },
+    {
+      "id": "paracetamol",
+      "display_name": "paracetamol",
+      "aliases": [
+        "acetaminophen",
+        "panadol",
+        "扑热息痛",
+        "对乙酰氨基酚"
+      ],
+      "source_id": "hh-paracetamol",
+      "fields": {
+        "indication": {
+          "en": "According to the leaflet, paracetamol (it notes that acetaminophen is another name for it) is a medicine for bringing down a fever and easing headache, aches in the body and pain generally.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        "how_to_take": {
+          "en": "Follow the directions printed on the product label, because paracetamol comes in more than one strength and form. Never use two paracetamol-containing products together. Stay within the amount the label recommends; the leaflet warns that too much can lead to a serious liver problem. Food makes no difference: it may be taken after eating or on an empty stomach. Anyone unsure how to take it is told to ask a healthcare professional. The leaflet names no time of day, no swallow-whole instruction and no dosing interval; it describes use as 'when needed' rather than necessarily regular (see missed dose).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        "missed_dose": {
+          "en": "No catch-up rule is given. The leaflet explains that paracetamol can be used just when fever or pain needs relief, so taking it on a regular schedule is not always required. Anyone who is unsure is told to check with their healthcare professional.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        "stop_or_see_doctor": {
+          "en": "(1) Precautions - tell a healthcare professional if you have an allergy to paracetamol or to anything else in the product; if you have liver disease or habitually drink a lot of alcohol; if you have kidney disease; or if you use any other medicines, counting supplements, traditional medicines and herbal products. (2) Warfarin or similar anti-clotting medicines: check with a healthcare professional before using paracetamol. (3) Any side effect you suspect is linked to paracetamol: let a healthcare professional know (the leaflet says side effects are few). (4) Stop paracetamol and see a healthcare professional straight away if any of the rare serious signs appear. Liver-problem signs (the leaflet introduces these by saying overdose may raise the risk of liver problems): feeling sick (nausea), appetite loss, sudden loss of weight, eyes and skin turning yellow, bruising or bleeding with no clear cause. Drug-allergy signs (one or more may occur): swelling of the face, eyes, lips or tongue; trouble breathing; an itchy rash covering the whole body. (5) See a doctor, because the problem may be too serious to treat by yourself, if: fever is still there after 3 days of treatment; a headache goes on beyond 2 days; pain has not got better after 7 days of treatment; or any of these get worse after treatment. (6) Took more than the recommended dose: get medical advice at once (stated in the page disclaimer). (7) Other side effects or worries about the medicine: speak to a doctor or pharmacist (disclaimer). The page does not mention 995, an ambulance or A&E / the Emergency Department anywhere; its strongest wording is to stop and see a healthcare professional immediately.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        "overdose": {
+          "en": "The leaflet says people who overdose on paracetamol may face a higher risk of liver problems, and separately that going above the label dose can lead to a serious liver problem. Its disclaimer tells anyone who has taken more than the recommended dose to get medical advice at once. Liver warning signs it lists: nausea, appetite loss, sudden loss of weight, yellow eyes and skin, and bruising or bleeding with no clear cause; for these it says to stop the medicine and see a healthcare professional straight away. It names no poison centre, no 995 / A&E instruction, and does not say whether to seek help when there are no symptoms.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        }
+      },
+      "other_points": [
+        {
+          "key": "paracetamol-op1",
+          "topic": "Other medicines to check first",
+          "en": "Warfarin, or similar medicines used to stop blood clots, is the single interaction named: check with a healthcare professional before using paracetamol alongside them. The precautions section also asks people to mention every other medicine, supplement, traditional medicine and herbal remedy they use.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op2",
+          "topic": "Food and drink",
+          "en": "No food is listed as something to avoid, and the medicine may be taken with a meal or without one. Alcohol appears only as a precaution: people who habitually drink a lot should tell their healthcare professional.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op3",
+          "topic": "Two paracetamol products together",
+          "en": "The leaflet tells readers not to use two products that both contain paracetamol at one time.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op4",
+          "topic": "Pregnancy",
+          "en": "The leaflet says paracetamol has decades of worldwide use for pain and fever, pregnant women included, and is still the recommended option for pain or fever in pregnancy provided it is used as directed. It adds that no link has been established between use in pregnancy and autism in children. Breastfeeding is not mentioned.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op5",
+          "topic": "Side-effect profile",
+          "en": "Described as well tolerated, with few side effects reported; the page lists no specific common side effects and asks people to tell a healthcare professional about any effect they think the medicine caused.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op6",
+          "topic": "Storage (safety)",
+          "en": "Keep it somewhere cool and dry, out of direct sunlight, and away from children.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op7",
+          "topic": "Disposal",
+          "en": "To throw paracetamol away, put it in a black rubbish bag, seal the bag tightly, then drop it in the rubbish chute or bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op8",
+          "topic": "Who wrote the leaflet / limits of the page",
+          "en": "The page says the National Medication Information workgroup developed it jointly. It lists the members as the healthcare cluster partners NHG Health, SingHealth and National University Health System; the community pharmacies Watsons, Guardian and Unity; plus the Pharmaceutical Society of Singapore. It states that the side-effect list is incomplete, that the page is no substitute for a healthcare professional's information, and that it does not show whether pharmacies or healthcare institutions have the medicine in stock (readers are told to ask those institutions).",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        },
+        {
+          "key": "paracetamol-op9",
+          "topic": "Videos and other languages",
+          "en": "The page embeds two video playlists, one about the medicine and one about drug allergies, and links to Chinese, Malay and Tamil video versions of each.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-paracetamol"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "indication",
+          "sg_says": "Brings down fever and eases headache, bodily aches and pain generally; no list of specific pain types.",
+          "us_label_says": "Pain reliever / fever reducer: temporary relief of minor aches and pains due to the common cold, headache, backache, minor arthritis pain, toothache, muscular aches, premenstrual and menstrual cramps; temporary reduction of fever. Same purpose; the US label is simply more itemised and adds 'minor' and 'temporarily'.",
+          "kind": "same"
+        },
+        {
+          "item": "how_to_take - food",
+          "sg_says": "States outright that food does not matter (may be taken with a meal or without).",
+          "us_label_says": "The US label is silent on food.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "how_to_take - schedule, age and duration",
+          "sg_says": "Only says to follow the label and stay within the label amount; gives no interval, no age split and no overall limit on how many days it may be used.",
+          "us_label_says": "Gives a dosing interval for adults and children 12 and over while symptoms last, tells under-12s to ask a doctor, and says not to use beyond 10 days unless a doctor directs.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "how_to_take - no doubling up / do not exceed label",
+          "sg_says": "Do not use two paracetamol-containing products together; do not go over the label amount, because too much may cause a serious liver problem. No figure is given.",
+          "us_label_says": "Do not take more than directed; do not use with any other acetaminophen-containing drug (prescription or non-prescription), and ask a doctor or pharmacist if unsure whether a product contains it. The US Liver warning additionally names a 24-hour amount as a liver-damage threshold; the SG leaflet has no such figure.",
+          "kind": "same"
+        },
+        {
+          "item": "missed_dose",
+          "sg_says": "Used when needed for fever or pain, so regular dosing is not always necessary; anyone unsure should check with a healthcare professional.",
+          "us_label_says": "The US label has no missed-dose text; the v1 table records 'Not applicable - taken as needed (OTC)'. Both sides treat it as an as-needed medicine; only the SG leaflet adds the 'check if unsure' line.",
+          "kind": "same"
+        },
+        {
+          "item": "stop_or_see_doctor - day limits",
+          "sg_says": "See a doctor if fever persists after 3 days of treatment, headache lasts beyond 2 days, or pain is no better after 7 days; also if any of these worsen after treatment.",
+          "us_label_says": "Stop use and ask a doctor if pain gets worse or lasts more than 10 days, or fever gets worse or lasts more than 3 days. Fever limit matches (3 days); pain limit differs (SG 7 vs US 10); the 2-day headache limit exists only in SG. The US label also says not to use for more than 10 days unless a doctor directs.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "stop_or_see_doctor - precautions (kidney disease, other medicines)",
+          "sg_says": "Tell a healthcare professional about kidney disease and about all other medicines including supplements, traditional and herbal products (in addition to liver disease, heavy regular drinking and warfarin-type medicines).",
+          "us_label_says": "Ask a doctor before use with liver disease; ask a doctor or pharmacist if taking the blood-thinner warfarin. Kidney disease and supplements / traditional / herbal products are not in the US row. SG widens warfarin to 'other similar' anti-clotting medicines; the US row names warfarin only.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor - known allergy to the medicine",
+          "sg_says": "Allergy to paracetamol or another ingredient is something to tell a healthcare professional about.",
+          "us_label_says": "The US label's 'Do not use' section says not to use it at all if allergic to acetaminophen or any inactive ingredient (v1 verbatim table, do_not_use field; this line is not in the v1 summary row). The US wording is the stricter of the two.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "stop_or_see_doctor - alcohol",
+          "sg_says": "Mentions habitual heavy drinking as something to tell a healthcare professional, without any number.",
+          "us_label_says": "Liver warning names a specific figure: 3 or more alcoholic drinks every day while using the product.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "stop_or_see_doctor - serious reaction signs listed",
+          "sg_says": "Allergy signs: swollen face, eyes, lips or tongue; breathing difficulty; itchy rash over the whole body. Liver-problem signs: nausea, poor appetite, sudden weight loss, eyes and skin going yellow, bruising or bleeding with no explanation. Action for both: stop and see a healthcare professional immediately.",
+          "us_label_says": "The US allergy alert covers skin reactions only (see next entry) and the US Liver warning lists no warning signs. Facial swelling, breathing difficulty and the liver sign list appear only on the SG side. The action is equivalent (US: stop use and seek medical help right away).",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor - US-only stop reasons",
+          "sg_says": "Lists an itchy whole-body rash, but not blisters or skin reddening, and has no 'new symptoms' or 'redness or swelling' line.",
+          "us_label_says": "Skin reddening, blisters or rash: stop use and seek medical help right away. Also stop use and ask a doctor if new symptoms occur or redness or swelling is present (these could be signs of a serious condition).",
+          "kind": "us_adds"
+        },
+        {
+          "item": "stop_or_see_doctor - pregnancy and breastfeeding",
+          "sg_says": "Positive statement: remains the recommended choice for pain or fever in pregnancy when used as directed, and no established link with autism in children. Breastfeeding is not mentioned.",
+          "us_label_says": "Pregnant or breast-feeding: ask a health professional before use. Not a direct contradiction, but the framing differs (SG reassures; US says ask first), and only the US label covers breastfeeding.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "overdose",
+          "sg_says": "Taking more than the recommended dose: get medical advice immediately; overdose may raise the risk of liver problems. No poison centre, no 995/A&E, nothing about what to do if there are no symptoms.",
+          "us_label_says": "Overdose: get medical help or contact Poison Control right away, even without signs or symptoms, for adults as well as children. Core action is the same (immediate medical help); the US label adds the poison-centre route and the 'even if no symptoms' point. US Poison Control is not a Singapore service.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "children - keep out of reach",
+          "sg_says": "Keep the medicine away from children.",
+          "us_label_says": "Keep out of reach of children.",
+          "kind": "same"
+        }
+      ]
+    },
+    {
+      "id": "ibuprofen",
+      "display_name": "ibuprofen",
+      "aliases": [
+        "nurofen",
+        "brufen",
+        "布洛芬"
+      ],
+      "source_id": "hh-ibuprofen",
+      "fields": {
+        "indication": {
+          "en": "The leaflet describes ibuprofen as an NSAID (non-steroidal anti-inflammatory drug) in common use for pain and inflammation. It also lists lowering the temperature in a fever and easing headaches, pain or inflammation in joints and muscles, gout attacks, toothache and period pain.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        "how_to_take": {
+          "en": "Take it with a meal where possible; the leaflet says this cuts down stomach irritation, and a healthcare professional may add a stomach-protecting medicine (famotidine and omeprazole are the examples given). It can be bought without a prescription for short-term use against fever, inflammation and pain that is mild to moderate. Strengths and dosage forms vary, so follow the label (or the prescription), never go above the labelled dose, and ask a healthcare professional when unsure. Use the smallest dose that works for as short a time as possible. It may be taken only when needed for a short period, or regularly if a doctor prescribed it that way. The leaflet gives no time of day and says nothing about swallowing tablets whole.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        "missed_dose": {
+          "en": "The leaflet says ibuprofen may be used only when needed, for a short period, in line with the doctor's prescription. Where a doctor has prescribed it for regular use: check with a healthcare professional before stopping; take a forgotten dose once you remember; if the next one is nearly due, take just the normal dose; never double up or add extra medicine to compensate.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        "stop_or_see_doctor": {
+          "en": "BEFORE TAKING, tell a healthcare professional about: allergy to NSAIDs, aspirin or any ingredient; pregnancy, planned pregnancy or breastfeeding; any other medicines, including supplements, traditional and herbal products; past ulcers or bleeding in the stomach or bowel, or other bleeding problems; asthma; past kidney or heart trouble, or stroke; any upcoming medical, surgical or dental procedure. REGULAR PRESCRIBED USE: check with a healthcare professional before stopping it. LONG USE: avoid prolonged use that is not medically supervised; the leaflet says it may raise the chance of heart attack, stroke, stomach ulcers and kidney problems. COMMON SIDE EFFECTS: stomach discomfort (pain, heartburn) and mild bleeding (nosebleeds with no clear cause, gums bleeding on brushing, small cuts that bleed for 10 to 15 minutes despite pressure); check with a healthcare professional if bleeding is still going after 15 minutes or you feel unwell, and tell them if these effects persist and bother you. ALLERGY SIGNS (swelling of the face, eyes, lips or tongue; trouble breathing; itchy rash across the whole body): stop the medicine and see a healthcare professional straight away. SERIOUS BLEEDING (blood in urine; black sticky stools when not on iron supplements; large bruises with no explanation; coughing up blood, or vomit that looks like coffee grounds; a sudden bad headache together with nausea or passing out): stop the medicine and tell a healthcare professional at once. SELF-TREATMENT LIMITS, see a doctor if: fever is still present after 3 days of treatment; a headache goes on beyond 2 days; pain is no better after 7 days of treatment; or any symptom gets worse after treatment. TOOK MORE THAN RECOMMENDED: get medical advice straight away. Other worrying side effects or concerns about the medicine: ask a doctor or pharmacist. The leaflet does not mention 995, an ambulance or A&E anywhere.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        "overdose": {
+          "en": "The disclaimer tells readers who have taken more than the recommended dose to get medical advice straight away. Separately, the leaflet warns that going over the labelled dose for a period of time may lead to serious problems with the stomach, kidneys or heart. No poison centre, 995 or A&E is named.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        }
+      },
+      "other_points": [
+        {
+          "key": "ibuprofen-op1",
+          "topic": "Other medicines and alcohol",
+          "en": "Blood-thinning medicines can interact with ibuprofen (aspirin, clopidogrel and warfarin are named). Do not combine it with another NSAID (naproxen and diclofenac are named). Avoid heavy drinking while on it, because alcohol in excess raises the chance of stomach bleeding. No specific foods are listed.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        {
+          "key": "ibuprofen-op2",
+          "topic": "Pregnancy and breastfeeding",
+          "en": "The only statement is to tell a healthcare professional if pregnant, planning a pregnancy or breastfeeding. No week-of-pregnancy cut-off is given.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        {
+          "key": "ibuprofen-op3",
+          "topic": "Stomach protection",
+          "en": "Taking the medicine after food is said to lower the chance of stomach discomfort; a stomach-protecting medicine may be supplied alongside it.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        {
+          "key": "ibuprofen-op4",
+          "topic": "Storage and disposal (safety-relevant part)",
+          "en": "Keep out of children's reach, in a cool dry spot out of direct sunlight; for the syrup, the package leaflet gives storage and expiry details. Disposal: seal it in a black rubbish bag before putting it in the chute or bin.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        {
+          "key": "ibuprofen-op5",
+          "topic": "Authorship and disclaimer",
+          "en": "Body text says the article was developed jointly by the National Medication Information workgroup (public healthcare clusters SingHealth, NUHS and NHG Health; the pharmacy chains Watsons, Guardian and Unity; and the Pharmaceutical Society of Singapore). It adds that the side-effect list is not complete, that the page does not replace advice from a healthcare professional, and that it says nothing about stock or availability at pharmacies or institutions.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        },
+        {
+          "key": "ibuprofen-op6",
+          "topic": "Multilingual videos",
+          "en": "The page points to NSAID and drug-allergy videos available in Chinese, Malay and Tamil.",
+          "zh": "",
+          "zh_status": "needs_translation",
+          "source_id": "hh-ibuprofen"
+        }
+      ],
+      "differences_vs_us_label": [
+        {
+          "item": "indication",
+          "sg_says": "NSAID for pain and inflammation; also fever, headaches, joint or muscle pain, gout attacks, toothache, period pain. No 'minor' or 'temporary' qualifier.",
+          "us_label_says": "Pain reliever / fever reducer for temporary relief of minor aches: headache, toothache, backache, menstrual cramps, common cold, muscle aches, minor arthritis pain; temporary fever reduction. Core uses overlap (pain, fever, headache, toothache, period pain, muscle pain); SG additionally names inflammation and gout attacks, while the US row additionally names backache and the common cold.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "how_to_take: food",
+          "sg_says": "Best taken with meals as the default, to cut down stomach irritation; a stomach-protecting medicine may be added by a healthcare professional.",
+          "us_label_says": "Take with food or milk only if stomach upset occurs; no mention of an added stomach-protecting medicine.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "how_to_take: interval and age",
+          "sg_says": "Follow the label; no dosing interval, age cut-off or wording about children is printed.",
+          "us_label_says": "Taken as needed while symptoms persist at a stated hours interval for adults and children 12 and over; children under 12: ask a doctor.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "how_to_take: dose principles",
+          "sg_says": "Do not go above the labelled dose; smallest effective dose for the shortest time.",
+          "us_label_says": "Do not take more than directed; the smallest effective dose should be used. (The 'shortest time' idea appears only in the warnings: risk is higher with longer use than directed.)",
+          "kind": "same"
+        },
+        {
+          "item": "how_to_take: regular prescribed use",
+          "sg_says": "As-needed short-term use, or regular use when a doctor prescribes it.",
+          "us_label_says": "OTC label describes as-needed use only; no doctor-prescribed regular pattern.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "missed_dose",
+          "sg_says": "As-needed use is acknowledged, but for doctor-prescribed regular use: take the forgotten dose when remembered, take only the normal dose if the next is nearly due, never double.",
+          "us_label_says": "Marked not applicable because the OTC product is taken as needed; no missed-dose instruction.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor: fever day-limit",
+          "sg_says": "See a doctor if fever is still there after 3 days of treatment (or if any symptom worsens after treatment).",
+          "us_label_says": "Stop use and ask a doctor if fever gets worse or lasts more than 3 days.",
+          "kind": "same"
+        },
+        {
+          "item": "stop_or_see_doctor: pain day-limit",
+          "sg_says": "See a doctor if pain has not improved after 7 days of treatment.",
+          "us_label_says": "Stop use and ask a doctor if pain gets worse or lasts more than 10 days.",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "stop_or_see_doctor: headache day-limit",
+          "sg_says": "See a doctor if a headache continues beyond 2 days.",
+          "us_label_says": "No headache-specific limit; headache falls under the general pain limit of more than 10 days.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor: allergy signs",
+          "sg_says": "Swollen face, eyes, lips or tongue, trouble breathing, itchy whole-body rash: stop and see a healthcare professional immediately.",
+          "us_label_says": "Hives, facial swelling, asthma (wheezing), shock, skin reddening, rash, blisters; especially in people allergic to aspirin: stop use and seek medical help right away. Same action; the symptom lists overlap but are worded differently.",
+          "kind": "same"
+        },
+        {
+          "item": "stop_or_see_doctor: heart attack / stroke symptoms",
+          "sg_says": "Only a general statement that long unsupervised use may raise heart attack and stroke risk; no list of heart or stroke symptoms and no instruction tied to them.",
+          "us_label_says": "Explicit heart attack / heart failure / stroke warning (can be fatal), plus stop use and ask a doctor for chest pain, trouble breathing, weakness in one part or side of the body, slurred speech or leg swelling.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "long or excessive use: risks named",
+          "sg_says": "Prolonged use without medical supervision may raise the risk of heart attack, stroke, kidney problems and stomach ulcers; exceeding the labelled dose for a period may lead to serious trouble with the stomach, kidneys or heart.",
+          "us_label_says": "Heart attack, heart failure and stroke risk is higher with more or longer use than directed; stomach-bleeding chance is higher when taking more or for longer than directed. US adds heart failure and 'can be fatal'; it does not name kidney problems as a long-use risk (kidney disease appears only as an ask-a-doctor condition).",
+          "kind": "same"
+        },
+        {
+          "item": "stop_or_see_doctor: bleeding signs",
+          "sg_says": "Serious-bleeding signs (blood in urine, black sticky stools, unexplained large bruises, coughing blood or coffee-ground vomit, or a sudden bad headache accompanied by nausea or a blackout): stop and inform a healthcare professional immediately. Also a 15-minute rule for small cuts, nosebleeds or gum bleeding that carry on.",
+          "us_label_says": "Stomach bleeding warning; stop use and ask a doctor for signs of stomach bleeding, itemised in the label text (the v1 file verbatim appendix row 12) as feeling faint, vomiting blood, bloody or black stools, stomach pain that does not get better. Overlap: black stools and blood in vomit. US adds feeling faint and persistent stomach pain; it has no urine, bruising, coughing-blood, sudden-headache or 15-minute mild-bleeding items, and its action is 'ask a doctor' rather than 'immediately'.",
+          "kind": "sg_adds"
+        },
+        {
+          "item": "stop_or_see_doctor: other stop-use triggers",
+          "sg_says": "See a doctor if any symptom gets worse after treatment; nothing about redness or swelling at the painful spot or about new symptoms.",
+          "us_label_says": "Stop use and ask a doctor also for redness or swelling in the painful area and for any new symptoms; 'gets worse' is attached to the pain and fever limits.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "stop_or_see_doctor: tell a professional before use",
+          "sg_says": "Tell a healthcare professional about NSAID or aspirin allergy, pregnancy or breastfeeding, other medicines including supplements and traditional or herbal products, past ulcer or bleeding, asthma, kidney or heart problems or stroke, and any planned medical, surgical or dental procedure.",
+          "us_label_says": "Shares allergy, stomach problems, heart disease, kidney disease, asthma, past stroke and other drugs. Adds: do not use right before or after heart surgery or after a past allergic reaction to any pain reliever / fever reducer; high blood pressure; liver cirrhosis; diuretic use; steroid or blood-thinning drugs; age 60 or older; being under a doctor's care for a serious condition; aspirin taken for heart attack or stroke (ibuprofen may reduce its benefit). SG in turn adds planned dental or other procedures, planning a pregnancy, and supplements / traditional / herbal remedies.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "stop_or_see_doctor: pregnancy",
+          "sg_says": "Tell a healthcare professional if pregnant, planning pregnancy or breastfeeding; no gestational-week limit.",
+          "us_label_says": "Ask a health professional if pregnant or breast-feeding; not to be used at 20 weeks or later unless a doctor definitely directs.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "other NSAIDs and blood thinners",
+          "sg_says": "Says ibuprofen can interact with blood thinners (aspirin, clopidogrel, warfarin named) and tells readers not to take it alongside other NSAIDs (naproxen, diclofenac named).",
+          "us_label_says": "Stomach bleeding warning lists the same two items as things that raise the chance of severe stomach bleeding: a blood-thinning (anticoagulant) or steroid drug, and other NSAID-containing drugs (aspirin, ibuprofen, naproxen or others); 'ask a doctor before use if the stomach bleeding warning applies'. US adds steroid drugs; SG names clopidogrel, warfarin and diclofenac and words it as an interaction / avoid.",
+          "kind": "same"
+        },
+        {
+          "item": "alcohol",
+          "sg_says": "Avoid excessive alcohol while taking it because of stomach-bleeding risk; no number of drinks is given.",
+          "us_label_says": "Chance of stomach bleeding is higher with 3 or more alcoholic drinks every day while using the product (a numeric threshold).",
+          "kind": "different_threshold"
+        },
+        {
+          "item": "overdose",
+          "sg_says": "Seek medical advice immediately if more than the recommended dose was taken; no poison centre or emergency number named.",
+          "us_label_says": "In case of overdose, get medical help or contact a Poison Control Center right away (a US service). Same action (immediate medical help); only the US row names a poison service, which does not apply in Singapore.",
+          "kind": "us_adds"
+        },
+        {
+          "item": "emergency wording (995 / A&E)",
+          "sg_says": "The leaflet never mentions 995, an ambulance or A&E; its strongest wording is to stop and see or inform a healthcare professional immediately.",
+          "us_label_says": "Likewise no emergency-number instruction in the row: allergy says seek medical help right away, heart/stroke symptoms say stop and ask a doctor. Neither source supplies a 995 escalation for ibuprofen; any such escalation has to come from the Table B sources.",
+          "kind": "same"
+        }
+      ]
+    }
+  ]
+}

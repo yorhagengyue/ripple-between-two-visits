@@ -1,0 +1,30 @@
+{
+  "request": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "system": "You look at a photo of a medicine label, box or bag. For each field, copy the printed text exactly as printed if, and only if, you can read every character of it clearly; otherwise use null. Never guess, complete or correct anything from what labels usually say. Answer JSON only: {\"medicine\": <the line with the medicine name (and strength) or null>, \"directions\": <the dosing line or null>, \"date\": <the dispensing date as printed or null>, \"clinic\": <the clinic or pharmacy name or null>}.",
+    "user": "Read these fields on this label.",
+    "json": true,
+    "images": [
+      {
+        "mime": "image/png",
+        "sha256": "4a1ea297750a7a643df5b9c70c99b80844bf35b9a573139caabceb80f34b258a"
+      }
+    ]
+  },
+  "response": {
+    "content": "{\"medicine\": \"AMLODIPINE 5MG TABLET\", \"directions\": \"Take ONE tablet every MORNING\", \"date\": \"01/09/2026\", \"clinic\": \"BLOSSOM FAMILY CLINIC (FICTIONAL)\"}",
+    "tokens": 530,
+    "usage": {
+      "promptTokens": 473,
+      "cacheHitTokens": 256,
+      "cacheMissTokens": 217,
+      "completionTokens": 57,
+      "reasoningTokens": 0
+    },
+    "usd": 0.00021,
+    "latency_ms": 900,
+    "finish_reason": "stop"
+  },
+  "recorded_at": "2026-10-09T06:22:49.598Z"
+}

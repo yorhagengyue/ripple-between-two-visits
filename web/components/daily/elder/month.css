@@ -1,0 +1,198 @@
+/*
+ * His month at the top of Today (owner 10-14; components/daily/elder/OwnMonth.tsx), on his paper and in his sizes. A
+ * day carries the mark her month gives it (components/family-ui/month.css), shape as well as colour, the colours
+ * darkened to read on his light ground: every dose taken, a teal disc with a white tick; one not taken, an amber ring;
+ * a reminder with no response, an amber ring with a bell; not yet, a dashed ring. A visit day's number is red (the
+ * owner's red for visit days, 10-14; the app's one red, --rp-urgent): on a red disc when the visit happened, in a red
+ * ring when it is planned. Today is outlined in ink; the day listed under the grid is tinted.
+ *
+ * Only --rp-* tokens and the three colours set on .rpu-month; sizes in calc(N * var(--rp-u)); text 18 and up; a day is
+ * 48px and up each way (the grid reaches 12px into each gutter: 49px a day on a 360px phone). Classes with the
+ * .rpu-month- prefix. Plain (unlayered) CSS; the list rows of the chosen day are the foundation's (.rpu-list-card,
+ * .rpu-li).
+ */
+
+/* the month and the chosen day under it (two sections side by side on the page) share the three colours */
+.rpu-month,
+.rpu-month-day {
+  /* 5.01:1 on paper, 4.56:1 on the chosen day's tint; the white tick on it 5.47:1 */
+  --rpu-month-taken: #0F766E;
+  /* 4.96:1 on paper, 4.52:1 on the tint */
+  --rpu-month-check: #9A5B00;
+  /* 6.64:1 on paper; white on it 7.26:1 */
+  --rpu-month-visit: var(--rp-urgent);
+}
+.rpu-month { display: flex; flex-direction: column; }
+.rpu-month-title { margin: 0; font-size: var(--rp-fs-body); font-weight: 900; line-height: 1.3; color: var(--rp-ink); }
+
+/* ---- the weekday letters and the grid, Monday first */
+.rpu-month-wd,
+.rpu-month-grid {
+  margin: 0 -12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.rpu-month-wd { margin-top: 8px; }
+.rpu-month-wd span { text-align: center; font-size: var(--rp-fs-min); line-height: 1.6; color: var(--rp-ink-3); }
+.rpu-month-grid { margin-top: 2px; row-gap: 4px; }
+.rpu-month-grid > li { min-width: 0; }
+
+/* a day: its number, its mark under it. A day without a record of his is dimmed, as a day still to come */
+.rpu-month-cell {
+  position: relative;
+  box-sizing: border-box;
+  min-height: calc(60 * var(--rp-u));
+  padding: calc(3 * var(--rp-u)) 0 calc(4 * var(--rp-u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2 * var(--rp-u));
+  border: 2px solid transparent;
+  border-radius: 14px;
+  color: var(--rp-ink-3);
+  text-decoration: none;
+}
+.rpu-month-num {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: calc(30 * var(--rp-u));
+  height: calc(30 * var(--rp-u));
+  border-radius: 50%;
+  font-size: var(--rp-fs-small);
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.rpu-month-cell[data-has="true"] { color: var(--rp-ink); }
+/* today: outlined in ink, its number bold */
+.rpu-month-cell[data-today="true"] { border-color: var(--rp-ink); color: var(--rp-ink); }
+.rpu-month-cell[data-today="true"] .rpu-month-num,
+.rpu-month-cell[data-chosen="true"] .rpu-month-num { font-weight: 900; }
+/* the day listed under the grid: tinted; another day than today also gets the accent's outline */
+.rpu-month-cell[data-chosen="true"] { background: var(--rp-accent-soft); }
+.rpu-month-cell[data-chosen="true"]:not([data-today="true"]) { border-color: var(--rp-accent); }
+/* a visit day: the number in red, on a red disc (it happened) or in a red ring (it is planned) */
+.rpu-month-cell[data-visit="past"] .rpu-month-num { background: var(--rpu-month-visit); color: var(--rp-white); font-weight: 900; }
+.rpu-month-cell[data-visit="planned"] .rpu-month-num { box-shadow: inset 0 0 0 2.5px var(--rpu-month-visit); color: var(--rpu-month-visit); font-weight: 900; }
+/* the day in words, for a screen reader only */
+.rpu-month-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* ---- the marks (the cell's 18, a row's 26, the legend's 22) */
+.rpu-month-marks { min-height: calc(18 * var(--rp-u)); display: flex; align-items: center; justify-content: center; }
+.rpu-month-mark {
+  box-sizing: border-box;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: calc(18 * var(--rp-u));
+  height: calc(18 * var(--rp-u));
+  border-radius: 50%;
+  color: var(--rp-white);
+}
+.rpu-month-mark[data-size="row"] { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); }
+.rpu-month-mark[data-size="legend"] { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+.rpu-month-mark svg { width: 72%; height: 72%; }
+.rpu-month-mark[data-mark="taken"] { background: var(--rpu-month-taken); }
+.rpu-month-mark[data-mark="missed"] { border: 2.5px solid var(--rpu-month-check); }
+.rpu-month-mark[data-mark="no_reply"] { border: 2.5px solid var(--rpu-month-check); color: var(--rpu-month-check); }
+.rpu-month-mark[data-mark="no_reply"] svg { width: 60%; height: 60%; }
+.rpu-month-mark[data-mark="pending"],
+.rpu-month-mark[data-mark="waiting"] { border: 2px dashed var(--rp-ink-3); }
+/* a dose from before he used Ripple: the short dash, no ring */
+.rpu-month-mark[data-mark="untracked"]::before { content: ""; width: 45%; height: 2.5px; border-radius: 2px; background: var(--rp-ink-3); }
+/* a visit, in the legend and on the chosen day's row */
+.rpu-month-mark[data-mark="visit"] { background: var(--rpu-month-visit); }
+.rpu-month-mark[data-mark="planned"] { border: 2.5px solid var(--rpu-month-visit); }
+
+/* ---- the legend: each mark with its words, two to a line, only the marks this month has */
+.rpu-month-legend {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.rpu-month-legend > li { min-width: 0; display: flex; align-items: center; gap: 8px; font-size: var(--rp-fs-min); line-height: 1.35; color: var(--rp-ink-2); }
+
+/* ---- the chosen day, when it is not today: its date, the way back to today, its records as rows */
+.rpu-month-day { display: flex; flex-direction: column; gap: 10px; }
+.rpu-month-dayhead { min-height: var(--rp-hit); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rpu-month-dayhead > h2 { margin: 0; font-size: var(--rp-fs-node); font-weight: 900; line-height: 1.3; color: var(--rp-ink); }
+.rpu-month-back { flex: none; min-height: var(--rp-hit); min-width: var(--rp-hit); display: inline-flex; align-items: center; justify-content: flex-end; font-size: var(--rp-fs-small); font-weight: 700; color: var(--rp-accent); text-decoration: none; }
+.rpu-month-none { margin: 0; font-size: var(--rp-fs-body); line-height: 1.5; color: var(--rp-ink-3); }
+
+/* ---- owner 10-15: a reading outside the target his doctor set. In a day's cell, beside the dose mark: a small upward
+   triangle in the doctor's colour (Ripple's purple on his side, the colour of his doctor's words), shape and colour both,
+   so it never reads as one of the dose marks (discs and rings) or the visit's red */
+.rpu-month-marks { gap: calc(3 * var(--rp-u)); }
+.rpu-month-mark[data-mark="outside"] {
+  width: calc(15 * var(--rp-u));
+  height: calc(13 * var(--rp-u));
+  border-radius: 0;
+  background: var(--rp-doctor);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.rpu-month-mark[data-mark="outside"][data-size="row"] { width: calc(24 * var(--rp-u)); height: calc(21 * var(--rp-u)); }
+.rpu-month-mark[data-mark="outside"][data-size="legend"] { width: calc(20 * var(--rp-u)); height: calc(17 * var(--rp-u)); }
+/* a reading inside the target, on the day's sheet: a small ink dot (her month's reading dot) */
+.rpu-month-mark[data-mark="reading"]::before { content: ""; width: 34%; height: 34%; border-radius: 50%; background: var(--rp-ink); }
+
+/* ---- the day's sheet (components/daily/elder/OwnDaySheet.tsx): over Today, under the long-press sheet (70); above the
+   ask button (60) and the tab bar (30). Inside the phone's column on a computer (app/desktop.css centres it at 430px) */
+.rpu-daysheet-wrap { position: fixed; inset: 0; z-index: 65; display: flex; flex-direction: column; justify-content: flex-end; }
+.rpu-daysheet-scrim { position: absolute; inset: 0; border: 0; padding: 0; margin: 0; background: rgb(24 32 44 / 0.42); cursor: default; animation: rpu-daysheet-fade 200ms ease-out both; }
+.rpu-daysheet {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  max-height: 88dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--rp-paper);
+  color: var(--rp-ink);
+  border-radius: 24px 24px 0 0;
+  padding: 10px var(--rp-gutter) calc(24px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 0.18);
+  gap: 14px;
+  animation: rpu-daysheet-up 280ms cubic-bezier(.32, .72, 0, 1) both;
+}
+.rpu-daysheet:focus { outline: none; }
+.rpu-daysheet::before { content: ""; align-self: center; flex: none; width: 40px; height: 5px; border-radius: 3px; background: var(--rp-line-2); }
+.rpu-daysheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--rp-hit); }
+.rpu-daysheet-head > h2 { margin: 0; font-size: var(--rp-fs-node); font-weight: 900; line-height: 1.3; color: var(--rp-ink); }
+.rpu-daysheet-close {
+  flex: none;
+  min-height: var(--rp-hit);
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 2px solid var(--rp-line);
+  background: var(--rp-white);
+  color: var(--rp-ink);
+  font: inherit;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  cursor: pointer;
+}
+.rpu-daysheet-close:focus-visible { outline: 3px solid var(--rp-ink); outline-offset: 2px; }
+.rpu-daysheet-body { display: flex; flex-direction: column; gap: 14px; }
+.rpu-daysheet-wrap[data-closing="true"] .rpu-daysheet { animation: rpu-daysheet-down 200ms ease-in both; pointer-events: none; }
+.rpu-daysheet-wrap[data-closing="true"] .rpu-daysheet-scrim { animation: rpu-daysheet-fadeout 200ms ease-in both; pointer-events: none; }
+
+/* a reading outside the target, on the sheet: its row tinted, the doctor's numbers in the doctor's colour, his words under */
+.rpu-month-bp[data-outside="true"] { background: var(--rp-accent-soft); }
+.rpu-month-outside { color: var(--rp-accent-ink); font-weight: 700; }
+.rpu-month-reason { display: block; margin-top: 4px; font-size: var(--rp-fs-body); font-weight: 700; line-height: 1.45; color: var(--rp-ink); overflow-wrap: anywhere; }
+
+@keyframes rpu-daysheet-up { from { transform: translateY(100%); } }
+@keyframes rpu-daysheet-down { to { transform: translateY(100%); } }
+@keyframes rpu-daysheet-fade { from { opacity: 0; } }
+@keyframes rpu-daysheet-fadeout { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .rpu-daysheet, .rpu-daysheet-scrim, .rpu-daysheet-wrap[data-closing="true"] .rpu-daysheet, .rpu-daysheet-wrap[data-closing="true"] .rpu-daysheet-scrim { animation: none; }
+}

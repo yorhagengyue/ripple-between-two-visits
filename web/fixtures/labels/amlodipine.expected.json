@@ -1,0 +1,16 @@
+{
+  "drug_text": "AMLODIPINE 5MG TABLET",
+  "drug_id": "amlodipine",
+  "strength": "5 mg",
+  "directions": "Take ONE tablet every MORNING",
+  "slots": {
+    "quantity": "1",
+    "unit": "tablet",
+    "time": "morning",
+    "frequency": "once_daily"
+  },
+  "indication_on_label": "high blood pressure",
+  "dispensed": "2026-09-01",
+  "clinic": "Blossom Family Clinic (fictional)",
+  "expected_status_after_confirm": "label_confirmed"
+}

@@ -1,0 +1,55 @@
+/*
+ * The mark that shows the next page is on its way (components/site/NavProgress.tsx; front-end line fe-12). Plain global
+ * CSS with the .rp12- prefix, only the foundation's tokens (app/ripple-ui.css, never repeated or edited here).
+ * Unlayered on purpose: the foundation's rules sit in @layer components.
+ *
+ * A 4px strip fixed over the top edge of the phone page: it takes no room and no pointer events, so the page under it
+ * neither moves nor loses a tap. Empty until a page has been on its way for 300 ms; then a bar in the accent that grows
+ * from the left, fast at first and ever slower (it never reaches the end by itself: the next page ends it). On a dark
+ * page (hers, .rpf-screen; a page root marked data-rp-phone="dark") the bar is the teal of the dark pages. On a
+ * computer app/desktop.css keeps the strip inside the phone's column (data-rp-phone-fixed); her screens and the demo's
+ * old phone frame (.rp-patient) are 430px columns of their own (app/ripple-ui.css, app/globals.css), which that file
+ * leaves alone, so the strip follows those here.
+ */
+.rp12-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 70;
+  overflow: hidden;
+  pointer-events: none;
+}
+html:has(.rpf-screen:not([data-fill="container"]), .rp-patient) .rp12-nav { max-width: 430px; margin-inline: auto; }
+
+.rp12-nav-bar {
+  display: block;
+  height: 100%;
+  background: var(--rp-accent);
+  transform-origin: left center;
+  transform: scaleX(.94);
+  animation: rp12-nav-grow 8s cubic-bezier(.08, .72, .2, 1) both;
+}
+html:has(.rpf-screen, [data-rp-phone="dark"]) .rp12-nav-bar { background: var(--rpf-teal); }
+@keyframes rp12-nav-grow {
+  from { transform: scaleX(.05); }
+  to { transform: scaleX(.94); }
+}
+/* someone who asked for less motion gets the bar itself, standing still */
+@media (prefers-reduced-motion: reduce) {
+  .rp12-nav-bar { animation: none; transform: scaleX(.6); }
+}
+
+/* the words for a screen reader: in the page, not on it */
+.rp12-nav-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

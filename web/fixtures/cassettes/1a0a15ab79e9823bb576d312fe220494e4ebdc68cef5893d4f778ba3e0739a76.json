@@ -1,0 +1,30 @@
+{
+  "request": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "system": "You look at a photo of a medicine label, box or bag. For each field, copy the printed text exactly as printed if, and only if, you can read every character of it clearly; otherwise use null. Never guess, complete or correct anything from what labels usually say. Answer JSON only: {\"medicine\": <the line with the medicine name (and strength) or null>, \"directions\": <the dosing line or null>, \"date\": <the dispensing date as printed or null>, \"clinic\": <the clinic or pharmacy name or null>}.",
+    "user": "Read these fields on this label.",
+    "json": true,
+    "images": [
+      {
+        "mime": "image/png",
+        "sha256": "5bcdfd177ebb1d193662c17491e92a3ff5effd22f52845b89c53bbb91f324b90"
+      }
+    ]
+  },
+  "response": {
+    "content": "{\"medicine\": \"宁和平压丸\", \"directions\": \"口服，一次六粒，一日三次\", \"date\": null, \"clinic\": null}",
+    "tokens": 507,
+    "usage": {
+      "promptTokens": 473,
+      "cacheHitTokens": 256,
+      "cacheMissTokens": 217,
+      "completionTokens": 34,
+      "reasoningTokens": 0
+    },
+    "usd": 0.000183,
+    "latency_ms": 972,
+    "finish_reason": "stop"
+  },
+  "recorded_at": "2026-10-09T06:22:51.914Z"
+}

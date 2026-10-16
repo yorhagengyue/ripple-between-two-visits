@@ -1,0 +1,2382 @@
+/*
+ * Ripple UI: the two phone systems.
+ *
+ * Part A, Mr Tan's phone (the elder side): --rp-* variables, .rpu-* classes.
+ *   The design is the timeline draft (owner, 2026-10-11; web/progress/fe.md): cool paper #F2F5F9, white cards with a
+ *   1px line, one accent (#6A4C93), Noto Sans / Noto Sans SC, someone else's words in Noto Serif / Noto Serif SC 400.
+ *   - A day, an answer, a recording: each is a line of nodes (.rpu-tl). The node is the source: who said it is the
+ *     node's shape plus the words next to it (.rpu-node, .rpu-tl-who), never a colour of its own. There are no
+ *     speaker colours: doctor, counter and pharmacist are the accent ring, the label and the daughter the ink ring.
+ *   - Primary button 72px, secondary 64px with a 2px ink border; in the lower part of the screen (.rpu-dock) or
+ *     under the line, indented to the line's text (.rpu-ind).
+ *   - Tap only. No confirm dialogs: a 12 s undo bar (.rpu-toast) in the fixed area at the bottom.
+ *   - No text under 18px anywhere (the draft's 15-17px are lifted to 18); every target at least 48x48 (bare text
+ *     links get the area by padding, the look stays).
+ *   - Every size is calc(N * var(--rp-u)): N is the design px, --rp-u is 1px at the browser's default text
+ *     size and grows with the phone's text-size setting (iOS Dynamic Type through -apple-system-body below;
+ *     elsewhere the browser's default font size). Zoom is never blocked.
+ *   - #8592A3 (--rp-edge) is for things that are not text: dashed frames, past nodes, the empty radio ring, input
+ *     borders. Text is never lighter than #475263 (--rp-ink-3).
+ *   - Readings are never judged: no colour on a reading. Red (#A4262C) only for 995, deleting and errors; the
+ *     recording dot has its own red (#E5484D).
+ *   - The draft loads sans 400/700/900 and serif 400/600 but writes 500 and 800 in its styles. The same weights are
+ *     loaded here (lib/ui/fonts.ts) and the same numbers written, so the browser falls back exactly as it does in
+ *     the draft: 500 draws 400, 800 draws 900.
+ *
+ * Part B, Wei Ling's phone (the daughter side): --rpf-* variables, .rpf-* classes.
+ *   Owner's decision 10-10 (C2 track D restyled it): Zicheng's dark v1 colours and fonts (#0A0C0F ground, teal
+ *   #37C2BA, amber #E6B45A) in the "second draft" layout (Ripple C2 进度/素材/2026-10-10-女儿端黑色第二稿.html): one
+ *   large sentence for Dad's state, the 7-dot week (state by shape + colour + words), a transcript-like timeline,
+ *   hairline rows, no card grids, one solid button per screen, amber only for no reply / not taken, no coloured word
+ *   inside a headline. Text at least 16px and AA: v1's weakest text step is lightened (lib/ui/tokens.ts notes);
+ *   hairlines are the solid hex of v1's rgba over the ground.
+ *
+ * For anyone editing:
+ * - Only --rp-*, --rpu-*, --rpf-* variables and .rpu / .rpu-* / .rpf / .rpf-* classes here (globals.css owns
+ *   the v3 page tokens and .rp-*; tests/unit/ui/contrast.test.ts checks there is no collision).
+ * - Plain CSS: no @import "tailwindcss" (globals.css pulls it in). Component rules sit in @layer components,
+ *   so a Tailwind utility on the same element still wins.
+ * - lib/ui/tokens.ts mirrors the colours and the type scale; the contrast test reads both.
+ */
+
+:root {
+  /* ---------- the unit: 1px of the design at the default text size ---------- */
+  --rp-u: min(0.0625rem, 2.5px);
+
+  /* ---------- Part A colours (the timeline draft; contrast in lib/ui/tokens.ts) ---------- */
+  --rp-paper: #F2F5F9;        /* the page */
+  --rp-white: #FFFFFF;        /* cards, buttons, fields */
+  --rp-tint: #E1E7EE;         /* grey box, the segmented control's groove, separators inside a list */
+  --rp-ink: #18202C;          /* 14.98:1 on paper */
+  --rp-ink-2: #2C3644;        /* the Chinese translation; 11.18:1 */
+  --rp-ink-3: #475263;        /* source lines, subtitles, idle tabs, placeholders; 7.23:1 */
+  --rp-line: #D5DCE5;         /* 1px hairline and card border (not text) */
+  --rp-line-2: #C3CCD8;       /* the timeline's rule, idle option and small-button borders, the 我 circle */
+  --rp-edge: #8592A3;         /* not text: dashed frames, past nodes, the empty radio ring, input borders */
+  --rp-accent: #6A4C93;       /* 6.26:1 on paper; white on it 6.85:1 */
+  --rp-accent-ink: #6A4C93;   /* accent words (the same purple: the draft has one) */
+  --rp-accent-press: #4E3672; /* a pressed accent button */
+  --rp-accent-soft: #EEE8F5;  /* Ripple's bubble, tinted box */
+  --rp-accent-halo: #E3DAF0;  /* the ring around "now" */
+  --rp-urgent: #A4262C;       /* 995, deleting, an error; 6.64:1 on paper, white on it 7.26:1 */
+  --rp-rec: #E5484D;          /* the recording dot */
+  --rp-rec-halo: #562C36;     /* rgba(229,72,77,.3) over ink, as a solid colour */
+  --rp-on-accent: #FFFFFF;
+  --rp-on-ink: #FFFFFF;
+  --rp-on-ink-2: #C3CCD8;     /* the second line on an ink ground (undo bar, recording bar); 10.10:1 */
+  --rp-on-ink-3: #D5DCE5;     /* the second line in an ink box; 11.86:1 */
+  --rp-on-urgent: #FFFFFF;
+  --rp-off: #6B7684;          /* the words on a disabled button only (3.34:1 on --rp-line; a disabled control is exempt) */
+  /* there are no speaker colours any more; the old names stay so every rule that used them keeps a value */
+  --rp-doctor: var(--rp-accent);
+  --rp-pharmacist: var(--rp-accent);
+  --rp-family: var(--rp-ink);
+  --rp-doctor-soft: var(--rp-accent-soft);
+  --rp-family-soft: var(--rp-tint);
+  --rp-urgent-soft: var(--rp-white);
+  --rp-toast-accent: var(--rp-on-ink-2);
+
+  /* type: next/font sets --rp-ff-* on <html> (app/layout.tsx); the literal names are the fallback */
+  --rp-font-sans: var(--rp-ff-sans, "Noto Sans"), var(--rp-ff-sans-zh, "Noto Sans SC"), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --rp-font-serif: var(--rp-ff-serif, "Noto Serif"), var(--rp-ff-serif-zh, "Noto Serif SC"), "Songti SC", serif;
+  --rp-font-mono: ui-monospace, Menlo, Consolas, monospace;
+
+  /* type scale (design px x unit); 18 is the floor */
+  --rp-fs-min: calc(18 * var(--rp-u));      /* source lines, tags, the tab bar, hints */
+  --rp-fs-orig: calc(18 * var(--rp-u));     /* the label as printed (mono); the draft's 17 lifted to 18 */
+  --rp-fs-sub: calc(19 * var(--rp-u));      /* a subtitle, the second line in a box */
+  --rp-fs-small: calc(20 * var(--rp-u));    /* a button in a row of actions, a field's name, 「‹ 返回」 */
+  --rp-fs-body: calc(21 * var(--rp-u));     /* Ripple's and his own sentences; 23 when filming */
+  --rp-fs-row: calc(22 * var(--rp-u));      /* a list row, the undo bar, the play pill, a translation */
+  --rp-fs-secondary: calc(23 * var(--rp-u)); /* secondary button, an option */
+  --rp-fs-said-en: calc(24 * var(--rp-u));  /* someone else's words, Latin (serif 400) */
+  --rp-fs-said-zh: calc(24 * var(--rp-u));  /* someone else's words, Chinese (serif 400) */
+  --rp-fs-node: calc(24 * var(--rp-u));     /* a node's title, Ripple's bubble, what he types */
+  --rp-fs-action: calc(26 * var(--rp-u));   /* primary button */
+  --rp-fs-drug: calc(26 * var(--rp-u));     /* a medicine's name on its card */
+  --rp-fs-ask: calc(28 * var(--rp-u));      /* 「对吗？」 */
+  --rp-fs-question: calc(30 * var(--rp-u)); /* his question as the title */
+  --rp-fs-headline: calc(30 * var(--rp-u)); /* a screen's title or its one sentence */
+  --rp-fs-title: calc(36 * var(--rp-u));    /* 「今天」 next to the 我 circle */
+  --rp-fs-reading: calc(44 * var(--rp-u));
+
+  /* sizes */
+  --rp-hit: calc(48 * var(--rp-u));
+  --rp-h-primary: calc(72 * var(--rp-u));
+  --rp-h-secondary: calc(64 * var(--rp-u));
+  --rp-h-source: calc(56 * var(--rp-u));     /* the play pill, a button in a row of actions */
+  --rp-gutter: 20px;
+  --rp-gap: 10px;                            /* between buttons */
+  --rp-block-gap: 18px;                      /* between blocks */
+  --rp-indent: calc(28 * var(--rp-u) + 12px);                       /* blocks under a timeline start where its text starts */
+  --rp-radius-btn: 16px;
+  --rp-radius-src: 14px;
+  --rp-radius-card: 18px;
+  --rp-radius-block: 20px;
+  --rp-tabbar-h: calc(68 * var(--rp-u));     /* an icon (28) over its word (18, line 22.5), 3 between, 8 above, 6 under */
+  --rp-saybar-h: calc(60 * var(--rp-u) + 24px);
+  --rp-typedock-h: calc(136 * var(--rp-u) + 38px);  /* a field (64) over a row with the primary button (72), 10 between, 14 around */
+  --rp-statusbar-h: 50px;
+
+  /* ---------- Part B colours (the v3 draft, Ripple-Daughter-v3; AA on their grounds in lib/ui/tokens.ts) ---------- */
+  --rpf-page: #05070A;
+  --rpf-bg: #0A0C0F;
+  --rpf-surface: #15181C;     /* inputs, the bottom sheet, the skeleton, a disabled button */
+  --rpf-surface-2: #1E2227;   /* the chosen half of 中/EN */
+  --rpf-ink: #F2F5F6;
+  --rpf-ink-2: #9AA1A6;
+  --rpf-ink-3: #80878C;       /* where the draft sets words in #6A7176 (under 4.5:1 on the ground): lightened to pass AA */
+  --rpf-dim: #6A7176;         /* the draft's weak grey, never text: the dashed "not yet" ring, an earlier timeline node, the sheet's handle */
+  --rpf-hair: #1B1D20;        /* rgba(255,255,255,.07) on the ground: rows and groups */
+  --rpf-hair-2: #27292C;      /* rgba(255,255,255,.12) on the ground: the timeline rule, the 中/EN outline, an open step */
+  --rpf-edge: #5C6368;        /* dashed frames in the gallery (non-text, 3:1 on the ground) */
+  --rpf-teal: #37C2BA;
+  --rpf-teal-ink: #5FD4CC;
+  --rpf-teal-line: #1E5E5C;   /* rgba(55,194,186,.45) on the ground (the gallery's event rule) */
+  --rpf-doc: #4CB3E6;
+  --rpf-doc-ink: #7CC8EE;
+  --rpf-doc-line: #285770;    /* rgba(76,179,230,.45) on the ground (the gallery's event rule) */
+  --rpf-chk: #E6B45A;         /* amber: only "no reply" and "not taken" */
+  --rpf-chk-line: #6D5831;    /* rgba(230,180,90,.45) on the ground (the gallery's event rule) */
+  --rpf-rec: #E5534B;         /* no longer drawn on her pages (the draft records in teal); kept for the token table */
+  --rpf-on-teal: #06201E;
+  --rpf-on-chk: #2A1E06;
+  --rpf-on-rec: #1A0605;
+  --rpf-banner: #25292F;      /* rgba(40,44,50,.9) on the ground: the phone's notification, drawn as a preview */
+  --rpf-banner-ink: #D5D9DB;
+  --rpf-banner-dim: #BAC0C4;
+  /* the draft's white and teal lines, as it writes them (outlines and rules only, never under text) */
+  --rpf-w10: rgba(255, 255, 255, .1);    /* an input's outline */
+  --rpf-w14: rgba(255, 255, 255, .14);   /* the rule after +65 */
+  --rpf-w16: rgba(255, 255, 255, .16);   /* the dotted line ahead of a live recording */
+  --rpf-w18: rgba(255, 255, 255, .18);   /* a small tag's outline */
+  --rpf-w20: rgba(255, 255, 255, .2);    /* the outlined button */
+  --rpf-w22: rgba(255, 255, 255, .22);   /* the rule left of someone's words */
+  --rpf-w28: rgba(255, 255, 255, .28);   /* a step's number ring */
+  --rpf-teal-22: rgba(55, 194, 186, .22);  /* the halo of the recording dot */
+  --rpf-teal-50: rgba(95, 212, 204, .5);   /* the record key's outer ring, 「听原声」 */
+  --rpf-teal-60: rgba(95, 212, 204, .6);   /* today's ring, the play circle */
+  --rpf-scrim: rgba(5, 7, 10, .74);        /* behind the bottom sheet */
+  --rpf-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Text", "Inter", "Helvetica Neue", "Segoe UI", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --rpf-fs-min: calc(16 * var(--rp-u));     /* notes, translations, the foot line; the draft's 15 and 14 are lifted to it */
+  --rpf-fs-body: calc(17 * var(--rp-u));    /* text, rows, buttons, the timeline */
+  --rpf-fs-title: calc(26 * var(--rp-u));   /* the bottom sheet's sentence */
+  --rpf-fs-hero: calc(30 * var(--rp-u));    /* the one large sentence of a screen */
+  --rpf-fs-value: calc(26 * var(--rp-u));
+  --rpf-fs-timer: calc(44 * var(--rp-u));   /* the recording time */
+  --rpf-hit: calc(44 * var(--rp-u));
+  --rpf-h-btn: calc(56 * var(--rp-u));      /* the solid button */
+  --rpf-h-btn-2: calc(52 * var(--rp-u));    /* the outlined button */
+  --rpf-h-btn-3: calc(48 * var(--rp-u));    /* plain words */
+  --rpf-h-top: calc(56 * var(--rp-u));      /* the top bar */
+}
+
+/*
+ * iOS: follow the phone's text size (Dynamic Type). Only on touch screens (on a Mac -apple-system-body is 13px)
+ * and only on pages that hold one of these phone screens, so every other page keeps its 16px root.
+ * At the default setting -apple-system-body is 17px, so the unit divides by 17: the design px stay exact.
+ */
+@supports (font: -apple-system-body) {
+  @media (hover: none) and (pointer: coarse) {
+    html:has(.rpu-screen, .rpf-screen) {
+      font: -apple-system-body;
+      line-height: 1.5;
+      --rp-u: min(calc(1rem / 17), 2.5px);
+    }
+  }
+}
+
+/* Filming (the brief's 拍摄模式): body text 21 -> 23. The nearest scope wins (inherited variables). */
+[data-filming="true"] {
+  --rp-fs-body: calc(23 * var(--rp-u));
+}
+[data-filming="false"] {
+  --rp-fs-body: calc(21 * var(--rp-u));
+}
+
+@layer components {
+  /* =================================================================== Part A: elder */
+
+  .rpu {
+    font-family: var(--rp-font-sans);
+    line-height: 1.45;
+    color: var(--rp-ink);
+    letter-spacing: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .rpu svg { display: inline-block; flex: none; }
+
+  .rpu-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .rpu a:focus-visible,
+  .rpu button:focus-visible,
+  .rpu input:focus-visible,
+  a.rpu:focus-visible,
+  button.rpu:focus-visible {
+    outline: 3px solid var(--rp-accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- screen ---------- */
+  .rpu-screen {
+    display: flex;
+    flex-direction: column;
+    background: var(--rp-paper);
+    min-height: 100dvh;
+    position: relative;
+    /* what is fixed at the bottom (tab bar, the say bar): the page and the undo bar keep clear of it */
+    --rpu-bottom: 0px;
+  }
+  .rpu-screen[data-fill="container"] { min-height: 0; height: 100%; }
+  .rpu-screen[data-tabbar="fixed"] { --rpu-bottom: calc(var(--rp-tabbar-h) + env(safe-area-inset-bottom)); }
+  /* only while the strip is drawn: since 10-14 his pages have none (components/daily/elder/SayBarLinks.tsx draws nothing) */
+  .rpu-screen[data-tabbar="fixed"][data-saybar="fixed"]:has(> .rpu-say) { --rpu-bottom: calc(var(--rp-tabbar-h) + var(--rp-saybar-h) + env(safe-area-inset-bottom)); }
+  .rpu-screen[data-tabbar="fixed"][data-saybar="fixed"][data-saybar-size="typing"] { --rpu-bottom: calc(var(--rp-tabbar-h) + var(--rp-typedock-h) + env(safe-area-inset-bottom)); }
+  .rpu-page {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px var(--rp-gutter) 18px;
+    overflow-wrap: break-word;
+  }
+  /* a fixed-height phone must scroll, never squash a block into the next one */
+  .rpu-page > * { flex-shrink: 0; }
+  .rpu-screen[data-fill="container"] > .rpu-page { overflow-y: auto; }
+  /* nothing fixed at the foot (no tab bar, no say bar): the draft's room under the last block, 40px, or 34px under
+     the lower buttons. Before the tab bar's rule, which wins where a screen has both */
+  .rpu-screen[data-foot="plain"] > .rpu-page { padding-bottom: 40px; }
+  .rpu-screen[data-foot="dock"] > .rpu-page { padding-bottom: 34px; }
+  .rpu-screen[data-tabbar="fixed"] > .rpu-page { padding-bottom: calc(var(--rpu-bottom) + 18px); }
+  /* while an undo bar stands at the foot (it says how high it is: --rpu-toast-h, components/ui/UndoToast.tsx) the page
+     is that much longer, so its last block can be scrolled clear of the bar. Nothing at all without a bar */
+  .rpu-page::after { content: ""; display: block; flex: none; height: var(--rpu-toast-h, 0px); }
+
+  /* blocks one under another, 18px apart (the draft's grid); .rpu-ind starts where a timeline's text starts */
+  .rpu-stack { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; gap: var(--rp-block-gap); }
+  .rpu-stack > * { margin-top: 0; }
+  .rpu-ind { margin-left: var(--rp-indent); }
+  /* a control that is as wide as its column by itself (width: 100%) gives the indent back, so it ends where the column ends */
+  .rpu-btn.rpu-ind, .rpu-opt.rpu-ind, .rpu-tap-play.rpu-ind { width: calc(100% - var(--rp-indent)); }
+  .rpu-btns { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rp-gap); }
+
+  /* ---------- page header: 「‹ 返回」, the title and its subtitle, the 我 circle (or words) on the right ---------- */
+  .rpu-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 0 12px;
+  }
+  .rpu-meta[data-line="true"] { border-bottom: 1px solid var(--rp-line); }
+  /* the account's line under the header (the example account's) keeps the header's own distance from that hairline */
+  .rpu-meta[data-line="true"] + .rpu-banner { margin-top: 12px; }
+  .rpu-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: var(--rp-hit);
+  }
+  .rpu-meta-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-meta-title { margin: 0; font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.2; }
+  .rpu-meta-title[data-size="big"] { font-size: var(--rp-fs-title); }
+  .rpu-meta-story {
+    font-size: var(--rp-fs-sub);
+    line-height: 1.4;
+    color: var(--rp-ink-3);
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+  }
+  .rpu-meta-end { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; flex: none; }
+  .rpu-meta-right { font-size: var(--rp-fs-sub); font-weight: 800; text-align: right; }
+  /* a bare word in the accent colour; the 48px area comes from its height, the row keeps the draft's rhythm */
+  .rpu-back {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 2px;
+    min-height: var(--rp-hit);
+    min-width: var(--rp-hit);
+    margin: -6px 0;
+    padding-right: 12px;
+    font-size: var(--rp-fs-small);
+    font-weight: 700;
+    color: var(--rp-accent);
+    text-decoration: none;
+  }
+  .rpu-back svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); margin-left: -6px; }
+  /* the way back as a button (it goes back in place): the same bare word, without a button's own frame */
+  button.rpu-back { border: 0; background: none; padding-top: 0; padding-bottom: 0; padding-left: 0; font-family: inherit; line-height: inherit; cursor: pointer; }
+  .rpu-me {
+    flex: none;
+    width: calc(52 * var(--rp-u));
+    height: calc(52 * var(--rp-u));
+    border-radius: 50%;
+    background: var(--rp-white);
+    border: 1.5px solid var(--rp-line-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--rp-fs-small);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--rp-ink);
+    text-decoration: none;
+  }
+
+  /* small bordered buttons: 中/EN, 改一下 */
+  .rpu-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: var(--rp-hit);
+    min-width: var(--rp-hit);
+    padding: 0 calc(14 * var(--rp-u));
+    border: 2px solid var(--rp-line-2);
+    border-radius: var(--rp-radius-src);
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    font-size: var(--rp-fs-min);
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    flex: none;
+  }
+  .rpu-chip-btn svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); }
+  .rpu-chip-btn[data-kind="lang"] { min-width: calc(72 * var(--rp-u)); }
+
+  /* ---------- a screen's one sentence, his question ---------- */
+  .rpu-headline {
+    margin: 8px 0 0;
+    font-size: var(--rp-fs-headline);
+    line-height: 1.25;
+    font-weight: 900;
+  }
+  .rpu-asked {
+    margin: 12px 0 0;
+    font-size: var(--rp-fs-min);
+    font-weight: 800;
+    color: var(--rp-ink-3);
+  }
+  .rpu-question {
+    margin: 4px 0 0;
+    font-size: var(--rp-fs-question);
+    line-height: 1.25;
+    font-weight: 900;
+  }
+  .rpu-ask {
+    margin: 0;
+    font-size: var(--rp-fs-ask);
+    line-height: 1.3;
+    font-weight: 900;
+  }
+
+  /* ---------- running text (Ripple's and his own words: sans) ---------- */
+  .rpu-text { margin: 10px 0 0; font-size: var(--rp-fs-body); line-height: 1.55; text-wrap: pretty; }
+  .rpu-text[data-variant="lede"] { margin-top: 6px; color: var(--rp-ink-3); }
+  .rpu-text[data-variant="strong"] { font-weight: 800; }
+  /* the draft's other paragraph sizes: 24 (a screen's opening sentence) and 18 */
+  .rpu-text[data-size="large"] { font-size: var(--rp-fs-node); line-height: 1.5; }
+  .rpu-text[data-size="small"] { font-size: var(--rp-fs-min); line-height: 1.5; }
+  .rpu-drug {
+    margin: 8px 0 0;
+    font-size: var(--rp-fs-drug);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  /* ---------- group label ---------- */
+  .rpu-label {
+    margin: 0;
+    font-size: var(--rp-fs-min);
+    font-weight: 800;
+    color: var(--rp-ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  /* a section's title with a rule running to the right */
+  .rpu-sec { display: flex; align-items: center; gap: 10px; padding-top: 6px; margin: 0; }
+  .rpu-sec-t { flex: none; max-width: 85%; font-size: var(--rp-fs-body); font-weight: 900; line-height: 1.3; }
+  .rpu-sec::after { content: ""; flex: 1; height: 2px; background: var(--rp-ink); }
+
+  /* ---------- the node: who said it, as a shape (always next to words) ---------- */
+  .rpu-node {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(22 * var(--rp-u));
+    height: calc(22 * var(--rp-u));
+    border-radius: 50%;
+    background: var(--rp-paper);
+    color: var(--rp-white);
+  }
+  .rpu-node svg { width: 70%; height: 70%; }
+  .rpu-node[data-node="me"] { background: var(--rp-ink); }
+  .rpu-node[data-node="rip"] { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); border-radius: 4px; background: var(--rp-accent); }
+  .rpu-node[data-node="doc"] { border: 3px solid var(--rp-accent); }
+  .rpu-node[data-node="unc"] { border: 3px dashed var(--rp-accent); }
+  .rpu-node[data-node="lab"] { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); border-radius: 3px; border: 3px solid var(--rp-ink); }
+  .rpu-node[data-node="dau"] { border: 3px solid var(--rp-ink); }
+  .rpu-node[data-node="sch"] { width: calc(14 * var(--rp-u)); height: calc(14 * var(--rp-u)); border: 2px solid var(--rp-edge); }
+  .rpu-node[data-node="now"] { background: var(--rp-accent); box-shadow: 0 0 0 5px var(--rp-accent-halo); }
+  .rpu-node[data-node="next"] { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); border: 2.5px solid var(--rp-edge); }
+  .rpu-node[data-node="ok"] { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); background: var(--rp-ink); }
+  .rpu-node[data-node="miss"] { border: 2px dashed var(--rp-edge); }
+  .rpu-node[data-node="sos"] { border-radius: 4px; background: var(--rp-urgent); }
+  .rpu-node[data-node="dot"] { width: calc(12 * var(--rp-u)); height: calc(12 * var(--rp-u)); background: var(--rp-edge); }
+  .rpu-node[data-node="wch"] { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); border-radius: 6px; border: 3px solid var(--rp-edge); }
+
+  /* ---------- the timeline: one rule, a node per entry ---------- */
+  .rpu-tl { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+  .rpu-tl-item { display: grid; grid-template-columns: calc(28 * var(--rp-u)) minmax(0, 1fr); column-gap: 12px; }
+  .rpu-tl-rail { position: relative; display: flex; justify-content: center; }
+  .rpu-tl-rail::before { content: ""; position: absolute; left: calc(14 * var(--rp-u) - 1px); top: 0; bottom: 0; width: 2px; background: var(--rp-line-2); }
+  .rpu-tl-item:first-child > .rpu-tl-rail::before { top: calc(14 * var(--rp-u)); }
+  .rpu-tl-item:last-child > .rpu-tl-rail::before { bottom: auto; height: calc(14 * var(--rp-u)); }
+  .rpu-tl-item:only-child > .rpu-tl-rail::before { display: none; }
+  .rpu-tl[data-open="true"] > .rpu-tl-item:last-child > .rpu-tl-rail::before { bottom: 0; height: auto; }
+  .rpu-tl[data-open="true"] > .rpu-tl-item:only-child > .rpu-tl-rail::before { display: block; top: calc(14 * var(--rp-u)); }
+  /* two timelines one under the other as one line: joinNext on the upper one (the rule runs to its bottom edge and the
+     last entry keeps its room), joinPrev on the lower one (the rule comes in from the top edge) */
+  .rpu-tl[data-join-next="true"] > .rpu-tl-item:last-child > .rpu-tl-rail::before { bottom: 0; height: auto; }
+  .rpu-tl[data-join-next="true"] > .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 22px; }
+  .rpu-tl[data-join-prev="true"] > .rpu-tl-item:first-child > .rpu-tl-rail::before { top: 0; }
+  .rpu-tl[data-join-next="true"] > .rpu-tl-item:only-child > .rpu-tl-rail::before,
+  .rpu-tl[data-join-prev="true"] > .rpu-tl-item:only-child > .rpu-tl-rail::before { display: block; }
+  .rpu-tl[data-join-next="true"]:not([data-join-prev="true"]) > .rpu-tl-item:only-child > .rpu-tl-rail::before { top: calc(14 * var(--rp-u)); }
+  .rpu-tl[data-join-prev="true"]:not([data-join-next="true"]) > .rpu-tl-item:only-child > .rpu-tl-rail::before { bottom: auto; height: calc(14 * var(--rp-u)); }
+  /* entries that share an element of their own inside the line (.rpu-tl-group: a question with its answer). The rule
+     runs through the group as if its entries stood in the line directly: every entry of a group is a middle one
+     (the rule from edge to edge, 22px under it), and only the line's very first and very last entry end it. `open`,
+     joinPrev and joinNext mean for a group at the line's end what they mean for an entry there */
+  .rpu-tl-group { display: block; min-width: 0; }
+  .rpu-tl > .rpu-tl-group > .rpu-tl-item > .rpu-tl-rail::before { display: block; top: 0; bottom: 0; height: auto; }
+  .rpu-tl > .rpu-tl-group > .rpu-tl-item > .rpu-tl-main { padding-bottom: 22px; }
+  .rpu-tl > .rpu-tl-group:first-child > .rpu-tl-item:first-child > .rpu-tl-rail::before { top: calc(14 * var(--rp-u)); }
+  .rpu-tl > .rpu-tl-group:last-child > .rpu-tl-item:last-child > .rpu-tl-rail::before { bottom: auto; height: calc(14 * var(--rp-u)); }
+  .rpu-tl > .rpu-tl-group:last-child > .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 0; }
+  .rpu-tl > .rpu-tl-group:only-child > .rpu-tl-item:only-child > .rpu-tl-rail::before { display: none; }
+  .rpu-tl[data-open="true"] > .rpu-tl-group:last-child > .rpu-tl-item:last-child > .rpu-tl-rail::before,
+  .rpu-tl[data-join-next="true"] > .rpu-tl-group:last-child > .rpu-tl-item:last-child > .rpu-tl-rail::before { display: block; bottom: 0; height: auto; }
+  .rpu-tl[data-join-next="true"] > .rpu-tl-group:last-child > .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 22px; }
+  .rpu-tl[data-join-prev="true"] > .rpu-tl-group:first-child > .rpu-tl-item:first-child > .rpu-tl-rail::before { display: block; top: 0; }
+  .rpu-tl-rail > .rpu-node { margin-top: calc(2 * var(--rp-u)); }
+  .rpu-tl-rail > .rpu-node[data-node="rip"],
+  .rpu-tl-rail > .rpu-node[data-node="lab"],
+  .rpu-tl-rail > .rpu-node[data-node="next"],
+  .rpu-tl-rail > .rpu-node[data-node="wch"] { margin-top: calc(3 * var(--rp-u)); }
+  .rpu-tl-rail > .rpu-node[data-node="sch"] { margin-top: calc(6 * var(--rp-u)); }
+  .rpu-tl-rail > .rpu-node[data-node="dot"] { margin-top: calc(7 * var(--rp-u)); }
+
+  /* ---------- ux pass 10-12 (H): Ripple's node is the logo's mark, not a square (components/ui/Timeline.tsx RIPPLE_MARK) ---------- */
+  .rpu-node[data-node="rip"] { width: calc(34 * var(--rp-u)); height: calc(34 * var(--rp-u)); border-radius: 0; background: var(--rp-paper); color: var(--rp-accent); }
+  .rpu-node[data-node="rip"] svg { width: 100%; height: 100%; }
+  .rpu-tl-rail > .rpu-node[data-node="rip"] { margin-top: calc(-5 * var(--rp-u)); }
+  .rpu-tl-rail > .rpu-node[data-node="ok"] { margin-top: 0; }
+  .rpu-tl-main { min-width: 0; padding-bottom: 22px; }
+  .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 0; }
+  .rpu-tl-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .rpu-tl-body > * { margin-top: 0; margin-bottom: 0; }
+  .rpu-tl-body[data-frame="card"] { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); padding: 14px 16px; }
+  .rpu-tl-body[data-frame="dash"] { background: var(--rp-white); border: 2px dashed var(--rp-edge); border-radius: var(--rp-radius-card); padding: 14px 16px; }
+  .rpu-tl-body[data-frame="hl"] { background: var(--rp-white); border: 2.5px solid var(--rp-accent); border-radius: var(--rp-radius-card); padding: 14px 16px; }
+  .rpu-tl-body[data-dim="true"] { opacity: .55; }
+  /* the head line: time · who · where it comes from */
+  .rpu-tl-head { margin: 0; font-size: var(--rp-fs-min); line-height: 1.45; color: var(--rp-ink-3); }
+  .rpu-tl-time { font-weight: 900; color: var(--rp-accent); margin-right: 8px; font-variant-numeric: tabular-nums; }
+  .rpu-tl-time[data-quiet="true"] { color: var(--rp-ink-3); }
+  .rpu-tl-who { font-weight: 800; color: var(--rp-ink); }
+  .rpu-tl-who[data-node="rip"] { color: var(--rp-accent); }
+  .rpu-tl-who[data-node="sos"] { color: var(--rp-urgent); }
+  .rpu-tl-title { margin: 0; font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.35; white-space: pre-line; }
+  .rpu-tl-title[data-size="reading"] { font-size: var(--rp-fs-reading); font-variant-numeric: tabular-nums; }
+  .rpu-tl-title[data-size="big"] { font-size: calc(32 * var(--rp-u)); }
+  .rpu-tl-title[data-size="large"] { font-size: var(--rp-fs-ask); }
+  .rpu-tl-note { margin: 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); white-space: pre-line; }
+  /* Ripple's fixed sentence in a tinted bubble; his own words plain */
+  .rpu-bubble { margin: 0; font-size: var(--rp-fs-node); line-height: 1.5; font-weight: 500; white-space: pre-line; }
+  .rpu-bubble[data-node="rip"] { padding: 12px 14px; background: var(--rp-accent-soft); border-radius: 14px; }
+  /* SSE (owner 10-15): the soft caret after Ripple's words while they are being written (AnswerCard's draft, the long
+     press's sheet). It breathes slowly; with less motion it simply stands there */
+  .rpu-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 3px;
+    vertical-align: -0.16em;
+    border-radius: 1px;
+    background: currentColor;
+    opacity: .55;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-caret { animation: rpu-caret-breathe 1.1s ease-in-out infinite alternate; }
+  }
+  @keyframes rpu-caret-breathe { from { opacity: .7; } to { opacity: .15; } }
+  /* his own words where there is no line (a card, the page the doctor reads): his node, the solid round one, then the
+     head line and the words in the plain face, on a line's measures (the node's column, 12px, the text) */
+  .rpu-own { display: grid; grid-template-columns: calc(28 * var(--rp-u)) minmax(0, 1fr); column-gap: 12px; align-items: start; }
+  .rpu-own > .rpu-node { justify-self: center; margin-top: calc(2 * var(--rp-u)); }
+  .rpu-own-main { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .rpu-own-main > * { margin: 0; }
+  .rpu-own[data-size="sub"] .rpu-bubble { font-size: var(--rp-fs-row); }
+  /* a row under an entry: the play pill and square tags */
+  .rpu-tl-ctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  /* a row of buttons inside an entry */
+  .rpu-acts { display: grid; grid-template-columns: repeat(var(--rpu-cols, 1), minmax(0, 1fr)); gap: var(--rp-gap); }
+  .rpu-act {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: var(--rp-h-source);
+    padding: 6px 10px;
+    border-radius: var(--rp-radius-src);
+    border: 2px solid var(--rp-ink);
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    font: inherit;
+    font-size: var(--rp-fs-small);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-act[data-variant="primary"] { background: var(--rp-accent); border-color: var(--rp-accent); color: var(--rp-on-accent); font-weight: 800; }
+  .rpu-act[data-variant="primary"]:active { background: var(--rp-accent-press); border-color: var(--rp-accent-press); }
+  .rpu-act[data-variant="outline"] { border-color: var(--rp-accent); color: var(--rp-accent); font-weight: 800; }
+  .rpu-act[data-variant="danger"] { background: var(--rp-urgent); border-color: var(--rp-urgent); color: var(--rp-on-urgent); font-weight: 800; }
+  .rpu-act[data-variant="on"] { background: var(--rp-ink); color: var(--rp-on-ink); font-weight: 800; }
+  .rpu-act:disabled:not([aria-busy="true"]) { background: var(--rp-tint); border-color: var(--rp-tint); color: var(--rp-off); cursor: default; }
+  .rpu-act[aria-busy="true"] { cursor: progress; }
+
+  /* a card of smaller entries hanging from one node: her recording, the medicine's label */
+  .rpu-sub { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); padding: 14px 16px; display: flex; flex-direction: column; }
+  .rpu-sub-row { display: flex; gap: 12px; align-items: flex-start; }
+  .rpu-sub-row + .rpu-sub-row { border-top: 1px solid var(--rp-tint); margin-top: 12px; padding-top: 12px; }
+  .rpu-sub-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .rpu-sub-main > * { margin-top: 0; margin-bottom: 0; }
+  .rpu-sub-title { font-size: var(--rp-fs-drug); font-weight: 700; line-height: 1.25; }
+  .rpu-sub-head { font-size: var(--rp-fs-min); line-height: 1.45; color: var(--rp-ink-3); }
+  .rpu-sub-head b { font-weight: 800; color: var(--rp-ink); }
+  /* 「看原文 ›」 inside a source line: the words keep their size, the tap area is 48px */
+  .rpu-inline-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--rp-hit);
+    min-width: var(--rp-hit);
+    margin: -15px 0;
+    font-weight: 800;
+    color: var(--rp-accent);
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  .rpu-inline-link svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  /* the round play button on a card: outline with a triangle, filled with two bars while it plays */
+  .rpu-playc {
+    flex: none;
+    width: var(--rp-hit);
+    height: var(--rp-hit);
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 2.5px solid var(--rp-accent);
+    background: var(--rp-white);
+    color: var(--rp-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+  }
+  .rpu-playc svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+  .rpu-playc[aria-pressed="true"] { background: var(--rp-accent); color: var(--rp-white); }
+  .rpu-playc:disabled { border-style: dashed; cursor: default; }
+
+  /* ---------- who said it, on one line (the node, the words, then where or when) ---------- */
+  .rpu-source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin: 0;
+    font-size: var(--rp-fs-min);
+    font-weight: 800;
+    line-height: 1.45;
+    color: var(--rp-ink);
+  }
+  .rpu-source[data-kind="ripple"] { color: var(--rp-accent); }
+  .rpu-source-name { min-width: 0; }
+  .rpu-source-when {
+    color: var(--rp-ink-3);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  /* where a restatement comes from: 「HealthHub 单张转述 · 2026年3月2日审阅」 */
+  .rpu-cite { margin: 8px 0 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+
+  /* the kind of source, for the few rules that still ask: purple for what was said at the clinic, ink for the rest */
+  .rpu[data-kind="doctor"], .rpu [data-kind="doctor"],
+  .rpu[data-kind="dispenser"], .rpu [data-kind="dispenser"],
+  .rpu[data-kind="pharmacist"], .rpu [data-kind="pharmacist"],
+  .rpu[data-kind="ripple"], .rpu [data-kind="ripple"] { --rpu-kind: var(--rp-accent); }
+  .rpu[data-kind="label"], .rpu [data-kind="label"],
+  .rpu[data-kind="leaflet"], .rpu [data-kind="leaflet"],
+  .rpu[data-kind="family"], .rpu [data-kind="family"],
+  .rpu[data-kind="self"], .rpu [data-kind="self"] { --rpu-kind: var(--rp-ink); }
+
+  /* ---------- someone else's exact words: serif, regular weight ---------- */
+  .rpu-said {
+    font-family: var(--rp-font-serif);
+    font-weight: 400;
+    font-size: var(--rp-fs-said-zh);
+    line-height: 1.5;
+    margin: 8px 0 0;
+    quotes: none;
+    white-space: pre-line;
+  }
+  .rpu-said[data-lang="en"] { font-size: var(--rp-fs-said-en); line-height: 1.45; }
+  .rpu-said[data-size="sub"] { font-size: var(--rp-fs-row); }
+  .rpu-said[data-ruled="true"] { border-left: 3px solid var(--rp-line); padding-left: 12px; }
+  /* the Chinese under English words, and the line that says which one counts */
+  .rpu-said-zh {
+    font-family: var(--rp-font-serif);
+    font-weight: 400;
+    font-size: var(--rp-fs-row);
+    line-height: 1.55;
+    color: var(--rp-ink-2);
+    margin: 8px 0 0;
+    padding-left: 12px;
+    border-left: 3px solid var(--rp-line);
+  }
+  .rpu-said-note { margin: 8px 0 0; font-size: var(--rp-fs-min); color: var(--rp-ink-3); }
+  /* the two as one element (it carries a page's hook): an entry's rhythm inside, 8px above it where it follows the
+     words it translates outside an entry */
+  .rpu-said-pair { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 8px 0 0; }
+  .rpu-said-pair > * { margin: 0; }
+  .rpu-tl-body > .rpu-said-pair, .rpu-sub-main > .rpu-said-pair { margin-top: 0; }
+
+  /* ---------- the label as printed: mono, exact case, in a dashed frame ---------- */
+  .rpu-orig {
+    font-family: var(--rp-font-mono);
+    font-weight: 400;
+    font-size: var(--rp-fs-orig);
+    line-height: 1.5;
+    color: var(--rp-ink);
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    border: 1.5px dashed var(--rp-edge);
+    border-radius: 10px;
+    background: var(--rp-white);
+    text-transform: none;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- the play pill: 「听原声」, 「看药袋原文 9月1日」; filled while it plays ---------- */
+  .rpu-src-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+  .rpu-src {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    min-height: var(--rp-h-source);
+    max-width: 100%;
+    padding: 4px calc(22 * var(--rp-u));
+    border: 2px solid var(--rp-accent);
+    border-radius: calc(28 * var(--rp-u));
+    background: var(--rp-white);
+    color: var(--rp-accent);
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .rpu-src svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+  .rpu-src[aria-pressed="true"] { background: var(--rp-accent); color: var(--rp-white); }
+  .rpu-src-time { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rpu-src:disabled { cursor: default; border-style: dashed; }
+
+  /* ---------- tags: square corners, one line weight: 「代录音」, 「还在等药袋确认」, 「示例」 ---------- */
+  .rpu-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px calc(10 * var(--rp-u));
+    border: 1.5px solid var(--rp-ink-3);
+    border-radius: 6px;
+    font-size: var(--rp-fs-min);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--rp-ink-3);
+  }
+  .rpu-tag svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  .rpu-tag[data-tone="ink"] { color: var(--rp-ink); border-color: var(--rp-ink); }
+
+  /* ---------- listen: the play pill; the progress is the elapsed time in its words ---------- */
+  .rpu-listen { display: grid; gap: 8px; margin-top: 10px; }
+  .rpu-listen .rpu-src-row { margin-top: 0; }
+  .rpu-track { display: none; }
+  .rpu-track-fill { display: block; }
+
+  /* ---------- ux pass 10-12 (G): 「听原声」 is a round play button and a line that fills (components/chat/PlayClip.tsx) ---------- */
+  .rpu-clip { flex-wrap: nowrap; gap: 14px; }
+  .rpu-clip-btn { flex: none; display: flex; align-items: center; justify-content: center; width: calc(48 * var(--rp-u)); height: calc(48 * var(--rp-u)); padding: 0; border: 0; border-radius: 50%; background: var(--rp-accent); color: var(--rp-on-accent); cursor: pointer; }
+  .rpu-clip-btn:active { background: var(--rp-accent-press); }
+  .rpu-clip-btn svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+  .rpu-clip-track { position: relative; flex: 1; min-width: calc(48 * var(--rp-u)); height: 6px; border-radius: 3px; background: var(--rp-tint); }
+  .rpu-clip-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--rp-accent); }
+  .rpu-clip-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--rp-accent); }
+
+  /* ---------- reading ---------- */
+  .rpu-reading { margin: 8px 0 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; }
+  .rpu-reading-num {
+    font-weight: 800;
+    font-size: var(--rp-fs-reading);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .rpu-reading-unit { font-size: var(--rp-fs-min); font-weight: 700; color: var(--rp-ink-3); }
+
+  /* ---------- buttons ---------- */
+  .rpu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--rp-h-secondary);
+    padding: 6px calc(16 * var(--rp-u));
+    border-radius: var(--rp-radius-btn);
+    border: 2px solid transparent;
+    font: inherit;
+    font-size: var(--rp-fs-secondary);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    flex: none;
+  }
+  .rpu-btn svg { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); }
+  .rpu-btn[data-variant="primary"] {
+    min-height: var(--rp-h-primary);
+    font-size: var(--rp-fs-action);
+    font-weight: 800;
+    background: var(--rp-accent);
+    color: var(--rp-on-accent);
+  }
+  .rpu-btn[data-variant="primary"]:active { background: var(--rp-accent-press); }
+  .rpu-btn[data-variant="secondary"] {
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    border-color: var(--rp-ink);
+  }
+  /* 「打 995」 */
+  .rpu-btn[data-variant="danger"] {
+    min-height: calc(80 * var(--rp-u));
+    font-size: var(--rp-fs-ask);
+    font-weight: 900;
+    background: var(--rp-urgent);
+    color: var(--rp-on-urgent);
+  }
+  .rpu-btn[data-variant="dark"] {
+    font-size: calc(24 * var(--rp-u));
+    font-weight: 800;
+    background: var(--rp-ink);
+    color: var(--rp-on-ink);
+  }
+  /* words only, in the accent colour */
+  .rpu-btn[data-variant="link"] { min-height: var(--rp-h-source); font-size: var(--rp-fs-row); font-weight: 800; color: var(--rp-accent); background: none; }
+  /* a pill with the accent outline: 「读给我听」 */
+  .rpu-btn[data-variant="outline"] { min-height: calc(60 * var(--rp-u)); border-radius: calc(30 * var(--rp-u)); border-color: var(--rp-accent); background: var(--rp-white); color: var(--rp-accent); font-size: var(--rp-fs-row); font-weight: 800; }
+  /* small, with the light border: 「‹ 上一周」 */
+  .rpu-btn[data-variant="small"] { min-height: var(--rp-h-source); border-radius: var(--rp-radius-src); border-color: var(--rp-line-2); background: var(--rp-white); color: var(--rp-ink); font-size: var(--rp-fs-small); }
+  /* the one of a row that is chosen */
+  .rpu-btn[data-variant="on"] { background: var(--rp-ink); color: var(--rp-on-ink); font-weight: 800; }
+  /* deleting: outlined (「删掉这次读数」) and filled (the second step of deleting the account) */
+  .rpu-btn[data-variant="danger-outline"] { border-color: var(--rp-urgent); background: var(--rp-white); color: var(--rp-urgent); font-weight: 800; }
+  .rpu-btn[data-variant="danger-solid"] { min-height: var(--rp-h-primary); font-size: var(--rp-fs-action); font-weight: 800; background: var(--rp-urgent); color: var(--rp-on-urgent); }
+  .rpu-btn[aria-busy="true"] { cursor: progress; }
+  .rpu-btn:disabled:not([aria-busy="true"]) {
+    cursor: default;
+    background: var(--rp-line);
+    color: var(--rp-off);
+    border-color: var(--rp-line);
+  }
+  .rpu-btn-note { margin: 6px 0 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); text-align: center; }
+  .rpu-pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 5.4em), 1fr));
+    gap: var(--rp-gap);
+    font-size: var(--rp-fs-secondary);
+  }
+  /* a row of buttons in equal columns (the draft's `r`); the words wrap inside a narrow one */
+  .rpu-row-btns { display: grid; grid-template-columns: repeat(var(--rpu-cols, 2), minmax(0, 1fr)); gap: var(--rp-gap); align-items: stretch; }
+  .rpu-row-btns > .rpu-btn { padding-left: 8px; padding-right: 8px; height: 100%; }
+  .rpu-dock { margin-top: auto; padding-top: 16px; display: grid; gap: var(--rp-gap); }
+  /* the draft's fixed area at the foot (`dk`): a white strip under a hairline, sticky at the bottom of the screen
+     (above a fixed tab bar). The page gives up its own foot to it; it leaves 34px under its buttons, 14px when a tab
+     bar or the say bar is fixed below */
+  .rpu-dock[data-bar="true"] {
+    position: sticky;
+    /* above what is fixed at the foot, and above an undo bar while one is there */
+    bottom: calc(var(--rpu-bottom) + var(--rpu-toast-h, 0px));
+    z-index: 20;
+    box-sizing: border-box;
+    grid-template-columns: minmax(0, 1fr);
+    margin-left: calc(-1 * var(--rp-gutter));
+    margin-right: calc(-1 * var(--rp-gutter));
+    padding: 14px var(--rp-gutter) 34px;
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+  }
+  .rpu-dock[data-bar="true"] > * { margin-top: 0; }
+  .rpu-screen[data-tabbar] .rpu-dock[data-bar="true"],
+  .rpu-screen[data-saybar] .rpu-dock[data-bar="true"] { padding-bottom: 14px; }
+  .rpu-screen:has(.rpu-dock[data-bar="true"]) > .rpu-page { padding-bottom: var(--rpu-bottom); }
+  .rpu-dock > .rpu-ask { margin-bottom: 4px; }
+
+  /* ---------- done ---------- */
+  .rpu-donehero { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .rpu-bigcheck {
+    width: calc(52 * var(--rp-u));
+    height: calc(52 * var(--rp-u));
+    border-radius: 50%;
+    background: var(--rp-ink);
+    color: var(--rp-on-ink);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .rpu-bigcheck svg { width: calc(30 * var(--rp-u)); height: calc(30 * var(--rp-u)); }
+  .rpu-donehero-title { margin: 0; font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.25; }
+  .rpu-donehero-sub { margin: 4px 0 0; font-size: var(--rp-fs-sub); color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }
+
+  .rpu-done { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .rpu-tick {
+    width: calc(30 * var(--rp-u));
+    height: calc(30 * var(--rp-u));
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--rp-ink);
+    color: var(--rp-on-ink);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .rpu-tick svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  /* recorded but not done (没吃, 等一下): the dashed ring; only a done row is filled */
+  .rpu-tick-noted { background: var(--rp-white); color: var(--rp-ink-3); border: 2px dashed var(--rp-edge); }
+  .rpu-done-text { flex: 1; min-width: 0; }
+  .rpu-done-t1 { font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+  .rpu-done-t2 { font-size: var(--rp-fs-min); color: var(--rp-ink-3); line-height: 1.5; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  /* ---------- rows: a white card, one thing per row ---------- */
+  .rpu-rows { margin-top: 10px; background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); overflow: hidden; }
+  .rpu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: calc(68 * var(--rp-u));
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rp-tint);
+    font-size: var(--rp-fs-body);
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--rp-ink);
+    text-decoration: none;
+  }
+  .rpu-rows .rpu-row { padding: 12px 16px; font-size: var(--rp-fs-row); }
+  .rpu-row:last-child { border-bottom: 0; }
+  .rpu-row-value { flex: none; max-width: 52%; font-size: var(--rp-fs-sub); font-weight: 800; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 6px; text-align: right; line-height: 1.35; }
+  .rpu-row svg { width: calc(24 * var(--rp-u)); height: calc(24 * var(--rp-u)); color: var(--rp-edge); }
+  .rpu-row-num { font-weight: 900; color: var(--rp-accent); margin-right: 6px; font-variant-numeric: tabular-nums; }
+
+  .rpu-added {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--rp-h-source);
+    margin-top: 18px;
+    padding: 12px 0;
+    border-top: 1px solid var(--rp-line);
+    font-size: var(--rp-fs-row);
+    font-weight: 800;
+    color: var(--rp-accent);
+    text-decoration: none;
+  }
+  .rpu-added svg { width: calc(24 * var(--rp-u)); height: calc(24 * var(--rp-u)); }
+  .rpu-added-chev { margin-left: auto; }
+  .rpu-added[data-at="bottom"] { margin-top: auto; }
+
+  .rpu-hr {
+    height: 0;
+    border: 0;
+    border-top: 1px solid var(--rp-line);
+    margin: 12px 0;
+    flex: none;
+  }
+
+  /* ---------- a list card: a mark, the words, what is on the right, a chevron ---------- */
+  .rpu-list { display: flex; flex-direction: column; gap: 8px; }
+  .rpu-list-card { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); overflow: hidden; }
+  .rpu-li {
+    box-sizing: border-box;
+    min-height: calc(68 * var(--rp-u));
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--rp-ink);
+    text-decoration: none;
+    width: 100%;
+    background: none;
+    border: 0;
+    font: inherit;
+    text-align: left;
+  }
+  .rpu-li + .rpu-li { border-top: 1px solid var(--rp-tint); }
+  .rpu-li[data-dim="true"] { opacity: .5; }
+  button.rpu-li, a.rpu-li { cursor: pointer; }
+  .rpu-li-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-li-t { font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+  .rpu-li-s { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); white-space: pre-line; }
+  .rpu-li-r { flex: none; max-width: 42%; font-size: var(--rp-fs-sub); font-weight: 800; color: var(--rp-ink-3); text-align: right; line-height: 1.35; }
+  .rpu-li-r[data-tone="accent"] { color: var(--rp-accent); }
+  /* a longer action goes under the title and its grey line (ListItem rightPlacement="below"), so the title keeps its line */
+  .rpu-li-r[data-placement="below"] { max-width: none; text-align: left; }
+  .rpu-li > svg { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); color: var(--rp-edge); }
+  /* a row that opens what it names, in place (today's earlier questions): <details class="rpu-fold"> with the row as
+     its <summary>; the chevron turns down while it is open */
+  .rpu-fold + .rpu-fold { border-top: 1px solid var(--rp-tint); }
+  .rpu-fold > summary { list-style: none; cursor: pointer; }
+  .rpu-fold > summary::-webkit-details-marker { display: none; }
+  .rpu-fold[open] > summary > svg { transform: rotate(90deg); }
+  .rpu-fold-body { padding: 16px; border-top: 1px solid var(--rp-tint); }
+  .rpu-mk {
+    flex: none;
+    width: calc(30 * var(--rp-u));
+    height: calc(30 * var(--rp-u));
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--rp-fs-min);
+    font-weight: 900;
+    color: var(--rp-white);
+    background: var(--rp-white);
+  }
+  .rpu-mk svg { width: 60%; height: 60%; }
+  .rpu-mk[data-mk="ok"], .rpu-mk[data-mk="me"] { background: var(--rp-ink); }
+  .rpu-mk[data-mk="todo"] { border: 2.5px solid var(--rp-edge); }
+  .rpu-mk[data-mk="sq"] { border-radius: 5px; background: var(--rp-accent); }
+  .rpu-mk[data-mk="miss"] { border: 2px dashed var(--rp-edge); }
+  .rpu-mk[data-mk="doc"] { border: 3px solid var(--rp-accent); }
+  .rpu-mk[data-mk="lab"] { border-radius: 4px; border: 3px solid var(--rp-ink); }
+  .rpu-mk[data-mk="dau"] { border: 3px solid var(--rp-ink); }
+  .rpu-mk[data-mk="num"] { background: var(--rp-tint); color: var(--rp-ink); }
+  .rpu-mk[data-mk="sos"] { border-radius: 5px; background: var(--rp-urgent); }
+
+  /* ---------- a box: plain, tinted, ink, dashed, grey, with the accent or the red border ---------- */
+  .rpu-box { border-radius: var(--rp-radius-btn); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; background: var(--rp-white); border: 1px solid var(--rp-line); color: var(--rp-ink); text-decoration: none; }
+  .rpu-box[data-variant="tint"] { background: var(--rp-accent-soft); border-color: var(--rp-accent-soft); }
+  .rpu-box[data-variant="ink"] { background: var(--rp-ink); border-color: var(--rp-ink); color: var(--rp-on-ink); }
+  .rpu-box[data-variant="dash"] { border: 2px dashed var(--rp-edge); }
+  .rpu-box[data-variant="grey"] { background: var(--rp-tint); border-color: var(--rp-tint); }
+  .rpu-box[data-variant="acc"] { border: 2.5px solid var(--rp-accent); }
+  .rpu-box[data-variant="red"] { border: 2.5px solid var(--rp-urgent); }
+  .rpu-box-t { margin: 0; font-size: var(--rp-fs-row); font-weight: 800; line-height: 1.4; white-space: pre-line; }
+  .rpu-box-s { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.55; color: var(--rp-ink-2); white-space: pre-line; }
+  .rpu-box[data-variant="ink"] .rpu-box-s { color: var(--rp-on-ink-3); }
+  .rpu-box-link { display: inline-flex; align-items: center; align-self: flex-start; gap: 2px; min-height: var(--rp-hit); margin: -8px 0; font-size: var(--rp-fs-small); font-weight: 800; color: var(--rp-accent); text-decoration: none; }
+  .rpu-box-link svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); }
+  .rpu-box[data-variant="ink"] .rpu-box-link { color: var(--rp-on-ink); }
+
+  /* ---------- undo (12 s, no confirm dialog): an ink bar in the white strip at the bottom ---------- */
+  .rpu-toast { display: block; }
+  .rpu-toast[data-placement="fixed"],
+  .rpu-toast[data-placement="absolute"] {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--rpu-bottom, 0px);
+    padding: 14px var(--rp-gutter);
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+    z-index: 40;
+  }
+  .rpu-toast[data-placement="absolute"] { position: absolute; }
+  .rpu-toast-in {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 18px;
+    border-radius: var(--rp-radius-btn);
+    background: var(--rp-ink);
+    color: var(--rp-on-ink);
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  .rpu-toast-msg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: var(--rp-fs-row); font-weight: 800; line-height: 1.35; color: var(--rp-on-ink); }
+  .rpu-toast-sub { font-size: var(--rp-fs-min); font-weight: 400; color: var(--rp-on-ink-2); }
+  .rpu-toast-undo {
+    min-height: var(--rp-h-source);
+    min-width: var(--rp-hit);
+    padding: 0 calc(16 * var(--rp-u));
+    border-radius: 12px;
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    border: 0;
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    flex: none;
+  }
+  .rpu-toast-left { font-size: var(--rp-fs-min); font-weight: 700; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }
+  /* the countdown is the number of seconds in the button; this element only carries the timing for tests */
+  .rpu-toast-bar { display: none; }
+  .rpu-toast-bar-fill[data-running="true"] { animation: rpu-countdown linear forwards; }
+  @keyframes rpu-countdown { from { width: 100%; } to { width: 0%; } }
+
+  /* ---------- ux pass 10-12 (D): 「开提醒」 comes down over the top of Today once; the cross puts it away ---------- */
+  .rpu-pushpop { position: fixed; top: 0; left: 0; right: 0; z-index: 45; box-sizing: border-box; padding: calc(10px + env(safe-area-inset-top)) var(--rp-gutter) 0; pointer-events: none; }
+  .rpu-pushpop-card {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(100dvh - 28px);
+    overflow-y: auto;
+    padding: 18px 18px 16px;
+    border-radius: var(--rp-radius-block);
+    border: 1px solid var(--rp-line);
+    background: var(--rp-white);
+    box-shadow: 0 10px 30px rgba(24, 32, 44, .22);
+    pointer-events: auto;
+  }
+  .rpu-pushpop-card > * { margin: 0; }
+  .rpu-pushpop-t { padding-right: 46px; font-size: var(--rp-fs-row); font-weight: 800; line-height: 1.35; color: var(--rp-ink); }
+  .rpu-pushpop-s { font-size: var(--rp-fs-sub); line-height: 1.45; color: var(--rp-ink-2); }
+  .rpu-pushpop-x { position: absolute; top: 6px; right: 6px; display: flex; align-items: center; justify-content: center; width: var(--rp-hit); height: var(--rp-hit); padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--rp-ink); cursor: pointer; }
+  .rpu-pushpop-x:disabled { color: var(--rp-off); cursor: default; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-pushpop-card { animation: rpu-pushpop-in .25s ease-out; }
+  }
+  @keyframes rpu-pushpop-in { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- 「按一下说 / 打字」: always there above the tab bar ---------- */
+  .rpu-say {
+    box-sizing: border-box;
+    display: flex;
+    gap: var(--rp-gap);
+    padding: 12px var(--rp-gutter);
+    border-top: 1px solid var(--rp-line);
+    background: var(--rp-paper);
+    height: var(--rp-saybar-h);
+  }
+  .rpu-say[data-placement="fixed"] { position: fixed; left: 0; right: 0; bottom: calc(var(--rp-tabbar-h) + env(safe-area-inset-bottom)); z-index: 30; }
+  .rpu-say[data-placement="static"] { flex: none; }
+  .rpu-say-btn {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 100%;
+    padding: 0 12px;
+    border-radius: calc(30 * var(--rp-u));
+    border: 2px solid var(--rp-ink);
+    background: var(--rp-paper);
+    color: var(--rp-ink);
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-say-btn[data-say="speak"] { flex: 1; min-width: 0; background: var(--rp-ink); color: var(--rp-on-ink); }
+  .rpu-say-btn[data-say="speak"]::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--rp-on-ink); }
+  .rpu-say-btn[data-say="type"] { flex: none; width: calc(104 * var(--rp-u)); max-width: 40%; }
+  .rpu-say-btn:disabled { background: var(--rp-line); border-color: var(--rp-line); color: var(--rp-off); cursor: default; }
+  .rpu-say-btn[data-say="speak"]:disabled::before { background: var(--rp-off); }
+
+  /* ---------- ux pass 10-12 (B): the bar's switch is a round keyboard button; the pill's dot rings once it was pressed ---------- */
+  .rpu-say-btn[data-say="type"] { width: calc(60 * var(--rp-u)); max-width: none; padding: 0; border-radius: 50%; }
+  .rpu-say-btn[data-say="speak"][data-busy="true"]::before { box-shadow: 0 0 0 6px rgba(255, 255, 255, .28); }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-say-btn[data-say="speak"][data-busy="true"]::before { animation: rpu-say-ring 1s ease-out infinite; }
+  }
+  @keyframes rpu-say-ring {
+    from { box-shadow: 0 0 0 0 rgba(255, 255, 255, .7), 0 0 0 0 rgba(255, 255, 255, .4); }
+    to { box-shadow: 0 0 0 9px rgba(255, 255, 255, 0), 0 0 0 18px rgba(255, 255, 255, 0); }
+  }
+
+  /* ---------- the typing dock (in the say bar's place once he taps 「打字」): a field over 「改用说的 / 发出」 ---------- */
+  .rpu-typedock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--rp-tabbar-h) + env(safe-area-inset-bottom));
+    z-index: 30;
+    box-sizing: border-box;
+    padding: 14px var(--rp-gutter);
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+    display: flex;
+    flex-direction: column;
+    gap: var(--rp-gap);
+  }
+  .rpu-typedock > * { margin-top: 0; }
+  .rpu-typedock-form { display: flex; flex-direction: column; gap: var(--rp-gap); }
+  .rpu-typedock-form .rpu-field-input { flex: none; width: 100%; }
+  .rpu-typedock-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rp-gap); }
+
+  /* ---------- ux pass 10-12 (C): the typing dock is one row, its field grows, the example sentences rise over it ---------- */
+  .rpu-typedock-form { flex-direction: row; align-items: flex-end; }
+  .rpu-typedock-form .rpu-field-input { flex: 1; width: auto; min-width: 0; }
+  .rpu-typedock-form textarea.rpu-field-input { display: block; resize: none; overflow-y: auto; padding: 14px 16px; max-height: calc(4 * 1.35em + 31px); }
+  /* with the caret in it the border is 1px thicker (the field's own rule further down takes that 1px from the padding): the words stay in the middle */
+  .rpu .rpu-typedock-form textarea.rpu-field-input:focus, .rpu .rpu-typedock-form textarea.rpu-field-input:focus-visible { padding: 13px 15px; }
+  .rpu-say-icon {
+    box-sizing: border-box;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(60 * var(--rp-u));
+    height: calc(60 * var(--rp-u));
+    margin-bottom: 2px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--rp-ink);
+    background: var(--rp-paper);
+    color: var(--rp-ink);
+    cursor: pointer;
+  }
+  .rpu-say-icon[data-kind="send"] { background: var(--rp-accent); border-color: var(--rp-accent); color: var(--rp-on-accent); }
+  .rpu-say-icon[data-kind="send"]:active { background: var(--rp-accent-press); border-color: var(--rp-accent-press); }
+  .rpu-say-icon:disabled { background: var(--rp-line); border-color: var(--rp-line); color: var(--rp-off); cursor: default; }
+  .rpu-typedock-form .rpu-field-input:placeholder-shown ~ .rpu-say-icon[data-kind="send"] { display: none; }
+  .rpu-typedock-form .rpu-field-input:not(:placeholder-shown) ~ .rpu-say-icon[data-kind="speak"] { display: none; }
+  .rpu-typedock:has(.rpu-field-input:not(:placeholder-shown)) .rpu-askideas { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-askideas { animation: rpu-ideas-rise .2s ease-out; }
+  }
+  @keyframes rpu-ideas-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- 问一句 (/p/ask): a column that fills the page; its dock (the field over 「问这句」) is an <ActionDock bar> at its foot ---------- */
+  .rpu-askscreen { flex: 1 0 auto; display: flex; flex-direction: column; gap: var(--rp-block-gap); min-width: 0; }
+  .rpu-askdock [hidden] { display: none; }
+  /* an answer has the screen: the dock is not held at the foot of the phone, it ends the page under the answer */
+  .rpu-askdock[data-pinned="false"] { position: static; }
+  .rpu-askdock-form { display: flex; flex-direction: column; gap: var(--rp-gap); }
+  .rpu-askdock-form .rpu-field-input { flex: none; width: 100%; }
+  .rpu-askdock-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rp-gap); }
+  /* with the worded microphone button next to 「问这句」: its sentence needs the wider column */
+  .rpu-askdock-row[data-voice="true"] { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .rpu-askdock-row > .rpu-btn { height: 100%; }
+  /* a button whose words are a sentence, next to a bigger one: 18px in two lines, the icon in front */
+  .rpu-btn[data-size="compact"] { padding: 6px 12px; gap: 8px; font-size: var(--rp-fs-min); line-height: 1.3; text-align: left; justify-content: flex-start; }
+  .rpu-btn[data-size="compact"] svg { width: calc(24 * var(--rp-u)); height: calc(24 * var(--rp-u)); }
+  /* 995 or the helplines have the screen: no tab bar under them (the draft's 09-1, 10-1). The dock then stands at the
+     foot of the phone and keeps the room a screen without a tab bar has under its buttons */
+  .rpu-screen:has(> .rpu-page > [data-rp="ask-screen"][data-urgent="true"]) > .rpu-tabs { display: none; }
+  .rpu-screen[data-tabbar="fixed"]:has(> .rpu-page > [data-rp="ask-screen"][data-urgent="true"]) { --rpu-bottom: env(safe-area-inset-bottom); }
+  .rpu-screen:has(> .rpu-page > [data-rp="ask-screen"][data-urgent="true"]) .rpu-dock[data-bar="true"] { padding-bottom: 34px; }
+
+  /* the microphone while it has the screen (the draft's `mic`): the round mark with five bars, a halo while it listens */
+  .rpu-micstage { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 24px 0 10px; }
+  .rpu-micstage-mark {
+    box-sizing: border-box;
+    width: calc(160 * var(--rp-u));
+    max-width: calc(100% - 56px);
+    aspect-ratio: 1;
+    margin: 28px;
+    border-radius: 50%;
+    background: var(--rp-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(8 * var(--rp-u));
+  }
+  .rpu-micstage[data-state="listening"] .rpu-micstage-mark { box-shadow: 0 0 0 14px var(--rp-accent-halo), 0 0 0 28px var(--rp-accent-soft); }
+  .rpu-micstage-mark > i { display: block; width: calc(8 * var(--rp-u)); height: 19%; border-radius: 4px; background: var(--rp-white); }
+  .rpu-micstage-mark > i:nth-child(2) { height: 36%; }
+  .rpu-micstage-mark > i:nth-child(3) { height: 26%; }
+  .rpu-micstage-mark > i:nth-child(4) { height: 41%; }
+  .rpu-micstage-mark > i:nth-child(5) { height: 21%; }
+  .rpu-micstage-title { margin: 0; font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.3; text-align: center; text-wrap: balance; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-micstage[data-state="listening"] .rpu-micstage-mark > i { animation: rpu-bars 1.1s ease-in-out infinite; }
+    .rpu-micstage[data-state="listening"] .rpu-micstage-mark > i:nth-child(2) { animation-delay: -.3s; }
+    .rpu-micstage[data-state="listening"] .rpu-micstage-mark > i:nth-child(3) { animation-delay: -.6s; }
+    .rpu-micstage[data-state="listening"] .rpu-micstage-mark > i:nth-child(4) { animation-delay: -.15s; }
+    .rpu-micstage[data-state="listening"] .rpu-micstage-mark > i:nth-child(5) { animation-delay: -.45s; }
+  }
+  @keyframes rpu-bars { 0%, 100% { transform: scaleY(.55); } 50% { transform: scaleY(1); } }
+
+  /* ---------- ux pass 10-12 (E): right after 吃了 / 还没吃, one round mark in the middle of the screen (components/today/DoseHero.tsx) ---------- */
+  .rpu-stack[data-hero="true"] { flex: 1 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .rpu-stack[data-hero="true"] > * { flex: none; }
+  .rpu-stack[data-hero="true"] > .rpu-hero-wrap { flex: 1 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  .rpu-hero { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 0 20px; }
+  /* the reasons stand under the puzzled mark and have to clear the undo bar on one screen: less air around it */
+  .rpu-hero[data-hero="why"] { padding: 4px 0 6px; }
+  .rpu-hero > * { margin: 0; }
+  .rpu-hero-mark { flex: none; display: flex; align-items: center; justify-content: center; width: calc(76 * var(--rp-u)); height: calc(76 * var(--rp-u)); border-radius: 50%; background: var(--rp-accent); color: var(--rp-on-accent); }
+  .rpu-hero-mark svg { width: 68%; height: 68%; overflow: visible; }
+  .rpu-hero-eye, .rpu-hero-dot { fill: currentColor; stroke: none; }
+  .rpu-hero-eye, .rpu-hero-mouth { opacity: 0; }
+  .rpu-hero-mark[data-kind="missed"] .rpu-hero-eye, .rpu-hero-mark[data-kind="missed"] .rpu-hero-mouth { display: none; }
+  .rpu-hero-k { margin-top: 14px; font-size: var(--rp-fs-min); font-weight: 700; line-height: 1.4; color: var(--rp-ink-3); }
+  .rpu-hero-t { margin-top: 16px; font-size: calc(34 * var(--rp-u)); font-weight: 900; line-height: 1.2; }
+  .rpu-hero-k + .rpu-hero-t { margin-top: 2px; }
+  .rpu-hero-t[data-size="ask"] { font-size: calc(30 * var(--rp-u)); line-height: 1.25; }
+  .rpu-hero-s { margin-top: 8px; font-size: var(--rp-fs-row); line-height: 1.4; color: var(--rp-ink-2); }
+  .rpu-hero-her { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: var(--rp-fs-small); font-weight: 700; line-height: 1.35; text-align: left; }
+  .rpu-hero-her-mark { flex: none; display: flex; align-items: center; justify-content: center; width: calc(36 * var(--rp-u)); height: calc(36 * var(--rp-u)); border-radius: 50%; background: var(--rp-ink); color: var(--rp-on-ink); }
+  .rpu-hero-med { display: flex; align-items: center; gap: 12px; min-height: calc(76 * var(--rp-u)); padding: 12px 0; border-top: 1px solid var(--rp-line); border-bottom: 1px solid var(--rp-line); }
+  .rpu-hero-med-main { flex: 1; min-width: 0; }
+  .rpu-hero-med-main > * { margin: 0; }
+  .rpu-hero-med-t { font-size: var(--rp-fs-body); font-weight: 700; line-height: 1.3; }
+  .rpu-hero-med-s { font-size: var(--rp-fs-min); line-height: 1.4; color: var(--rp-ink-2); }
+  .rpu-hero-med > .rpu-act { flex: none; width: auto; padding-inline: 16px; }
+  /* the reasons under the puzzled mark: centred buttons, 「我自己说」 last and filled (the canvas screen 02-4) */
+  [data-rp="reasons"][data-look="buttons"] .rpu-choices { gap: 10px; }
+  [data-rp="reasons"][data-look="buttons"] .rpu-opt { justify-content: center; min-height: calc(60 * var(--rp-u)); border: 2.5px solid var(--rp-ink); border-radius: 18px; text-align: center; font-size: var(--rp-fs-body); font-weight: 700; }
+  [data-rp="reasons"][data-look="buttons"] .rpu-opt-main { flex: none; }
+  [data-rp="reasons"][data-look="buttons"] .rpu-opt[data-reason="self"] { min-height: calc(64 * var(--rp-u)); gap: 10px; background: var(--rp-accent); border-color: var(--rp-accent); color: var(--rp-on-accent); font-size: var(--rp-fs-secondary); }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-hero-mark[data-kind="taken"] .rpu-hero-check { stroke-dasharray: 36; animation: rpu-hero-check 1.6s ease-in-out both; }
+    .rpu-hero-mark[data-kind="taken"] .rpu-hero-eye { transform-box: fill-box; transform-origin: center; animation: rpu-hero-eyes 1.6s ease-in-out both; }
+    .rpu-hero-mark[data-kind="taken"] .rpu-hero-mouth { stroke-dasharray: 26; animation: rpu-hero-mouth 1.6s ease-in-out both; }
+    .rpu-hero-mark[data-kind="missed"] .rpu-hero-check { stroke-dasharray: 36; animation: rpu-hero-draw .4s ease-out both; }
+    .rpu-hero-face { transform-origin: center; animation: rpu-hero-tilt 1.6s ease-in-out .15s both; }
+    .rpu-hero-brow { transform-box: fill-box; transform-origin: center; animation: rpu-hero-brow 1.6s ease-in-out .15s both; }
+  }
+  @keyframes rpu-hero-draw { from { stroke-dashoffset: 36; } to { stroke-dashoffset: 0; } }
+  @keyframes rpu-hero-check { 0% { stroke-dashoffset: 36; opacity: 1; } 25%, 55% { stroke-dashoffset: 0; opacity: 1; } 65%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+  @keyframes rpu-hero-eyes { 0%, 62% { opacity: 0; transform: scale(.3); } 76%, 100% { opacity: 1; transform: scale(1); } }
+  @keyframes rpu-hero-mouth { 0%, 66% { stroke-dashoffset: 26; opacity: 0; } 67% { stroke-dashoffset: 26; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+  @keyframes rpu-hero-tilt { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-9deg); } 60% { transform: rotate(7deg); } }
+  @keyframes rpu-hero-brow { 0%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-2.5px); } }
+
+  /* ---------- ux pass 10-12 (I): on the two round-mark screens the header's 「今天」 is the way back, an arrow in front of it ---------- */
+  .rpu-hero-head { position: relative; }
+  .rpu-hero-head .rpu-meta-text { padding-left: calc(28 * var(--rp-u)); }
+  /* one button over the arrow and the word: clear, so the header's own 「今天」 shows through it */
+  .rpu-hero-back { position: absolute; left: calc(-8 * var(--rp-u)); top: 0; display: flex; align-items: center; justify-content: flex-start; width: calc(132 * var(--rp-u)); height: calc(52 * var(--rp-u)); padding: 0; border: 0; background: none; color: var(--rp-ink); cursor: pointer; }
+
+  /* ---------- tab bar (owner 10-14): four places, an icon over its word, as her bar; the current one is bold and
+     purple under a 4px bar. The padding and the gap follow the unit, so the bar is never taller than --rp-tabbar-h ---------- */
+  .rpu-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0 0 env(safe-area-inset-bottom);
+    margin: 0;
+  }
+  .rpu-tabs[data-placement="absolute"] { position: absolute; padding-bottom: 0; }
+  .rpu-tabs[data-placement="static"] { position: relative; padding-bottom: 0; flex: none; z-index: auto; }
+  .rpu-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(3 * var(--rp-u));
+    box-sizing: border-box;
+    min-height: var(--rp-tabbar-h);
+    min-width: 0;
+    padding: calc(8 * var(--rp-u)) 2px calc(6 * var(--rp-u));
+    /* 18 at the default size, capped at 24 so 「Records」 stays whole in a quarter of a 360px phone at a large text size */
+    font-size: min(var(--rp-fs-min), 24px);
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--rp-ink-3);
+    text-align: center;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .rpu-tab svg { flex: none; width: min(calc(28 * var(--rp-u)), 36px); height: min(calc(28 * var(--rp-u)), 36px); }
+  .rpu-tab[aria-current="page"] { font-weight: 800; color: var(--rp-accent); box-shadow: inset 0 4px 0 var(--rp-accent); }
+  .rpu-tab-label { display: block; max-width: 100%; }
+  /* the tab he tapped while its page is on the way (TabWait.tsx): it looks chosen at once, the page he is leaving no
+     longer; after a moment a line over the bar says so, and after three seconds that it is slow (the draft's 通用-1) */
+  .rpu-tab-going { display: none; }
+  .rpu-tab:has(> .rpu-tab-going) { font-weight: 800; color: var(--rp-accent); box-shadow: inset 0 4px 0 var(--rp-accent); }
+  .rpu-tabs:has(.rpu-tab-going) .rpu-tab[aria-current="page"]:not(:has(> .rpu-tab-going)) { font-weight: 500; color: var(--rp-ink-3); box-shadow: none; }
+  /* (Today's 「按一下说」 bar stands just above the tab bar: for that moment the line has its place, so the two are
+     never half over each other; the bar is back if the page does not come) */
+  .rpu-tabs:has(> .rpu-tabs-wait) { z-index: 31; }
+  .rpu-screen:has(> .rpu-tabs > .rpu-tabs-wait) .rpu-say[data-placement="fixed"] { visibility: hidden; }
+  .rpu-tabs-wait {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    box-sizing: border-box;
+    padding: 12px var(--rp-gutter);
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+    font-size: var(--rp-fs-min);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--rp-ink-2);
+    text-align: center;
+  }
+
+  /* ---------- emergency: the red card, 995 one tap away ---------- */
+  .rpu-emergency {
+    background: var(--rp-urgent);
+    color: var(--rp-on-urgent);
+    border-radius: var(--rp-radius-block);
+    padding: 18px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .rpu-emergency-who { margin: 0; display: flex; align-items: center; gap: 8px; font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-on-urgent); }
+  .rpu-emergency-who::before { content: ""; width: 14px; height: 14px; border-radius: 3px; background: var(--rp-on-urgent); }
+  .rpu-emergency-title { margin: 0; font-size: var(--rp-fs-ask); font-weight: 900; line-height: 1.4; color: var(--rp-on-urgent); }
+  .rpu-emergency-body { margin: 0; font-size: var(--rp-fs-body); line-height: 1.55; font-weight: 700; color: var(--rp-on-urgent); }
+  .rpu-emergency-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: calc(80 * var(--rp-u));
+    padding: 8px 18px;
+    border-radius: var(--rp-radius-btn);
+    background: var(--rp-on-urgent);
+    color: var(--rp-urgent);
+    text-decoration: none;
+    font-size: var(--rp-fs-question);
+    font-weight: 900;
+    flex-wrap: wrap;
+  }
+  .rpu-emergency-call svg { width: calc(30 * var(--rp-u)); height: calc(30 * var(--rp-u)); }
+  .rpu-emergency-call-label { font-size: var(--rp-fs-question); }
+  .rpu-emergency-call-num { font-size: var(--rp-fs-question); line-height: 1; font-variant-numeric: tabular-nums; }
+  .rpu-emergency a:focus-visible { outline-color: var(--rp-on-urgent); }
+
+  /* helplines (self-harm): calm. Each fixed sentence is Ripple's bubble (.rpu-bubble), each number a button of a row
+     of actions under it (.rpu-act: 56 high; 995 red, a number to call filled, WhatsApp outlined). Numbers stay
+     selectable text */
+  .rpu-hotlines { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .rpu-hotline { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .rpu-hotline > * { margin: 0; }
+  .rpu-call-num { font-variant-numeric: tabular-nums; user-select: all; }
+
+  /* ---------- empty / loading / error / offline ---------- */
+  .rpu-state { padding: 18px 0 8px; display: grid; gap: 10px; justify-items: start; }
+  .rpu-state-icon {
+    width: calc(52 * var(--rp-u));
+    height: calc(52 * var(--rp-u));
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--rp-tint);
+    color: var(--rp-ink-3);
+  }
+  .rpu-state-icon svg { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); }
+  .rpu-state-title { margin: 0; font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.35; }
+  .rpu-state-text { margin: 0; font-size: var(--rp-fs-body); line-height: 1.55; color: var(--rp-ink-2); }
+  .rpu-state[data-state="error"] .rpu-state-text { color: var(--rp-ink); }
+  .rpu-state .rpu-btn { width: 100%; }
+  .rpu-skel { display: grid; gap: 14px; padding: 18px 0 8px; }
+  .rpu-skel-line { display: block; height: calc(20 * var(--rp-u)); border-radius: 10px; background: var(--rp-tint); }
+  .rpu-skel-line[data-size="headline"] { height: calc(36 * var(--rp-u)); border-radius: 12px; width: 70%; }
+  .rpu-skel-line[data-size="button"] { height: var(--rp-h-primary); border-radius: var(--rp-radius-btn); width: 100%; margin-top: 8px; }
+  .rpu-skel-line[data-size="short"] { width: 42%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-skel-line { animation: rpu-breathe 2.4s ease-in-out infinite; }
+  }
+  @keyframes rpu-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+  /* microphone permission, "tap to play" */
+  .rpu-perm { display: grid; gap: 12px; margin-top: 16px; }
+  .rpu-perm-icon {
+    width: calc(64 * var(--rp-u));
+    height: calc(64 * var(--rp-u));
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--rp-accent-soft);
+    color: var(--rp-accent);
+  }
+  .rpu-perm[data-state="denied"] .rpu-perm-icon,
+  .rpu-perm[data-state="unavailable"] .rpu-perm-icon { background: var(--rp-tint); color: var(--rp-ink-3); }
+  .rpu-perm-icon svg { width: calc(32 * var(--rp-u)); height: calc(32 * var(--rp-u)); }
+  .rpu-tap-play {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: calc(72 * var(--rp-u));
+    padding: 10px calc(18 * var(--rp-u));
+    border-radius: var(--rp-radius-btn);
+    border: 2px solid var(--rp-accent);
+    background: var(--rp-white);
+    color: var(--rp-accent);
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 800;
+    text-align: left;
+    cursor: pointer;
+  }
+  .rpu-tap-play-icon {
+    width: var(--rp-hit);
+    height: var(--rp-hit);
+    box-sizing: border-box;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 2.5px solid var(--rp-accent);
+    background: var(--rp-white);
+    color: var(--rp-accent);
+    flex: none;
+  }
+  .rpu-tap-play-icon svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+
+  /* ---------- ask: speak first, typing second ---------- */
+  .rpu-heard { margin-top: 16px; padding: 14px 0; border-top: 1px solid var(--rp-line); border-bottom: 1px solid var(--rp-line); }
+  .rpu-heard-text { margin: 4px 0 0; font-size: var(--rp-fs-node); font-weight: 500; line-height: 1.5; }
+  .rpu-mic {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 6px 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: var(--rp-ink-3);
+    cursor: pointer;
+  }
+  .rpu-mic-circle {
+    width: calc(148 * var(--rp-u));
+    max-width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--rp-accent);
+    color: var(--rp-white);
+    box-shadow: 0 0 0 14px var(--rp-accent-halo);
+    margin-top: 14px;
+  }
+  .rpu-mic-circle svg { width: 44%; height: 44%; }
+  .rpu-mic[data-state="listening"] .rpu-mic-circle { box-shadow: 0 0 0 14px var(--rp-accent-halo), 0 0 0 28px var(--rp-accent-soft); }
+  .rpu-mic-label { font-size: var(--rp-fs-small); line-height: 1.5; text-align: center; margin-top: 18px; }
+  .rpu-field { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 12px 0 0; align-items: stretch; }
+  .rpu-field-label { flex-basis: 100%; font-size: var(--rp-fs-small); font-weight: 800; color: var(--rp-ink); }
+  .rpu-field-input {
+    flex: 1 1 11em;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: var(--rp-h-secondary);
+    padding: 8px 16px;
+    border: 1.5px solid var(--rp-edge);
+    border-radius: var(--rp-radius-src);
+    background: var(--rp-white);
+    font: inherit;
+    font-size: var(--rp-fs-node);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--rp-ink);
+  }
+  .rpu-field-input::placeholder { color: var(--rp-ink-3); opacity: 1; }
+  /* the field he is typing in: the accent border, 2.5px (the border is the focus mark) */
+  .rpu .rpu-field-input:focus, .rpu .rpu-field-input:focus-visible { border: 2.5px solid var(--rp-accent); padding: 7px 15px; outline: 0; }
+  .rpu-field .rpu-btn { width: auto; flex: 1 0 auto; }
+
+  /* a field with its name above, its hint and its error below (the draft's input) */
+  .rpu-f { display: flex; flex-direction: column; gap: 8px; }
+  .rpu-f[data-dim="true"] { opacity: .5; }
+  .rpu-f-label { font-size: var(--rp-fs-small); font-weight: 800; }
+  /* the box is the draft's 64 (76 for a big number); the input fills its whole height, so the place to tap is the box
+     itself (an input kept inside the box's padding measured 46, under the 48 a target needs) */
+  .rpu-f-box {
+    box-sizing: border-box;
+    min-height: var(--rp-h-secondary);
+    border-radius: var(--rp-radius-src);
+    background: var(--rp-white);
+    border: 1.5px solid var(--rp-edge);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .rpu-f-box:focus-within { border: 2.5px solid var(--rp-accent); padding: 0 15px; }
+  .rpu-f[data-error="true"] .rpu-f-box { border: 2px solid var(--rp-urgent); padding: 0 15.5px; }
+  .rpu-f-input {
+    flex: 1;
+    align-self: stretch;
+    min-width: 0;
+    min-height: calc(var(--rp-h-secondary) - 5px);
+    border: 0;
+    outline: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-size: var(--rp-fs-node);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--rp-ink);
+  }
+  .rpu .rpu-f-input:focus-visible { outline: 0; }
+  .rpu-f-input::placeholder { color: var(--rp-ink-3); opacity: 1; }
+  .rpu-f[data-big="true"] .rpu-f-box { min-height: calc(76 * var(--rp-u)); }
+  .rpu-f[data-big="true"] .rpu-f-input { font-size: calc(40 * var(--rp-u)); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .rpu-f[data-mono="true"] .rpu-f-input { font-family: var(--rp-font-mono); letter-spacing: .06em; }
+  .rpu-f-eye { flex: none; min-height: var(--rp-hit); min-width: var(--rp-hit); margin: -6px -8px -6px 0; padding: 0 8px; border: 0; background: none; font: inherit; font-size: var(--rp-fs-sub); font-weight: 800; color: var(--rp-accent); cursor: pointer; }
+  .rpu-f-error { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.5; font-weight: 800; color: var(--rp-urgent); }
+  .rpu-f-hint { margin: 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+
+  /* ---------- one of several, or several of several: a white row with a ring or a box that fills ---------- */
+  .rpu-choices { display: flex; flex-direction: column; gap: var(--rp-gap); margin-top: 14px; }
+  .rpu-opts { display: flex; flex-direction: column; gap: var(--rp-gap); }
+  .rpu-opt {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: calc(68 * var(--rp-u));
+    padding: 12px 16px;
+    border-radius: var(--rp-radius-btn);
+    background: var(--rp-white);
+    border: 1.5px solid var(--rp-line-2);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--rp-ink);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-opt[aria-checked="true"], .rpu-opt[aria-pressed="true"] { border: 2.5px solid var(--rp-accent); padding: 11px 15px; }
+  .rpu-opt-dot {
+    flex: none;
+    width: calc(30 * var(--rp-u));
+    height: calc(30 * var(--rp-u));
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 2.5px solid var(--rp-edge);
+    background: var(--rp-white);
+    color: var(--rp-white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rpu-opt-dot svg { width: 66%; height: 66%; }
+  .rpu-opt[aria-checked="true"] .rpu-opt-dot, .rpu-opt[aria-pressed="true"] .rpu-opt-dot { border: calc(9 * var(--rp-u)) solid var(--rp-accent); }
+  .rpu-opt[data-multi="true"] .rpu-opt-dot { border-radius: 7px; }
+  .rpu-opt[data-multi="true"][aria-checked="true"] .rpu-opt-dot { border: 0; background: var(--rp-accent); }
+  .rpu-opt-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-opt-t { font-size: var(--rp-fs-secondary); font-weight: 700; line-height: 1.35; }
+  .rpu-opt-s { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); font-weight: 400; }
+  .rpu-opt:disabled { cursor: progress; }
+
+  /* chips: a short answer among a few */
+  .rpu-chips { display: flex; flex-wrap: wrap; gap: var(--rp-gap); }
+  .rpu-chip {
+    box-sizing: border-box;
+    min-height: var(--rp-h-source);
+    padding: 6px calc(18 * var(--rp-u));
+    border-radius: calc(28 * var(--rp-u));
+    display: inline-flex;
+    align-items: center;
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    border: 2px solid var(--rp-edge);
+    font: inherit;
+    font-size: var(--rp-fs-body);
+    font-weight: 700;
+    line-height: 1.3;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-chip[aria-pressed="true"] { background: var(--rp-accent); border-color: var(--rp-accent); color: var(--rp-on-accent); }
+
+  /* a segmented control: one of two or three, in a grey groove */
+  .rpu-seg { display: grid; grid-template-columns: repeat(var(--rpu-cols, 2), minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: var(--rp-radius-btn); background: var(--rp-tint); }
+  .rpu-seg-item {
+    box-sizing: border-box;
+    min-height: calc(52 * var(--rp-u));
+    padding: 4px 6px;
+    border-radius: 12px;
+    border: 0;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font: inherit;
+    font-size: var(--rp-fs-small);
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--rp-ink-3);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-seg-item[aria-pressed="true"], .rpu-seg-item[aria-current="true"] { background: var(--rp-white); color: var(--rp-ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+
+  /* which step of how many */
+  .rpu-step { display: flex; flex-direction: column; gap: 8px; }
+  .rpu-step-t { margin: 0; font-size: var(--rp-fs-sub); font-weight: 800; color: var(--rp-ink-3); }
+  .rpu-step-segs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
+  .rpu-step-segs i { display: block; height: 8px; border-radius: 2px; background: var(--rp-line); }
+  .rpu-step-segs i[data-state="done"] { background: var(--rp-accent); }
+  .rpu-step-segs i[data-state="now"] { background: var(--rp-white); box-shadow: inset 0 0 0 2px var(--rp-accent); }
+
+  /* 「对 / 改」: one thing read from a label, and the two answers */
+  .rpu-kv { display: flex; flex-direction: column; gap: var(--rp-gap); }
+  .rpu-kv-row { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-btn); padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 10px; }
+  .rpu-kv-row[data-state="yes"] { border: 2px solid var(--rp-ink); padding: 11px 11px 11px 15px; }
+  .rpu-kv-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-kv-l { font-size: var(--rp-fs-min); color: var(--rp-ink-3); font-weight: 700; }
+  .rpu-kv-v { font-size: var(--rp-fs-body); font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+  .rpu-kv-v[data-mono="true"] { font-family: var(--rp-font-mono); }
+  .rpu-kv-s { font-size: var(--rp-fs-min); color: var(--rp-accent); font-weight: 800; line-height: 1.4; }
+  .rpu-kv-btns { flex: none; display: flex; gap: 6px; }
+  .rpu-kv-btn { box-sizing: border-box; width: calc(58 * var(--rp-u)); height: var(--rp-h-source); border-radius: 12px; border: 2px solid var(--rp-ink); background: var(--rp-white); color: var(--rp-ink); display: inline-flex; align-items: center; justify-content: center; font: inherit; font-size: var(--rp-fs-small); font-weight: 800; cursor: pointer; text-decoration: none; }
+  .rpu-kv-btn[aria-pressed="true"] { background: var(--rp-ink); color: var(--rp-on-ink); }
+
+  /* the recovery code: shown once, in a frame */
+  .rpu-code { background: var(--rp-white); border: 2px solid var(--rp-ink); border-radius: var(--rp-radius-btn); padding: 18px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .rpu-code-t { margin: 0; font-family: var(--rp-font-mono); font-size: var(--rp-fs-ask); font-weight: 700; letter-spacing: .08em; text-align: center; line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
+  .rpu-code-s { margin: 0; font-size: var(--rp-fs-min); color: var(--rp-ink-3); }
+
+  /* the week's blood pressure: a bar per day from the lower to the upper number, the doctor's numbers as dashed lines */
+  .rpu-chart { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); padding: 16px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .rpu-chart-plot { position: relative; height: calc(230 * var(--rp-u)); margin: 0 4px; }
+  .rpu-chart-ref { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--rp-accent); }
+  .rpu-chart-ref-t { position: absolute; right: 0; transform: translateY(-110%); font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-accent); background: var(--rp-white); padding: 0 4px; }
+  .rpu-chart-days { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .rpu-chart-day { position: relative; }
+  .rpu-chart-bar { position: absolute; left: 50%; margin-left: -7px; width: 14px; border-radius: 7px; background: var(--rp-ink); }
+  .rpu-chart-v { position: absolute; left: 50%; transform: translate(-50%, -100%); margin-top: -4px; font-size: var(--rp-fs-min); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rpu-chart-x { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: var(--rp-fs-min); color: var(--rp-ink-3); }
+  .rpu-chart-x > span { display: flex; flex-direction: column; }
+  .rpu-chart-x > span[data-today="true"] { color: var(--rp-accent); }
+  .rpu-chart-x b { font-weight: 800; }
+  .rpu-chart-cap { margin: 0; font-size: var(--rp-fs-min); color: var(--rp-ink-3); line-height: 1.5; padding: 0 4px; }
+
+  /* ---------- the card the doctor reads: white, a heavy ink frame, large words ---------- */
+  .rpu-fordoctor { background: var(--rp-white); color: var(--rp-ink); border: 3px solid var(--rp-ink); border-radius: var(--rp-radius-block); padding: 22px 20px; display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+  .rpu-fordoctor-kicker { margin: 0; font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-ink-3); }
+  .rpu-fordoctor-text { margin: 0; font-size: var(--rp-fs-question); line-height: 1.4; font-weight: 700; color: var(--rp-ink); }
+
+  /* ---------- recording: an ink bar, the red dot, the time ---------- */
+  .rpu-rec { display: flex; align-items: center; gap: 16px; margin: 8px 0 0; padding: 18px 20px; border-radius: var(--rp-radius-block); background: var(--rp-ink); color: var(--rp-on-ink); font-size: var(--rp-fs-row); font-weight: 800; }
+  .rpu-rec-dot { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); border-radius: 50%; background: var(--rp-rec); box-shadow: 0 0 0 6px var(--rp-rec-halo); flex: none; }
+  .rpu-rec-time { margin-left: auto; font-family: var(--rp-font-mono); font-size: calc(40 * var(--rp-u)); font-weight: 700; color: var(--rp-on-ink); font-variant-numeric: tabular-nums; }
+  .rpu-rec[data-mini="true"] .rpu-rec-time { font-size: var(--rp-fs-ask); }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-rec-dot { animation: rpu-rec-pulse 1.6s ease-in-out infinite; }
+  }
+  @keyframes rpu-rec-pulse { 0%, 100% { box-shadow: 0 0 0 6px var(--rp-rec-halo); } 50% { box-shadow: 0 0 0 2px var(--rp-rec-halo); } }
+  .rpu-captions { display: grid; gap: 16px; margin-top: 14px; padding: 16px 0; border-top: 1px solid var(--rp-line); border-bottom: 1px solid var(--rp-line); }
+  .rpu-caption { margin: 0; font-size: var(--rp-fs-node); line-height: 1.5; }
+  .rpu-caption[data-when="earlier"] { font-size: var(--rp-fs-body); color: var(--rp-ink-3); }
+  .rpu-caption-when { display: block; font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-ink-3); margin-bottom: 2px; }
+
+  /* ---------- review, one line at a time ---------- */
+  .rpu-review { flex: 1; display: flex; flex-direction: column; }
+  .rpu-progress { display: flex; gap: 4px; margin-top: 12px; }
+  .rpu-progress i { height: 8px; flex: 1; border-radius: 2px; background: var(--rp-line); display: block; }
+  .rpu-progress i[data-on="true"] { background: var(--rp-accent); }
+
+  /* ---------- answers ---------- */
+  .rpu-answer { display: flex; flex-direction: column; flex: 1; }
+  .rpu-answer > * { flex-shrink: 0; }
+  .rpu-answer-part { margin-top: 4px; }
+  /* Ripple's own sentence with its name run in: the purple square, 「Ripple」, then the words (sans) */
+  .rpu-runin { display: inline-flex; align-items: center; gap: 8px; margin-right: 8px; vertical-align: -.16em; font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-accent); white-space: nowrap; }
+  .rpu-runin-badge { width: 20px; height: 20px; border-radius: 4px; display: grid; place-items: center; background: var(--rp-accent); color: var(--rp-accent); overflow: hidden; }
+  .rpu-runin-badge svg { width: 1px; height: 1px; opacity: 0; }
+
+  /* ---------- question list ---------- */
+  .rpu-qlist { margin-top: 8px; }
+  .rpu-q { padding: 18px 0; border-bottom: 1px solid var(--rp-line); display: grid; gap: 8px; }
+  .rpu-q:last-child { border-bottom: 0; }
+  .rpu-q-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+  .rpu-q-origin { display: inline-flex; align-items: center; gap: 6px; font-size: var(--rp-fs-min); font-weight: 700; color: var(--rp-ink-3); }
+  .rpu-q-origin svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+  .rpu-q-text { margin: 0; font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.5; }
+  .rpu-q-evidence { margin: 0; font-size: var(--rp-fs-min); line-height: 1.55; color: var(--rp-ink-3); }
+  .rpu-q-answer { padding-left: 12px; border-left: 3px solid var(--rp-line); }
+
+  /* ---------- the brief, for the doctor: large English ---------- */
+  .rpu-brief { display: grid; gap: 0; }
+  .rpu-brief-kicker { margin: 10px 0 0; font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-ink-3); }
+  .rpu-brief-title { margin: 4px 0 6px; font-size: var(--rp-fs-headline); line-height: 1.2; font-weight: 900; }
+  .rpu-brief-item { margin: 0; padding: 12px 0; border-bottom: 1px solid var(--rp-line); font-size: var(--rp-fs-body); line-height: 1.5; }
+  .rpu-brief-num { font-size: var(--rp-fs-row); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .rpu-brief-own { display: block; margin-top: 4px; font-size: var(--rp-fs-body); font-weight: 700; }
+  .rpu-brief-note { display: block; margin-top: 2px; font-size: var(--rp-fs-min); font-weight: 700; color: var(--rp-ink-3); }
+  .rpu-brief-qtitle { margin: 16px 0 6px; font-size: var(--rp-fs-body); font-weight: 900; }
+  .rpu-brief-qs { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; font-size: var(--rp-fs-body); line-height: 1.5; }
+
+  /* ---------- what family can see: a card of rows, each with a switch that says 开 / 关 under it ---------- */
+  .rpu-toggles { margin-top: 10px; background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); overflow: hidden; }
+  .rpu-toggle-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rp-tint); }
+  .rpu-toggles .rpu-toggle-row { padding: 14px 16px; }
+  .rpu-toggle-row:last-child { border-bottom: 0; }
+  .rpu-toggle-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-toggle-title { margin: 0; font-size: var(--rp-fs-body); font-weight: 700; line-height: 1.4; }
+  .rpu-toggle-desc { margin: 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+  .rpu-switch {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: calc(64 * var(--rp-u));
+    min-height: var(--rp-hit);
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--rp-accent);
+    font: inherit;
+    font-size: var(--rp-fs-min);
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+    flex: none;
+  }
+  .rpu-switch-track {
+    box-sizing: border-box;
+    width: calc(64 * var(--rp-u));
+    height: calc(38 * var(--rp-u));
+    border-radius: calc(19 * var(--rp-u));
+    padding: 3px;
+    display: flex;
+    justify-content: flex-end;
+    background: var(--rp-accent);
+  }
+  .rpu-switch-knob {
+    width: calc(32 * var(--rp-u));
+    height: calc(32 * var(--rp-u));
+    border-radius: 50%;
+    background: var(--rp-white);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+  }
+  .rpu-switch[aria-checked="false"] { color: var(--rp-ink-3); }
+  .rpu-switch[aria-checked="false"] .rpu-switch-track { justify-content: flex-start; background: var(--rp-line-2); }
+  .rpu-switch:disabled { cursor: progress; }
+
+  /* ---------- blood pressure: three large fields like the monitor's rows, and a big keypad ---------- */
+  .rpu-bp { display: grid; gap: 14px; margin-top: 12px; }
+  .rpu-lcd { display: grid; gap: 10px; }
+  .rpu-lcd-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    min-height: calc(76 * var(--rp-u));
+    padding: 6px 16px;
+    border-radius: var(--rp-radius-src);
+    border: 1.5px solid var(--rp-edge);
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .rpu-lcd-row[aria-pressed="true"] { border: 2.5px solid var(--rp-accent); padding: 5px 15px; }
+  .rpu-lcd-name { font-size: var(--rp-fs-small); font-weight: 800; color: var(--rp-ink); line-height: 1.25; }
+  .rpu-lcd-name small { display: block; font-size: var(--rp-fs-min); font-weight: 700; color: var(--rp-ink-3); }
+  .rpu-lcd-val { font-size: calc(40 * var(--rp-u)); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .rpu-lcd-val[data-empty="true"] { color: var(--rp-ink-3); }
+  .rpu-keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--rp-gap); }
+  .rpu-key {
+    min-height: calc(60 * var(--rp-u));
+    border-radius: var(--rp-radius-src);
+    border: 2px solid var(--rp-line-2);
+    background: var(--rp-white);
+    color: var(--rp-ink);
+    font: inherit;
+    font-size: var(--rp-fs-ask);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 4px;
+  }
+  .rpu-key:active { background: var(--rp-tint); }
+  .rpu-key[data-fn="true"] { font-size: var(--rp-fs-min); font-weight: 800; background: var(--rp-tint); border-color: var(--rp-tint); line-height: 1.2; }
+  .rpu-bp-error { margin: 0; font-size: var(--rp-fs-body); font-weight: 700; color: var(--rp-ink); }
+
+  /* ---------- page frames: stubs that later tracks replace ---------- */
+  .rpu-section { display: block; }
+  .rpu-placeholder {
+    display: grid;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 14px 16px;
+    border: 2px dashed var(--rp-edge);
+    border-radius: var(--rp-radius-btn);
+    background: var(--rp-white);
+  }
+  .rpu-placeholder-name { margin: 0; font-size: var(--rp-fs-body); font-weight: 800; }
+  .rpu-placeholder-line { margin: 0; font-size: var(--rp-fs-min); line-height: 1.45; color: var(--rp-ink-3); }
+
+  /* one quiet line in a tinted box: 「示例资料：陈先生（虚构人物）」, 「家人写了 2 条」 */
+  .rpu-banner { display: flex; gap: 10px; align-items: flex-start; box-sizing: border-box; min-height: var(--rp-hit); margin-top: 0; margin-bottom: 12px; padding: 10px 16px; border-radius: var(--rp-radius-btn); background: var(--rp-accent-soft); font-size: var(--rp-fs-min); font-weight: 700; line-height: 1.5; color: var(--rp-ink); }
+  .rpu-banner svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); color: var(--rp-accent); margin-top: 2px; }
+
+  /* ---------- 我 (Me): a card, one entry per row ---------- */
+  .rpu-menu { margin-top: 12px; background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); overflow: hidden; }
+  .rpu-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: calc(68 * var(--rp-u));
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rp-tint);
+    color: var(--rp-ink);
+    text-decoration: none;
+  }
+  .rpu-menu .rpu-entry { padding: 12px 16px; }
+  .rpu-entry:last-child { border-bottom: 0; }
+  .rpu-entry-icon {
+    width: calc(30 * var(--rp-u));
+    height: calc(30 * var(--rp-u));
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--rp-tint);
+    color: var(--rp-ink);
+    flex: none;
+  }
+  .rpu-entry-icon svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  .rpu-entry-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .rpu-entry-title { font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+  .rpu-entry-status { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+  .rpu-entry > svg { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); color: var(--rp-edge); }
+  .rpu-entry[data-crew="true"] .rpu-entry-icon { background: var(--rp-ink); color: var(--rp-on-ink); }
+
+  /* =================================================================== Part B: daughter */
+  /*
+   * The v3 draft (Ripple-Daughter-v3, 47 screens A to I), as built by the fe-d track. One large sentence per screen,
+   * hairlines and space instead of cards, one solid button per screen (teal; amber only where Dad did not reply),
+   * state said by shape, colour and a word together. What differs from the draft, and why:
+   *   - its 15px and 14px text is 16px here (her page checks: nothing under 16);
+   *   - words it sets in #6A7176 use --rpf-ink-3 (AA); #6A7176 itself stays for rings and handles (--rpf-dim);
+   *   - it draws each screen 852px tall with no scrolling; here a screen is at least the viewport tall, the bottom
+   *     group sits at the bottom when the content fits, and the whole page scrolls when it does not.
+   * Sizes are calc(N * var(--rp-u)) so they follow the phone's text size.
+   */
+
+  .rpf {
+    font-family: var(--rpf-font);
+    font-size: var(--rpf-fs-body);
+    line-height: 1.5;
+    color: var(--rpf-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .rpf svg { display: inline-block; flex: none; }
+  .rpf a:focus-visible,
+  .rpf button:focus-visible,
+  a.rpf:focus-visible,
+  button.rpf:focus-visible { outline: 3px solid var(--rpf-teal-ink); outline-offset: 2px; }
+  /* the ground outside her column (a window wider than 430, the overscroll on a phone) is her dark one. !important
+     because globals.css sets the body's ground outside any layer, and an unlayered rule beats a layered one whatever
+     its selector: without it her dark column stood on his light paper */
+  html:has(.rpf-screen[data-fill="viewport"]) body { background: var(--rpf-page) !important; }
+
+  .rpf-screen {
+    position: relative;
+    background: var(--rpf-bg);
+    color: var(--rpf-ink);
+    min-height: 100dvh;
+    width: 100%;
+    max-width: 430px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .rpf-screen[data-fill="container"] { min-height: 0; height: 100%; max-width: none; }
+  .rpf-page { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; padding: env(safe-area-inset-top, 0px) 24px max(10px, env(safe-area-inset-bottom, 0px)); }
+  .rpf-page > * { flex-shrink: 0; }
+  .rpf-screen[data-fill="container"] > .rpf-page { overflow-y: auto; }
+  .rpf-col { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .rpf-col > * { flex-shrink: 0; }
+
+  /* ---- the top bar: where she is (or the way back) on the left, 中/EN and 「我的」 on the right */
+  .rpf-top { min-height: var(--rpf-h-top); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rpf-top-titles { display: flex; flex-direction: column; min-width: 0; }
+  .rpf-top-title { margin: 0; font-size: var(--rpf-fs-body); font-weight: 600; line-height: 1.3; color: var(--rpf-ink); }
+  .rpf-top-sub, .rpf-kicker { margin: 0; font-size: var(--rpf-fs-min); line-height: 1.3; font-weight: 400; color: var(--rpf-ink-2); font-variant-numeric: tabular-nums; }
+  .rpf-brand { margin: 0; font-size: var(--rpf-fs-body); font-weight: 600; letter-spacing: .01em; color: var(--rpf-ink); }
+  .rpf-top-right { display: flex; align-items: center; gap: 10px; flex: none; }
+  .rpf-top-right[data-tight="true"] { gap: 12px; }
+  .rpf-top-link { min-width: var(--rpf-hit); min-height: var(--rpf-hit); display: flex; align-items: center; justify-content: flex-end; font: inherit; font-size: var(--rpf-fs-min); color: var(--rpf-ink); text-decoration: none; background: none; border: 0; padding: 0; cursor: pointer; }
+  .rpf-top-link[data-kind="skip"] { min-width: calc(52 * var(--rp-u)); justify-content: center; }
+  .rpf-back { display: flex; align-items: center; gap: 2px; min-height: var(--rpf-hit); margin-left: -10px; padding-right: 8px; min-width: 0; color: var(--rpf-ink); text-decoration: none; }
+  .rpf-back svg { width: calc(28 * var(--rp-u)); height: calc(28 * var(--rp-u)); }
+  .rpf-live { display: flex; align-items: center; gap: 10px; min-height: var(--rpf-hit); }
+  .rpf-live i { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--rpf-teal); box-shadow: 0 0 0 4px var(--rpf-teal-22); }
+  /* 中/EN: one link, the language in use on the darker half */
+  .rpf-lang { display: flex; align-items: center; height: var(--rpf-hit); border: 1px solid var(--rpf-hair-2); border-radius: 999px; padding: 3px; flex: none; text-decoration: none; }
+  .rpf-lang span { width: calc(38 * var(--rp-u)); height: calc(36 * var(--rp-u)); border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-lang span[data-on="true"] { background: var(--rpf-surface-2); color: var(--rpf-ink); font-weight: 600; }
+  /* the three first-visit steps */
+  .rpf-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .rpf-stepper i { display: block; height: 4px; border-radius: 2px; background: var(--rpf-hair-2); }
+  .rpf-stepper i[data-done="true"] { background: var(--rpf-teal); }
+  .rpf-stepper + .rpf-hero .rpf-h1, .rpf-stepper + form .rpf-h1 { margin-top: 28px; }
+
+  /* ---- the one large sentence, and the line under it: one colour, always */
+  .rpf-h1 { margin: 20px 0 0; font-size: var(--rpf-fs-hero); line-height: 1.3; font-weight: 600; letter-spacing: -.01em; color: var(--rpf-ink); text-wrap: pretty; }
+  .rpf-screen:lang(en) .rpf-h1 { line-height: 1.22; letter-spacing: -.015em; }
+  .rpf-h2 { margin: 22px 0 0; font-size: var(--rpf-fs-title); line-height: 1.3; font-weight: 600; color: var(--rpf-ink); text-wrap: pretty; }
+  .rpf-sub { margin: 10px 0 0; font-size: var(--rpf-fs-body); line-height: 1.5; color: var(--rpf-ink-2); text-wrap: pretty; }
+  .rpf-hero { display: block; }
+  .rpf-notice + .rpf-hero .rpf-h1, .rpf-notice + [data-rp="no-reply"] .rpf-h1 { margin-top: 14px; }
+  .rpf-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: var(--rpf-fs-min); line-height: 1.5; color: var(--rpf-ink-2); text-wrap: pretty; }
+  .rpf-note svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); margin-top: 2px; }
+  .rpf-section { margin: 26px 0 6px; font-size: var(--rpf-fs-min); font-weight: 400; color: var(--rpf-ink-2); }
+  .rpf-label { font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+
+  /* ---- state marks: shape, colour and a word together */
+  .rpf-mark { width: calc(40 * var(--rp-u)); height: calc(40 * var(--rp-u)); border-radius: 50%; display: grid; place-items: center; box-sizing: border-box; flex: none; }
+  .rpf-mark[data-size="32"] { width: calc(32 * var(--rp-u)); height: calc(32 * var(--rp-u)); }
+  .rpf-mark[data-size="30"] { width: calc(30 * var(--rp-u)); height: calc(30 * var(--rp-u)); }
+  .rpf-mark[data-size="26"] { width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); }
+  .rpf-mark[data-size="22"] { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+  .rpf-mark[data-size="20"] { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); }
+  .rpf-mark[data-size="18"] { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  .rpf-mark svg { width: 45%; height: 45%; }
+  .rpf-mark[data-mark="taken"] { background: var(--rpf-teal); color: var(--rpf-on-teal); }
+  .rpf-mark[data-mark="missed"] { border: 2.5px solid var(--rpf-chk); }
+  .rpf-mark[data-mark="no_reply"] { border: 2.5px solid var(--rpf-chk); color: var(--rpf-chk); }
+  .rpf-mark[data-mark="no_reply"] svg { width: 42%; height: 42%; }
+  .rpf-mark[data-mark="pending"] { border: 2px dashed var(--rpf-dim); }
+  .rpf-mark[data-mark="pending"][data-today="true"], .rpf-mark[data-mark="waiting"] { border: 2px dashed var(--rpf-ink-2); }
+  .rpf-mark[data-mark="none"]::before, .rpf-mark[data-mark="off"]::before { content: ""; width: 40%; height: 2.5px; border-radius: 2px; background: var(--rpf-ink-2); }
+  .rpf-mark[data-mark="blank"] { background: var(--rpf-surface); }
+  .rpf-mark[data-today="true"] { box-shadow: 0 0 0 3px var(--rpf-bg), 0 0 0 4.5px var(--rpf-teal-60); }
+
+  /* ---- the week: seven days, the weekday above, the word under */
+  .rpf-week { margin-top: 28px; display: block; text-decoration: none; color: inherit; }
+  .rpf-notice ~ .rpf-week, .rpf-linkrow + .rpf-week { margin-top: 20px; }
+  .rpf-tl + .rpf-week { margin-top: 16px; }
+  .rpf-week-head { min-height: var(--rpf-hit); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .rpf-week-head > span:first-child { font-size: var(--rpf-fs-body); font-weight: 600; color: var(--rpf-ink); flex: none; }
+  .rpf-week-sum { display: flex; align-items: center; gap: 6px; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); text-align: right; min-width: 0; }
+  .rpf-week-sum b { font-weight: 400; }
+  /* 8px into each gutter: at 16px the three-character words (「还没到」) need the room the draft's 15px did not */
+  .rpf-days { margin: 8px -8px 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .rpf-day { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+  .rpf-day-wd { font-size: var(--rpf-fs-min); line-height: 1.125; color: var(--rpf-ink-2); font-weight: 400; }
+  .rpf-day[data-today="true"] .rpf-day-wd { color: var(--rpf-ink); font-weight: 600; }
+  .rpf-day-word { min-height: calc(18 * var(--rp-u)); font-size: var(--rpf-fs-min); line-height: 1.125; letter-spacing: -.04em; color: var(--rpf-ink-2); text-align: center; }
+  .rpf-day[data-mark="missed"] .rpf-day-word, .rpf-day[data-mark="no_reply"] .rpf-day-word { color: var(--rpf-chk); }
+
+  /* ---- hairline rows: a name and its value */
+  .rpf-facts, .rpf-grid { margin-top: 18px; display: flex; flex-direction: column; border-top: 1px solid var(--rpf-hair); }
+  .rpf-section + .rpf-facts, .rpf-section + .rpf-grid { margin-top: 0; }
+  .rpf-fact, .rpf-stat { min-height: calc(48 * var(--rp-u)); padding: 6px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-body); line-height: 1.4; color: var(--rpf-ink-2); text-decoration: none; }
+  .rpf-fact > span:first-child, .rpf-stat > span:first-child { flex: 0 1 auto; min-width: 0; }
+  .rpf-stat-label { margin: 0; color: var(--rpf-ink-2); }
+  .rpf-stat-foot { margin: 0; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-fact b, .rpf-fact-value, .rpf-stat-value { flex: 0 1 auto; max-width: 66%; display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 0; color: var(--rpf-ink); font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .rpf-stat-unit { margin-left: 3px; }
+  .rpf-fact[data-state="off"] .rpf-fact-value, .rpf-stat[data-state="off"] .rpf-stat-value { color: var(--rpf-ink-2); }
+  .rpf-fact svg, .rpf-stat svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); color: var(--rpf-ink-2); }
+  /* 「我的」: the name is the bright side, the value the quiet one */
+  .rpf-facts[data-kind="settings"] .rpf-fact { min-height: calc(50 * var(--rp-u)); color: var(--rpf-ink); width: 100%; background: none; border-top: 0; border-left: 0; border-right: 0; font-family: inherit; text-align: left; cursor: pointer; }
+  .rpf-facts[data-kind="settings"] div.rpf-fact { cursor: default; }
+  .rpf-facts[data-kind="settings"] .rpf-fact-value { color: var(--rpf-ink-2); }
+  /* a whole row that opens a screen */
+  .rpf-linkrow { min-height: calc(52 * var(--rp-u)); padding: 6px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rpf-hair); border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-body); color: var(--rpf-ink); text-decoration: none; }
+  .rpf-linkrow svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); color: var(--rpf-ink-2); }
+  /* the foot line that opens 「爸爸让你看到的」 */
+  .rpf-consent { margin: 10px 0 4px; min-height: var(--rpf-hit); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: var(--rpf-fs-min); line-height: 1.45; color: var(--rpf-ink-2); text-decoration: none; }
+  .rpf-consent svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); }
+  /* 「这是爸爸同意给你看的…」 under a title */
+  .rpf-agreed { margin: 20px 0 0; min-height: calc(48 * var(--rp-u)); padding: 6px 0; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--rpf-hair); border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-ink-2); }
+  /* a quiet line at the top of her home: he changed a switch, no network, notifications off */
+  .rpf-notice { margin: 0; min-height: calc(52 * var(--rp-u)); padding: 4px 0; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-ink); }
+  .rpf-notice > span:not(.rpf-mark):not(.rpf-notice-icon) { flex: 1; min-width: 0; }
+  .rpf-notice-icon { position: relative; width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); display: grid; place-items: center; flex: none; color: var(--rpf-ink-2); }
+  .rpf-notice-icon svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  .rpf-notice-icon[data-off="true"]::after { content: ""; position: absolute; width: calc(24 * var(--rp-u)); height: 2px; background: var(--rpf-ink-2); transform: rotate(-45deg); }
+  .rpf-notice-act { min-height: var(--rpf-hit); min-width: var(--rpf-hit); display: flex; align-items: center; justify-content: flex-end; gap: 4px; flex: none; padding: 0; background: none; border: 0; font: inherit; font-size: var(--rpf-fs-min); color: var(--rpf-teal-ink); text-decoration: none; cursor: pointer; }
+  .rpf-notice-act svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); flex: none; }
+  /* the action is the whole line (「开通知：爸爸没回时告诉你」): its words at the left, the chevron at the right */
+  .rpf-notice-act[data-wide="true"] { flex: 1; min-width: 0; justify-content: space-between; gap: 12px; text-align: left; line-height: 1.4; }
+
+  /* ---- the timeline: time, node, what happened */
+  .rpf-tl { margin: 30px 0 0; padding: 0; list-style: none; }
+  .rpf-hero + .rpf-tl { margin-top: 14px; }
+  .rpf-hero[data-lede="true"] + .rpf-tl { margin-top: 26px; }
+  .rpf-ev { display: grid; grid-template-columns: calc(56 * var(--rp-u)) calc(32 * var(--rp-u)) minmax(0, 1fr); column-gap: 10px; }
+  .rpf-ev-when { font-size: var(--rpf-fs-body); line-height: calc(26 * var(--rp-u)); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--rpf-ink); }
+  .rpf-ev-node { display: flex; flex-direction: column; align-items: center; }
+  .rpf-ev-node > i { display: block; margin-top: 6px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--rpf-ink-2); box-sizing: border-box; flex: none; }
+  .rpf-ev-node > .rpf-mark { margin-top: -3px; }
+  .rpf-ev-node > b { display: block; flex: 1; width: 2px; min-height: 14px; margin-top: 6px; background: var(--rpf-hair-2); }
+  .rpf-ev-body { min-width: 0; padding-bottom: 22px; }
+  .rpf-ev:last-child .rpf-ev-body { padding-bottom: 0; }
+  .rpf-ev-what { display: block; font-size: var(--rpf-fs-body); line-height: calc(26 * var(--rp-u)); color: var(--rpf-ink); }
+  .rpf-ev-say { display: block; margin-top: 8px; border-left: 2px solid var(--rpf-w22); padding: 1px 0 1px 12px; font-size: var(--rpf-fs-min); line-height: 1.55; color: var(--rpf-ink-2); text-wrap: pretty; }
+  .rpf-ev[data-tone="warn"][data-node="no_reply"] .rpf-ev-when { color: var(--rpf-chk); }
+  .rpf-ev[data-state="past"] .rpf-ev-when, .rpf-ev[data-state="future"] .rpf-ev-when { font-weight: 400; color: var(--rpf-ink-2); }
+  .rpf-ev[data-state="past"] .rpf-ev-what, .rpf-ev[data-state="future"] .rpf-ev-what { color: var(--rpf-ink-2); }
+  .rpf-ev[data-state="past"] .rpf-ev-node > i { border-color: var(--rpf-dim); }
+  .rpf-ev[data-state="future"] .rpf-ev-node > i { border: 2px dashed var(--rpf-dim); }
+
+  /* ---- someone's own words: a thin rule on the left, no ground, no card */
+  .rpf-said { margin: 0; border-left: 2px solid var(--rpf-w22); padding: 1px 0 1px 12px; font-size: var(--rpf-fs-body); line-height: 1.45; color: var(--rpf-ink); text-wrap: pretty; }
+  .rpf-quote { margin: 20px 0 0; display: flex; flex-direction: column; gap: 10px; }
+  .rpf-quote-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: var(--rpf-hit); }
+  .rpf-quote-who { margin: 0; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); font-variant-numeric: tabular-nums; }
+  .rpf-quote-body { border-left: 2px solid var(--rpf-w22); padding: 1px 0 1px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .rpf-quote-words { margin: 0; font-size: var(--rpf-fs-body); line-height: 1.5; color: var(--rpf-ink); text-wrap: pretty; }
+  .rpf-quote-zh { margin: 0; font-size: var(--rpf-fs-min); line-height: 1.55; color: var(--rpf-ink-2); text-wrap: pretty; }
+  .rpf-quote-src { margin: 0; font-size: var(--rpf-fs-min); line-height: 1.5; color: var(--rpf-ink-2); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+  /* a small word tag: 代录音, 语音, 打字 */
+  .rpf-chip { flex: none; display: inline-block; padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--rpf-w18); font-size: var(--rpf-fs-min); line-height: 1.3; color: var(--rpf-ink-2); }
+  /* the round play key */
+  .rpf-play { width: var(--rpf-hit); height: var(--rpf-hit); border-radius: 50%; display: grid; place-items: center; flex: none; padding: 0; background: none; border: 0; box-shadow: inset 0 0 0 1.5px var(--rpf-teal-60); color: var(--rpf-teal-ink); cursor: pointer; }
+  .rpf-play svg { width: calc(14 * var(--rp-u)); height: calc(16 * var(--rp-u)); }
+  .rpf-play i { display: block; width: calc(12 * var(--rp-u)); height: calc(12 * var(--rp-u)); border-radius: 3px; background: var(--rpf-teal-ink); }
+
+  /* ---- lists */
+  /* numbered steps */
+  .rpf-steplist { margin: 18px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rpf-hair); }
+  .rpf-steplist li { min-height: calc(56 * var(--rp-u)); padding: 10px 0; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-body); line-height: 1.45; color: var(--rpf-ink); }
+  .rpf-stepnum { width: calc(28 * var(--rp-u)); height: calc(28 * var(--rp-u)); border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--rpf-w28); display: grid; place-items: center; flex: none; font-size: var(--rpf-fs-min); font-weight: 600; line-height: 1; color: var(--rpf-ink); }
+  /* what follows a decision, one short dash each */
+  .rpf-dashlist { margin: 26px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rpf-hair); }
+  .rpf-dashlist li { min-height: calc(52 * var(--rp-u)); padding: 12px 0; display: flex; align-items: flex-start; gap: 14px; border-bottom: 1px solid var(--rpf-hair); font-size: var(--rpf-fs-body); line-height: 1.5; color: var(--rpf-ink); }
+  .rpf-dashlist li::before { content: ""; width: 14px; height: 2px; border-radius: 1px; background: var(--rpf-ink-2); margin-top: 12px; flex: none; }
+  .rpf-dashlist + .rpf-section { margin-top: 20px; }
+  .rpf-section + .rpf-dashlist { margin-top: 0; }
+  /* the invitation: what she will see once he switches it on (the name, and under it what exactly), then the one
+     sentence about what stays hidden */
+  .rpf-perm { margin: 4px 0 0; padding: 0; list-style: none; }
+  .rpf-perm li { min-height: var(--rpf-hit); padding: 7px 0; box-sizing: border-box; display: flex; align-items: flex-start; gap: 14px; font-size: var(--rpf-fs-body); line-height: 1.4; color: var(--rpf-ink); }
+  .rpf-perm li > .rpf-mark { margin-top: 1px; }
+  .rpf-perm-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpf-perm-detail { font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-ink-2); }
+  /* the lines under a name were written to follow it in brackets: on a line of their own the English starts with a capital */
+  .rpf-perm-detail::first-letter, .rpf-share-sub::first-letter { text-transform: uppercase; }
+  .rpf-perm-head { margin: 26px 0 0; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-perm-note { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--rpf-hair); }
+  /* what he shares: six rows, 开 with a tick or 没有分享 with a dash */
+  .rpf-shares { margin: 24px 0 0; display: flex; flex-direction: column; border-top: 1px solid var(--rpf-hair); }
+  .rpf-share { min-height: calc(68 * var(--rp-u)); padding: 10px 0; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--rpf-hair); color: inherit; text-decoration: none; }
+  .rpf-shares[data-kind="plain"] .rpf-share { min-height: calc(46 * var(--rp-u)); padding: 6px 0; }
+  .rpf-share-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpf-share-title { margin: 0; font-size: var(--rpf-fs-body); line-height: 1.4; color: var(--rpf-ink); }
+  .rpf-share-sub { margin: 0; font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-ink-2); }
+  .rpf-share-icon { display: flex; align-items: center; gap: 4px; flex: none; font-size: var(--rpf-fs-min); color: var(--rpf-teal-ink); }
+  .rpf-share[data-shared="false"] .rpf-share-icon { color: var(--rpf-ink-2); }
+  .rpf-share-icon svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); }
+  /* the week, day by day */
+  .rpf-weeknav { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; }
+  .rpf-weeknav a, .rpf-weeknav span { min-height: var(--rpf-hit); min-width: var(--rpf-hit); display: flex; align-items: center; gap: 4px; font-size: var(--rpf-fs-min); color: var(--rpf-ink); text-decoration: none; }
+  .rpf-weeknav span { color: var(--rpf-ink-3); }
+  .rpf-weeknav svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); }
+  .rpf-weeknav span svg { color: var(--rpf-dim); }
+  .rpf-daylist { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border-top: 1px solid var(--rpf-hair); }
+  .rpf-dayrow { min-height: calc(56 * var(--rp-u)); padding: 6px 0; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--rpf-hair); }
+  .rpf-dayrow-wd { flex: none; font-size: var(--rpf-fs-body); color: var(--rpf-ink); }
+  .rpf-dayrow[data-today="true"] .rpf-dayrow-wd { font-weight: 600; }
+  .rpf-dayrow-date { flex: 1; min-width: 0; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-dayrow-state { flex: none; font-size: var(--rpf-fs-body); font-variant-numeric: tabular-nums; color: var(--rpf-ink); text-align: right; }
+  .rpf-dayrow[data-mark="missed"] .rpf-dayrow-state, .rpf-dayrow[data-mark="no_reply"] .rpf-dayrow-state { color: var(--rpf-chk); }
+  .rpf-dayrow[data-mark="pending"] .rpf-dayrow-state, .rpf-dayrow[data-mark="none"] .rpf-dayrow-state { color: var(--rpf-ink-2); }
+  /* a list of visits: the date, what it was, the way in */
+  .rpf-visits { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+  .rpf-visit { min-height: calc(72 * var(--rp-u)); padding: 12px 0; display: grid; grid-template-columns: calc(96 * var(--rp-u)) minmax(0, 1fr) auto; gap: 12px; align-items: center; border-bottom: 1px solid var(--rpf-hair); color: inherit; text-decoration: none; }
+  .rpf-visit > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rpf-visit b { font-size: var(--rpf-fs-body); font-weight: 600; color: var(--rpf-ink); }
+  .rpf-visit i { font-style: normal; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-visit em { font-style: normal; font-size: var(--rpf-fs-body); color: var(--rpf-ink); overflow-wrap: anywhere; }
+  .rpf-visit svg { width: calc(16 * var(--rp-u)); height: calc(16 * var(--rp-u)); color: var(--rpf-ink-2); }
+  /* his notes, her recordings: one block per item */
+  .rpf-items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+  .rpf-items[data-top="true"] { margin-top: 28px; border-top: 1px solid var(--rpf-hair); }
+  .rpf-item { padding: 18px 0; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid var(--rpf-hair); }
+  .rpf-items[data-top="true"] .rpf-item { padding: 16px 0; }
+  .rpf-item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-item-main { display: flex; align-items: center; gap: 14px; }
+  .rpf-item-main > div { flex: 1; min-width: 0; }
+  .rpf-item-acts { display: flex; align-items: center; gap: 6px; flex: none; }
+  .rpf-item-name { margin: 0; font-size: var(--rpf-fs-body); line-height: 1.45; color: var(--rpf-ink); }
+  .rpf-item-sub { margin: 2px 0 0; font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-ink-2); }
+  /* the devices she signed in on: a name, where it stands, and 「退出这台」 at the right */
+  .rpf-items[data-kind="devices"] { border-top: 1px solid var(--rpf-hair); }
+  .rpf-items[data-kind="devices"] .rpf-item { padding: 14px 0; }
+  .rpf-item-len { flex: none; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); font-variant-numeric: tabular-nums; }
+  .rpf-nowplaying { display: flex; align-items: center; gap: 8px; font-size: var(--rpf-fs-min); color: var(--rpf-teal-ink); }
+  .rpf-list { margin: 8px 0 0; padding-left: 1.2em; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); line-height: 1.55; }
+  .rpf-list li + li { margin-top: 4px; }
+  .rpf-details { margin-top: 6px; }
+  .rpf-details summary { min-height: var(--rpf-hit); display: flex; align-items: center; cursor: pointer; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+
+  /* ---- buttons: one solid per screen, then outlined, then plain words */
+  .rpf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: var(--rpf-h-btn);
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: var(--rpf-fs-body);
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    color: var(--rpf-ink);
+    cursor: pointer;
+    flex: none;
+  }
+  .rpf-btn svg { width: calc(14 * var(--rp-u)); height: calc(14 * var(--rp-u)); }
+  .rpf-btn i[data-glyph="stop"] { display: block; width: calc(14 * var(--rp-u)); height: calc(14 * var(--rp-u)); border-radius: 3px; background: currentColor; }
+  .rpf-btn[data-variant="primary"] { background: var(--rpf-teal); color: var(--rpf-on-teal); }
+  .rpf-btn[data-variant="warn"] { background: var(--rpf-chk); color: var(--rpf-on-chk); }
+  .rpf-btn[data-variant="secondary"] { min-height: var(--rpf-h-btn-2); font-weight: 500; box-shadow: inset 0 0 0 1px var(--rpf-w20); }
+  .rpf-btn[data-variant="quiet"] { min-height: var(--rpf-h-btn-3); font-weight: 400; color: var(--rpf-ink-2); }
+  .rpf-btn[data-size="small"] { display: inline-flex; width: auto; justify-self: start; align-self: flex-start; min-height: var(--rpf-hit); padding: 0 16px; gap: 8px; font-size: var(--rpf-fs-min); font-weight: 400; }
+  .rpf-btn[data-size="small"][data-variant="quiet"] { padding: 0 12px; }
+  .rpf-btn[data-size="small"][data-tone="teal"] { box-shadow: inset 0 0 0 1px var(--rpf-teal-50); color: var(--rpf-ink); }
+  .rpf-btn[data-size="small"] svg { width: calc(11 * var(--rp-u)); height: calc(13 * var(--rp-u)); color: var(--rpf-teal-ink); }
+  .rpf-btn[aria-busy="true"] { cursor: progress; opacity: .8; }
+  .rpf-btn:disabled:not([aria-busy="true"]), .rpf-btn[aria-disabled="true"] { cursor: default; background: var(--rpf-surface); color: var(--rpf-ink-3); box-shadow: none; }
+  .rpf-btns { display: grid; gap: 10px; }
+  .rpf-btns[data-pair="true"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8em), 1fr)); }
+  .rpf-textline { min-height: var(--rpf-h-btn-3); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 6px; font-size: var(--rpf-fs-body); color: var(--rpf-ink-2); }
+  .rpf-textline a { min-height: var(--rpf-hit); min-width: var(--rpf-hit); display: inline-flex; align-items: center; justify-content: center; color: var(--rpf-ink); font-weight: 600; text-decoration: none; }
+  .rpf-plainlink { min-height: var(--rpf-hit); display: inline-flex; align-items: center; align-self: flex-start; margin-top: 8px; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); text-decoration: none; }
+  /* the bottom of a screen: pushed down when the content is shorter than the phone */
+  /* ---- her bottom bar (owner 10-14; the iOS app's four tabs): flat, on the page's ground, a hairline above; an icon
+     over its word, the place she is on in the iOS tint. It stays at the bottom of the phone while the page scrolls;
+     under the bottom sheet and its scrim (40, 41) */
+  .rpf-tabs { position: sticky; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--rpf-bg); border-top: 1px solid var(--rpf-hair-2); padding: 6px 8px max(6px, env(safe-area-inset-bottom, 0px)); }
+  .rpf-tab { min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--rpf-ink-2); text-decoration: none; font-size: var(--rpf-fs-min); line-height: 1.2; font-weight: 500; border-radius: 12px; }
+  .rpf-tab svg { width: 24px; height: 24px; }
+  .rpf-tab[aria-current="page"] { color: var(--rpf-teal); font-weight: 700; }
+  .rpf-screen[data-tabs] > .rpf-page { padding-bottom: 10px; }
+
+  .rpf-dock { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .rpf-dock[data-foot="b"] { gap: 6px; margin-bottom: 6px; }
+  .rpf-dock[data-foot="c"] { margin-bottom: 10px; }
+  .rpf-dock[data-foot="d"] { margin-bottom: 6px; }
+  .rpf-dock[data-foot="e"] { margin-bottom: 24px; }
+  .rpf-dock[data-foot="h"] { gap: 6px; margin-bottom: 18px; }
+  .rpf-dock[data-foot="n"] { margin-bottom: 14px; }
+  .rpf-dock > .rpf-note { margin-top: 4px; }
+  .rpf-dock:empty { display: none; }
+  /* a screen that only says one thing: the sentence sits between the top bar and the button */
+  .rpf-empty { margin-top: auto; display: flex; flex-direction: column; gap: 16px; padding-top: 20px; }
+  .rpf-empty .rpf-h1 { margin-top: 0; }
+  .rpf-empty .rpf-sub { margin-top: -4px; }
+  .rpf-empty-mark { width: calc(48 * var(--rp-u)); height: calc(48 * var(--rp-u)); display: flex; align-items: center; flex: none; }
+  .rpf-empty-mark::before { content: ""; width: 28px; height: 3px; border-radius: 2px; background: var(--rpf-ink-2); }
+  .rpf-empty-mark[data-kind="done"] { width: auto; height: auto; gap: 12px; font-size: var(--rpf-fs-body); font-weight: 600; color: var(--rpf-ink); }
+  .rpf-empty-mark[data-kind="done"]::before { content: none; }
+  .rpf-micmark { position: relative; width: calc(56 * var(--rp-u)); height: calc(56 * var(--rp-u)); border-radius: 50%; display: grid; place-items: center; flex: none; box-shadow: inset 0 0 0 1.5px var(--rpf-teal-60); color: var(--rpf-teal-ink); }
+  .rpf-micmark::before { content: ""; width: 14px; height: 22px; border-radius: 7px; border: 2px solid currentColor; box-sizing: border-box; }
+  .rpf-micmark[data-off="true"] { box-shadow: inset 0 0 0 1.5px var(--rpf-w22); color: var(--rpf-ink-2); margin-top: 20px; }
+  .rpf-micmark[data-off="true"]::after { content: ""; position: absolute; width: 30px; height: 2.5px; border-radius: 2px; background: currentColor; transform: rotate(-45deg); }
+  .rpf-micmark[data-off="true"] + .rpf-h1 { margin-top: 18px; }
+
+  /* ---- the phone's own notification, drawn so she knows what it will look like */
+  .rpf-banner { margin-top: 12px; border-radius: 22px; background: var(--rpf-banner); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+  .rpf-banner-app { width: calc(38 * var(--rp-u)); height: calc(38 * var(--rp-u)); border-radius: 10px; background: var(--rpf-teal); display: grid; place-items: center; flex: none; }
+  .rpf-banner-app::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--rpf-on-teal); box-sizing: border-box; }
+  .rpf-banner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpf-banner-head { display: flex; justify-content: space-between; gap: 8px; }
+  .rpf-banner-head b { font-size: var(--rpf-fs-min); font-weight: 600; line-height: 1.4; color: var(--rpf-ink); }
+  .rpf-banner-head span { flex: none; font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-banner-dim); }
+  .rpf-banner-text > span { font-size: var(--rpf-fs-min); line-height: 1.4; color: var(--rpf-banner-ink); }
+
+  /* ---- the recorder */
+  .rpf-recbtn { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: auto auto 24px; padding: 20px 12px 0; background: none; border: 0; font: inherit; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); cursor: pointer; }
+  .rpf-recbtn-ring { width: calc(96 * var(--rp-u)); height: calc(96 * var(--rp-u)); border-radius: 50%; box-shadow: inset 0 0 0 2px var(--rpf-teal-50); display: grid; place-items: center; }
+  .rpf-recbtn-ring i { width: 81.25%; height: 81.25%; border-radius: 50%; background: var(--rpf-teal); display: grid; place-items: center; }
+  .rpf-recbtn-ring i::before { content: ""; width: 28.2%; height: 28.2%; border-radius: 50%; background: var(--rpf-on-teal); }
+  .rpf-take { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .rpf-take[data-live="true"] { align-items: center; gap: 28px; }
+  .rpf-rec-time { margin: 0; font-size: var(--rpf-fs-body); font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--rpf-ink); }
+  .rpf-take[data-live="true"] .rpf-rec-time { font-size: var(--rpf-fs-timer); font-weight: 500; }
+  .rpf-wave { width: 100%; height: calc(72 * var(--rp-u)); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
+  .rpf-wave i { display: block; width: 3px; min-height: 3px; border-radius: 2px; background: var(--rpf-teal); flex: none; }
+  .rpf-wave[data-live="true"] { height: calc(84 * var(--rp-u)); justify-content: flex-start; }
+  .rpf-wave[data-live="true"] > span { display: flex; align-items: center; gap: 3px; flex: none; max-width: 70%; overflow: hidden; justify-content: flex-end; }
+  .rpf-wave[data-live="true"] > b { display: block; width: 2px; height: 100%; border-radius: 1px; background: var(--rpf-ink); margin: 0 6px; flex: none; }
+  .rpf-wave[data-live="true"] > u { display: block; flex: 1; border-top: 2px dotted var(--rpf-w16); }
+  .rpf-wave[data-size="small"] { height: calc(32 * var(--rp-u)); flex: 1; min-width: 0; width: auto; }
+  .rpf-wave[data-size="small"] i { background: var(--rpf-teal-ink); }
+  .rpf-rec-status { margin: 0; font-size: var(--rpf-fs-min); line-height: 1.5; color: var(--rpf-ink-2); }
+  .rpf-rec-status[data-tone="warn"] { color: var(--rpf-chk); }
+  .rpf-playback { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--rpf-hair); border-bottom: 1px solid var(--rpf-hair); }
+  .rpf-playback > span:last-child { flex: none; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); font-variant-numeric: tabular-nums; }
+  .rpf-nowrow { margin-top: 10px; padding: 14px 0; border-top: 1px solid var(--rpf-hair); display: flex; align-items: center; gap: 14px; }
+  .rpf-nowrow > div { flex: 1; min-width: 0; }
+  .rpf-nowrow + .rpf-linkrow { margin-top: 0; }
+  .rpf-tips { margin: 12px 0 0; padding: 0; font-size: var(--rpf-fs-body); color: var(--rpf-ink-2); line-height: 1.5; text-wrap: pretty; }
+
+  /* ---- forms on her phone (her short sign-up, Dad's number) */
+  .rpf-field { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+  .rpf-hero + .rpf-field { margin-top: 26px; }
+  .rpf-input, .rpf-inputwrap {
+    min-height: calc(54 * var(--rp-u));
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--rpf-w10);
+    background: var(--rpf-surface);
+    color: var(--rpf-ink);
+    font: inherit;
+    font-size: var(--rpf-fs-body);
+    caret-color: var(--rpf-teal-ink);
+    width: 100%;
+  }
+  .rpf-input::placeholder { color: var(--rpf-ink-2); opacity: 1; }
+  .rpf-input:focus, .rpf-inputwrap:focus-within { outline: none; box-shadow: inset 0 0 0 1.5px var(--rpf-teal-ink); }
+  .rpf-inputwrap { display: flex; align-items: center; gap: 12px; }
+  .rpf-inputwrap > span { flex: none; padding-right: 12px; border-right: 1px solid var(--rpf-w14); color: var(--rpf-ink); }
+  .rpf-inputwrap .rpf-input { flex: 1; min-width: 0; padding: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  .rpf-inputwrap .rpf-input:focus { box-shadow: none; }
+  /* plain words at the right end of a field (「显示密码」): a target of its own */
+  .rpf-inputact { flex: none; min-height: var(--rpf-hit); min-width: var(--rpf-hit); margin-right: -4px; padding: 0 4px; background: none; border: 0; font: inherit; font-size: var(--rpf-fs-min); color: var(--rpf-teal-ink); cursor: pointer; }
+  .rpf-sheet .rpf-input:not(.rpf-inputwrap .rpf-input), .rpf-sheet .rpf-inputwrap { background: var(--rpf-bg); }
+  /* a checkbox whose whole row is the target (44px+): the native input covers the row, a drawn box shows the state */
+  .rpf-check { position: relative; display: flex; gap: 12px; align-items: center; margin-top: 20px; min-height: var(--rpf-hit); font-size: var(--rpf-fs-min); line-height: 1.45; color: var(--rpf-ink-2); cursor: pointer; }
+  .rpf-check input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .rpf-checkbox { width: calc(24 * var(--rp-u)); height: calc(24 * var(--rp-u)); border-radius: 7px; box-shadow: inset 0 0 0 2px var(--rpf-ink-2); display: grid; place-items: center; flex: none; color: var(--rpf-on-teal); }
+  .rpf-checkbox svg { width: 58%; height: 58%; opacity: 0; }
+  .rpf-check input:checked + .rpf-checkbox { background: var(--rpf-teal); box-shadow: none; }
+  .rpf-check input:checked + .rpf-checkbox svg { opacity: 1; }
+  .rpf-check input:focus-visible + .rpf-checkbox { outline: 3px solid var(--rpf-teal-ink); outline-offset: 2px; }
+  .rpf-check a { position: relative; z-index: 1; color: var(--rpf-teal-ink); text-decoration: none; }
+  /* 「我同意 使用条款 和 隐私说明」: the box with 「我同意」 is the checkbox, the two names are links, each a 44px target */
+  .rpf-checkrow { margin-top: 20px; min-height: var(--rpf-hit); display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px; font-size: var(--rpf-fs-min); line-height: 1.45; color: var(--rpf-ink-2); }
+  .rpf-checkrow .rpf-check { margin-top: 0; padding-right: 2px; }
+  .rpf-checkrow a { min-height: var(--rpf-hit); min-width: var(--rpf-hit); display: inline-flex; align-items: center; justify-content: center; color: var(--rpf-teal-ink); text-decoration: none; }
+  .rpf-error { margin: 12px 0 0; font-size: var(--rpf-fs-min); line-height: 1.5; color: var(--rpf-chk); }
+  .rpf-code { margin: 26px 0 0; font-size: var(--rpf-fs-title); font-weight: 600; letter-spacing: .06em; font-variant-numeric: tabular-nums; color: var(--rpf-ink); overflow-wrap: anywhere; }
+  .rpf-code[data-size="big"] { margin: 32px 0 12px; font-size: var(--rpf-fs-timer); letter-spacing: .14em; text-align: center; user-select: all; }
+  /* 中文 | English on 「我的」. The draft's pill is 44px with 38px halves; each half is a target of its own here, so the
+     halves are 44px and the pill 50px. */
+  .rpf-seg { display: grid; grid-template-columns: 1fr 1fr; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--rpf-hair-2); padding: 3px; }
+  .rpf-seg > * { min-height: var(--rpf-hit); border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); text-decoration: none; }
+  .rpf-seg > [aria-current="true"] { background: var(--rpf-surface-2); color: var(--rpf-ink); font-weight: 600; }
+
+  /* ---- the bottom sheet (Dad's number, asked once). The only things of hers that are fixed to the window: both stay
+     inside the screen's column (430 wide, in the middle) when the window is wider than it, like the screen itself */
+  .rpf-scrim { position: fixed; inset: 0; z-index: 40; background: var(--rpf-scrim); border: 0; padding: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 100%; cursor: default; }
+  .rpf-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; width: 100%; max-width: 430px; margin-inline: auto; background: var(--rpf-surface); border-radius: 28px 28px 0 0; padding: 10px 24px max(40px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; max-height: 92dvh; overflow-y: auto; }
+  .rpf-sheet::before { content: ""; align-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--rpf-dim); flex: none; }
+  .rpf-sheet .rpf-field { margin-top: 22px; }
+  .rpf-sheet .rpf-dock { margin-top: 24px; padding-top: 0; gap: 6px; }
+
+  /* ---- loading: the screen's shape in still grey, no shimmer */
+  .rpf-skel { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .rpf-skel i, .rpf-bar { display: block; height: calc(28 * var(--rp-u)); border-radius: 8px; background: var(--rpf-surface); }
+  .rpf-skel i:nth-child(odd) { width: 88%; }
+  .rpf-skel i:nth-child(even) { width: 46%; }
+  .rpf-skel i[data-size="big"] { width: 88%; }
+  .rpf-skel i[data-size="card"] { height: calc(48 * var(--rp-u)); width: 100%; }
+  .rpf-bar[data-size="small"] { height: calc(16 * var(--rp-u)); border-radius: 6px; }
+
+  /* ---- one motion: a new state comes in from 8px below, 240ms; none when the phone asks for less motion */
+  @media (prefers-reduced-motion: no-preference) {
+    .rpf-rise { animation: rpf-rise 240ms ease-out both; }
+  }
+  @keyframes rpf-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ---- the gallery's older pieces (/design/family): event blocks, counts, plain states. Not on her pages. */
+  .rpf-event { margin: 22px 0 0; padding-left: 12px; border-left: 2px solid var(--rpf-kind, var(--rpf-hair-2)); display: grid; gap: 4px; }
+  .rpf-event[data-kind="doctor"] { --rpf-kind: var(--rpf-doc-line); --rpf-kind-ink: var(--rpf-doc-ink); }
+  .rpf-event[data-kind="check"] { --rpf-kind: var(--rpf-chk-line); --rpf-kind-ink: var(--rpf-chk); }
+  .rpf-event[data-kind="ripple"] { --rpf-kind: var(--rpf-teal-line); --rpf-kind-ink: var(--rpf-teal-ink); }
+  .rpf-tag { display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--rpf-fs-min); font-weight: 600; color: var(--rpf-kind-ink, var(--rpf-ink-2)); }
+  .rpf-tag svg { width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+  .rpf-event-title { margin: 0; font-size: var(--rpf-fs-body); font-weight: 600; line-height: 1.4; }
+  .rpf-event-body { margin: 0; font-size: var(--rpf-fs-body); line-height: 1.5; color: var(--rpf-ink-2); }
+  .rpf-event-quote { margin: 0; font-size: var(--rpf-fs-body); line-height: 1.5; }
+  .rpf-event-src { margin: 0; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); }
+  .rpf-event-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .rpf-pills { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .rpf-pill { display: inline-flex; align-items: center; gap: 7px; font-size: var(--rpf-fs-min); color: var(--rpf-ink-2); line-height: 1.4; }
+  .rpf-pill b { font-weight: 600; color: var(--rpf-ink); font-variant-numeric: tabular-nums; }
+  .rpf-state { display: grid; gap: 10px; justify-items: start; padding: 18px 0; }
+  .rpf-state-title { margin: 0; font-size: var(--rpf-fs-body); font-weight: 600; color: var(--rpf-ink); }
+  .rpf-state-text { margin: 0; font-size: var(--rpf-fs-body); color: var(--rpf-ink-2); line-height: 1.5; }
+  .rpf-placeholder { border: 2px dashed var(--rpf-edge); border-radius: 12px; padding: 12px 14px; color: var(--rpf-ink-2); }
+
+  /* ---------- owner's tidy of 10-13: the reminder that is due comes down over the top of his page once and leaves by
+     itself (components/daily/elder/DueReminder.tsx). The box of .rpu-pushpop; no shadow, a border in the line colour ---------- */
+  .rpu-duepop { position: fixed; top: 0; left: 0; right: 0; z-index: 45; box-sizing: border-box; padding: calc(10px + env(safe-area-inset-top)) var(--rp-gutter) 0; pointer-events: none; }
+  .rpu-duepop-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(100dvh - 28px);
+    overflow-y: auto;
+    padding: 14px 16px 16px;
+    border-radius: var(--rp-radius-block);
+    border: 1px solid var(--rp-line);
+    background: var(--rp-paper);
+    pointer-events: auto;
+  }
+  .rpu-duepop-card > * { margin: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .rpu-duepop-card { animation: rpu-pushpop-in .25s ease-out; }
+  }
+}

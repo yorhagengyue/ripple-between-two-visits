@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "visit": "v3",
+    "use": "tests only; app code must not import this file"
+  },
+  "answers": [
+    {
+      "id": "v3-u01",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v3-u02",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "核对卡：09-02 以来记了 10 次，平均 140/85，9 次高于 Dr Lim 08-24 说的 135/85",
+      "required_line": null
+    },
+    {
+      "id": "v3-u03",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v3-u04",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "核对卡：那颗白色小药是 amlodipine 5 mg；33 个早上勾了 29 个，漏的 4 个都是周二、周四打太极的早上",
+      "required_line": null
+    },
+    {
+      "id": "v3-u05",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v3-u06",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "核对卡：09-30 你说过「脚踝有点肿」",
+      "required_line": null
+    },
+    {
+      "id": "v3-u07",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "用药：新增 losartan 50 mg，每天早上一次（待标签确认）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u08",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "检查：两周后验肾功能；复诊：六周后",
+      "required_line": null
+    },
+    {
+      "id": "v3-u09",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "问题列表出现",
+      "required_line": null
+    },
+    {
+      "id": "v3-u10",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题 1（Ripple 发现：今天有新药）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u11",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答已存",
+      "required_line": null
+    },
+    {
+      "id": "v3-u12",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题 2（Ripple 发现：今天约了验血）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u13",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答已存",
+      "required_line": null
+    },
+    {
+      "id": "v3-u14",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题 3（来自规律：漏服都在太极日）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u15",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答已存",
+      "required_line": null
+    },
+    {
+      "id": "v3-u16",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题 4（他自己的单子）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u17",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答已存",
+      "required_line": null
+    },
+    {
+      "id": "v3-u18",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题 5（被拒答的：D29 晚上他问 app「能不能多吃一粒」，app 不答，加进问题单）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u19",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答已存（医生原话，挂时间点）",
+      "required_line": null
+    },
+    {
+      "id": "v3-u20",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "警示线（D42 医生重说一次，之后转述警示线用这一句和日期）；指示：量法（读数高时坐下，休息五分钟再量，记下来给医生）",
+      "required_line": null
+    }
+  ]
+}

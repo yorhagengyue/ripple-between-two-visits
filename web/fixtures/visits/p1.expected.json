@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "visit": "p1",
+    "use": "tests only; app code must not import this file"
+  },
+  "answers": [
+    {
+      "id": "p1-u01",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "同意",
+      "required_line": null
+    },
+    {
+      "id": "p1-u02",
+      "true_role": "pharmacist",
+      "speaker_name": "Pharmacist Raj",
+      "expected_item": "同意",
+      "required_line": null
+    },
+    {
+      "id": "p1-u03",
+      "true_role": "pharmacist",
+      "speaker_name": "Pharmacist Raj",
+      "expected_item": "回答（药剂师原话），问题单那条标为已答",
+      "required_line": null
+    }
+  ]
+}

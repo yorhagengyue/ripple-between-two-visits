@@ -1,0 +1,24 @@
+{
+  "request": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "system": "You are an independent checker for a medication-companion app used by older patients. You get SOURCE (the complete text of one source: a doctor's words, a medicine label, a leaflet summary written for reviewers, or a summary of the patient's own records), sometimes FRAGMENT (the part another model says it relied on; a hint only: judge against the whole SOURCE) and SENTENCE (what the app wants to show the patient). Answer supported only when the SOURCE, read as a whole, says what the SENTENCE says: the same medicine, amounts, times and instructions; nothing added; nothing made stronger, weaker, more reassuring or more alarming; no new advice. Not supported, among others: a SENTENCE that turns 'the source does not mention X' or 'the source is silent on X' into a statement about X (for example that the medicine does or does not treat X); a SENTENCE lifted out of its context so that it now refers to something else (a reassurance about one rare side effect presented as a general reassurance); words that minimise or judge (only, just, most people, no trouble, fine, normal) that the SOURCE does not use about the same thing; any claim about what the medicine treats, prevents or protects against that the SOURCE does not state. If unsure, answer not supported. Answer with JSON only: {\"supported\": true|false, \"reason\": \"<few words>\"}.",
+    "user": "{\"task\":\"support\",\"source\":\"(1) Under precautions, the leaflet asks people to let their healthcare professional know about: an allergy to amlodipine or to anything else in the product; being pregnant, trying for a baby, or breastfeeding; and every other medicine in use, with supplements, traditional medicines and herbal products counted. No timing (before or during treatment) is spelled out. (2) Stopping the medicine is something to clear with a healthcare professional first. (3) Under the heading for rare but serious effects that need medical advice at once - signs of a drug allergy, any one or more of: puffiness of the face, eyes, lips or tongue, trouble breathing, or an itchy rash spread across the entire body: stop the medicine and get seen by a healthcare professional straight away. (4) Same heading - liver injury, described as very rare (it may settle by itself but can sometimes be serious): dark urine, pale stools, feeling or being sick, poor appetite, tummy pain, or a yellow tinge to the skin or eyes: stop the medicine and get seen by a doctor at once. The page adds that the odds of this are very small and that most people have no trouble with the medicine. (5) Any worry about the medicine, or any other effect the person believes it is causing: speak to a doctor or pharmacist. (6) Having had more than the recommended amount: get medical advice straight away (closing disclaimer; see overdose). (7) The common effects (swollen legs, headache, a flushed warm face, feeling dizzy or light-headed on standing up) are listed with no instruction to stop or to see anyone. The leaflet names no emergency number and does not mention 995, A&E, a GP or a polyclinic.\",\"sentence\":\"Liver injury from amlodipine is common.\"}",
+    "json": true
+  },
+  "response": {
+    "content": "{\n  \"supported\": false,\n  \"reason\": \"Source says liver injury is very rare, not common.\"\n}",
+    "tokens": 734,
+    "usage": {
+      "promptTokens": 710,
+      "cacheHitTokens": 640,
+      "cacheMissTokens": 70,
+      "completionTokens": 24,
+      "reasoningTokens": 0
+    },
+    "usd": 0.001032,
+    "latency_ms": 1293,
+    "finish_reason": "stop"
+  },
+  "recorded_at": "2026-10-09T06:22:54.222Z"
+}

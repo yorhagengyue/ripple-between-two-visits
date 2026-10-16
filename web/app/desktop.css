@@ -1,0 +1,125 @@
+/*
+ * Ripple on a computer.
+ *
+ * Owner, 2026-10-11: the judges open the site on a laptop. The phone is unchanged. In a window 720px wide or wider
+ * every phone page is one column, 430px at the default text size, centred on a flat ground (the stage), and what is
+ * fixed at the bottom of the phone stays inside the column. CSS only: no wrapper, no second scroll container. The
+ * document scrolls as it does on a phone, and the DOM the tests address is the same at every width.
+ *
+ * The contract (every front-end line was given the same words):
+ *   the column   .rpu-screen (components/ui Screen) unless it fills a container ([data-fill="container"]: the /design
+ *                phones), and any page root that carries data-rp-phone (bare or "light": the light stage; "dark": the
+ *                dark one). A screen inside the old demo frame (.rp-patient, already a 430px column) is not a column.
+ *   kept inside  the foundation's fixed bars (.rpu-tabs, .rpu-say[data-placement="fixed"], .rpu-typedock,
+ *                .rpu-toast[data-placement="fixed"]), the reminder strip above a page (.rp-due), and any element that
+ *                carries data-rp-phone-fixed (a fixed element of another line that spans the phone, at its bottom or
+ *                at its top: here it spans the column, edge to edge; an inset belongs in its padding). Only its left,
+ *                right and width are set here. The marked element is the whole strip: what moves is drawn inside it
+ *                (a child, a scaleX from the left), and it is not placed with a transform of its own (none is reset).
+ *   the stage    the colour behind the column, on <body>, only while the document holds a column: light --rp-tint
+ *                (#E1E7EE), dark --rpf-page (#05070A). Wei Ling's screens (.rpf-screen) keep their own wide-window
+ *                rules in app/ripple-ui.css; no rule here styles an .rpf-* element.
+ *   the note     beside the column from 1100px: components/desktop/DeskNote.tsx, which puts it in the DOM only then.
+ *
+ * For anyone editing:
+ * - Every rule but the first is inside `@media screen and (min-width: 720px)` (the note: 1100px), and every rule of
+ *   the 720px block is scoped to a document that holds a column. So nothing changes below 720px, on paper, or on a
+ *   page made for a computer (/demo, /how, /eval, /director, /backstage, /design).
+ *   tests/unit/desktop/desktop-css.test.ts holds the file to this.
+ * - The column's selector is written out in full each time (CSS has no name for a selector); the test checks every
+ *   copy is the same and that components/desktop/column.ts, which the note and the e2e spec read, says the same.
+ * - The note's greys are chosen by DeskNote.tsx from <body>'s real colour (data-stage), not by a selector here: her
+ *   screens bring their own dark ground, and the note must be readable on whatever is really behind it.
+ * - Unlayered on purpose: the foundation's rules sit in @layer components, so these win whatever their specificity.
+ * - No vw: 100vw includes a classic scrollbar, and a bar sized with it would sit beside the column, not on it. The
+ *   column is centred with auto margins; the fixed bars keep the foundation's left: 0 and right: 0 and get a
+ *   max-width with auto margins, which centres them in the same box.
+ * - The width follows the foundation's unit (--rp-u): a larger text size widens the column instead of crushing the
+ *   page, and it never exceeds the window.
+ * - Only --rpdesk-* variables and .rpdesk-* classes are declared here.
+ */
+
+/* the note takes no room unless the window is wide (it is not in the DOM then either) */
+.rpdesk-note { display: none; }
+
+@media screen and (min-width: 720px) {
+  /* ---------- the stage ---------- */
+  html:has(:is(.rpu-screen, [data-rp-phone]):not([data-fill="container"]):not(.rp-patient *)) body {
+    background: var(--rp-tint);
+  }
+  html:has([data-rp-phone="dark"]:not([data-fill="container"]):not(.rp-patient *)) body {
+    background: var(--rpf-page);
+  }
+
+  /* ---------- the column: its width, its place, a one-pixel line down each side ---------- */
+  :is(.rpu-screen, [data-rp-phone]):not([data-fill="container"]):not(.rp-patient *) {
+    width: calc(430 * var(--rp-u));
+    max-width: 100%;
+    margin-inline: auto;
+    box-shadow: 0 0 0 1px var(--rp-line);
+  }
+  [data-rp-phone="dark"]:not([data-fill="container"]):not(.rp-patient *) {
+    box-shadow: 0 0 0 1px var(--rpf-hair-2);
+  }
+
+  /* the reminder that is due, a strip above the page (components/daily/elder/DueReminder.tsx): the column's top */
+  html:has(:is(.rpu-screen, [data-rp-phone]):not([data-fill="container"]):not(.rp-patient *)) .rp-due {
+    width: calc(430 * var(--rp-u));
+    max-width: 100%;
+    margin-inline: auto;
+    box-shadow: 0 0 0 1px var(--rp-line);
+  }
+
+  /* ---------- what is fixed at the bottom of the phone: the same box as the column ---------- */
+  html:has(:is(.rpu-screen, [data-rp-phone]):not([data-fill="container"]):not(.rp-patient *)) :is(.rpu-tabs:not([data-placement="absolute"], [data-placement="static"]), .rpu-say[data-placement="fixed"], .rpu-typedock, .rpu-toast[data-placement="fixed"]) {
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: calc(430 * var(--rp-u));
+    margin-inline: auto;
+  }
+  /* a fixed element of another line, marked by its owner: important, because its own rules are not the foundation's */
+  html:has(:is(.rpu-screen, [data-rp-phone]):not([data-fill="container"]):not(.rp-patient *)) [data-rp-phone-fixed] {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    max-width: calc(430 * var(--rp-u)) !important;
+    margin-inline: auto !important;
+  }
+}
+
+/* ---------- the note beside the column: a QR code to the front door, a label and a sentence (DeskNote.tsx) ---------- */
+@media screen and (min-width: 1100px) {
+  /* half a column and a 40px gap to the right of the window's middle; DeskNote.tsx checks that it fits before it draws it */
+  .rpdesk-note {
+    display: flex;
+    flex-direction: column;
+    gap: calc(6 * var(--rp-u));
+    position: fixed;
+    top: calc(28 * var(--rp-u));
+    left: calc(50% + 215 * var(--rp-u) + 40px);
+    width: calc(220 * var(--rp-u));
+    margin: 0;
+    font-family: var(--rp-font-sans);
+    font-size: var(--rp-fs-min);
+    line-height: 1.5;
+    color: var(--rp-ink-3);
+  }
+  /* dark modules on white on either stage: a camera reads nothing else reliably */
+  .rpdesk-note-qr {
+    display: block;
+    width: calc(132 * var(--rp-u));
+    height: calc(132 * var(--rp-u));
+    margin-bottom: calc(8 * var(--rp-u));
+    border-radius: 12px;
+    background: var(--rp-white);
+    box-shadow: 0 0 0 1px var(--rp-line);
+  }
+  /* the foundation's group label and its note: the same grey, the label heavier */
+  .rpdesk-note-lead { margin: 0; font-weight: 700; }
+  .rpdesk-note-text { margin: 0; }
+
+  /* on a dark stage (her screens, the sign-in pages): her grey and her font */
+  .rpdesk-note[data-stage="dark"] { font-family: var(--rpf-font); color: var(--rpf-ink-2); }
+  .rpdesk-note[data-stage="dark"] .rpdesk-note-qr { box-shadow: none; }
+}

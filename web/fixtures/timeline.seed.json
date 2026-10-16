@@ -1,0 +1,700 @@
+{
+  "meta": {
+    "story": "docs/plan/visits-script.md",
+    "d0": "2026-08-24",
+    "judge_landing_day": 29,
+    "note": "Synthetic persona. All names, clinics and numbers are fictional and pending clinician review."
+  },
+  "persona": {
+    "id": "mr-tan",
+    "display_name": "Mr Tan",
+    "chinese_name": "陈先生",
+    "age": 67,
+    "home": "Toa Payoh",
+    "languages": [
+      "zh-Hans",
+      "en-SG"
+    ],
+    "ui_language": "zh-Hans",
+    "large_text": true,
+    "routine": [
+      {
+        "label": "Morning walk in the park",
+        "label_zh": "公园散步",
+        "days": "daily",
+        "time": "06:30"
+      },
+      {
+        "label": "Tai chi",
+        "label_zh": "打太极",
+        "days": [
+          "Tue",
+          "Thu"
+        ],
+        "time": "07:30"
+      },
+      {
+        "label": "Breakfast",
+        "label_zh": "早饭",
+        "days": "daily",
+        "time": "08:30"
+      }
+    ],
+    "healthier_sg_clinic": "Blossom Family Clinic (fictional)"
+  },
+  "family": [
+    {
+      "id": "wei-ling",
+      "display_name": "Wei Ling",
+      "relation": "daughter",
+      "age": 39
+    }
+  ],
+  "family_grants": {
+    "wei-ling": {
+      "dose_summary": true,
+      "bp_summary": true,
+      "questions_count": true,
+      "no_reply_alert": true,
+      "visit_transcripts": false,
+      "notes": false
+    }
+  },
+  "visits": [
+    {
+      "id": "v1",
+      "day": 0,
+      "date": "2026-08-24",
+      "kind": "healthier_sg_check_in",
+      "place": "Blossom Family Clinic (fictional)",
+      "script_section": "D0",
+      "audio_fixture": "visit_A.wav"
+    },
+    {
+      "id": "v2",
+      "day": 8,
+      "date": "2026-09-01",
+      "kind": "follow_up",
+      "place": "Blossom Family Clinic (fictional)",
+      "script_section": "D8",
+      "audio_fixture": "visit_B.wav"
+    },
+    {
+      "id": "p1",
+      "day": 12,
+      "date": "2026-09-05",
+      "kind": "pharmacy",
+      "place": "Neighbourhood pharmacy (fictional)",
+      "script_section": "D12",
+      "audio_fixture": "pharmacy_C.wav"
+    },
+    {
+      "id": "v3",
+      "day": 42,
+      "date": "2026-10-05",
+      "kind": "follow_up",
+      "place": "Blossom Family Clinic (fictional)",
+      "script_section": "D42",
+      "audio_fixture": "visit_D.wav"
+    }
+  ],
+  "required_doctor_lines": [
+    {
+      "id": "R1",
+      "visit": "v1",
+      "speaker": "doctor",
+      "text": "At home, we want it below 135 over 85.",
+      "kind": "target",
+      "slots": {
+        "systolic": 135,
+        "diastolic": 85
+      }
+    },
+    {
+      "id": "R2",
+      "visit": "v1",
+      "speaker": "doctor",
+      "text": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+      "kind": "threshold",
+      "slots": {
+        "systolic": 180
+      }
+    },
+    {
+      "id": "R3",
+      "visit": "v2",
+      "speaker": "doctor",
+      "text": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+      "kind": "purpose"
+    },
+    {
+      "id": "R4",
+      "visit": "v2",
+      "speaker": "doctor",
+      "text": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+      "kind": "instruction"
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-amlodipine",
+      "drug_id": "amlodipine",
+      "origin": "prescription",
+      "prescribed_visit": "v2",
+      "start_day": 9,
+      "label": {
+        "text": "AMLODIPINE 5MG TABLET\nTake ONE tablet every MORNING",
+        "drug": "amlodipine",
+        "strength": "5 mg",
+        "directions": "Take ONE tablet every MORNING",
+        "dispensed": "2026-09-01",
+        "clinic": "Blossom Family Clinic (fictional)",
+        "photo_fixture": "labels/amlodipine.png"
+      },
+      "status": "label_confirmed"
+    },
+    {
+      "id": "med-ibuprofen",
+      "drug_id": "ibuprofen",
+      "origin": "self_bought",
+      "label": {
+        "text": "Ibuprofen 200 mg tablets",
+        "drug": "ibuprofen",
+        "strength": "200 mg",
+        "photo_fixture": "labels/ibuprofen.png"
+      },
+      "status": "label_confirmed",
+      "note": "bought for knee pain"
+    },
+    {
+      "id": "med-relative-box",
+      "drug_id": null,
+      "origin": "relative",
+      "start_day": 8,
+      "label": {
+        "text": "(Chinese-only label)",
+        "photo_fixture": "labels/relative_box.png"
+      },
+      "status": "unidentified",
+      "pharmacist_answer": {
+        "visit": "p1",
+        "text": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit."
+      }
+    },
+    {
+      "id": "med-losartan",
+      "drug_id": "losartan",
+      "origin": "prescription",
+      "prescribed_visit": "v3",
+      "start_day": 43,
+      "label": null,
+      "status": "awaiting_label"
+    }
+  ],
+  "bp_readings": [
+    {
+      "day": 1,
+      "date": "2026-08-25",
+      "slot": "morning",
+      "systolic": 137,
+      "diastolic": 93
+    },
+    {
+      "day": 1,
+      "date": "2026-08-25",
+      "slot": "evening",
+      "systolic": 141,
+      "diastolic": 94
+    },
+    {
+      "day": 2,
+      "date": "2026-08-26",
+      "slot": "morning",
+      "systolic": 147,
+      "diastolic": 91
+    },
+    {
+      "day": 2,
+      "date": "2026-08-26",
+      "slot": "evening",
+      "systolic": 144,
+      "diastolic": 88
+    },
+    {
+      "day": 3,
+      "date": "2026-08-27",
+      "slot": "morning",
+      "systolic": 148,
+      "diastolic": 97
+    },
+    {
+      "day": 3,
+      "date": "2026-08-27",
+      "slot": "evening",
+      "state": "unconfirmed"
+    },
+    {
+      "day": 4,
+      "date": "2026-08-28",
+      "slot": "morning",
+      "systolic": 140,
+      "diastolic": 93
+    },
+    {
+      "day": 4,
+      "date": "2026-08-28",
+      "slot": "evening",
+      "systolic": 148,
+      "diastolic": 95
+    },
+    {
+      "day": 5,
+      "date": "2026-08-29",
+      "slot": "morning",
+      "systolic": 146,
+      "diastolic": 96
+    },
+    {
+      "day": 5,
+      "date": "2026-08-29",
+      "slot": "evening",
+      "systolic": 144,
+      "diastolic": 93
+    },
+    {
+      "day": 6,
+      "date": "2026-08-30",
+      "slot": "morning",
+      "systolic": 142,
+      "diastolic": 93
+    },
+    {
+      "day": 6,
+      "date": "2026-08-30",
+      "slot": "evening",
+      "systolic": 143,
+      "diastolic": 85
+    },
+    {
+      "day": 7,
+      "date": "2026-08-31",
+      "slot": "morning",
+      "systolic": 139,
+      "diastolic": 97
+    },
+    {
+      "day": 7,
+      "date": "2026-08-31",
+      "slot": "evening",
+      "systolic": 153,
+      "diastolic": 87
+    },
+    {
+      "day": 11,
+      "date": "2026-09-04",
+      "slot": "morning",
+      "systolic": 135,
+      "diastolic": 87
+    },
+    {
+      "day": 14,
+      "date": "2026-09-07",
+      "slot": "morning",
+      "systolic": 136,
+      "diastolic": 82
+    },
+    {
+      "day": 18,
+      "date": "2026-09-11",
+      "slot": "morning",
+      "systolic": 141,
+      "diastolic": 83
+    },
+    {
+      "day": 21,
+      "date": "2026-09-14",
+      "slot": "morning",
+      "systolic": 126,
+      "diastolic": 82
+    },
+    {
+      "day": 25,
+      "date": "2026-09-18",
+      "slot": "morning",
+      "systolic": 142,
+      "diastolic": 85
+    },
+    {
+      "day": 28,
+      "date": "2026-09-21",
+      "slot": "morning",
+      "systolic": 148,
+      "diastolic": 85
+    },
+    {
+      "day": 32,
+      "date": "2026-09-25",
+      "slot": "morning",
+      "systolic": 141,
+      "diastolic": 85
+    },
+    {
+      "day": 35,
+      "date": "2026-09-28",
+      "slot": "morning",
+      "systolic": 146,
+      "diastolic": 82
+    },
+    {
+      "day": 39,
+      "date": "2026-10-02",
+      "slot": "morning",
+      "systolic": 138,
+      "diastolic": 82
+    },
+    {
+      "day": 29,
+      "date": "2026-09-22",
+      "slot": "evening",
+      "systolic": 150,
+      "diastolic": 95,
+      "note": "hero moment"
+    }
+  ],
+  "dose_log": [
+    {
+      "day": 9,
+      "date": "2026-09-02",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 10,
+      "date": "2026-09-03",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 11,
+      "date": "2026-09-04",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 12,
+      "date": "2026-09-05",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 13,
+      "date": "2026-09-06",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 14,
+      "date": "2026-09-07",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 15,
+      "date": "2026-09-08",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "missed",
+      "reason": "tai_chi_morning",
+      "reason_text_zh": "打太极，忘了"
+    },
+    {
+      "day": 16,
+      "date": "2026-09-09",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 17,
+      "date": "2026-09-10",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "missed",
+      "reason": "tai_chi_morning",
+      "reason_text_zh": "打太极，忘了"
+    },
+    {
+      "day": 18,
+      "date": "2026-09-11",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 19,
+      "date": "2026-09-12",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 20,
+      "date": "2026-09-13",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 21,
+      "date": "2026-09-14",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 22,
+      "date": "2026-09-15",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 23,
+      "date": "2026-09-16",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 24,
+      "date": "2026-09-17",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "missed",
+      "reason": "tai_chi_morning",
+      "reason_text_zh": "打太极，忘了"
+    },
+    {
+      "day": 25,
+      "date": "2026-09-18",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 26,
+      "date": "2026-09-19",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 27,
+      "date": "2026-09-20",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 28,
+      "date": "2026-09-21",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 29,
+      "date": "2026-09-22",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 30,
+      "date": "2026-09-23",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 31,
+      "date": "2026-09-24",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 32,
+      "date": "2026-09-25",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 33,
+      "date": "2026-09-26",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 34,
+      "date": "2026-09-27",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 35,
+      "date": "2026-09-28",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 36,
+      "date": "2026-09-29",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "missed",
+      "reason": "tai_chi_morning",
+      "reason_text_zh": "打太极，忘了"
+    },
+    {
+      "day": 37,
+      "date": "2026-09-30",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 38,
+      "date": "2026-10-01",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 39,
+      "date": "2026-10-02",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 40,
+      "date": "2026-10-03",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    },
+    {
+      "day": 41,
+      "date": "2026-10-04",
+      "med": "med-amlodipine",
+      "slot": "morning",
+      "state": "taken"
+    }
+  ],
+  "notes": [
+    {
+      "day": 37,
+      "date": "2026-09-30",
+      "text_zh": "今天在大巴窑中心走了一圈，脚踝有点肿。",
+      "source": "voice_note"
+    },
+    {
+      "day": 20,
+      "date": "2026-09-13",
+      "text_zh": "我今天好累。",
+      "source": "typed",
+      "app_reply": "logged; asked whether today's tablet was taken"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-machine",
+      "asked_at_visit": "v1",
+      "for": "doctor",
+      "origin": "before_you_go",
+      "text_zh": "家里那个机器是绑手腕的，可以用吗？",
+      "status": "answered",
+      "answer": {
+        "visit": "v1",
+        "speaker": "doctor",
+        "text": "手腕的不太准。买一个绑手臂的，upper arm 的。"
+      }
+    },
+    {
+      "id": "q-knee-1",
+      "asked_at_visit": "v2",
+      "for": "doctor",
+      "origin": "own",
+      "text_zh": "膝盖痛吃药房买的止痛药，可以一起吃吗？",
+      "status": "answered",
+      "answer": {
+        "visit": "v2",
+        "speaker": "doctor",
+        "text": "Which one? Bring it next time and show me. For now, try not to take it every day."
+      }
+    },
+    {
+      "id": "q-relative-box",
+      "for": "pharmacist",
+      "origin": "unidentified_medicine",
+      "created_day": 8,
+      "text_zh": "亲戚带来的那盒药是什么？可以一起吃吗？",
+      "status": "answered",
+      "answer": {
+        "visit": "p1",
+        "speaker": "pharmacist",
+        "text": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit."
+      }
+    },
+    {
+      "id": "q-extra-tablet",
+      "for": "doctor",
+      "origin": "refused_question",
+      "created_day": 29,
+      "text_zh": "读数高的时候（例如 150/95）可以多吃一粒吗？",
+      "status": "answered",
+      "answer": {
+        "visit": "v3",
+        "speaker": "doctor",
+        "text": "No, please don't take an extra tablet on your own. One high reading doesn't mean the dose is wrong; I look at all your readings together, and that's why we're adding losartan today."
+      }
+    },
+    {
+      "id": "q-tai-chi",
+      "for": "doctor",
+      "origin": "pattern",
+      "created_day": 25,
+      "text_zh": "打太极的早上我常常忘记吃，可以打完太极回来再吃吗？",
+      "status": "open",
+      "evidence": "4 missed mornings, all on tai chi days"
+    },
+    {
+      "id": "q-knee-2",
+      "for": "doctor",
+      "origin": "own",
+      "created_day": 30,
+      "text_zh": "膝盖止痛药还可以吃吗？",
+      "status": "open"
+    }
+  ],
+  "reminder_clips": [
+    {
+      "id": "clip-wei-ling-1",
+      "by": "wei-ling",
+      "text_zh": "爸，早餐吃了吗？药记得吃哦。",
+      "audio_fixture": "reminders/wei_ling.wav",
+      "plays_at": "after_breakfast"
+    }
+  ]
+}

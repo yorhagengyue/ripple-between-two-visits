@@ -1,0 +1,1019 @@
+/*
+ * Ripple auth screens: the welcome page, log-in, sign-up and recovery (/, /login, /signup, /recover), derived from
+ * the owner's iOS app.
+ *
+ * Source (read, never changed): ripple-ios RippleApp/DesignSystem (RippleColor, RippleStyle, RippleComponents,
+ * RippleAnimatedLogo) and the Onboarding and Auth views (WelcomeView, SignInView, EmailEntryView, VerifyCodeView,
+ * ProfileSetupView, AllSetView). What is copied: the mark, the layout and the spacing, the pieces and their
+ * proportions; in the dark set also the ground and the teal. The steps, fields and words stay the web app's own.
+ *
+ * One set of components (components/auth-ui), two sizes, chosen by the screen's data-rp-side:
+ *   elder   Mr Tan's pages, and the door everyone comes through (the welcome, 「你是哪一位？」): the iOS screens one
+ *           text size up (about 1.2 times, never under 18px); targets 48 and up.
+ *   family  the iOS sizes; text styles under 16px lifted to 16; targets 44 and up: his son's or daughter's log-in and
+ *           sign-up. (Wei Ling's two pages on the way into an invitation are the daughter's line's own, after her
+ *           draft.)
+ *
+ * Two sets of the colour variables, chosen by the screen's data-rp-phone (which lib/ui/auth-tokens.ts AUTH_SCHEME
+ * gives each face, the elder's, the family's and the door's, and nothing else decides):
+ *   light   the elder version: the same screens on the elder side's ground and ink (the foundation's tokens,
+ *           app/ripple-ui.css --rp-*), so his sign-up and the setting-up screens after it are one product.
+ *   dark    the iOS app's own colours: the look the set was copied from. The door and the family's pages are drawn
+ *           in it; one value puts his pages back on it too.
+ *
+ * The cold start's black screen over the welcome is not here: components/auth-ui/splash.css, with its own two colours.
+ *
+ * For anyone editing:
+ * - Only --rpa-* variables and .rpa-ios-* classes here (components/account/account.css owns the older .rpa-* names of
+ *   the pages under /p/me; tests/unit/ui/auth-contrast.test.ts checks the two files share no class).
+ * - Every colour is a variable of the two set blocks at the top (and of the paper set at the end, for printing); no
+ *   rule below names a colour. A rule that differs between the sets is keyed by the same mark,
+ *   .rpa-ios-screen[data-rp-phone="…"], so the mark is the one switch. The desktop layout (app/desktop.css) reads the
+ *   mark too.
+ * - The light set's values are written out (the test needs numbers to check contrast) and mirror the foundation's
+ *   tokens one for one; the test reads app/ripple-ui.css and fails if one of them moves.
+ * - A phone column: nothing here is position: fixed, no size is in vw, and no media query asks the window's width
+ *   (in a wide window the screen is a 430px column, and those would measure the window, not the column).
+ * - Text sizes and the heights of things he taps are calc(N * var(--rp-u)): N is the design px and --rp-u
+ *   (app/ripple-ui.css) grows with the phone's text size. Gaps, paddings and corner radii are px, as on iOS, where
+ *   Dynamic Type does not move them. The logo is px too: an image does not grow with text.
+ * - lib/ui/auth-tokens.ts mirrors the colours and both size tables; the test reads this file and compares.
+ * - Plain CSS, component rules in @layer components (a Tailwind utility on the same element still wins).
+ */
+
+/* ---------- colours: dark, the iOS app's own (RippleColor.swift). The default, and every screen marked "dark" ---------- */
+:root,
+.rpa-ios-screen[data-rp-phone="dark"] {
+  --rpa-page: #05070A;
+  --rpa-bg: #0A0C0F;
+  --rpa-surface: #15181C;
+  --rpa-surface-2: #1B1F26;
+  --rpa-fill-2: rgba(255, 255, 255, 0.08);
+  --rpa-hairline: rgba(255, 255, 255, 0.06);
+  --rpa-field-line: rgba(255, 255, 255, 0.06);
+  --rpa-stroke: rgba(255, 255, 255, 0.1);
+  --rpa-stroke-2: rgba(255, 255, 255, 0.14);
+  --rpa-track: rgba(120, 120, 128, 0.32);
+  --rpa-knob: #FFFFFF;
+  --rpa-text: #F2F5F6;
+  --rpa-text-2: #9AA1A6;
+  --rpa-text-3: #80878C;
+  --rpa-dim: #6A7176;
+  --rpa-accent: #37C2BA;
+  --rpa-accent-light: #5FD4CC;
+  --rpa-accent-muted: rgba(55, 194, 186, 0.16);
+  --rpa-accent-focus: rgba(55, 194, 186, 0.75);
+  --rpa-accent-soft: rgba(55, 194, 186, 0.35);
+  --rpa-on-accent: #06201E;
+  --rpa-warning: #E6B45A;
+  --rpa-logo: #FFFFFF;
+  --rpa-scheme: dark;
+}
+
+/*
+ * ---------- colours: light, the elder side's ground and ink (app/ripple-ui.css: --rp-paper, --rp-white, --rp-ink,
+ * --rp-ink-3, --rp-accent and their kin; which token each value mirrors is in lib/ui/auth-tokens.ts) ----------
+ * On the screen, and on the document that holds such a screen: the page behind it takes its colour from here too.
+ */
+.rpa-ios-screen[data-rp-phone="light"],
+html:has(.rpa-ios-screen[data-rp-phone="light"]) {
+  --rpa-page: #E1E7EE;
+  --rpa-bg: #F2F5F9;
+  --rpa-surface: #FFFFFF;
+  --rpa-surface-2: #EEE8F5;
+  --rpa-fill-2: #FFFFFF;
+  --rpa-hairline: #D5DCE5;
+  --rpa-field-line: #8592A3;
+  --rpa-stroke: #8592A3;
+  --rpa-stroke-2: #18202C;
+  --rpa-track: #C3CCD8;
+  --rpa-knob: #FFFFFF;
+  --rpa-text: #18202C;
+  --rpa-text-2: #475263;
+  --rpa-text-3: #475263;
+  --rpa-dim: #8592A3;
+  --rpa-accent: #6A4C93;
+  --rpa-accent-light: #6A4C93;
+  --rpa-accent-muted: #EEE8F5;
+  --rpa-accent-focus: #6A4C93;
+  --rpa-accent-soft: #E3DAF0;
+  --rpa-on-accent: #FFFFFF;
+  --rpa-warning: #A4262C;
+  --rpa-logo: #18202C;
+  --rpa-scheme: light;
+}
+
+:root {
+  /* ---------- type: the system font, as the iOS app ---------- */
+  --rpa-font: -apple-system, "SF Pro Text", "SF Pro Display", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --rpa-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Mono", monospace;
+
+  /* under the last button: the home indicator's inset, or 12px in a browser that has none */
+  --rpa-safe-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+
+  /* ---------- the page: 16px sides as every iOS screen of the flow, 6 over the top bar, 16 under the last button ---------- */
+  --rpa-gutter: 16px;
+  --rpa-top: 6px;
+  --rpa-foot: calc(16px + var(--rpa-safe-bottom));
+}
+
+/* ---------- sizes, family: the iOS numbers (15, 13 and 12 lifted to 16) ---------- */
+.rpa-ios-screen {
+  --rpa-fs-large-title: calc(34 * var(--rp-u));
+  --rpa-fs-title: calc(28 * var(--rp-u));
+  --rpa-fs-title2: calc(22 * var(--rp-u));
+  --rpa-fs-title3: calc(20 * var(--rp-u));
+  --rpa-fs-headline: calc(17 * var(--rp-u));
+  --rpa-fs-body: calc(17 * var(--rp-u));
+  --rpa-fs-callout: calc(16 * var(--rp-u));
+  --rpa-fs-subheadline: calc(16 * var(--rp-u));
+  --rpa-fs-footnote: calc(16 * var(--rp-u));
+  --rpa-fs-caption: calc(16 * var(--rp-u));
+  --rpa-fs-code: calc(26 * var(--rp-u));
+  --rpa-fs-avatar: calc(40 * var(--rp-u));
+  --rpa-h-primary: calc(54 * var(--rp-u));
+  --rpa-h-action: calc(52 * var(--rp-u));
+  --rpa-h-secondary: calc(52 * var(--rp-u));
+  --rpa-h-text-btn: calc(44 * var(--rp-u));
+  --rpa-hit: calc(44 * var(--rp-u));
+  --rpa-h-field: calc(54 * var(--rp-u));
+  --rpa-h-field-icon: calc(58 * var(--rp-u));
+  --rpa-h-row: calc(54 * var(--rp-u));
+  --rpa-h-code: calc(60 * var(--rp-u));
+  --rpa-chip: calc(44 * var(--rp-u));
+  --rpa-tile: calc(30 * var(--rp-u));
+  --rpa-avatar: calc(96 * var(--rp-u));
+  --rpa-switch-w: calc(51 * var(--rp-u));
+  --rpa-switch-h: calc(31 * var(--rp-u));
+  /* the iOS kicker is written in capitals */
+  --rpa-kicker-case: uppercase;
+  /* running text: SF's own leading; Chinese sets taller on iOS too (PingFang's line is about 1.4) */
+  --rpa-lh-text: 1.3;
+  --rpa-lh-title: 1.21;
+}
+.rpa-ios-screen:lang(zh-Hans) {
+  --rpa-lh-text: 1.45;
+  --rpa-lh-title: 1.25;
+}
+
+/* ---------- sizes, elder: one text size up ---------- */
+.rpa-ios-screen[data-rp-side="elder"] {
+  --rpa-fs-large-title: calc(40 * var(--rp-u));
+  --rpa-fs-title: calc(34 * var(--rp-u));
+  --rpa-fs-title2: calc(26 * var(--rp-u));
+  --rpa-fs-title3: calc(24 * var(--rp-u));
+  --rpa-fs-headline: calc(20 * var(--rp-u));
+  --rpa-fs-body: calc(20 * var(--rp-u));
+  --rpa-fs-callout: calc(19 * var(--rp-u));
+  --rpa-fs-subheadline: calc(18 * var(--rp-u));
+  --rpa-fs-footnote: calc(18 * var(--rp-u));
+  --rpa-fs-caption: calc(18 * var(--rp-u));
+  --rpa-fs-code: calc(31 * var(--rp-u));
+  --rpa-fs-avatar: calc(48 * var(--rp-u));
+  --rpa-h-primary: calc(64 * var(--rp-u));
+  --rpa-h-action: calc(64 * var(--rp-u));
+  --rpa-h-secondary: calc(60 * var(--rp-u));
+  --rpa-h-text-btn: calc(48 * var(--rp-u));
+  --rpa-hit: calc(48 * var(--rp-u));
+  --rpa-h-field: calc(64 * var(--rp-u));
+  --rpa-h-field-icon: calc(68 * var(--rp-u));
+  --rpa-h-row: calc(64 * var(--rp-u));
+  --rpa-h-code: calc(72 * var(--rp-u));
+  --rpa-chip: calc(52 * var(--rp-u));
+  --rpa-tile: calc(36 * var(--rp-u));
+  --rpa-avatar: calc(116 * var(--rp-u));
+  --rpa-switch-w: calc(61 * var(--rp-u));
+  --rpa-switch-h: calc(37 * var(--rp-u));
+  /* capitals are harder to read at his size; his labels stay as written */
+  --rpa-kicker-case: none;
+}
+
+/*
+ * ---------- the light set is the elder side's: what his sign-up and the setting-up screens after it both have is the
+ * foundation's own, by its tokens (app/ripple-ui.css) ----------
+ * The typeface, the gutter and where the top bar and the last button sit, and the two buttons' heights. The rules
+ * that draw them (the back word, the buttons, a field's edge, an error) are at the end of the components below, keyed
+ * by the same mark. The layout, the pieces and their proportions stay the iOS-derived ones.
+ */
+.rpa-ios-screen[data-rp-phone="light"] {
+  --rpa-font: var(--rp-font-sans);
+  --rpa-gutter: var(--rp-gutter);
+  --rpa-top: 4px;
+  --rpa-foot: max(34px, calc(14px + env(safe-area-inset-bottom, 0px)));
+  --rpa-h-primary: var(--rp-h-primary);
+  --rpa-h-action: var(--rp-h-primary);
+  --rpa-h-secondary: var(--rp-h-secondary);
+}
+
+/*
+ * iOS: follow the phone's text size (Dynamic Type), as app/ripple-ui.css does for its own screens. Only on touch
+ * screens and only on a page that holds one of these screens. At the default setting -apple-system-body is 17px, so
+ * the unit divides by 17 and the design px stay exact.
+ */
+@supports (font: -apple-system-body) {
+  @media (hover: none) and (pointer: coarse) {
+    html:has(.rpa-ios-screen) {
+      font: -apple-system-body;
+      line-height: 1.5;
+      --rp-u: min(calc(1rem / 17), 2.5px);
+    }
+  }
+}
+
+/*
+ * Behind a screen: what shows when the page is pulled past its end on a phone, and beside the column in a window too
+ * narrow for the desktop layout to take over (app/desktop.css does the wide ones, from the same mark). The colour is
+ * the screen's own set's (the document that holds a light screen has the light set, above).
+ */
+html:has(.rpa-ios-screen[data-rp-phone]) body {
+  background: var(--rpa-page);
+}
+
+@layer components {
+  /* =================================================================== the screen */
+
+  .rpa-ios-screen {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 430px;
+    min-height: 100dvh;
+    margin-inline: auto;
+    background: var(--rpa-bg);
+    color: var(--rpa-text);
+    color-scheme: var(--rpa-scheme);
+    font-family: var(--rpa-font);
+    font-size: var(--rpa-fs-body);
+    line-height: var(--rpa-lh-text);
+    letter-spacing: normal;
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .rpa-ios-screen[data-fill="container"] { min-height: 0; height: 100%; max-width: none; }
+  .rpa-ios-screen svg { display: inline-block; flex: none; }
+
+  /* 16px sides, as every iOS screen of the flow (.padding(.horizontal, 16)) */
+  .rpa-ios-page {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--rpa-top) + env(safe-area-inset-top, 0px)) var(--rpa-gutter) var(--rpa-foot);
+  }
+  /* a short phone scrolls; nothing is squashed into the block after it */
+  .rpa-ios-page > * { flex-shrink: 0; }
+  .rpa-ios-screen[data-fill="container"] > .rpa-ios-page { overflow-y: auto; }
+  /* a pinned bottom area brings its own padding */
+  .rpa-ios-page:has(> .rpa-ios-dock[data-pinned="true"]) { padding-bottom: 0; }
+
+  /* one step of a flow: a column that fills the page, so its dock sits at the bottom */
+  .rpa-ios-flow { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .rpa-ios-flow > * { flex-shrink: 0; }
+
+  .rpa-ios-screen a:focus-visible,
+  .rpa-ios-screen button:focus-visible,
+  .rpa-ios-screen summary:focus-visible {
+    outline: 2px solid var(--rpa-accent-light);
+    outline-offset: 2px;
+  }
+
+  .rpa-ios-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* =================================================================== the top bar (the navigation bar) */
+
+  /* back on the left, the step count or the language on the right; wraps when the text is very large */
+  .rpa-ios-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    min-height: var(--rpa-hit);
+  }
+  .rpa-ios-nav-end { display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px 12px; margin-left: auto; }
+
+  /* a bar button: iOS 26 draws these as glass capsules; here the surface colour with a thin edge */
+  .rpa-ios-nav-btn {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: var(--rpa-hit);
+    min-width: var(--rpa-hit);
+    padding: 0 16px;
+    border: 1px solid var(--rpa-stroke);
+    border-radius: 999px;
+    background: var(--rpa-surface);
+    color: var(--rpa-text);
+    font: inherit;
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpa-ios-nav-btn[data-kind="back"] { padding-left: 10px; }
+  .rpa-ios-nav-btn[data-tint="accent"] { color: var(--rpa-accent-light); }
+  .rpa-ios-nav-btn svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); }
+  .rpa-ios-nav-btn:active { opacity: .6; }
+
+  .rpa-ios-step {
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+    color: var(--rpa-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* =================================================================== the logo */
+
+  /* the white mark straight on the ground, no tile (RippleLogoMark); the side is set by the component, in px */
+  .rpa-ios-logo { display: block; max-width: 100%; }
+  .rpa-ios-logo path {
+    fill: var(--rpa-logo);
+    stroke: var(--rpa-logo);
+    fill-opacity: 1;
+    stroke-width: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* the counters of p, p and e: the ground showing through */
+  .rpa-ios-logo path[data-hole="true"] { fill: var(--rpa-bg); stroke: var(--rpa-bg); }
+
+  /*
+   * The draw-in, once (RippleAnimatedLogo plays the SVG's own CSS): each path draws its outline for 1.4s from its
+   * delay, then fills over 0.5s. Not played for someone who asked the phone for less motion: they get the finished mark.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .rpa-ios-logo[data-animated="true"] path {
+      fill-opacity: 0;
+      stroke-width: 2;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: rpa-ios-logo-draw 1.4s ease forwards, rpa-ios-logo-fill .5s ease forwards;
+      animation-delay: var(--rpa-logo-delay, 0s), calc(var(--rpa-logo-delay, 0s) + 1.4s);
+    }
+  }
+
+  /* =================================================================== titles and text */
+
+  /* the welcome's and the log-in's head: the mark, a centred title, a centred line (WelcomeView, SignInView) */
+  .rpa-ios-hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 8px; }
+  /* with nothing under it the head sits in the middle of the free space, as SignInView's between its two spacers */
+  .rpa-ios-hero[data-centre="true"] { margin-block: auto; padding-bottom: 24px; }
+  .rpa-ios-hero-text { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%; margin-top: 24px; }
+  .rpa-ios-hero-text[data-gap="10"] { gap: 10px; }
+
+  .rpa-ios-title {
+    margin: 0;
+    font-size: var(--rpa-fs-title);
+    font-weight: 700;
+    line-height: var(--rpa-lh-title);
+    color: var(--rpa-text);
+  }
+  .rpa-ios-title[data-size="large"] { font-size: var(--rpa-fs-large-title); }
+  .rpa-ios-title[data-align="centre"] { text-align: center; }
+
+  /* a form screen's head: the title 8px under the bar, its line 8px under the title (EmailEntryView) */
+  .rpa-ios-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 8px; }
+
+  .rpa-ios-text {
+    margin: 12px 0 0;
+    font-size: var(--rpa-fs-body);
+    line-height: var(--rpa-lh-text);
+    color: var(--rpa-text);
+  }
+  /* the grey line under a title (.subheadline, textSecondary) */
+  .rpa-ios-text[data-variant="lede"] { font-size: var(--rpa-fs-subheadline); color: var(--rpa-text-2); }
+  /* the one line that matters (.headline) */
+  .rpa-ios-text[data-variant="strong"] { font-size: var(--rpa-fs-headline); font-weight: 600; }
+  /* small print (.caption, textTertiary lightened) */
+  .rpa-ios-text[data-variant="note"] { font-size: var(--rpa-fs-caption); color: var(--rpa-text-3); }
+  .rpa-ios-text[data-size="callout"] { font-size: var(--rpa-fs-callout); }
+  .rpa-ios-text[data-align="centre"] { text-align: center; }
+  .rpa-ios-head > .rpa-ios-text,
+  .rpa-ios-hero-text > .rpa-ios-text { margin-top: 0; }
+  /* WelcomeView insets its line 28 from the screen's edge, SignInView 32 */
+  .rpa-ios-hero-text > .rpa-ios-text[data-inset="28"] { padding-inline: 12px; }
+  .rpa-ios-hero-text > .rpa-ios-text[data-inset="32"] { padding-inline: 16px; }
+  /* a word of his inside a grey sentence: the account's name (VerifyCodeView writes the address so) */
+  .rpa-ios-text b { font-weight: 600; color: var(--rpa-accent-light); }
+
+  /* what went wrong: under the field it belongs to (the iOS screens put it there, in a footnote) */
+  .rpa-ios-error {
+    margin: 12px 0 0;
+    font-size: var(--rpa-fs-footnote);
+    line-height: var(--rpa-lh-text);
+    color: var(--rpa-warning);
+  }
+  .rpa-ios-error[data-align="centre"] { text-align: center; }
+
+  /* =================================================================== buttons */
+
+  .rpa-ios-btn {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--rpa-h-action);
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 14px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--rpa-fs-headline);
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity .12s ease-out, transform .12s ease-out;
+  }
+  .rpa-ios-btn svg { width: 1.05em; height: 1.05em; }
+
+  /* RipplePrimaryButtonStyle: teal, the dark label, pressed 0.88 and a hair smaller */
+  .rpa-ios-btn[data-variant="primary"] { background: var(--rpa-accent); color: var(--rpa-on-accent); }
+  .rpa-ios-btn[data-variant="primary"]:active { opacity: .88; transform: scale(.99); }
+  /* the welcome's button: 54 tall, radius 16, the soft teal glow (shadow radius 9, y 6) */
+  .rpa-ios-btn[data-shape="hero"] { min-height: var(--rpa-h-primary); border-radius: 16px; box-shadow: 0 6px 18px var(--rpa-accent-soft); }
+  /* AllSetView's: radius 26, with the glow */
+  .rpa-ios-btn[data-shape="pill"] { border-radius: 26px; box-shadow: 0 6px 18px var(--rpa-accent-soft); }
+
+  /* the second choice (SignInView's Continue with Email): white 8% with a white 14% edge */
+  .rpa-ios-btn[data-variant="secondary"] {
+    min-height: var(--rpa-h-secondary);
+    border: 1px solid var(--rpa-stroke-2);
+    background: var(--rpa-fill-2);
+    color: var(--rpa-text);
+  }
+  .rpa-ios-btn[data-variant="secondary"]:active { opacity: .7; }
+
+  /* RippleTextButtonStyle: quiet words, full width so the whole line can be tapped, pressed 0.6 */
+  .rpa-ios-btn[data-variant="text"] {
+    min-height: var(--rpa-h-text-btn);
+    padding: 4px 8px;
+    border-radius: 10px;
+    color: var(--rpa-accent-light);
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+  }
+  .rpa-ios-btn[data-variant="text"]:active { opacity: .6; }
+  .rpa-ios-btn[data-tint="secondary"] { color: var(--rpa-text-2); }
+  /* small print that can be tapped (the judges' line) */
+  .rpa-ios-btn[data-tint="quiet"] { color: var(--rpa-text-3); font-size: var(--rpa-fs-caption); font-weight: 400; }
+  /* only as wide as its words, at the end of its line (「显示密码」 under a field) */
+  .rpa-ios-btn[data-fit="end"] { width: auto; justify-self: end; margin-left: auto; padding-inline: 12px; }
+  .rpa-ios-btn[data-fit="start"] { width: auto; justify-self: start; margin-right: auto; padding-inline: 12px; }
+
+  .rpa-ios-btn[aria-busy="true"] { opacity: .6; cursor: progress; }
+  .rpa-ios-btn:disabled:not([aria-busy="true"]) { opacity: .5; cursor: default; }
+
+  /* buttons right under a form (EmailEntryView: 24 under the field) */
+  .rpa-ios-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 24px; }
+
+  /* the bottom of a screen: pushed down by the free space (ProfileSetupView's Spacer), 12 between buttons */
+  .rpa-ios-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: auto; padding-top: 24px; }
+  /*
+   * pinned to the bottom of the screen with the content scrolling under it (WelcomeView's safeAreaInset): 14 between,
+   * 8 above the home indicator
+   */
+  .rpa-ios-dock[data-pinned="true"] {
+    position: sticky;
+    bottom: 0;
+    gap: 14px;
+    margin-inline: calc(-1 * var(--rpa-gutter));
+    padding: 12px var(--rpa-gutter) calc(8px + var(--rpa-safe-bottom));
+    background: var(--rpa-bg);
+  }
+  .rpa-ios-dock[data-pinned="true"] > .rpa-ios-btn[data-variant="text"] + .rpa-ios-btn[data-variant="text"] { margin-top: -14px; }
+  /* after a block that centres itself, the free space is shared in two, above it and under it (SignInView's and
+     AllSetView's two spacers), not in three */
+  .rpa-ios-hero[data-centre="true"] ~ .rpa-ios-dock,
+  .rpa-ios-done ~ .rpa-ios-dock { margin-top: 0; }
+
+  /* text buttons one under another, centred (「已经有账号？登录」) */
+  .rpa-ios-links { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
+
+  /* =================================================================== fields */
+
+  /* ProfileSetupView: a small label 28 under what is above, the field 8 under its label; the next label 20 lower */
+  .rpa-ios-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 24px; min-width: 0; }
+  .rpa-ios-field + .rpa-ios-field { margin-top: 20px; }
+  /* VerifyCodeView: the boxes 28 under the line */
+  .rpa-ios-field[data-code] { margin-top: 28px; }
+  .rpa-ios-field > .rpa-ios-text,
+  .rpa-ios-field > .rpa-ios-error { margin-top: 4px; }
+
+  .rpa-ios-kicker {
+    padding-left: 12px;
+    font-size: var(--rpa-fs-caption);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: .5px;
+    text-transform: var(--rpa-kicker-case);
+    color: var(--rpa-text-2);
+  }
+
+  /* the field itself: surface, radius 14, a hairline; the teal edge while he is in it */
+  .rpa-ios-input-box {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--rpa-h-field);
+    padding: 0 18px;
+    border: 1px solid var(--rpa-field-line);
+    border-radius: 14px;
+    background: var(--rpa-surface);
+  }
+  /* EmailEntryView's: an icon in front, 58 tall */
+  .rpa-ios-input-box[data-icon="true"] { min-height: var(--rpa-h-field-icon); }
+  .rpa-ios-input-box:focus-within { border-color: var(--rpa-accent-focus); box-shadow: inset 0 0 0 .5px var(--rpa-accent-focus); }
+  .rpa-ios-input-box > svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); color: var(--rpa-accent); }
+
+  .rpa-ios-input {
+    box-sizing: border-box;
+    flex: 1;
+    align-self: stretch;
+    min-width: 0;
+    min-height: var(--rpa-hit);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--rpa-text);
+    caret-color: var(--rpa-accent-light);
+    font: inherit;
+    font-size: var(--rpa-fs-body);
+    line-height: 1.3;
+  }
+  .rpa-ios-input::placeholder { color: var(--rpa-text-3); opacity: 1; }
+  /* a browser's own fill for a remembered account keeps the field's colours */
+  .rpa-ios-input:-webkit-autofill,
+  .rpa-ios-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--rpa-text);
+    box-shadow: 0 0 0 1000px var(--rpa-surface) inset;
+    caret-color: var(--rpa-accent-light);
+  }
+
+  /*
+   * a code he copies from his card or hears from family (VerifyCodeView's look): centred, large, evenly spaced, in a
+   * box of radius 13. One real field: what he types stays as he typed it.
+   */
+  .rpa-ios-input-box[data-code] { min-height: var(--rpa-h-code); padding: 0 12px; border-color: var(--rpa-stroke); border-radius: 13px; }
+  .rpa-ios-input-box[data-code]:focus-within { border-color: var(--rpa-accent-focus); }
+  .rpa-ios-input-box[data-code] > .rpa-ios-input {
+    font-family: var(--rpa-font-mono);
+    font-size: var(--rpa-fs-code);
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-align: center;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .rpa-ios-input-box[data-code="digits"] > .rpa-ios-input { letter-spacing: .3em; }
+  .rpa-ios-input-box[data-code] > .rpa-ios-input::placeholder { font-weight: 400; }
+
+  /* =================================================================== choices, a switch, a tick box */
+
+  /* one of a few rows (a radio group): the row's edge turns teal and its ring fills with a tick */
+  .rpa-ios-choices { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 24px; }
+  .rpa-ios-choice {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: var(--rpa-h-row);
+    padding: 12px 18px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 14px;
+    background: var(--rpa-surface);
+    color: var(--rpa-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .rpa-ios-choice[aria-checked="true"] { border-color: var(--rpa-accent-focus); box-shadow: inset 0 0 0 .5px var(--rpa-accent-focus); }
+  .rpa-ios-choice:active { opacity: .8; }
+  .rpa-ios-choice-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
+  .rpa-ios-choice-title { font-size: var(--rpa-fs-headline); font-weight: 600; line-height: 1.3; }
+  .rpa-ios-choice-sub { font-size: var(--rpa-fs-footnote); line-height: var(--rpa-lh-text); color: var(--rpa-text-2); }
+  .rpa-ios-choice-mark {
+    box-sizing: border-box;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(26 * var(--rp-u));
+    height: calc(26 * var(--rp-u));
+    border: 1.5px solid var(--rpa-dim);
+    border-radius: 50%;
+    color: var(--rpa-on-accent);
+  }
+  .rpa-ios-choice[aria-checked="true"] .rpa-ios-choice-mark { border-color: var(--rpa-accent); background: var(--rpa-accent); }
+  .rpa-ios-choice-mark svg { width: 62%; height: 62%; }
+
+  /* a row with a switch (ProfileSetupView's value row): what it is, one line about it, the switch with its word */
+  .rpa-ios-switch-row {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    min-height: var(--rpa-h-row);
+    margin-top: 12px;
+    padding: 8px 8px 8px 18px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 14px;
+    background: var(--rpa-surface);
+  }
+  .rpa-ios-switch-text { flex: 1 1 10em; display: grid; gap: 2px; min-width: 0; }
+  .rpa-ios-switch-title { margin: 0; font-size: var(--rpa-fs-body); line-height: 1.3; }
+  .rpa-ios-switch-desc { margin: 0; font-size: var(--rpa-fs-footnote); line-height: var(--rpa-lh-text); color: var(--rpa-text-2); }
+  .rpa-ios-switch {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: var(--rpa-hit);
+    min-height: var(--rpa-hit);
+    margin-left: auto;
+    padding: 0 6px;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    color: var(--rpa-text-2);
+    font: inherit;
+    font-size: var(--rpa-fs-footnote);
+    cursor: pointer;
+  }
+  .rpa-ios-switch[aria-checked="true"] { color: var(--rpa-text); }
+  .rpa-ios-switch-track {
+    position: relative;
+    flex: none;
+    width: var(--rpa-switch-w);
+    height: var(--rpa-switch-h);
+    border-radius: 999px;
+    background: var(--rpa-track);
+    transition: background-color .2s ease;
+  }
+  .rpa-ios-switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: calc(var(--rpa-switch-h) - 4px);
+    height: calc(var(--rpa-switch-h) - 4px);
+    border-radius: 50%;
+    background: var(--rpa-knob);
+    transition: transform .2s ease;
+  }
+  .rpa-ios-switch[aria-checked="true"] .rpa-ios-switch-track { background: var(--rpa-accent); }
+  .rpa-ios-switch[aria-checked="true"] .rpa-ios-switch-knob { transform: translateX(calc(var(--rpa-switch-w) - var(--rpa-switch-h))); }
+
+  /* a tick box and its sentence: the whole line is the box (her sign-up's 「我读过并同意…」) */
+  .rpa-ios-check {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--rpa-hit);
+    margin-top: 20px;
+    padding: 6px 0;
+    font-size: var(--rpa-fs-body);
+    line-height: var(--rpa-lh-text);
+    color: var(--rpa-text);
+    cursor: pointer;
+  }
+  .rpa-ios-check > input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .rpa-ios-check-box {
+    box-sizing: border-box;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(24 * var(--rp-u));
+    height: calc(24 * var(--rp-u));
+    border: 1.5px solid var(--rpa-dim);
+    border-radius: 7px;
+    /* a small field: on its surface the ring is seen in both sets (on paper it would not reach 3:1) */
+    background: var(--rpa-surface);
+    color: var(--rpa-on-accent);
+  }
+  .rpa-ios-check-box svg { width: 70%; height: 70%; opacity: 0; }
+  .rpa-ios-check > input:checked + .rpa-ios-check-box { border-color: var(--rpa-accent); background: var(--rpa-accent); }
+  .rpa-ios-check > input:checked + .rpa-ios-check-box svg { opacity: 1; }
+  .rpa-ios-check > input:focus-visible + .rpa-ios-check-box { outline: 2px solid var(--rpa-accent-light); outline-offset: 2px; }
+
+  /* =================================================================== blocks */
+
+  /* RippleCard: surface, a hairline, radius 20 */
+  .rpa-ios-card {
+    box-sizing: border-box;
+    margin-top: 20px;
+    padding: 18px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 20px;
+    background: var(--rpa-surface);
+  }
+
+  /* a text he agrees to, as published: paragraphs, and list items that begin with their dot */
+  .rpa-ios-paragraphs p { margin: 12px 0 0; font-size: var(--rpa-fs-body); line-height: 1.5; color: var(--rpa-text); }
+  .rpa-ios-paragraphs p:first-child { margin-top: 0; }
+  /* a line that wraps starts under the words, not under the dot */
+  .rpa-ios-paragraphs p[data-item="true"] { margin-top: 6px; padding-left: .8em; text-indent: -.8em; }
+  .rpa-ios-paragraphs ul { margin: 0; padding: 0; list-style: none; }
+  .rpa-ios-paragraphs li { margin: 10px 0 0; font-size: var(--rpa-fs-callout); line-height: 1.5; color: var(--rpa-text-2); }
+  .rpa-ios-paragraphs li:first-child { margin-top: 0; }
+
+  /* a line that opens a text under it (「读条款全文」) */
+  .rpa-ios-more { margin-top: 4px; }
+  .rpa-ios-more > summary {
+    display: flex;
+    align-items: center;
+    min-height: var(--rpa-hit);
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+    color: var(--rpa-accent-light);
+    cursor: pointer;
+    list-style: none;
+  }
+  .rpa-ios-more > summary::-webkit-details-marker { display: none; }
+  .rpa-ios-more > summary::after { content: "›"; margin-left: 6px; transition: transform .15s ease; }
+  .rpa-ios-more[open] > summary::after { transform: rotate(90deg); }
+  .rpa-ios-more > .rpa-ios-card { margin-top: 4px; }
+
+  /* a line with its small icon tile (AllSetView's rows), as a hint on its own surface */
+  .rpa-ios-hint {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 14px;
+    background: var(--rpa-surface);
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+    line-height: var(--rpa-lh-text);
+    color: var(--rpa-text);
+  }
+  .rpa-ios-tile {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: var(--rpa-tile);
+    height: var(--rpa-tile);
+    border-radius: 9px;
+    background: var(--rpa-surface-2);
+    color: var(--rpa-accent-light);
+  }
+  .rpa-ios-tile svg { width: 50%; height: 50%; }
+
+  /* the recovery code as he copies it: one card, large and evenly spaced, picked whole by one tap */
+  .rpa-ios-code {
+    box-sizing: border-box;
+    margin: 24px 0 0;
+    padding: 22px 12px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 20px;
+    background: var(--rpa-surface);
+    color: var(--rpa-text);
+    font-family: var(--rpa-font-mono);
+    font-size: var(--rpa-fs-code);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: .06em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    word-break: break-all;
+    user-select: all;
+  }
+
+  /* the card he prints or photographs: the app, his account, the code, how to use it */
+  .rpa-ios-recovery-card {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+    padding: 20px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 20px;
+    background: var(--rpa-surface);
+  }
+  .rpa-ios-recovery-title { margin: 0; font-size: var(--rpa-fs-title3); font-weight: 700; line-height: var(--rpa-lh-title); }
+  .rpa-ios-recovery-row { margin: 0; font-size: var(--rpa-fs-body); line-height: 1.5; overflow-wrap: anywhere; }
+  .rpa-ios-recovery-row strong {
+    display: block;
+    font-size: var(--rpa-fs-caption);
+    font-weight: 600;
+    letter-spacing: .5px;
+    color: var(--rpa-text-2);
+  }
+  .rpa-ios-recovery-row[data-use="true"] { font-size: var(--rpa-fs-footnote); color: var(--rpa-text-2); }
+  .rpa-ios-recovery-code {
+    font-family: var(--rpa-font-mono);
+    font-size: var(--rpa-fs-code);
+    font-weight: 600;
+    letter-spacing: .06em;
+    word-break: break-all;
+  }
+
+  /* 「读给我听」: a capsule with its icon, under the title */
+  .rpa-ios-read {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--rpa-hit);
+    margin-top: 12px;
+    padding: 0 16px;
+    border: 1px solid var(--rpa-stroke-2);
+    border-radius: 999px;
+    background: var(--rpa-fill-2);
+    color: var(--rpa-text);
+    font: inherit;
+    font-size: var(--rpa-fs-subheadline);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .rpa-ios-read[aria-pressed="true"] { border-color: var(--rpa-accent-focus); }
+  .rpa-ios-read svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); color: var(--rpa-accent); }
+
+  /* =================================================================== the welcome's rows, the avatar, the tick */
+
+  /* FeatureRow: a 44 chip, a headline, a footnote; 22 between rows, 24 from the screen's edge */
+  .rpa-ios-features { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; width: 100%; box-sizing: border-box; margin-top: 32px; padding-inline: 8px; text-align: left; }
+  .rpa-ios-feature { display: flex; align-items: center; gap: 16px; }
+  .rpa-ios-chip {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: var(--rpa-chip);
+    height: var(--rpa-chip);
+    border-radius: 12px;
+    background: var(--rpa-accent-muted);
+    color: var(--rpa-accent);
+  }
+  .rpa-ios-chip svg { width: 46%; height: 46%; }
+  .rpa-ios-feature-text { display: grid; gap: 2px; min-width: 0; }
+  .rpa-ios-feature-title { margin: 0; font-size: var(--rpa-fs-headline); font-weight: 600; line-height: 1.3; color: var(--rpa-text); }
+  .rpa-ios-feature-sub { margin: 0; font-size: var(--rpa-fs-footnote); line-height: var(--rpa-lh-text); color: var(--rpa-text-2); }
+
+  /* ProfileSetupView's circle: his initial once he has typed a name, a person before that */
+  .rpa-ios-avatar {
+    box-sizing: border-box;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: var(--rpa-avatar);
+    height: var(--rpa-avatar);
+    margin-top: 28px;
+    overflow: hidden;
+    border: 1px solid var(--rpa-accent-soft);
+    border-radius: 50%;
+    background: var(--rpa-accent-muted);
+    color: var(--rpa-accent-light);
+    font-size: var(--rpa-fs-avatar);
+    font-weight: 600;
+    line-height: 1;
+  }
+  .rpa-ios-avatar svg { width: 40%; height: 40%; }
+  /* ProfileSetupView: the label 28 under the circle */
+  .rpa-ios-avatar + .rpa-ios-field { margin-top: 28px; }
+
+  /* AllSetView's BrandGlyph: a tick on a soft teal disc, over a centred title */
+  .rpa-ios-done { display: flex; flex-direction: column; align-items: center; margin-block: auto; padding-block: 24px; text-align: center; }
+  .rpa-ios-glyph {
+    display: grid;
+    place-items: center;
+    width: 125px;
+    height: 125px;
+    margin: 20px 0 30px;
+    border-radius: 50%;
+    background: var(--rpa-accent-muted);
+    color: var(--rpa-accent);
+  }
+  .rpa-ios-glyph svg { width: 58px; height: 58px; }
+  .rpa-ios-done > .rpa-ios-text { margin-top: 12px; padding-inline: 12px; }
+
+  /* =================================================================== the ways on (「你是哪一位？」) */
+
+  /*
+   * A large row that is a whole card to tap: RippleCard's block (surface, a hairline, radius 20) holding FeatureRow's
+   * parts (the chip, a headline, a line), and the chevron of a row that leads on. The rows stand in the screen's bottom
+   * area one under another, where SignInView has its two ways to continue.
+   */
+  .rpa-ios-way {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: calc(2 * var(--rpa-hit));
+    padding: 18px 14px 18px 18px;
+    border: 1px solid var(--rpa-hairline);
+    border-radius: 20px;
+    background: var(--rpa-surface);
+    color: var(--rpa-text);
+    text-decoration: none;
+  }
+  .rpa-ios-way:active { opacity: .8; }
+  /* (one column that may be narrower than its longest word: at a very large text size a long word breaks, it does not push the card wider than the phone) */
+  .rpa-ios-way-text { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
+  .rpa-ios-way-title { font-size: var(--rpa-fs-title3); font-weight: 600; line-height: 1.3; }
+  .rpa-ios-way-sub { font-size: var(--rpa-fs-footnote); line-height: var(--rpa-lh-text); color: var(--rpa-text-2); }
+  /* the chevron: a sign that the row leads on, beside words that already say where */
+  .rpa-ios-way > svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); color: var(--rpa-text-3); }
+
+  /* =================================================================== the light set: the elder side's own shapes */
+
+  /*
+   * Only what the setting-up screens have too (see the block of variables above): drawn as the foundation draws it,
+   * with its tokens, so the last sign-up screen and the first setting-up screen are one product.
+   */
+
+  /* the top bar is the foundation's header row: the back word's 48px area reaches 6px over the rows around it */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-nav { min-height: calc(var(--rpa-hit) - 12px); }
+  /* 「‹ 返回」: a bare word in the action colour (.rpu-back) */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-nav-btn[data-kind="back"] {
+    margin-block: -6px;
+    padding: 0 12px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--rpa-accent-light);
+    font-size: var(--rp-fs-small);
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-nav-btn[data-kind="back"] svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); margin-left: -6px; }
+
+  /* the two buttons (.rpu-btn): 72 and 64 tall (the variables above), the foundation's corners and label, no glow */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="primary"],
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="secondary"] {
+    padding: 6px calc(16 * var(--rp-u));
+    border-radius: var(--rp-radius-btn);
+    box-shadow: none;
+  }
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="primary"] { font-size: var(--rp-fs-action); font-weight: 800; }
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="secondary"] { border-width: 2px; font-size: var(--rp-fs-secondary); font-weight: 700; }
+  /* words that are tapped are bold on the elder side */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="text"]:not([data-tint="quiet"]),
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-nav-btn,
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-more > summary,
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-way-title { font-weight: 700; }
+
+  /* a field (.rpu-f-box): the edge at rest 1.5px, 2.5px in the action colour while he is in it, 2px in the error's */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-input-box { border-width: 1.5px; }
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-input-box:focus-within { box-shadow: inset 0 0 0 1px var(--rpa-accent-focus); }
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-input-box:has(> .rpa-ios-input[aria-invalid="true"]) { border-color: var(--rpa-warning); box-shadow: inset 0 0 0 .5px var(--rpa-warning); }
+  /* what went wrong (.rpu-f-error): bold */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-error { font-size: var(--rp-fs-sub); font-weight: 800; }
+}
+
+@keyframes rpa-ios-logo-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes rpa-ios-logo-fill {
+  to { fill-opacity: 1; stroke-width: 0; }
+}
+
+/*
+ * On paper (the recovery card): the same variables with paper's values, black on white, and only the card is printed.
+ * Whichever set the screen is drawn in: the selectors are the two set blocks' own, so these values come after them.
+ */
+@media print {
+  :root,
+  html:has(.rpa-ios-screen[data-rp-phone]),
+  .rpa-ios-screen[data-rp-phone] {
+    --rpa-page: #FFFFFF;
+    --rpa-bg: #FFFFFF;
+    --rpa-surface: #FFFFFF;
+    --rpa-hairline: #000000;
+    --rpa-text: #000000;
+    --rpa-text-2: #333333;
+    --rpa-scheme: light;
+  }
+  .rpa-ios-no-print { display: none !important; }
+  .rpa-ios-screen { min-height: 0; }
+  .rpa-ios-recovery-card { margin: 0; break-inside: avoid; }
+}

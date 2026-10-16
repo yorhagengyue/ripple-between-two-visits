@@ -1,0 +1,366 @@
+/*
+ * Ripple in motion (owner, 2026-10-14: 「现在是毫无动画的，我需要添加大量的切换动画、Hover 动画、点击动画等等，把它做成一个
+ * 真实的 APP，你仿 iOS 的做就可以了」). Both phones (his light pages /p/*, her dark ones /f/*) and the door (/, /who, /login,
+ * /signup). Elderly people use it: the motion is iOS-calm, quick and smooth, never bouncy, never long.
+ *
+ *   between pages  React's <ViewTransition> (components/ui/PageTransition.tsx, around every screen) and the way a link
+ *                  goes (lib/ui/nav-motion.ts):
+ *                    forward  the new page slides in from the right over the old one, which moves a little to the left
+ *                             and dims (iOS's push), 350 ms
+ *                    back     the same the other way (iOS's pop)
+ *                    tab      a place of a bottom bar: the new page fades in over the old one, 180 ms, nothing slides
+ *                    none     everything else (the language switch, a redirect, the browser's own back, a ?query of the
+ *                             same page): no motion
+ *                  The bottom bars never move: each has a name of its own and is drawn still over the pages.
+ *   press          everything he or she taps dips a little (scale .97, a little darker) within 100 ms and comes back
+ *                  in 200 ms; a whole row or card dips less (it is wide). CSS :active only: a long press (Explainable)
+ *                  keeps every pointer event, and a held row is not dipped twice (the hold has its own dip).
+ *   hover          only where there is a real pointer (a computer): a light tint on rows, cards and the quieter
+ *                  buttons, a deeper tone on the filled ones, the hand cursor. Never on a phone.
+ *   in place       sheets come up from the bottom over a fading ground and go down again; a section that opens in
+ *                  place opens its height and its chevron turns; a switch's knob slides; what arrives (a caption, a
+ *                  point of the summary, an answer, the undo bar, a card of her feed) rises 8px as it fades in; the
+ *                  mark after 已服药 / 未服药 pops (never above 1.04). Nothing moves by itself except the recording dot,
+ *                  which breathes.
+ *   less motion    prefers-reduced-motion: nothing moves, nothing scales; at most a short fade.
+ *
+ * For anyone editing:
+ * - Only --rpmo-* variables and rpmo-* names (view-transition names and classes, keyframes) are declared here. The
+ *   colours are the two phones' own tokens (app/ripple-ui.css --rp-*, --rpf-*), read, never redefined, and the tints
+ *   below are only ever on a state that passes (pressed, hovered, moving): at rest every page looks exactly as it did
+ *   without this file.
+ * - Motion only: no size, no space, no colour at rest, no word. A transform, a filter, an opacity, a transition.
+ * - Every duration is at most 400 ms; nothing overshoots more than 1.04; no parallax.
+ * - The rules for elements sit in @layer components, after app/ripple-ui.css's (this file is imported after it in
+ *   app/layout.tsx): of two rules of the same weight, these win. The view-transition rules and the bars' names are
+ *   outside any layer (pseudo-elements of the document). The sheet of the long press has its own motion in
+ *   components/explain/explain.css.
+ */
+
+:root {
+  /* iOS's own curve for a push and a sheet: quick to start, long to settle, never past the end */
+  --rpmo-ease: cubic-bezier(.32, .72, 0, 1);
+  --rpmo-push: 350ms;
+  --rpmo-tab: 180ms;
+  --rpmo-sheet: 300ms;
+  /* the press: in within 100 ms, back in 200 ms on a curve that settles without passing its end */
+  --rpmo-press-in: 100ms;
+  --rpmo-press-out: 200ms;
+  --rpmo-settle: cubic-bezier(.2, .8, .2, 1);
+  /* how far a thing dips while it is held: a control, a row as wide as the screen, a small place (none with less motion) */
+  --rpmo-dip: .97;
+  --rpmo-dip-row: .985;
+  --rpmo-dip-small: .94;
+  /* the ground of a row while it is held or hovered: his ink over his white or paper, her white over her dark */
+  --rpmo-row-press: rgba(24, 32, 44, .08);
+  --rpmo-row-hover: rgba(24, 32, 44, .04);
+  --rpmo-row-press-dark: rgba(255, 255, 255, .08);
+  --rpmo-row-hover-dark: rgba(255, 255, 255, .045);
+}
+/* less motion: nothing dips (a colour or a fade still changes). Outside the layer, as the values above */
+@media (prefers-reduced-motion: reduce) {
+  :root { --rpmo-dip: 1; --rpmo-dip-row: 1; --rpmo-dip-small: 1; }
+}
+
+/* =================================================================== between pages */
+
+/* the pictures of a running transition take no taps: a tap goes to the page under them */
+::view-transition { pointer-events: none; }
+/* what is not a screen or a bar (the page's ground, the stage beside the column) changes at once, with no crossfade of
+   the whole window: the motion is the screens' own, and the transition lasts no longer than they move */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+
+/* the bottom bars stay where they are, drawn still over the pages that move (only the page's own bar: a /design phone
+   has its own and never moves) */
+.rpu-tabs[data-placement="fixed"] { view-transition-name: rpmo-tabs; }
+.rpf-screen[data-fill="viewport"] > .rpf-tabs { view-transition-name: rpmo-ftabs; }
+::view-transition-group(rpmo-tabs),
+::view-transition-group(rpmo-ftabs) { animation: none; z-index: 100; }
+::view-transition-old(rpmo-tabs),
+::view-transition-old(rpmo-ftabs) { display: none; }
+::view-transition-new(rpmo-tabs),
+::view-transition-new(rpmo-ftabs) { animation: none; }
+/* a page under one of the four has no bar (her week day by day, a screen of 「我的」): going there the bar fades away
+   where it stands, coming back it fades in where it stands; it never slides with a page */
+::view-transition-old(rpmo-tabs):only-child,
+::view-transition-old(rpmo-ftabs):only-child { display: block; animation: 150ms ease-out both rpmo-fade-out; }
+::view-transition-new(rpmo-tabs):only-child,
+::view-transition-new(rpmo-ftabs):only-child { animation: 200ms ease-out both rpmo-fade-in; }
+
+/* the screen that leaves and the one that arrives are one pair (components/ui/PageTransition.tsx): their pictures move
+   inside the new screen's box, so on a computer (a 430px column) nothing slides over the ground beside it. The old
+   picture is held where it stood on the window (--rpmo-dy: the page may have been scrolled down) */
+::view-transition-group(.rpmo-push),
+::view-transition-group(.rpmo-pop),
+::view-transition-group(.rpmo-tab) { overflow: clip; }
+::view-transition-old(.rpmo-push),
+::view-transition-old(.rpmo-pop),
+::view-transition-old(.rpmo-tab) { translate: 0 var(--rpmo-dy, 0px); }
+
+/* forward: the new page comes in from the right edge over the old one, which moves a third of the way left and dims */
+::view-transition-old(.rpmo-push) { animation: var(--rpmo-push) var(--rpmo-ease) both rpmo-under-out; }
+::view-transition-new(.rpmo-push) { animation: var(--rpmo-push) var(--rpmo-ease) both rpmo-over-in; }
+/* back: the page leaves to the right, over the one under it, which comes back from the left and brightens */
+::view-transition-old(.rpmo-pop) { z-index: 1; animation: var(--rpmo-push) var(--rpmo-ease) both rpmo-over-out; }
+::view-transition-new(.rpmo-pop) { animation: var(--rpmo-push) var(--rpmo-ease) both rpmo-under-in; }
+/* a place of the bottom bar: the new page fades in over the old one, which stays as it is under it */
+::view-transition-old(.rpmo-tab) { animation: none; }
+::view-transition-new(.rpmo-tab) { animation: var(--rpmo-tab) ease-out both rpmo-fade-in; }
+
+@keyframes rpmo-over-in { from { transform: translateX(100%); } }
+@keyframes rpmo-over-out { to { transform: translateX(100%); } }
+@keyframes rpmo-under-out { to { transform: translateX(-30%); filter: brightness(.92); } }
+@keyframes rpmo-under-in { from { transform: translateX(-30%); filter: brightness(.92); } }
+@keyframes rpmo-fade-in { from { opacity: 0; } }
+@keyframes rpmo-fade-out { to { opacity: 0; } }
+
+/* less motion: no page slides; the new page fades in over the old one */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.rpmo-push),
+  ::view-transition-old(.rpmo-pop) { z-index: auto; animation: none; }
+  ::view-transition-new(.rpmo-push),
+  ::view-transition-new(.rpmo-pop) { animation: 150ms ease-out both rpmo-fade-in; }
+}
+
+/* =================================================================== press and hover */
+@layer components {
+  /*
+   * What can be tapped, by how it answers a finger (iOS: a control dips and darkens a little while it is held, a row
+   * of a list lights up, the words of a link fade):
+   *   a control  a button with a ground or an outline of its own: dips to .97 and darkens a little
+   *   a row      as wide as the screen (a row of a list, a card that is a link): dips less (.985), its ground tints
+   *   words      a link that is only words (「‹ 就诊」, 「看原文 ›」): dips and fades
+   *   a place    of a bottom bar, a day of a month: small, so it dips a little more (.94)
+   * Only what is a link or a button: a row that is a plain <div> does not move.
+   */
+  :is(
+    .rpu-btn, .rpu-act, .rpu-chip-btn, .rpu-chip, .rpu-src, .rpu-clip-btn, .rpu-playc, .rpu-tap-play, .rpu-say-btn, .rpu-say-icon,
+    .rpu-toast-undo, .rpu-kv-btn, .rpu-key, .rpu-lcd-row, .rpu-opt, .rpu-seg-item, .rpu-emergency-call, .rpu-me, .rpu-switch,
+    .rpu-pushpop-x, .rpu-mic, .rpu-meds-cam-shutter, .rpu-meds-cam-alt, .rpu-meds-cam-way, .rpx-close,
+    .rpf-btn, .rpf-play, .rpf-recbtn, .rpf-lang, .rpf-seg > a, .rpf-inputact, .rpfb-choices > button,
+    .rpa-ios-btn, .rpa-ios-nav-btn, .rpa-ios-way, .rpa-ios-choice, .rpa-ios-read, .rpa-choice, .rpa-read,
+    a.rpu-li, button.rpu-li, a.rpu-row, a.rpu-added, a.rpu-box, a.rpu-entry, a.rpu-banner, .rpu-fold > summary, a.rp03-cell-week,
+    .rp06-fold-sum, .rpm-details > summary,
+    .rpf-linkrow, a.rpf-fact, button.rpf-fact, a.rpf-stat, a.rpf-share, a.rpf-week, a.rpf-visit, a.rpf-consent, a.rpf-month-rowin,
+    .rpf-details summary,
+    .rpu-back, .rpu-inline-link, .rpu-box-link, .rpu-f-eye, .rpu-month-back, .rpu-meds-cam-back, .rpu-meds-onlist,
+    .rpa-back-button, .rpa-text-button,
+    .rpf-back, .rpf-top-link, .rpf-notice-act, .rpf-textline a, .rpf-plainlink, .rpf-checkrow a, .rpf-weeknav a,
+    .rpf-month-nav > a, .rpfr-restlink,
+    .rpu-tab, .rpf-tab, a.rpu-month-cell, a.rpf-month-cell
+  ) {
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      scale var(--rpmo-press-out) var(--rpmo-settle),
+      transform var(--rpmo-press-out) var(--rpmo-settle),
+      filter var(--rpmo-press-out) ease-out,
+      opacity var(--rpmo-press-out) ease-out,
+      background-color var(--rpmo-press-out) ease-out,
+      color var(--rpmo-press-out) ease-out,
+      box-shadow var(--rpmo-press-out) ease-out;
+  }
+
+  /* ---- hover: only where there is a real pointer (a computer), never on a phone. Before the rules for a thing held
+     down, so that a press over a hovered thing shows the press */
+  @media (hover: hover) and (pointer: fine) {
+    :is(a.rpu-li, button.rpu-li, a.rpu-row, a.rpu-added, a.rpu-entry, .rpu-fold > summary, .rp06-fold-sum, .rpm-details > summary, a.rpu-month-cell):hover {
+      background-color: var(--rpmo-row-hover);
+    }
+    :is(.rpf-linkrow, a.rpf-fact, button.rpf-fact, a.rpf-stat, a.rpf-share, a.rpf-week, a.rpf-visit, a.rpf-consent, a.rpf-month-rowin, .rpf-details summary, a.rpf-month-cell, .rpf-btn[data-variant="secondary"], .rpf-play, .rpf-lang):hover {
+      background-color: var(--rpmo-row-hover-dark);
+    }
+    /* a control on its own white ground: a shade darker */
+    :is(
+      .rpu-btn:not([data-variant="link"], [data-variant="primary"], [data-variant="danger"], [data-variant="dark"], [data-variant="danger-solid"], [data-variant="on"]),
+      .rpu-act:not([data-variant="primary"], [data-variant="danger"], [data-variant="on"]),
+      .rpu-chip-btn, .rpu-chip:not([aria-pressed="true"]), .rpu-src:not([aria-pressed="true"]), .rpu-playc:not([aria-pressed="true"]), .rpu-tap-play,
+      .rpu-say-icon:not([data-kind="send"]), .rpu-kv-btn:not([aria-pressed="true"]), .rpu-key, .rpu-lcd-row, .rpu-opt, .rpu-seg-item, .rpu-me, .rpu-pushpop-x,
+      a.rpu-box, a.rpu-banner, a.rp03-cell-week, .rpx-close, .rpa-choice, .rpa-read
+    ):hover:not(:disabled) {
+      filter: brightness(.97);
+    }
+    /* a filled one: a deeper tone */
+    :is(
+      .rpu-btn:is([data-variant="primary"], [data-variant="danger"], [data-variant="dark"], [data-variant="danger-solid"], [data-variant="on"]),
+      .rpu-act:is([data-variant="primary"], [data-variant="danger"], [data-variant="on"]),
+      .rpu-chip[aria-pressed="true"], .rpu-src[aria-pressed="true"], .rpu-playc[aria-pressed="true"], .rpu-kv-btn[aria-pressed="true"], .rpu-clip-btn,
+      .rpu-say-btn, .rpu-say-icon[data-kind="send"], .rpu-toast-undo, .rpu-emergency-call, .rpu-meds-cam-shutter,
+      .rpf-btn:is([data-variant="primary"], [data-variant="warn"]),
+      .rpa-ios-btn:not([data-variant="text"]), .rpa-ios-nav-btn, .rpa-ios-way, .rpa-ios-choice, .rpa-ios-read
+    ):hover:not(:disabled, [aria-disabled="true"]) {
+      filter: brightness(.92);
+    }
+    /* words: a little lighter */
+    :is(
+      .rpu-btn[data-variant="link"], .rpu-back, .rpu-inline-link, .rpu-box-link, .rpu-f-eye, .rpu-month-back, .rpu-meds-cam-back, .rpu-meds-onlist,
+      .rpa-back-button, .rpa-text-button, .rpa-ios-btn[data-variant="text"],
+      .rpf-btn[data-variant="quiet"], .rpf-back, .rpf-top-link, .rpf-notice-act, .rpf-textline a, .rpf-plainlink, .rpf-checkrow a,
+      .rpf-weeknav a, .rpf-month-nav > a, .rpf-inputact, .rpfr-restlink
+    ):hover:not(:disabled) {
+      opacity: .75;
+    }
+    /* a place of a bottom bar that is not the one he or she is on: its words darken towards the chosen one's */
+    .rpu-tab:not([aria-current="page"]):hover { color: var(--rp-ink); }
+    .rpf-tab:not([aria-current="page"]):hover { color: var(--rpf-ink); }
+    /* the hand, on everything that can be tapped (the foundation gives it to most already) */
+    :is(a.rpu-li, button.rpu-li, a.rpu-row, .rpu-tab, .rpf-tab, a.rpf-month-cell, a.rpu-month-cell, .rpf-linkrow, a.rpf-fact, a.rpf-stat, a.rpf-share, a.rpf-week, a.rpf-visit, a.rpf-consent, .rpa-ios-way):hover {
+      cursor: pointer;
+    }
+  }
+
+  /* ---- held: a control */
+  :is(
+    .rpu-btn:not([data-variant="link"]), .rpu-act, .rpu-chip-btn, .rpu-chip, .rpu-src, .rpu-clip-btn, .rpu-playc, .rpu-tap-play,
+    .rpu-say-btn, .rpu-say-icon, .rpu-toast-undo, .rpu-kv-btn, .rpu-key, .rpu-lcd-row, .rpu-opt, .rpu-seg-item, .rpu-emergency-call,
+    .rpu-me, .rpu-pushpop-x, .rpu-meds-cam-shutter, .rpu-meds-cam-alt, .rpu-meds-cam-way, .rpx-close,
+    .rpf-btn:not([data-variant="quiet"]), .rpf-play, .rpf-lang, .rpf-seg > a, .rpfb-choices > button,
+    .rpa-ios-btn:not([data-variant="text"]), .rpa-ios-nav-btn, .rpa-ios-way, .rpa-ios-choice, .rpa-ios-read, .rpa-choice, .rpa-read
+  ):active:not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+    scale: var(--rpmo-dip);
+    filter: brightness(.94);
+    transition-duration: var(--rpmo-press-in);
+  }
+  /* the switch, the microphone, her record key: the whole thing dips, nothing darkens (their words are on the page's ground) */
+  :is(.rpu-switch, .rpu-mic, .rpf-recbtn):active:not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+    scale: var(--rpmo-dip);
+    transition-duration: var(--rpmo-press-in);
+  }
+
+  /* ---- held: a row or a card (his ground tints with his ink, hers with her white) */
+  :is(a.rpu-li, button.rpu-li, a.rpu-row, a.rpu-added, a.rpu-entry, .rpu-fold > summary, .rp06-fold-sum, .rpm-details > summary):active:not(:disabled, [aria-busy="true"]) {
+    scale: var(--rpmo-dip-row);
+    background-color: var(--rpmo-row-press);
+    transition-duration: var(--rpmo-press-in);
+  }
+  /* a card that is a link has a ground of its own: it darkens instead */
+  :is(a.rpu-box, a.rpu-banner, a.rp03-cell-week):active {
+    scale: var(--rpmo-dip-row);
+    filter: brightness(.95);
+    transition-duration: var(--rpmo-press-in);
+  }
+  :is(.rpf-linkrow, a.rpf-fact, button.rpf-fact, a.rpf-stat, a.rpf-share, a.rpf-week, a.rpf-visit, a.rpf-consent, a.rpf-month-rowin, .rpf-details summary):active:not(:disabled, [aria-busy="true"]) {
+    scale: var(--rpmo-dip-row);
+    background-color: var(--rpmo-row-press-dark);
+    transition-duration: var(--rpmo-press-in);
+  }
+
+  /* ---- held: words */
+  :is(
+    .rpu-btn[data-variant="link"], .rpu-back, .rpu-inline-link, .rpu-box-link, .rpu-f-eye, .rpu-month-back, .rpu-meds-cam-back, .rpu-meds-onlist,
+    .rpa-back-button, .rpa-text-button, .rpa-ios-btn[data-variant="text"],
+    .rpf-btn[data-variant="quiet"], .rpf-back, .rpf-top-link, .rpf-notice-act, .rpf-textline a, .rpf-plainlink, .rpf-checkrow a, .rpf-weeknav a,
+    .rpf-month-nav > a, .rpf-inputact, .rpfr-restlink
+  ):active:not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+    scale: var(--rpmo-dip);
+    opacity: .55;
+    transition-duration: var(--rpmo-press-in);
+  }
+
+  /* ---- held: a place of a bottom bar, a day of a month */
+  :is(.rpu-tab, .rpf-tab, a.rpu-month-cell, a.rpf-month-cell):active {
+    scale: var(--rpmo-dip-small);
+    opacity: .75;
+    transition-duration: var(--rpmo-press-in);
+  }
+
+  /* a row he holds for Ripple's read dips with its wrapper (components/explain/explain.css): not a second time itself.
+     (:is() with an id that is never on the page lends the rule an id's weight, over every :active rule above) */
+  :is(.rpx, #rpmo-weight)[data-holding="true"] :active { scale: none; }
+
+  /* =================================================================== in place */
+
+  /* ---- a sheet comes up from the bottom over its ground, and goes down again (her bottom sheet, components/family-ui
+     Sheet.tsx: data-closing while it leaves). His long press's sheet: components/explain/explain.css */
+  .rpf-scrim { animation: rpmo-fade-in 250ms ease-out backwards; }
+  .rpf-sheet { animation: rpmo-sheet-up var(--rpmo-sheet) var(--rpmo-ease) backwards; }
+  .rpf-scrim[data-closing="true"] { animation: rpmo-fade-out 220ms ease-in both; pointer-events: none; }
+  .rpf-sheet[data-closing="true"] { animation: rpmo-sheet-down 220ms cubic-bezier(.4, 0, 1, 1) both; pointer-events: none; }
+
+  /* ---- what arrives rises 8px as it fades in: the undo bar, an answer after 提问, a line of the captions and a
+     point of 「实时总结」 while he records (the live regions of the recording screen), a card of her 「留意」. Filled
+     backwards only: once it has risen nothing of the motion stays on the element (a transform held at its end would
+     make a card the frame of a sheet fixed inside it, her 「打电话给爸爸」's) */
+  .rpu-toast-in,
+  [data-testid="ask-answer"]:not([data-settled]),
+  [data-testid="ask-draft"],
+  .rpu-visit-group[aria-live="polite"] .rpu-tl-item,
+  [aria-live="polite"] .rpu-visit-notes > li,
+  .rpfr-item { animation: rpmo-rise 250ms ease-out backwards; }
+  /* (SSE, owner 10-15: an answer told as it is made rises once, as its draft; the final answer that takes the draft's place,
+     data-settled, is already on the screen and does not rise again) */
+
+  /* ---- the round mark after 已服药 / 未服药 (components/today/DoseHero.tsx) pops in: up to 1.04, back to its size */
+  .rpu-hero-mark { animation: rpmo-pop 340ms cubic-bezier(.2, .8, .2, 1) backwards; }
+
+  /* ---- a switch: the knob slides, the track's colour follows. The knob stands where the track's own rule puts it,
+     but by a translate from the track's start (the same place: the track is 64 wide with 3px inside, the knob 32), so
+     the move can be eased */
+  .rpu-switch-track { justify-content: flex-start; transition: background-color 200ms ease-out; }
+  .rpu-switch-knob { transition: translate 200ms var(--rpmo-settle); }
+  .rpu-switch:not([aria-checked="false"]) .rpu-switch-knob { translate: calc(32 * var(--rp-u) - 6px) 0; }
+
+  /* ---- a section that opens in place. An earlier visit on 就诊 (components/visit/elder/VisitHub.tsx) is drawn
+     when he opens it: it opens its height from nothing, clipped while it grows; the chevron of its row turns */
+  .rpu-visit-fold > svg[data-icon="chevron"],
+  .rpu-fold > summary > svg { transition: transform 250ms var(--rpmo-ease); }
+  @supports (interpolate-size: allow-keywords) {
+    .rpu-visit-row > .rpu-fold-body { interpolate-size: allow-keywords; animation: rpmo-open 300ms var(--rpmo-ease) backwards; }
+  }
+  @supports not (interpolate-size: allow-keywords) {
+    .rpu-visit-row > .rpu-fold-body { animation: rpmo-rise 250ms ease-out backwards; }
+  }
+  /* the folds that are the browser's own <details> (an earlier question on the ask screen, a part of a medicine's
+     card, her invitation's consent): the content opens its height, clipped only while it moves */
+  @supports (interpolate-size: allow-keywords) and selector(::details-content) {
+    :is(.rpu-fold, .rp06-fold, .rpf-details, .rpm-details, .rpa-ios-more) { interpolate-size: allow-keywords; }
+    :is(.rpu-fold, .rp06-fold, .rpf-details, .rpm-details, .rpa-ios-more)::details-content {
+      height: 0;
+      clip-path: inset(0);
+      transition: height 300ms var(--rpmo-ease), content-visibility 300ms allow-discrete, clip-path 0s;
+    }
+    :is(.rpu-fold, .rp06-fold, .rpf-details, .rpm-details, .rpa-ios-more)[open]::details-content {
+      height: auto;
+      clip-path: none;
+      transition: height 300ms var(--rpmo-ease), content-visibility 300ms allow-discrete, clip-path 0s 300ms allow-discrete;
+    }
+  }
+
+  /* ---- her 「正在录」 dot breathes, as his recording dot does (app/ripple-ui.css rpu-rec-pulse) */
+  .rpf-live i { animation: rpmo-breathe 1.6s ease-in-out infinite; }
+
+  /* =================================================================== less motion */
+  @media (prefers-reduced-motion: reduce) {
+    .rpf-sheet,
+    .rpf-sheet[data-closing="true"] { animation: none; }
+    .rpu-toast-in,
+    [data-testid="ask-answer"]:not([data-settled]),
+    [data-testid="ask-draft"],
+    .rpu-visit-group[aria-live="polite"] .rpu-tl-item,
+    [aria-live="polite"] .rpu-visit-notes > li,
+    .rpfr-item,
+    .rpu-hero-mark,
+    .rpu-visit-row > .rpu-fold-body { animation: rpmo-fade-in 150ms ease-out backwards; }
+    .rpu-switch-knob,
+    .rpu-visit-fold > svg[data-icon="chevron"],
+    .rpu-fold > summary > svg { transition: none; }
+    :is(.rpu-fold, .rp06-fold, .rpf-details, .rpm-details, .rpa-ios-more)::details-content,
+    :is(.rpu-fold, .rp06-fold, .rpf-details, .rpm-details, .rpa-ios-more)[open]::details-content { transition: none; }
+    .rpf-live i { animation: none; }
+  }
+}
+
+@keyframes rpmo-sheet-up { from { transform: translateY(100%); } }
+@keyframes rpmo-sheet-down { to { transform: translateY(100%); } }
+@keyframes rpmo-rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes rpmo-pop {
+  0% { opacity: 0; transform: scale(.86); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes rpmo-open {
+  0% { height: 0; opacity: 0; clip-path: inset(0); }
+  99.9% { clip-path: inset(0); }
+  100% { opacity: 1; clip-path: none; }
+}
+@keyframes rpmo-breathe { 0%, 100% { box-shadow: 0 0 0 4px var(--rpf-teal-22); } 50% { box-shadow: 0 0 0 1.5px var(--rpf-teal-22); } }

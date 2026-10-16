@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+/*
+ * Ripple tokens.
+ * Light (default) = docs/design/visit-transcript/v3-light.html, values copied verbatim.
+ * Dark (defined, not enabled) = ripple-site --color-app-* (switch with <html data-theme="dark">).
+ * Event colours are reserved: doctor #4CB3E6, check #E8C15A, Ripple teal #37C2BA (Ripple's own question list).
+ * Do not reuse them for anything else (.codebuddy/rules/design).
+ */
+:root,
+[data-theme="light"] {
+  --page: #E6EBED;
+  --bg: #F5F7F8;
+  --surface: #FFFFFF;
+  --surface2: #F0F3F4;
+  --hair: rgba(16, 32, 36, .08);
+  --hair2: rgba(16, 32, 36, .16);
+  --t1: #0F1B1E;
+  --t2: #56646A;
+  --t3: #8A969A;
+
+  /* Ripple brand teal: Ripple's own question list (fill #37C2BA, text on white uses the darker step) */
+  --accent: #37C2BA;
+  --accentL: #12867F;
+  --accentM: rgba(55, 194, 186, .13);
+  --onAccent: #06201E;
+
+  /* doctor's instruction (blue-teal) */
+  --doc: #4CB3E6;
+  --docL: #1F7DB3;
+  --docM: rgba(76, 179, 230, .10);
+  --onDoc: #062033;
+
+  /* check: "I said it wrong / unsure, but Ripple has the record" */
+  --chk: #E8C15A;
+  --chkT: #8E6100;
+  --chkM: rgba(232, 193, 90, .16);
+  --onChk: #2A2006;
+
+  --shadow-card: 0 1px 3px rgba(16, 32, 36, .05);
+  --shadow-list: 0 2px 10px rgba(16, 32, 36, .06);
+
+  color-scheme: light;
+}
+
+/* Ripple dark (ripple-site --color-app-*). Defined now, not enabled. */
+[data-theme="dark"] {
+  --page: #0a0c0f;
+  --bg: #0a0c0f;
+  --surface: #15181c;
+  --surface2: #1b2026;
+  --hair: rgba(255, 255, 255, .06);
+  --hair2: rgba(255, 255, 255, .1);
+  --t1: #f2f5f6;
+  --t2: #9aa1a6;
+  --t3: #6a7176;
+
+  --accent: #37c2ba;
+  --accentL: #5fd4cc;
+  --accentM: rgba(55, 194, 186, .16);
+  --onAccent: #06201e;
+
+  --doc: #4CB3E6;
+  --docL: #4CB3E6;
+  --docM: rgba(76, 179, 230, .14);
+  --onDoc: #062033;
+
+  --chk: #E8C15A;
+  --chkT: #E8C15A;
+  --chkM: rgba(232, 193, 90, .14);
+  --onChk: #2A2006;
+
+  --shadow-card: none;
+  --shadow-list: none;
+
+  color-scheme: dark;
+}
+
+/* Tailwind utilities (kebab names, ripple-site style):
+ * bg-page bg-bg bg-surface bg-surface-2 border-hair text-ink text-ink-2 text-ink-3
+ * bg-accent text-accent-ink bg-accent-wash text-on-accent
+ * bg-doc text-doc-ink bg-doc-wash text-on-doc   bg-chk text-chk-ink bg-chk-wash text-on-chk */
+@theme inline {
+  --color-page: var(--page);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface2);
+  --color-hair: var(--hair);
+  --color-hair-2: var(--hair2);
+  --color-ink: var(--t1);
+  --color-ink-2: var(--t2);
+  --color-ink-3: var(--t3);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accentL);
+  --color-accent-wash: var(--accentM);
+  --color-on-accent: var(--onAccent);
+  --color-doc: var(--doc);
+  --color-doc-ink: var(--docL);
+  --color-doc-wash: var(--docM);
+  --color-on-doc: var(--onDoc);
+  --color-chk: var(--chk);
+  --color-chk-ink: var(--chkT);
+  --color-chk-wash: var(--chkM);
+  --color-on-chk: var(--onChk);
+
+  --font-sans: -apple-system, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+
+  /* Mr Tan's pages: body text never below 18px */
+  --text-body: 18px;
+  --text-body--line-height: 1.45;
+  --text-body-lg: 20px;
+  --text-body-lg--line-height: 1.4;
+
+  /* phone column */
+  --container-phone: 430px;
+}
+
+html {
+  /* root stays 16px so rem utilities are unchanged; patient pages opt into 18px via .rp-patient */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--page);
+  color: var(--t1);
+  font-family: var(--font-sans);
+}
+
+/* ---------- Layout scopes ---------- */
+
+/* Mobile pages (/p/*, /f, /join): max 430px wide, body text >= 18px. */
+.rp-patient {
+  max-width: 430px;
+  margin-inline: auto;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--t1);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+/* Filming mode: larger captions (set data-filming="true" on the patient root). */
+.rp-patient[data-filming="true"] {
+  font-size: 20px;
+}
+
+/* ---------- Components ported from v3-light.html (patient scale) ---------- */
+
+.rp-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--accentL);
+}
+
+/* counter pills under the visit header */
+.rp-count {
+  font-size: 13px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  color: var(--t2);
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.rp-count b { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--t1); }
+.rp-count i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+/* event cards: .rp-card + .rp-card-doc (doctor said) or .rp-card-chk (check) */
+.rp-card {
+  border-radius: 16px;
+  padding: 12px 13px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.rp-card-doc {
+  background: linear-gradient(var(--docM), var(--docM)), var(--surface);
+  border-color: rgba(76, 179, 230, .4);
+}
+.rp-card-chk {
+  background: linear-gradient(var(--chkM), var(--chkM)), var(--surface);
+  border-color: rgba(200, 150, 30, .38);
+}
+.rp-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.rp-card-doc .rp-tag { color: var(--docL); }
+.rp-card-chk .rp-tag { color: var(--chkT); }
+.rp-card-body { font-size: 18px; line-height: 1.4; margin-top: 6px; }
+.rp-num { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* source label next to every clinical line (医生说 / 柜台说 / 药剂师说 / 药袋 / 单张 / 本人说 / 女儿说).
+ * .rp-src and .rp-tag keep the v3 sizes (13px / 12px): the design rule calls them 小标签, so they are
+ * exempt from the 18px body-text rule (e2e/helpers.ts SMALL_TEXT_EXEMPT). Open for the owner: whether
+ * Mr Tan's source labels should be larger. Everything else on the phone pages is 18px or more. */
+.rp-src { font-size: 13px; color: var(--t3); margin-top: 8px; }
+
+/* Ripple question list */
+.rp-qlist {
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid rgba(55, 194, 186, .45);
+  box-shadow: var(--shadow-list);
+  overflow: hidden;
+}
+.rp-qlist .rp-tag { color: var(--accentL); }
+.rp-q { padding: 12px 14px; border-bottom: 1px solid var(--hair); }
+.rp-q:last-child { border-bottom: none; }
+.rp-qt { font-size: 18px; line-height: 1.38; font-weight: 600; }
+
+/* buttons
+ * In @layer components so Tailwind utilities on the same element (text-*, px-*, py-*, ring-*, text-ink)
+ * win; unlayered rules would beat every layered utility. No font-size here: a button inherits the
+ * size of where it sits (preflight sets `font: inherit`), so on the phone pages it is 18px, 20px in
+ * filming mode, and a utility such as text-lg sets it explicitly on desktop pages. */
+@layer components {
+  .rp-btn {
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .rp-btn-accent { background: var(--accent); color: var(--onAccent); }
+  .rp-btn-chk { background: var(--chk); color: var(--onChk); }
+  .rp-btn-ghost { background: rgba(16, 32, 36, .06); color: var(--t2); }
+  [data-theme="dark"] .rp-btn-ghost { background: rgba(255, 255, 255, .06); }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "/p/today",
+  "name": "Ripple",
+  "short_name": "Ripple",
+  "description": "看诊之间陪着你：记下医生说的话，到时间提醒吃药。",
+  "lang": "zh-Hans",
+  "dir": "ltr",
+  "start_url": "/p/today",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F5F9",
+  "theme_color": "#6A4C93",
+  "categories": ["health", "medical"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

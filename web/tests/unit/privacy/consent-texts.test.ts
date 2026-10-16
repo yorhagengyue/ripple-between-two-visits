@@ -1,0 +1,153 @@
+/**
+ * The consent texts (lib/privacy/consent-texts.ts, track A): every published text's sha256 is the hash of exactly its
+ * words, a (kind, version, locale) appears once, each sign-up kind has its current version in both languages, and the
+ * texts say what real-app 3.11 requires (DeepSeek in China, where data is stored, the placeholder officer).
+ */
+import { createHash } from "node:crypto";
+import { describe, expect, it } from "vitest";
+import {
+  CONSENT_TEXTS,
+  CURRENT_CONSENT_VERSIONS,
+  DATA_PROTECTION_OFFICER,
+  consentBody,
+  consentText,
+  currentConsentText,
+  type SignupConsentKind,
+} from "@/lib/privacy/consent-texts";
+
+const sha = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
+
+describe("consent texts", () => {
+  it("each sha256 is the hash of exactly its text (a changed text needs a new version and its new hash)", () => {
+    for (const t of CONSENT_TEXTS) {
+      expect(t.text, `${t.kind} ${t.version} ${t.locale}`).toBe(consentBody(t.title, t.paragraphs));
+      expect(t.sha256, `${t.kind} ${t.version} ${t.locale}: the right sha256 is ${sha(t.text)}`).toBe(sha(t.text));
+    }
+  });
+
+  it("a kind, version and locale is published once", () => {
+    const keys = CONSENT_TEXTS.map((t) => `${t.kind}|${t.version}|${t.locale}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("every sign-up kind has its current version in Chinese and English", () => {
+    for (const kind of Object.keys(CURRENT_CONSENT_VERSIONS) as SignupConsentKind[]) {
+      for (const locale of ["zh-Hans", "en"] as const) {
+        const t = currentConsentText(kind, locale);
+        expect(t.version).toBe(CURRENT_CONSENT_VERSIONS[kind]);
+        expect(consentText(kind, t.version, locale)).toBe(t);
+      }
+    }
+    expect(consentText("terms_privacy", "1999-01-01", "en")).toBeNull();
+  });
+
+  it("the AI text names DeepSeek and China and lists what is sent; refusing keeps the app working", () => {
+    const zh = currentConsentText("ai_processing", "zh-Hans").text;
+    const en = currentConsentText("ai_processing", "en").text;
+    for (const word of ["DeepSeek", "中国", "你问的话", "逐字稿", "药袋的照片", "翻译", "不同意也照样能用"]) expect(zh).toContain(word);
+    for (const word of ["DeepSeek", "China", "what you ask", "transcripts", "labels", "translated", "If you say no"]) expect(en).toContain(word);
+  });
+
+  it("the terms say where data is, how long, who sees it, export and deletion, and the officer", () => {
+    const zh = currentConsentText("terms_privacy", "zh-Hans").text;
+    const en = currentConsentText("terms_privacy", "en").text;
+    for (const word of ["东京", "新加坡", "90 天", "家人", "导出", "删除", "7 天", "21 天", DATA_PROTECTION_OFFICER["zh-Hans"]]) expect(zh).toContain(word);
+    for (const word of ["Tokyo", "Singapore", "90 days", "family", "export", "delete", "7 days", "21 days", DATA_PROTECTION_OFFICER.en]) expect(en).toContain(word);
+  });
+
+  // Line bind, 2026-10-11: binding by account (lib/care/bind.ts) shows a linked family member four items at once, so
+  // 「你确认过的家人，只能看你打开的那几项」 was no longer true. The terms got a new version; the old one stays published
+  // word for word, because the records of everyone who agreed to it point at it.
+  it("terms 2026-10-11 differ from 2026-10-10 in one paragraph, 「谁能看」, and 2026-10-10 is still published as it was", () => {
+    const FIRST = { "zh-Hans": "52f8a0840609b9d835ffab7d6efd4c4159ea9efeed1e3cddcc3ad045e76d8bae", en: "481f91ffac0d49d3d90c5cf05b0916665a080ee7d6912677d9158ca11d55f8fe" } as const;
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const old = consentText("terms_privacy", "2026-10-10", locale)!;
+      const now = consentText("terms_privacy", "2026-10-11", locale)!;
+      expect(old.sha256, locale).toBe(FIRST[locale]);
+      expect(now.title, locale).toBe(old.title);
+      expect(now.paragraphs.length, locale).toBe(old.paragraphs.length);
+      expect(now.paragraphs.flatMap((p, i) => (p === old.paragraphs[i] ? [] : [i])), locale).toEqual([3]);
+    }
+    const zh = consentText("terms_privacy", "2026-10-11", "zh-Hans")!.paragraphs[3]!;
+    const en = consentText("terms_privacy", "2026-10-11", "en")!.paragraphs[3]!;
+    // what he is told: a link is made by either of them typing the other's account, what she sees at once, what stays
+    // closed, and that he can switch anything off or remove the link
+    for (const word of ["谁能看：你自己", "你填了家人的账号，或者家人填了你的账号，就绑定了", "这周吃药的天数", "量了几次血压", "有几个问题要问医生", "提醒两次没回的时候会收到通知", "看诊录音和你的笔记要你自己打开", "随时关掉", "解除绑定", "每次查看都会留下记录"]) expect(zh, word).toContain(word);
+    for (const word of ["Who can see it: you", "When you enter a family member's account, or they enter yours, you are linked", "at once", "took your medicine", "blood pressure readings", "questions are waiting for the doctor", "two reminders go unanswered", "stay closed until you open them", "switch any item off or remove the link", "every look is logged"]) expect(en, word).toContain(word);
+    expect(zh).not.toContain("你确认过的家人");
+    expect(en).not.toContain("you have confirmed");
+  });
+
+  // The owner's decision of 2026-10-14: the same six switches, and each one shows its kind in full while it is on
+  // (lib/care/home.ts). 「谁能看」 had named counts (the days, how many readings, how many questions). The terms got a new
+  // version; 2026-10-11 stays published word for word, because the records of everyone who agreed to it point at it.
+  // The owner's other decision of that day (professional words, not spoken ones) reached the 华语 of this version before
+  // it was published: 「存什么」 and 「留多久」 say 服药, 就诊 where they said 吃药, 看诊, and the line about where Ripple's
+  // words come from names the label as 药品标签 (the photo he takes is still of his 药袋). The English differs in 「谁能看」
+  // only.
+  it("terms 2026-10-14 differ from 2026-10-11 in one sentence of 「谁能看」: what a linked family member sees, named in full; the 华语 in professional words; 2026-10-11 is still published as it was", () => {
+    const SECOND = { "zh-Hans": "b94703af75bfbadc25aa4de10a14d7b718a881665602c63a8df35f6e84559ae8", en: "1df71b1ad4aeda9960ff00acbe3ecc785dbd9805c5405e5b3fcb76b33582763b" } as const;
+    expect(CURRENT_CONSENT_VERSIONS.terms_privacy).toBe("2026-10-14");
+    const sentences = (p: string) => p.split(/(?<=[。.])\s*/);
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const old = consentText("terms_privacy", "2026-10-11", locale)!;
+      const now = consentText("terms_privacy", "2026-10-14", locale)!;
+      expect(old.sha256, locale).toBe(SECOND[locale]);
+      expect(now.title, locale).toBe(old.title);
+      expect(now.paragraphs.length, locale).toBe(old.paragraphs.length);
+      expect(now.paragraphs.flatMap((p, i) => (p === old.paragraphs[i] ? [] : [i])), locale).toEqual(locale === "zh-Hans" ? [0, 2, 3, 5] : [3]);
+      const [a, b] = [sentences(old.paragraphs[3]!), sentences(now.paragraphs[3]!)];
+      expect(b.length, locale).toBe(a.length);
+      expect(b.filter((s, i) => s !== a[i]), locale).toHaveLength(1);
+      expect(currentConsentText("terms_privacy", locale), locale).toBe(now);
+    }
+    const zh = consentText("terms_privacy", "2026-10-14", "zh-Hans")!.paragraphs[3]!;
+    const en = consentText("terms_privacy", "2026-10-14", "en")!.paragraphs[3]!;
+    for (const word of ["家人马上能看到每日服药情况（药物名称、服药时间、未服药的原因）、血压读数、待问医生的问题", "两次提醒均未回应时会收到通知", "就诊录音和你的笔记要你自己打开", "随时关掉", "解除绑定", "每次查看都会留下记录"]) expect(zh, word).toContain(word);
+    // the other three 华语 paragraphs that changed: the same facts, in the professional words
+    const zhAll = consentText("terms_privacy", "2026-10-14", "zh-Hans")!;
+    expect(zhAll.paragraphs[0]).toBe("存什么：你记录的服药情况、血压、问题和笔记；就诊的录音和逐字稿；药袋的照片；你自己填的资料。");
+    expect(zhAll.paragraphs[2]).toContain("就诊录音从就诊那天起留 90 天");
+    expect(zhAll.paragraphs[5]).toContain("只来自医生、药剂师、药品标签或官方单张的原话");
+    for (const word of ["吃药", "没吃", "没回", "看诊"]) expect(zhAll.text, word).not.toContain(word);
+    for (const word of ["they can at once see your medicine each day (which medicine, when, and the reason when you did not take it), your blood pressure readings and the questions you want to ask your doctor", "two reminders go unanswered", "stay closed until you open them", "switch any item off or remove the link", "every look is logged"]) {
+      expect(en, word).toContain(word);
+    }
+    // the counts are gone from the text in force
+    for (const word of ["这周吃药的天数", "量了几次血压", "有几个问题要问医生"]) expect(zh, word).not.toContain(word);
+    for (const word of ["how many days", "how many blood pressure readings", "how many questions"]) expect(en, word).not.toContain(word);
+  });
+
+  // The owner's decision of 2026-10-14: visit recordings are transcribed by Tencent Cloud's speech recognition, and the
+  // model writes Ripple's summary of what was said. The AI text got a new version; 2026-10-10 stays published word for
+  // word, because the records of everyone who agreed to it point at it (and their yes still counts: nothing asks again).
+  it("ai_processing 2026-10-15: Tencent's transcription said as a fact outside his yes, the summary among what his yes sends; 2026-10-10 still published as it was", () => {
+    const FIRST = { "zh-Hans": "ee325d64ad7989a154d7c737070cfa9ef368ed0841613a447fc9bbb69713965b", en: "56be326a59b1a7cf12499f14b090fcc78113cd4ab70f17d7bf4a00c174d805fb" } as const;
+    expect(CURRENT_CONSENT_VERSIONS.ai_processing).toBe("2026-10-15");
+    for (const locale of ["zh-Hans", "en"] as const) {
+      const old = consentText("ai_processing", "2026-10-10", locale)!;
+      const now = consentText("ai_processing", "2026-10-15", locale)!;
+      expect(old.sha256, locale).toBe(FIRST[locale]);
+      expect(sha(old.text), locale).toBe(FIRST[locale]);
+      expect(now.title, locale).toBe(old.title);
+      expect(currentConsentText("ai_processing", locale), locale).toBe(now);
+    }
+    const zh = consentText("ai_processing", "2026-10-15", "zh-Hans")!;
+    const en = consentText("ai_processing", "2026-10-15", "en")!;
+    // the transcription: who, where, what goes and what comes back, and that it does not wait for this yes
+    const tzh = zh.paragraphs.find((p) => p.startsWith("就诊录音转成文字"))!;
+    for (const w of ["腾讯云的语音识别服务", "新加坡", "一句一句发过去", "分段发过去", "转出的文字发回 Ripple", "不需要你同意 AI 处理"]) expect(tzh, w).toContain(w);
+    const ten = en.paragraphs.find((p) => p.startsWith("Visit recordings are turned into text"))!;
+    for (const w of ["Tencent Cloud's speech recognition service", "Singapore", "each stretch of speech is sent as you finish it", "in pieces", "the text comes back to Ripple", "does not need your agreement to AI processing"]) expect(ten, w).toContain(w);
+    // not in the list of what his yes sends (that list is DeepSeek's)
+    expect(zh.paragraphs.filter((p) => p.startsWith("· ")).join(" ")).not.toContain("腾讯云");
+    expect(en.paragraphs.filter((p) => p.startsWith("· ")).join(" ")).not.toContain("Tencent");
+    // the summary: what the transcript is also sent for, marked as not confirmed, and gone when he says no
+    expect(zh.text).toContain("写出 Ripple 的总结（几条要点，标明未经确认，不当作医生的原话）");
+    expect(zh.text).toContain("没有 Ripple 的总结");
+    expect(en.text).toContain("to write Ripple's summary while you record and when the visit ends (a few short points, marked as not confirmed, never taken as the doctor's words)");
+    expect(en.text).toContain("there is no Ripple summary");
+    // the owner's professional words of 10-14
+    for (const word of ["吃药", "没吃", "看诊"]) expect(zh.text, word).not.toContain(word);
+  });
+});

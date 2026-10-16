@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "visit": "p1",
+    "source": "docs/plan/visits-script.md",
+    "timing": "synthetic reading speed, not measured",
+    "use": "SPEECH_PROVIDER=mock returns exactly these fields"
+  },
+  "utterances": [
+    {
+      "id": "p1-u01",
+      "t_start_ms": 1500,
+      "t_end_ms": 5346,
+      "speaker_cluster": 0,
+      "lang": "en-SG",
+      "text": "Can I record? I want to ask about this medicine."
+    },
+    {
+      "id": "p1-u02",
+      "t_start_ms": 6046,
+      "t_end_ms": 7584,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Sure. Let me see."
+    },
+    {
+      "id": "p1-u03",
+      "t_start_ms": 8284,
+      "t_end_ms": 18668,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit."
+    }
+  ]
+}

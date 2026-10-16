@@ -1,0 +1,2 @@
+# These files run on the Linux server: Unix line ends in every checkout (a bash script with CR line ends does not run).
+* text eol=lf

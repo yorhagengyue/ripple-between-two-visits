@@ -1,0 +1,18 @@
+# /etc/systemd/system/ripple-backup.service (C2 track P; docs/plan/hosting.md 5.14 item 2). Installed by provision.sh.
+# Both environment files are optional here ("-"): while the backup is not configured the script says so and ends well.
+[Unit]
+Description=Ripple backup: database (public and auth) and files, encrypted, to object storage
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/ripple/web.env
+EnvironmentFile=-/etc/ripple/backup.env
+Environment=TZ=Asia/Singapore
+ExecStart=/usr/local/bin/node /usr/local/lib/ripple/backup.mjs
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+TimeoutStartSec=3h

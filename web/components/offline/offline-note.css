@@ -1,0 +1,20 @@
+/*
+ * What waits on this phone (components/offline/OfflineNote.tsx) in the timeline design (front-end line fe-12). The
+ * boxes, the list card and the buttons are components/ui; here are the few rules their arrangement needs. Plain global
+ * CSS with the .rp12- prefix, only --rp-* tokens (app/ripple-ui.css, never repeated or edited here), no text under
+ * 18px. Unlayered on purpose: the foundation's rules sit in @layer components.
+ */
+
+/* the note is one block of the page: 18px from its neighbours by itself, none of its own inside a stack (the stack's gap) */
+.rp12-offline { margin: 18px 0; }
+.rpu-stack > .rp12-offline { margin: 0; }
+
+/* one entry of the white card: its row, and under a reading still on the phone the button that takes it out */
+.rp12-out + .rp12-out { border-top: 1px solid var(--rp-tint); }
+.rp12-out-act { padding: 0 16px 14px; }
+
+/* an entry the server did not take, inside its red-bordered box: which one (and what he answered), why, 「知道了」 */
+.rp12-out-what { margin: 0; font-weight: 700; color: var(--rp-ink); font-variant-numeric: tabular-nums; }
+.rp12-out-said::before { content: " · "; }
+.rp12-out-why { margin: 2px 0 0; }
+.rpu-btn.rp12-out-away { margin-top: 12px; }

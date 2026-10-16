@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "generated_from": [
+      "Ripple 规则库资料 · 新加坡药物单张转述与差异 v1.1（2026-10-01）.json",
+      "Ripple 规则库资料出处表 v1.1 新加坡版（2026-10-01）.md"
+    ],
+    "author_of_research": "Zicheng (v1.1, 2026-10-01)",
+    "rules": [
+      "Patient-facing text is our paraphrase with a citation; never copy HealthHub/HPB/MOH sentences.",
+      "US label text is reference only and never shown to the patient.",
+      "Numbers marked do-not-display in the B4 notes must never appear in output.",
+      "zh fields must be human-reviewed before zh_status becomes 'reviewed'."
+    ]
+  },
+  "screening": [
+    {
+      "id": "C1-01",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "**Programme name**",
+      "who": "—",
+      "interval_doses": "—",
+      "official_page": "ask.gov.sg (Healthier SG): [What happened to Screen for Life?](https://ask.gov.sg/healthiersg/questions/cmb7ophun0013za2otmdvcpvf); [Health Appointment System](https://book.health.gov.sg/healthiersg-screening); [CHAS GP Reference Guide, Oct 2025 (PDF)](https://edge.sitecorecloud.io/agencyforinb6cc-agencyforin73f5-production08ac-d178/media/primary-care-pages-pcp/Scheme-and-Programmes/Healthier-SG-Screening/CHAS-GP-Reference-Guide-Oct-2025.pdf); Primary Care Pages [Healthier SG Screening](https://www.primarycarepages.sg/schemes-and-programmes/healthier-sg-screening)",
+      "page_date": "answer updated 2025-05-28 · guide Oct 2025 · PCP 31 Mar 2026",
+      "note_zh": "✅ 「Screen for Life 已改名 Healthier SG Screening」属实，福利不变（预约网站、2025-10 CHAS GP 参考指南也写「前称 Screen for Life」）。**官方没写改名生效日期**；最早有日期的官方说法是这条 2025-05-28 的回答，AIC 页上 2022-11 的通告还用旧名（推断改名在两者之间，非官方原文）。"
+    },
+    {
+      "id": "C1-02",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "**Cardiovascular risk screening** — obesity (BMI + waist), blood pressure, blood sugar, blood cholesterol",
+      "who": "Adults **40 and above** who have **never been diagnosed** with high blood pressure, diabetes or high blood cholesterol, and have not had this screening in the past 3 years",
+      "interval_doses": "**Every 3 years** if results are normal",
+      "official_page": "HealthHub [Screening journey](https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey?age_group=50-and-above&gender=female) · HealthHub [programme page](https://www.healthhub.sg/programmes/healthiersg-screening) · Primary Care Pages [Healthier SG Screening](https://www.primarycarepages.sg/schemes-and-programmes/healthier-sg-screening) (PR test rates)",
+      "page_date": "HealthHub: not shown · PCP: updated 31 Mar 2026",
+      "note_zh": "在参与的 CHAS GP 诊所做，不需要邀请信。公民每次 ≤ $5（PG $0；MG / CHAS 蓝卡橙卡 $2；CHAS 绿卡及其他 $5），含首次复诊；已注册 Healthier SG 的公民在自己的注册诊所 $0。PR：问诊所的 HPB 标准检验价 + 诊金（2026-04-01 起有标准价）。"
+    },
+    {
+      "id": "C1-03",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "Already diagnosed with high blood pressure, diabetes or high blood cholesterol",
+      "who": "**Not eligible** for this screening",
+      "interval_doses": "No screening interval — keep regular consultations and routine lab monitoring with the family doctor (no interval stated)",
+      "official_page": "HealthHub [Screening journey](https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey?age_group=50-and-above&gender=female); MOH / AMS [STRC 2026 Vol 1 report](https://isomer-user-content.by.gov.sg/3/15ed4753-8da1-4550-b237-fdabf2b54206/STRC%202026_Volume%201_Feb2026.pdf), p.5",
+      "page_date": "STRC: Feb 2026",
+      "note_zh": "✅ 待核说法属实。国家筛查委员会报告第 5 页的定义：筛查是给**还没被诊断**的无症状者做的检测；因为本身已有该病而做的检查属于**对已有疾病的临床管理**，不算筛查，按临床指南做监测。HealthHub 也写已确诊者不符合资格、应找家庭医生定期复诊和化验。**监测间隔官方没写**。"
+    },
+    {
+      "id": "C1-04",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "Diabetes Risk Assessment (HPB, online self-check)",
+      "who": "Adults **18–39**",
+      "interval_doses": "Lower risk: repeat the assessment **every 2 years** (sooner if weight, BP, family history etc. change). Higher risk: email invitation to subsidised cardiovascular risk screening at a CHAS GP",
+      "official_page": "HealthHub [Screening FAQ](https://www.healthhub.sg/programmes/healthiersg-screening/screening-faq)",
+      "page_date": "not shown",
+      "note_zh": "40 岁及以上直接做心血管筛查，不用做评估。被判高风险、做完筛查之后多久再筛，官方没写。"
+    },
+    {
+      "id": "C1-05",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "**Cervical cancer screening**",
+      "who": "Women **25 and above** who have ever been sexually active (no Pap test in past 3 years / no HPV test in past 5 years)",
+      "interval_doses": "Age 25–29: **Pap test every 3 years**. Age 30+: **HPV test every 5 years**. No upper age limit; from 69, stopping can be discussed with a GP after two negative screens in 10 years (latest within 5 years)",
+      "official_page": "HealthHub [Screening journey](https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey?age_group=50-and-above&gender=female); HealthHub [Screening FAQ](https://www.healthhub.sg/programmes/healthiersg-screening/screening-faq) (HPV vaccine); STRC 2026 Vol 1; Primary Care Pages [cancer-screening protocol](https://www.primarycarepages.sg/Healthier-SG/Care-Protocols/Preventive/Cancer-Screening); Primary Care Pages [Healthier SG Screening](https://www.primarycarepages.sg/schemes-and-programmes/healthier-sg-screening) (PR test rates, Table 1)",
+      "page_date": "journey, FAQ: not shown · STRC: Feb 2026 · protocol: 14 Aug 2026 · PCP HSG page: updated 31 Mar 2026",
+      "note_zh": "打过 HPV 疫苗也要筛。HealthHub 资格文字写「female Singapore Citizen」，但同页叫 PR 去问诊所价格；PR 标准价 Pap $13 + GST、HPV $48 + GST。结果异常：高危 HPV 转医院做阴道镜，其他高危型一年后复查（异常 ≠ 癌症）。"
+    },
+    {
+      "id": "C1-06",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "**Colorectal cancer screening** (FIT home stool test)",
+      "who": "Adults **50 and above** who have not done a FIT in the past year",
+      "interval_doses": "**FIT every year** (colonoscopy every 5–10 years is mentioned as an alternative, but only FIT is covered by Healthier SG Screening)",
+      "official_page": "HealthHub [Screening journey](https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey?age_group=50-and-above&gender=female); Primary Care Pages [protocol](https://www.primarycarepages.sg/Healthier-SG/Care-Protocols/Preventive/Cancer-Screening); Primary Care Pages [Healthier SG Screening](https://www.primarycarepages.sg/schemes-and-programmes/healthier-sg-screening) (PR test rates)",
+      "page_date": "not shown · 14 Aug 2026 · 31 Mar 2026",
+      "note_zh": "已患大肠癌的人不适用，应定期看医生。FIT 阳性 ≠ 癌症，要进一步检查（多为结肠镜）；两周内没接到协调员电话，打 HPB 1800 223 1313。PR 标准价 $31 + GST（两份试剂盒）。"
+    },
+    {
+      "id": "C1-07",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "**Breast cancer screening** (mammogram)",
+      "who": "Women **40–74** with no breast symptoms; 75+ may be offered it after discussing their own risk with a doctor. Not during pregnancy; wait at least 6 months after stopping breastfeeding",
+      "interval_doses": "**40–49: every year. 50–74: every 2 years**",
+      "official_page": "MOH / AMS [STRC 2026 Vol 1](https://isomer-user-content.by.gov.sg/3/15ed4753-8da1-4550-b237-fdabf2b54206/STRC%202026_Volume%201_Feb2026.pdf) (MOH page [3 Feb 2026](https://www.moh.gov.sg/others/resources-and-statistics/strc-2026-volume-1/)); Primary Care Pages [protocol](https://www.primarycarepages.sg/Healthier-SG/Care-Protocols/Preventive/Cancer-Screening); HealthHub [Screening journey](https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey?age_group=50-and-above&gender=female); HealthHub [Screening FAQ](https://www.healthhub.sg/programmes/healthiersg-screening/screening-faq) (pregnancy / breastfeeding); [Health Appointment System](https://book.health.gov.sg/healthiersg-screening) (eligibility accordion)",
+      "page_date": "STRC Feb 2026 · protocol 14 Aug 2026 · journey, FAQ, booking site: not shown",
+      "note_zh": "⚠️ **官方页面之间不一致**：2026 年报告把年龄从 50–69 改为 40–74，GP 规程（2026-08-14）已采用；但预约网站的资格栏还写「50 岁以上，40–49 岁先问医生」，HealthHub FAQ 第 5 题只写「50 岁以上、每两年」（同一 FAQ 的乳腺第 2 题又写 40–49 岁每年一次）。只在参与的综合诊疗所做；价格 $0（已注册 HSG 公民）/ PG $25 / MG $37.50 / 公民 $50 / PR $75。有乳房症状不走筛查，直接看医生（B2）。"
+    },
+    {
+      "id": "C1-08",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "Functional screening for seniors (vision, hearing, oral health) — **Project Silver Screen**",
+      "who": "Citizens and PRs **60 and above** not screened in the past 12 months",
+      "interval_doses": "Once at least 12 months have passed since the last one; **fully subsidised from 1 Sep 2026** (follow-up care or devices may cost extra)",
+      "official_page": "HealthHub [Project Silver Screen](https://www.healthhub.sg/well-being-and-lifestyle/active-ageing/project-silver-screen)",
+      "page_date": "08 Sep 2026",
+      "note_zh": "**不属于 Healthier SG Screening**，是另一个项目。"
+    },
+    {
+      "id": "C1-09",
+      "section": "C1　Healthier SG Screening（原 Screen for Life）",
+      "kind": "screening",
+      "item": "National screening recommendations behind the programme (for clinicians)",
+      "who": "Diabetes: 40+ · Lipids: 40+ · Blood pressure: 18+ · Obesity (BMI + waist): 18+",
+      "interval_doses": "Diabetes (FPG or HbA1c) every 3 years · lipids every 3 years · blood pressure opportunistically and at least yearly · BMI + waist yearly",
+      "official_page": "MOH / AMS [STRC 2026 Vol 1](https://isomer-user-content.by.gov.sg/3/15ed4753-8da1-4550-b237-fdabf2b54206/STRC%202026_Volume%201_Feb2026.pdf), pp.18–23",
+      "page_date": "Feb 2026",
+      "note_zh": "这是面向医生的全国建议，**不等于**补贴项目的资格（补贴项目是 40 岁起、每 3 年）。有危险因素的人群建议更早 / 更频繁，由医生判断。"
+    },
+    {
+      "id": "C2-01",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Which version is current**",
+      "who": "—",
+      "interval_doses": "—",
+      "official_page": "CDA [Vaccinations](https://www.cda.gov.sg/public/vaccinations/) → [NAIS PDF, updated 1 Apr 2026](https://isomer-user-content.by.gov.sg/18/94b2ad6d-6ff8-4ae8-a945-d77326d83e3f/NAIS_1%20Apr%202026.pdf)",
+      "page_date": "CDA page 22 May 2026 · PDF 1 Apr 2026",
+      "note_zh": "NAIS 现在挂在传染病管理局（CDA）页面上，MOH 旧地址已跳转过来。2025-08-21 那份 PDF 已被取代；两版之间唯一实质改动是乙肝的肾病 4 剂方案。**HealthHub 上的 NAIS PDF 链接还指向 2020 年的旧图（没有 PCV20、没有带状疱疹疫苗），别用。**"
+    },
+    {
+      "id": "C2-02",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Claim check: PCV20 and Shingrix added from 2025-09-01**",
+      "who": "—",
+      "interval_doses": "—",
+      "official_page": "MOH / CDA [press release, 29 Aug 2025](https://www.moh.gov.sg/newsroom/new-vaccines-against-shingles-and-pneumococcal-disease-added-to-national-adult-immunisation-schedule/); [MOH Circular 03/2025](https://isomer-user-content.by.gov.sg/7/18bc4545-014a-4725-adf1-8440bdf1f372/MOH%20Cir%2003_2025%20Inclusion%20of%20Shingles%20Vaccine%20and%20Updates%20to%20Pneumococcal%20Vaccine%20in%20NAIS.pdf) (10 Feb 2025)",
+      "page_date": "29 Aug 2025",
+      "note_zh": "✅ 属实，2025-09-01 起两种疫苗加入并开始补贴；旧版 PDF（含 2020 年图）里没有。补充：PCV20 是作为**替代方案**加入的，PCV13 / PPSV23 没有被移除；已经打过 PCV13 / PPSV23 的人可以问医生要不要打 PCV20；打过活疫苗 Zostavax 的人也可以再打 Shingrix。"
+    },
+    {
+      "id": "C2-03",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Influenza**",
+      "who": "All adults **65+**; adults 18+ with long-term lung or heart conditions (incl. asthma), diabetes or other chronic metabolic, kidney, nerve, liver or blood conditions, or immunosuppression (needing follow-up or hospital care); people on **long-term aspirin therapy**; **pregnant women** (any stage); people receiving intermediate / long-term care services",
+      "interval_doses": "**1 dose every year or every season**",
+      "official_page": "NAIS PDF (1 Apr 2026), p.2",
+      "page_date": "1 Apr 2026",
+      "note_zh": "长期服阿司匹林的人在流感疫苗对象里（原因：流感后有 Reye 综合征风险）——和本项目的阿司匹林用户相关。原文这一条写「Persons age 18 years」没写「or older」，字面有歧义。2026-09 有临时季节性建议（北半球疫苗晚两周到货），见 CDA [4 Sep 2026 update](https://www.cda.gov.sg/news-and-events/update-on-seasonal-influenza-vaccination/)，是临时的。"
+    },
+    {
+      "id": "C2-04",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Pneumococcal — PCV20** (added 1 Sep 2025)",
+      "who": "All adults **65+**; adults 18+ with chronic lung, heart or liver disease, diabetes, a cochlear implant or CSF leak, an immunocompromising condition, or chronic kidney disease",
+      "interval_doses": "**1 dose**",
+      "official_page": "NAIS PDF, p.3; MOH [Healthier SG Vaccinations](https://www.moh.gov.sg/managing-expenses/schemes-and-subsidies/healthier-sg-vaccinations/)",
+      "page_date": "1 Apr 2026 · MOH 28 Aug 2026",
+      "note_zh": "可以选 PCV20 一针，或按原来的 PCV13 和 / 或 PPSV23 方案。MOH Circular 03/2025 的 PCV20 对象里多列了「无脾或脾功能缺失」，现行 NAIS PDF、CDA 和 MOH 页面都没有这一条（待确认）。"
+    },
+    {
+      "id": "C2-05",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Pneumococcal — PCV13 and / or PPSV23** (existing option)",
+      "who": "PCV13: 65+; adults 18+ with a cochlear implant or CSF leak, an immunocompromising condition, or chronic kidney disease. PPSV23: 65+; adults 18+ with the same conditions as PCV20",
+      "interval_doses": "PCV13: 1 dose, given first. PPSV23: 1 or 2 doses depending on age / condition, after PCV13 when both are needed",
+      "official_page": "NAIS PDF, pp.3–4",
+      "page_date": "1 Apr 2026",
+      "note_zh": "两针之间隔多久、什么情况打 1 针或 2 针，NAIS 没写数字。"
+    },
+    {
+      "id": "C2-06",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Shingles — recombinant zoster vaccine (RHZV, Shingrix)** (added 1 Sep 2025)",
+      "who": "All adults **60+**; adults 18+ with an immunocompromising condition (immunodeficiency, or immunosuppression from treatment)",
+      "interval_doses": "**2 doses, 2–6 months apart** (1–2 months apart possible if immunocompromised)",
+      "official_page": "NAIS PDF, p.5; HealthHub [Shingles vaccine leaflet](https://www.healthhub.sg/medication-devices-and-treatment/medications/shingles-herpes-zoster-vaccine) (examples of immunocompromising conditions); MOH [Healthier SG Vaccinations](https://www.moh.gov.sg/managing-expenses/schemes-and-subsidies/healthier-sg-vaccinations/) (cost)",
+      "page_date": "1 Apr 2026 · leaflet 2 Feb 2026 · MOH 28 Aug 2026",
+      "note_zh": "打过活疫苗（HZVL / Zostavax）的，一般至少隔 5 年再打 RHZV。已注册 Healthier SG 的公民在注册诊所打 NAIS 疫苗免费，**只有 RHZV 仍需封顶自付**。"
+    },
+    {
+      "id": "C2-07",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Tdap** (tetanus, diphtheria, pertussis)",
+      "who": "**Pregnant women**",
+      "interval_doses": "**1 dose in every pregnancy**, between weeks 16 and 32 (a dose after week 32 can be considered)",
+      "official_page": "NAIS PDF, p.6",
+      "page_date": "1 Apr 2026",
+      "note_zh": "目的是保护新生儿免受百日咳。"
+    },
+    {
+      "id": "C2-08",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**HPV2** (Cervarix)",
+      "who": "Females **18–26** not previously vaccinated",
+      "interval_doses": "**3 doses** (months 0, 1, 6); if started by 26, the rest can be finished up to age 45",
+      "official_page": "NAIS PDF, p.6",
+      "page_date": "1 Apr 2026",
+      "note_zh": "旧版 HealthHub 图写的是 HPV2 或 HPV4，现行版只列 HPV2。"
+    },
+    {
+      "id": "C2-09",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Hepatitis B**",
+      "who": "Adults with no evidence of immunity or past infection",
+      "interval_doses": "**3 doses** (months 0, 1, 6). Chronic kidney disease stage 4–5 and / or dialysis: **4 doses** (months 0, 1, 2, 6)",
+      "official_page": "NAIS PDF, p.6",
+      "page_date": "1 Apr 2026",
+      "note_zh": "肾病方案是 2026-04-01 版新增内容。PDF 里写了每剂微克数，按规矩没搬进表。"
+    },
+    {
+      "id": "C2-10",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**MMR** (measles, mumps, rubella)",
+      "who": "Adults with no evidence of immunity or past infection",
+      "interval_doses": "**2 doses, at least 4 weeks apart**",
+      "official_page": "NAIS PDF, p.7",
+      "page_date": "1 Apr 2026",
+      "note_zh": ""
+    },
+    {
+      "id": "C2-11",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "**Varicella** (chickenpox)",
+      "who": "Adults with no evidence of immunity or past infection",
+      "interval_doses": "**2 doses, 4–8 weeks apart**",
+      "official_page": "NAIS PDF, p.7",
+      "page_date": "1 Apr 2026",
+      "note_zh": ""
+    },
+    {
+      "id": "C2-12",
+      "section": "C2　国家成人免疫计划 NAIS（现行版：2026-04-01）",
+      "kind": "screening",
+      "item": "General caveat",
+      "who": "—",
+      "interval_doses": "—",
+      "official_page": "NAIS PDF, p.2",
+      "page_date": "1 Apr 2026",
+      "note_zh": "NAIS 自己写明：个人适合打什么、能不能拿补贴，要看医生。AI 讲完时间表后可以用这条做「问医生」的依据（用自己的话写）。"
+    }
+  ]
+}

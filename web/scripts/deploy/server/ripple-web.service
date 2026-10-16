@@ -1,0 +1,29 @@
+# /etc/systemd/system/ripple-web.service (C2 track P; docs/plan/hosting.md 5.8). Installed by provision.sh.
+# The app listens on 127.0.0.1 only: the outside reaches it through Caddy, which checks the origin lock.
+# systemd reads /etc/ripple/web.env as root and starts the process as the service user, which cannot read the file.
+[Unit]
+Description=Ripple web (next start)
+After=network-online.target
+Wants=network-online.target
+# nothing to start before the first release
+ConditionPathExists=/srv/ripple/current
+
+[Service]
+User=ripple
+Group=ripple
+WorkingDirectory=/srv/ripple/current
+EnvironmentFile=/etc/ripple/web.env
+Environment=NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 TZ=Asia/Singapore
+ExecStart=/usr/local/bin/node node_modules/next/dist/bin/next start -p 3200 -H 127.0.0.1
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+MemoryMax=3G
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/ripple
+
+[Install]
+WantedBy=multi-user.target

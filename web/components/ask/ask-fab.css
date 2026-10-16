@@ -1,0 +1,121 @@
+/*
+ * The round 提问 button at the bottom right of his pages and its sheet (components/ask/AskFab.tsx; owner 10-15). The
+ * foundation's tokens only (app/ripple-ui.css). The button is 64px (his targets are at least 48px); the sheet's words are
+ * at least 18px. On a computer the button and the sheet stay inside the phone's column (app/desktop.css centres it at
+ * 430px).
+ */
+.rpa-fab {
+  position: fixed;
+  right: max(16px, calc((100vw - 430px) / 2 + 16px));
+  z-index: 60;
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--rp-accent);
+  color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.22);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: scale 140ms ease-out, box-shadow 140ms ease-out;
+}
+.rpa-fab:active,
+.rpa-fab[data-mode="listening"] { scale: 0.94; box-shadow: 0 3px 10px rgb(0 0 0 / 0.25); }
+.rpa-fab[data-mode="listening"] { box-shadow: 0 0 0 8px color-mix(in srgb, var(--rp-accent) 25%, transparent); }
+.rpa-fab-word { font-size: 18px; line-height: 1; font-weight: 700; margin-top: 2px; letter-spacing: 0; }
+.rpa-fab svg { width: 24px; height: 24px; }
+.rpa-fab:focus-visible { outline: 3px solid var(--rp-ink); outline-offset: 3px; }
+
+.rpa-sheet-wrap { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; justify-content: flex-end; }
+.rpa-scrim { position: absolute; inset: 0; background: rgb(0 0 0 / 0.35); animation: rpa-fade 200ms ease-out both; }
+.rpa-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--rp-paper, #fff);
+  color: var(--rp-ink);
+  border-radius: 24px 24px 0 0;
+  padding: 18px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 0.18);
+  animation: rpa-rise 300ms cubic-bezier(.32, .72, 0, 1) both;
+}
+.rpa-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.rpa-sheet-t { font-size: 22px; font-weight: 800; }
+.rpa-close { min-height: 48px; padding: 0 16px; border-radius: 999px; border: 2px solid var(--rp-line); background: transparent; color: var(--rp-ink); font-size: 18px; font-weight: 700; cursor: pointer; }
+.rpa-sheet-body { display: flex; flex-direction: column; gap: 14px; }
+.rpa-heard { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.5; }
+.rpa-wait { margin: 0; font-size: 18px; color: var(--rp-ink-3); }
+.rpa-note { margin: 0; font-size: 18px; line-height: 1.5; color: var(--rp-ink); }
+.rpa-form { display: flex; flex-direction: column; gap: 10px; }
+.rpa-field { width: 100%; min-height: 64px; box-sizing: border-box; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--rp-line); font: inherit; font-size: 20px; line-height: 1.4; resize: none; background: var(--rp-paper, #fff); color: var(--rp-ink); }
+.rpa-field:focus { outline: none; border-color: var(--rp-accent); }
+.rpa-send { min-height: 56px; border: 0; border-radius: 16px; background: var(--rp-accent); color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; }
+.rpa-hint { margin: 0; font-size: 18px; color: var(--rp-ink-3); line-height: 1.5; }
+
+.rpa-listen { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 18px 0 8px; }
+.rpa-listen-t { margin: 0; font-size: 26px; font-weight: 800; }
+.rpa-listen[data-cancel="true"] .rpa-listen-t { color: var(--rp-urgent); }
+.rpa-listen-s { margin: 0; min-height: 27px; font-size: 18px; color: var(--rp-ink-3); text-align: center; }
+.rpa-bars { display: inline-flex; align-items: flex-end; gap: 7px; height: 40px; }
+.rpa-bar { width: 12px; border-radius: 4px; background: var(--rp-line); transition: background-color 90ms linear; }
+.rpa-bar:nth-child(1) { height: 14px; }
+.rpa-bar:nth-child(2) { height: 21px; }
+.rpa-bar:nth-child(3) { height: 28px; }
+.rpa-bar:nth-child(4) { height: 34px; }
+.rpa-bar:nth-child(5) { height: 40px; }
+.rpa-bar[data-on="true"] { background: var(--rp-accent); }
+
+/* 「按住 说话」 at the foot of the sheet (10-15) */
+.rpa-holdbar {
+  /* pinned to the foot of the sheet: always in reach under a long answer (the sheet scrolls, the bar stays) */
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  box-shadow: 0 -12px 12px -6px var(--rp-paper);
+  margin-top: 14px;
+  width: 100%;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 16px;
+  border: 2px solid var(--rp-accent);
+  background: var(--rp-paper);
+  color: var(--rp-accent);
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background-color 120ms ease-out, color 120ms ease-out, scale 120ms ease-out;
+}
+.rpa-holdbar[data-holding="true"] { background: var(--rp-accent); color: #fff; scale: 0.98; }
+.rpa-holdbar svg { width: 24px; height: 24px; }
+
+@keyframes rpa-rise { from { transform: translateY(100%); } }
+@keyframes rpa-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .rpa-sheet, .rpa-scrim { animation: none; }
+  .rpa-fab, .rpa-bar { transition: none; }
+}
+
+/* While the round button is drawn (AskFab sets data-ask-fab on the root), a page with the fixed tab bar keeps room for it
+   at its foot, so the page's last buttons can scroll clear of it (10-15: it covered "See this week" on the screen after a
+   reading). A page with its own sticky dock has the button standing above that dock instead. */
+:root[data-ask-fab="shown"] .rpu-screen[data-tabbar="fixed"]:not(:has(.rpu-dock[data-bar="true"])) > .rpu-page {
+  padding-bottom: calc(var(--rpu-bottom) + 18px + 72px);
+}

@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "purpose": "Closed bilingual vocabulary for the slot check (plan section 6.3). Every drug, unit, frequency, time and number that appears in a clinical sentence is normalised to an id from this file, in English, Mandarin and common Singlish/label shorthand. A token that maps to nothing here cannot pass the slot check.",
+    "extend_rule": "Add entries only with a source (label sample, leaflet, or the visit script). Keep it closed: no fuzzy matching inside the verifier."
+  },
+  "drugs": {
+    "amlodipine": ["amlodipine", "amlodipine besylate", "amlodipine besilate", "norvasc", "氨氯地平", "络活喜"],
+    "losartan": ["losartan", "losartan potassium", "cozaar", "氯沙坦", "科素亚"],
+    "metformin": ["metformin", "metformin hydrochloride", "glucophage", "二甲双胍"],
+    "atorvastatin": ["atorvastatin", "atorvastatin calcium", "lipitor", "阿托伐他汀"],
+    "aspirin": ["aspirin", "low-dose aspirin", "acetylsalicylic acid", "cardiprin", "阿司匹林"],
+    "paracetamol": ["paracetamol", "acetaminophen", "panadol", "扑热息痛", "对乙酰氨基酚", "必理痛"],
+    "ibuprofen": ["ibuprofen", "nurofen", "brufen", "布洛芬", "芬必得"]
+  },
+  "units": {
+    "tablet": ["tablet", "tablets", "tab", "tabs", "pill", "pills", "粒", "片", "颗", "粒药"],
+    "mg": ["mg", "milligram", "milligrams", "毫克"],
+    "capsule": ["capsule", "capsules", "cap", "胶囊"]
+  },
+  "frequencies": {
+    "once_daily": ["once a day", "once daily", "one time a day", "od", "每天一次", "一天一次", "每日一次"],
+    "twice_daily": ["twice a day", "twice daily", "two times a day", "bd", "bid", "每天两次", "一天两次", "每日两次"],
+    "three_times_daily": ["three times a day", "tds", "tid", "每天三次", "一天三次"],
+    "when_needed": ["when needed", "as needed", "prn", "需要时", "有需要的时候"],
+    "twice_weekly": ["twice a week", "two times a week", "每周两次", "一个星期两次"]
+  },
+  "times": {
+    "morning": ["morning", "every morning", "om", "in the morning", "早上", "每天早上", "早晨"],
+    "night": ["night", "at night", "on", "bedtime", "晚上", "睡前"],
+    "after_breakfast": ["after breakfast", "早饭后", "吃完早餐"],
+    "after_food": ["after food", "after meals", "饭后"],
+    "with_or_without_food": ["with or without food", "饭前饭后都可以", "饭前饭后吃都可以"],
+    "evening": ["evening", "傍晚"]
+  },
+  "numbers": {
+    "0.5": ["0.5", "half", "半", "半粒", "半片"],
+    "1": ["1", "one", "a", "一", "壹"],
+    "2": ["2", "two", "二", "两"],
+    "3": ["3", "three", "三"],
+    "4": ["4", "four", "四"],
+    "5": ["5", "five", "五"],
+    "6": ["6", "six", "六"],
+    "7": ["7", "seven", "七"],
+    "8": ["8", "eight", "八"],
+    "9": ["9", "nine", "九"],
+    "10": ["10", "ten", "十"],
+    "50": ["50", "fifty", "五十"],
+    "100": ["100", "one hundred", "一百"]
+  },
+  "directive_patterns": {
+    "note": "Patterns aimed at the user. Match whole patterns, not single characters, so ordinary explanations such as 这个药是早上吃的 or 可以问药剂师 are not blocked.",
+    "en": ["\\byou should (take|stop|skip|double|increase|reduce)\\b", "\\byou can (take|stop|skip|double|increase|reduce)\\b", "\\b(take|have) (an )?extra\\b", "\\bdouble (the |your )?dose\\b", "\\bstop taking\\b", "\\bskip (the |your )?(next )?dose\\b", "\\b(increase|reduce|lower|raise) (the |your )?dose\\b"],
+    "zh": ["你(可以|应该|要|就)(多|少)?吃", "(多|少|加|减)吃(一|两|半)?(粒|片|颗)", "(停|停掉|别吃|不要吃)(这个|那个)?药", "(加倍|翻倍)", "(跳过|省掉)(这|下)?一?(次|顿)"]
+  }
+}

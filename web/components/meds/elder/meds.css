@@ -1,0 +1,253 @@
+/*
+ * 「我的药」 on his own account (the timeline draft's 06-3 to 06-9 and 08): the few pieces these screens need beyond the
+ * foundation (app/ripple-ui.css Part A). Plain global CSS, loaded by the components of this folder (this app's CSS
+ * pipeline has no CSS modules: components/meds/classes.ts). Only --rp-* tokens and sizes in calc(N * var(--rp-u));
+ * text 18px and up, targets 48px and up; #8592A3 (--rp-edge) never as a text colour.
+ *
+ * For the desktop column (a window 720 and wider shows each phone page as one 430 column): no vw units, no media
+ * queries on the window's width, and nothing here is position: fixed (what stays at the bottom is the foundation's:
+ * the tab bar, and the dock strip of a step, <ActionDock bar>, which is sticky in the page's flow).
+ *
+ *   .rpu-meds-step*    one step of adding a medicine: the header, the blocks, the buttons in the lower part
+ *   .rpu-meds-kv*      06-4a: a 「对 / 改」 row that can open a field under its words (the foundation's row has no slot
+ *                      for it, and its two buttons take no test hook)
+ *   .rpu-meds-left     06-4a: 「还有 2 项没对」, the grey bar at the foot (a status, not a button)
+ *   .rpu-meds-status   06-6: a row's status on the right; in English it wraps at its spaces
+ *   .rpu-meds-onlist   06-9: 「已在下次看诊的问题单里 ›」, a line of its own that is the way to his list
+ *   .rpu-meds-cam*     06-3, 08-1a: the step before the phone's own camera, in the draft's dark camera look
+ *   .rpu-meds-photo    the photo he took, while it is read and on the screen of a box nobody identified
+ */
+
+@layer components {
+  /* ---------- one step of adding a medicine: its header, then its blocks 18px apart, the buttons in the lower part ---------- */
+  .rpu-meds-step { flex: 1 0 auto; min-width: 0; display: flex; flex-direction: column; }
+  .rpu-meds-step-body { flex: 1 0 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--rp-block-gap); }
+  .rpu-meds-step-body > * { margin-top: 0; flex-shrink: 0; }
+  .rpu-meds-step-body > .rpu-dock { margin-top: auto; }
+  /* a step with no header (the photo is being read): its first block keeps clear of the top edge */
+  .rpu-meds-step > .rpu-meds-step-body:first-child { padding-top: 12px; }
+
+  /* ---------- 06-4a: one line of the label, 「对」 and 「改」, and the field 「改」 opens ---------- */
+  .rpu-meds-kv { flex-wrap: wrap; }
+  .rpu-meds-kv-edit {
+    flex: 0 0 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 6px;
+  }
+  .rpu-meds-kv-edit > * { margin-top: 0; }
+
+  .rpu-meds-left {
+    box-sizing: border-box;
+    margin: 0;
+    min-height: var(--rp-h-primary);
+    padding: 6px calc(16 * var(--rp-u));
+    border-radius: var(--rp-radius-btn);
+    background: var(--rp-line);
+    color: var(--rp-ink-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: calc(24 * var(--rp-u));
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  /* ---------- 06-6: a row's status, on the right. In English the words are long (「Label checked」): on one line they
+     take the row's whole 42% and the medicine's name breaks in the middle of a word. They wrap at their spaces
+     instead, so the name keeps its room. The 华语 words (five or six characters) stay as the foundation sets them. ---------- */
+  .rpu-meds-status:lang(en) { display: inline-block; width: min-content; min-width: 5em; }
+
+  /* ---------- 06-9: 「已在下次看诊的问题单里 ›」 under an item he was not sure of: a line of its own that is the way to
+     his list. The foundation's inline link is for a few words inside a line: it takes its 48px with negative margins
+     around a fixed height, so a second line (the English words need one) ran into the buttons under it. Here the 48px
+     come from padding that the same negative margin gives back: the target is 48 and up, the line takes only the room
+     of its words, on one line or on two. ---------- */
+  .rpu-tl-body > .rpu-meds-onlist {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding-block: 11px;
+    margin-block: -11px;
+    font-size: var(--rp-fs-min);
+    font-weight: 800;
+    line-height: 1.5;
+    color: var(--rp-accent);
+    text-decoration: none;
+  }
+  .rpu-tl-body > .rpu-meds-onlist > svg { flex: none; width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); }
+
+  /* ---------- the photo he took ---------- */
+  .rpu-meds-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: calc(240 * var(--rp-u));
+    object-fit: contain;
+    border-radius: var(--rp-radius-btn);
+    border: 1px solid var(--rp-line);
+    background: var(--rp-white);
+  }
+
+  /* ---------- 06-3, 08-1a: before the phone's camera opens (the draft's camera screen: dark, a white frame) ---------- */
+  .rpu-screen.rpu-meds-cam {
+    --rpu-meds-cam-bg: #0B0E13;
+    --rpu-meds-cam-panel: #1C222B;
+    --rpu-meds-cam-dim: #C3CCD8;
+    background: var(--rpu-meds-cam-bg);
+    color: var(--rp-white);
+  }
+  .rpu-meds-cam-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 2px 0 16px;
+    color: var(--rp-white);
+  }
+  .rpu-meds-cam-body > * { margin: 0; flex-shrink: 0; }
+  .rpu-meds-cam a:focus-visible,
+  .rpu-meds-cam button:focus-visible { outline-color: var(--rp-white); }
+  .rpu-meds-cam-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--rp-hit); }
+  .rpu-meds-cam-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    min-height: var(--rp-hit);
+    min-width: var(--rp-hit);
+    padding: 0 12px 0 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--rp-fs-small);
+    font-weight: 700;
+    color: var(--rp-white);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-meds-cam-back svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); margin-left: -6px; }
+  .rpu-meds-cam-hint { font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.45; text-align: center; color: var(--rp-white); }
+  /* the viewfinder's place: where the label goes once the camera is open */
+  .rpu-meds-cam-view {
+    position: relative;
+    flex: 1 0 auto;
+    min-height: calc(220 * var(--rp-u));
+    border-radius: var(--rp-radius-card);
+    background: var(--rpu-meds-cam-panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rpu-meds-cam-view::before {
+    content: "";
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: 18px;
+    right: 18px;
+    border: 3px solid var(--rp-white);
+    border-radius: 14px;
+    pointer-events: none;
+  }
+  .rpu-meds-cam-in {
+    position: relative;
+    padding: 44px 34px;
+    font-size: var(--rp-fs-sub);
+    line-height: 1.5;
+    text-align: center;
+    color: var(--rpu-meds-cam-dim);
+    white-space: pre-line;
+  }
+  /* the shutter: the white ring with a white disc, and the word under it (a button always has its word) */
+  .rpu-meds-cam-shutter {
+    align-self: center;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: calc(120 * var(--rp-u));
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--rp-fs-small);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--rp-white);
+    cursor: pointer;
+  }
+  .rpu-meds-cam-shutter::before {
+    content: "";
+    box-sizing: border-box;
+    width: calc(84 * var(--rp-u));
+    height: calc(84 * var(--rp-u));
+    border-radius: 50%;
+    border: 5px solid var(--rp-white);
+    background: radial-gradient(circle closest-side, var(--rp-white) calc(100% - 6px), transparent calc(100% - 5px));
+  }
+  .rpu-meds-cam-note { font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rpu-meds-cam-dim); text-align: center; }
+  .rpu-meds-cam-alts { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rp-gap); }
+  /* a sample label (the example account), another way in: the outlined white pill of the draft's camera */
+  .rpu-meds-cam-alt {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(60 * var(--rp-u));
+    padding: 6px calc(18 * var(--rp-u));
+    border-radius: calc(30 * var(--rp-u));
+    border: 2px solid var(--rp-white);
+    background: none;
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--rp-white);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .rpu-meds-cam-alt:disabled { border-style: dashed; cursor: progress; }
+  .rpu-meds-cam-ways { display: grid; grid-template-columns: repeat(var(--rpu-cols, 2), minmax(0, 1fr)); gap: var(--rp-gap); }
+  .rpu-meds-cam-way {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--rp-h-source);
+    padding: 4px 8px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--rp-fs-row);
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--rp-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+}
+
+/* ux pass 10-12 (round 6, W): on the card of a medicine nobody identified, the two choices are large buttons side by
+   side under what was said (the owner's canvas, 08-3); the chosen one has the accent border on the accent tint */
+.rp06-choice-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rp-gap); }
+.rp06-choice-btns > .rpu-btn { padding-inline: 6px; }
+.rp06-choice-btns > .rpu-btn[aria-pressed="true"] { border-color: var(--rp-accent); background: var(--rp-accent-soft); color: var(--rp-accent-press); font-weight: 800; }
+
+/* ux pass 10-12 (round 6, Y): a part of a medicine's card opens and closes on a tap of its title; the mark at the end
+   of the title points right when closed and down when open */
+.rp06-fold { min-width: 0; }
+.rp06-fold-sum { display: flex; align-items: center; gap: 10px; min-height: var(--rp-hit); cursor: pointer; list-style: none; }
+.rp06-fold-sum::-webkit-details-marker { display: none; }
+.rp06-fold-sum > .rpu-sec { flex: 1; min-width: 0; margin: 0; }
+.rp06-fold-mark { flex: none; display: flex; color: var(--rp-ink-3); transition: transform 0.15s ease; }
+.rp06-fold-mark svg { width: calc(24 * var(--rp-u)); height: calc(24 * var(--rp-u)); }
+.rp06-fold[open] > .rp06-fold-sum .rp06-fold-mark { transform: rotate(90deg); }
+.rp06-fold-body { padding-top: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .rp06-fold-mark { transition: none; }
+}

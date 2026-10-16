@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "purpose": "Three more of Mr Tan's medicines, laid out on an example account only (scene 3 of the owner's demo video, 10-15: he faces four medicines and has forgotten how much of each to take). Read by web/lib/story/example-meds.ts; the story template (timeline.seed.json) is unchanged.",
+    "story": "Prescribed and dispensed at Blossom Family Clinic (fictional) together with his amlodipine: the labels carry the same dispensing date as amlodipine's (v2, day 8, dates in the template's calendar and moved to the account's days like amlodipine's), taken from day 9 on. No visit recording mentions them, so no visit is named as where they were prescribed and no doctor's words are linked to them.",
+    "doses": "Every slot each medicine is taken in, every day from start_day to the day before today: taken, except a morning on which the template's own log has his morning tablet missed (the four tai chi mornings): then every morning medicine is missed, with the same reason in his words.",
+    "note": "Fictional, as the rest of the persona. The label lines are exactly what the printed labels for the film say (D:/ripple-c2/print/medicine-labels-1015)."
+  },
+  "medications": [
+    {
+      "id": "x-med-metformin",
+      "drug_id": "metformin",
+      "origin": "prescription",
+      "start_day": 9,
+      "label": {
+        "text": "METFORMIN 500MG TABLET\nTake TWO tablets twice a day AFTER breakfast and dinner",
+        "drug": "metformin",
+        "strength": "500 mg",
+        "directions": "Take TWO tablets twice a day AFTER breakfast and dinner",
+        "dispensed": "2026-09-01",
+        "clinic": "Blossom Family Clinic (fictional)"
+      },
+      "status": "label_confirmed",
+      "dose_slots": ["morning", "evening"],
+      "dose_slots_source": "patient",
+      "dose_slots_note": "The label's time words name breakfast and dinner; the closed table (lib/daily/slots.ts) reads only breakfast (morning), so the two slots are kept as his own choice, as a twice-a-day label asks him."
+    },
+    {
+      "id": "x-med-atorvastatin",
+      "drug_id": "atorvastatin",
+      "origin": "prescription",
+      "start_day": 9,
+      "label": {
+        "text": "ATORVASTATIN 20MG TABLET\nTake ONE tablet at BEDTIME",
+        "drug": "atorvastatin",
+        "strength": "20 mg",
+        "directions": "Take ONE tablet at BEDTIME",
+        "dispensed": "2026-09-01",
+        "clinic": "Blossom Family Clinic (fictional)"
+      },
+      "status": "label_confirmed"
+    },
+    {
+      "id": "x-med-aspirin",
+      "drug_id": "aspirin",
+      "origin": "prescription",
+      "start_day": 9,
+      "label": {
+        "text": "ASPIRIN 100MG TABLET\nTake ONE tablet every MORNING AFTER breakfast",
+        "drug": "aspirin",
+        "strength": "100 mg",
+        "directions": "Take ONE tablet every MORNING AFTER breakfast",
+        "dispensed": "2026-09-01",
+        "clinic": "Blossom Family Clinic (fictional)"
+      },
+      "status": "label_confirmed"
+    }
+  ]
+}

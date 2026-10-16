@@ -1,0 +1,99 @@
+/*
+ * The watch in the timeline design (design group 12: the trends screen /p/watch and Today's cell). Almost all of it is
+ * components/ui (the header, the segmented control, the chart's white frame, the list card, the timeline and its row of
+ * buttons); here are the few pieces it does not have. Plain global CSS with the .rp12- prefix (this app's CSS pipeline
+ * turns every *.css into global CSS). Only --rp-* tokens (app/ripple-ui.css, which this file never repeats or edits),
+ * sizes in calc(N * var(--rp-u)), no text under 18px. Unlayered on purpose: the foundation's rules sit in
+ * @layer components, so the rules here win without out-weighing them.
+ *
+ * Nothing here is coloured by what a number is: the marks are ink, his usual range is the grey ground, and the words
+ * say the rest. Red and the accent are not used for a value.
+ */
+
+/* ---------- what stands inside an entry Today's page draws: the entry's own rhythm (8px, no margins) ---------- */
+.rp12-cell { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp12-cell > * { margin-top: 0; margin-bottom: 0; }
+
+/* 「已在下次看诊的问题单里」 inside the watch's own entry: the tick of a "done" node in front of the title's words */
+.rp12-done { display: flex; align-items: flex-start; gap: 10px; }
+.rp12-done > .rpu-node { margin-top: calc(3 * var(--rp-u)); }
+.rp12-done > span:last-child { min-width: 0; }
+
+/* ---------- the chosen number: its card, then its weeks; the two not chosen stay in the page, hidden ---------- */
+[data-testid="watch-trend"][hidden] { display: none; }
+
+/* the newest value over the day it is from, inside the chart's white frame */
+.rp12-latest { display: flex; flex-direction: column; gap: 2px; padding: 0 4px; }
+.rp12-latest > .rpu-reading { margin: 0; }
+.rp12-latest-when { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.4; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }
+
+/*
+ * The plot: 170 high; on its right a margin for the two numbers of his usual range. Every mark is placed in percent
+ * of this box (WatchChart.tsx), so nothing here depends on the phone's width.
+ */
+.rp12-plot {
+  position: relative;
+  height: calc(170 * var(--rp-u));
+  margin: calc(6 * var(--rp-u)) calc(62 * var(--rp-u)) 0 4px;
+}
+/* his usual range: the grey ground with a line along its top and its bottom (the lines are what the eye finds) */
+.rp12-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  background: var(--rp-tint);
+  border-top: 1.5px solid var(--rp-edge);
+  border-bottom: 1.5px solid var(--rp-edge);
+}
+/* where one week ends and the next begins: a hairline, lighter than anything that is data */
+.rp12-week { position: absolute; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: var(--rp-line); }
+/* the days joined: a 2px ink line (the path is stretched to the box; its stroke is not) */
+.rp12-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.rp12-line path { stroke: var(--rp-ink); stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round; }
+/* one dot per day; the newest day's is the large one, with a ring of the card's white around it */
+.rp12-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--rp-ink);
+}
+.rp12-dot[data-last="true"] {
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  box-shadow: 0 0 0 2.5px var(--rp-white);
+}
+/* the two numbers of his usual range, in the margin, each level with its line */
+.rp12-band-t {
+  position: absolute;
+  left: 100%;
+  margin-left: 8px;
+  transform: translateY(-50%);
+  font-size: var(--rp-fs-min);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--rp-ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* a narrow band: the upper number stands above its line and the lower one below, so they never touch */
+.rp12-band-t[data-edge="top"][data-close="true"] { transform: translateY(-100%); }
+.rp12-band-t[data-edge="bottom"][data-close="true"] { transform: translateY(0); }
+
+/* a range with its unit, kept on one line inside a sentence */
+.rp12-nowrap { white-space: nowrap; }
+
+/* the first and the last day of the four weeks, under the two ends of the plot */
+.rp12-x {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 calc(62 * var(--rp-u)) 0 4px;
+  font-size: var(--rp-fs-min);
+  line-height: 1.3;
+  color: var(--rp-ink-3);
+  font-variant-numeric: tabular-nums;
+}

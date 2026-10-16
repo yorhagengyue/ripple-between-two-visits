@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "visit": "v3",
+    "source": "docs/plan/visits-script.md",
+    "timing": "synthetic reading speed, not measured",
+    "use": "SPEECH_PROVIDER=mock returns exactly these fields"
+  },
+  "utterances": [
+    {
+      "id": "v3-u01",
+      "t_start_ms": 1500,
+      "t_end_ms": 5730,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "So Mr Tan, how has your blood pressure been at home?"
+    },
+    {
+      "id": "v3-u02",
+      "t_start_ms": 6430,
+      "t_end_ms": 9122,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "Quite okay lah. Around 130, I think."
+    },
+    {
+      "id": "v3-u03",
+      "t_start_ms": 9822,
+      "t_end_ms": 12898,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "And your medicine, you take it every day?"
+    },
+    {
+      "id": "v3-u04",
+      "t_start_ms": 13598,
+      "t_end_ms": 17828,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "Yes, every morning. The small white one, I forget the name."
+    },
+    {
+      "id": "v3-u05",
+      "t_start_ms": 18528,
+      "t_end_ms": 19728,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Any ankle swelling?"
+    },
+    {
+      "id": "v3-u06",
+      "t_start_ms": 20428,
+      "t_end_ms": 21966,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "Hmm, don't think so."
+    },
+    {
+      "id": "v3-u07",
+      "t_start_ms": 22666,
+      "t_end_ms": 29204,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Okay. We keep amlodipine at 5 milligrams, and I'll add losartan 50 milligrams, once in the morning."
+    },
+    {
+      "id": "v3-u08",
+      "t_start_ms": 29904,
+      "t_end_ms": 37211,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Do a blood test for the kidneys in two weeks, and come back to see me in six weeks."
+    },
+    {
+      "id": "v3-u09",
+      "t_start_ms": 37911,
+      "t_end_ms": 40218,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Anything else you want to ask?"
+    },
+    {
+      "id": "v3-u10",
+      "t_start_ms": 40918,
+      "t_end_ms": 43610,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "Doctor, the two pills, can eat together?"
+    },
+    {
+      "id": "v3-u11",
+      "t_start_ms": 44310,
+      "t_end_ms": 47002,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Yes, both together after breakfast is fine."
+    },
+    {
+      "id": "v3-u12",
+      "t_start_ms": 47702,
+      "t_end_ms": 51163,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "The blood test, I need to fast or not?"
+    },
+    {
+      "id": "v3-u13",
+      "t_start_ms": 51863,
+      "t_end_ms": 58016,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "No need to fast for this one. Just take your medicine as usual and come in."
+    },
+    {
+      "id": "v3-u14",
+      "t_start_ms": 58716,
+      "t_end_ms": 64466,
+      "speaker_cluster": 1,
+      "lang": "zh",
+      "text": "打太极的早上我常常忘记吃，可以打完太极回来再吃吗？"
+    },
+    {
+      "id": "v3-u15",
+      "t_start_ms": 65166,
+      "t_end_ms": 71204,
+      "speaker_cluster": 0,
+      "lang": "zh-en",
+      "text": "可以，回来再吃，每天差不多同一个时间就好。Same time every day."
+    },
+    {
+      "id": "v3-u16",
+      "t_start_ms": 71904,
+      "t_end_ms": 73442,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "And the knee painkiller?"
+    },
+    {
+      "id": "v3-u17",
+      "t_start_ms": 74142,
+      "t_end_ms": 85680,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "Try not to take ibuprofen regularly. It can push your blood pressure up. For the knee, paracetamol is the safer one, and we'll look at the knee properly next time."
+    },
+    {
+      "id": "v3-u18",
+      "t_start_ms": 86380,
+      "t_end_ms": 94072,
+      "speaker_cluster": 1,
+      "lang": "en-SG",
+      "text": "One more, doctor. That night my reading was 150 over 95. Can I take one more tablet when it's high?"
+    },
+    {
+      "id": "v3-u19",
+      "t_start_ms": 94772,
+      "t_end_ms": 107464,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "No, please don't take an extra tablet on your own. One high reading doesn't mean the dose is wrong; I look at all your readings together, and that's why we're adding losartan today."
+    },
+    {
+      "id": "v3-u20",
+      "t_start_ms": 108164,
+      "t_end_ms": 122394,
+      "speaker_cluster": 0,
+      "lang": "en",
+      "text": "If it's high, sit down, rest five minutes and measure again, then write it down for me. If it's above 180 on top, or you have chest pain, weakness on one side or slurred speech, call 995."
+    }
+  ]
+}

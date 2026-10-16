@@ -1,0 +1,2962 @@
+{
+  "dose today morning | zh-Hans": {
+    "checked": [
+      "Amlodipine 5 mg：记录为未服药，原因：去公园了，药没带在身上。",
+      "提醒：8:45，9:15 再次提醒，9:45 截止。",
+      "最近 7 天（所有药物）：应服 7 次，已服 5 次，未服 2 次。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。"
+        }
+      }
+    ],
+    "verdict": "10月13日早间药物，记录为未服药，原因：去公园了，药没带在身上。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "dose",
+      "ref": "dose today morning",
+      "name": "10月13日 早间药物"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "想问问：10月13日 早间药物",
+      "for": "doctor"
+    }
+  },
+  "dose today morning | en": {
+    "checked": [
+      "Amlodipine 5 mg: logged as not taken (reason: 去公园了，药没带在身上).",
+      "Reminders at 8:45 and 9:15; the window closes at 9:45.",
+      "Last 7 days (all medicines): 7 due, 5 taken, 2 not taken."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "Morning medicine on 13 Oct: logged as not taken (reason: 去公园了，药没带在身上).",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "dose",
+      "ref": "dose today morning",
+      "name": "Morning medicine, 13 Oct"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "I want to ask about: Morning medicine, 13 Oct",
+      "for": "doctor"
+    }
+  },
+  "dose yesterday morning | zh-Hans": {
+    "checked": [
+      "Amlodipine 5 mg：7:30 记录为已服药。",
+      "提醒：8:45，9:15 再次提醒，9:45 截止。",
+      "最近 7 天（所有药物）：应服 7 次，已服 5 次，未服 2 次。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。"
+        }
+      }
+    ],
+    "verdict": "10月12日早间药物，记录为已服药（7:30）。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "dose",
+      "ref": "dose yesterday morning",
+      "name": "10月12日 早间药物"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "想问问：10月12日 早间药物",
+      "for": "doctor"
+    }
+  },
+  "dose yesterday morning | en": {
+    "checked": [
+      "Amlodipine 5 mg: logged as taken at 7:30.",
+      "Reminders at 8:45 and 9:15; the window closes at 9:45.",
+      "Last 7 days (all medicines): 7 due, 5 taken, 2 not taken."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "Morning medicine on 12 Oct: logged as taken at 7:30.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "dose",
+      "ref": "dose yesterday morning",
+      "name": "Morning medicine, 12 Oct"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "I want to ask about: Morning medicine, 12 Oct",
+      "for": "doctor"
+    }
+  },
+  "dose today evening | zh-Hans": null,
+  "dose today evening | en": null,
+  "bp today | zh-Hans": {
+    "checked": [
+      "本次：147/93，10月13日 早上 8:20 记录。",
+      "这周（10月12日到10月18日）测量 2 次，平均 167/97。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 2 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这次 147/93，不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp today",
+      "name": "血压 147/93 · 10月13日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 147/93 · 10月13日",
+      "for": "doctor"
+    }
+  },
+  "bp today | en": {
+    "checked": [
+      "This reading: 147/93, recorded 13 Oct, 8:20 am.",
+      "This week (12 Oct to 18 Oct): 2 readings, average 167/97.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "2 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "This reading, 147/93, is not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp today",
+      "name": "Blood pressure 147/93, 13 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure 147/93, 13 Oct",
+      "for": "doctor"
+    }
+  },
+  "bp above the warning line | zh-Hans": {
+    "checked": [
+      "本次：186/101，10月13日 早上 8:25 记录。",
+      "医生的警示线：上面的数字超过 180（9月1日 就诊时说的）。",
+      "这周（10月12日到10月18日）测量 2 次，平均 167/97。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 2 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R2",
+        "span": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "slots": {},
+        "en": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R2",
+          "utteranceId": "v1-u09",
+          "tStartMs": 53681,
+          "clipPath": "visits/clips/v1-u09.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u09",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "如果你在家量的血压，上面的数超过 180，或者胸口痛、一边身体没力、说话不清楚，就去急诊，或者打 995。"
+        }
+      },
+      {
+        "speechAct": "referral",
+        "sourceId": "referral:B1-01",
+        "span": "995 — ring at once, even if unsure; do not drive yourself — 995 — SCDF emergency ambulance, 24 hours",
+        "slots": {},
+        "en": "If you feel very unwell, call 995 straight away or go to the nearest A&E.",
+        "zh": "要是很不舒服，请马上打 995，或者去最近的急诊。",
+        "origin": "template",
+        "templateId": "signal_995_unwell",
+        "cite": {
+          "referralId": "B1-01"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这次上面的数字是 186，超过医生说的 180。医生的原话在下面。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "bp",
+      "ref": "bp above the warning line",
+      "name": "血压 186/101 · 10月13日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 186/101 · 10月13日",
+      "for": "doctor"
+    }
+  },
+  "bp above the warning line | en": {
+    "checked": [
+      "This reading: 186/101, recorded 13 Oct, 8:25 am.",
+      "Your doctor's warning line: a top number above 180 (said at the visit on 1 Sep).",
+      "This week (12 Oct to 18 Oct): 2 readings, average 167/97.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "2 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R2",
+        "span": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "slots": {},
+        "en": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R2",
+          "utteranceId": "v1-u09",
+          "tStartMs": 53681,
+          "clipPath": "visits/clips/v1-u09.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u09",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      },
+      {
+        "speechAct": "referral",
+        "sourceId": "referral:B1-01",
+        "span": "995 — ring at once, even if unsure; do not drive yourself — 995 — SCDF emergency ambulance, 24 hours",
+        "slots": {},
+        "en": "If you feel very unwell, call 995 straight away or go to the nearest A&E.",
+        "zh": "要是很不舒服，请马上打 995，或者去最近的急诊。",
+        "origin": "template",
+        "templateId": "signal_995_unwell",
+        "cite": {
+          "referralId": "B1-01"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "The top number of this reading, 186, is above the 180 your doctor said. Your doctor's own words are below.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "bp",
+      "ref": "bp above the warning line",
+      "name": "Blood pressure 186/101, 13 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure 186/101, 13 Oct",
+      "for": "doctor"
+    }
+  },
+  "bp not measured | zh-Hans": {
+    "checked": [
+      "10月13日 晚间未测量。",
+      "这周（10月12日到10月18日）测量 2 次，平均 167/97。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 2 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "10月13日 晚间没有读数。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "bp",
+      "ref": "bp not measured",
+      "name": "10月13日 晚间 未测量"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：10月13日 晚间 未测量",
+      "for": "doctor"
+    }
+  },
+  "bp not measured | en": {
+    "checked": [
+      "13 Oct, evening: no reading was taken.",
+      "This week (12 Oct to 18 Oct): 2 readings, average 167/97.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "2 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "There is no reading for 13 Oct, evening.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "bp",
+      "ref": "bp not measured",
+      "name": "13 Oct, evening: not measured"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: 13 Oct, evening: not measured",
+      "for": "doctor"
+    }
+  },
+  "bp week | zh-Hans": {
+    "checked": [
+      "这周（10月12日到10月18日）测量 2 次，平均 167/97。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 2 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这周测量 2 次，平均 167/97；2 次不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp_week",
+      "ref": "bp week",
+      "name": "血压 · 10月12日到10月18日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 · 10月12日到10月18日",
+      "for": "doctor"
+    }
+  },
+  "bp week | en": {
+    "checked": [
+      "This week (12 Oct to 18 Oct): 2 readings, average 167/97.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "2 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "This week: 2 readings, average 167/97; 2 not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp_week",
+      "ref": "bp week",
+      "name": "Blood pressure, 12 Oct to 18 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure, 12 Oct to 18 Oct",
+      "for": "doctor"
+    }
+  },
+  "bp last week | zh-Hans": {
+    "checked": [
+      "那一周（10月5日到10月11日）测量 2 次，平均 142/82。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 2 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "那一周测量 2 次，平均 142/82；2 次不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp_week",
+      "ref": "bp last week",
+      "name": "血压 · 10月5日到10月11日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 · 10月5日到10月11日",
+      "for": "doctor"
+    }
+  },
+  "bp last week | en": {
+    "checked": [
+      "That week (5 Oct to 11 Oct): 2 readings, average 142/82.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "2 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "That week: 2 readings, average 142/82; 2 not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp_week",
+      "ref": "bp last week",
+      "name": "Blood pressure, 5 Oct to 11 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure, 5 Oct to 11 Oct",
+      "for": "doctor"
+    }
+  },
+  "next visit | zh-Hans": {
+    "checked": [
+      "就是今天。",
+      "地点：Blossom Family Clinic (fictional)。",
+      "问题单里有 4 个问题等着问。",
+      "上次就诊：9月13日。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "继续量，现在一个星期两次就够了。五个星期后回来。"
+        }
+      }
+    ],
+    "verdict": "下次就诊在 10月13日，就是今天。问题单里有 4 个问题等着问。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "next_visit",
+      "ref": "next visit",
+      "name": "下次就诊 · 10月13日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：下次就诊 · 10月13日",
+      "for": "doctor"
+    }
+  },
+  "next visit | en": {
+    "checked": [
+      "It is today.",
+      "Where: Blossom Family Clinic (fictional).",
+      "4 questions wait on your list.",
+      "Last visit: 13 Sep."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "Your next visit is 13 Oct, today. 4 questions wait on your list.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "next_visit",
+      "ref": "next visit",
+      "name": "Next visit, 13 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Next visit, 13 Oct",
+      "for": "doctor"
+    }
+  },
+  "med med-amlodipine | zh-Hans": {
+    "checked": [
+      "医生开的。",
+      "药袋：9月9日 配药。",
+      "服药时间：早间（依药品标签）。",
+      "医生 9月9日 说过这个药。",
+      "最近 7 天：应服 7 次，已服 5 次，未服 2 次。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "请不要自己改药量。如果读数高，把它们写下来，下次看诊时告诉我。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "hh-amlodipine:amlodipine.purpose",
+        "span": "The leaflet describes amlodipine as a medicine that brings blood pressure down; it does this by letting the blood vessels loosen and open wider. Lowering blood pressure is the only purpose the page gives - chest pain (angina) is not mentioned, and the words 'high blood pressure' or 'hypertension' do not appear in the leaflet text itself.",
+        "slots": {},
+        "cite": {
+          "kbSourceId": "hh-amlodipine",
+          "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/amlodipine",
+          "title": "HealthHub medication leaflet: amlodipine",
+          "pageDate": "Article last reviewed 02 March 2026 (visible on page; the page's JSON-LD dateModified is 2026-03-02, which agrees)",
+          "reviewStatus": "draft"
+        },
+        "en": "Amlodipine lowers blood pressure. It relaxes and widens the blood vessels.",
+        "zh": "氨氯地平用来降血压，它让血管放松、变宽。",
+        "attribution": "leaflet",
+        "origin": "patient_text"
+      }
+    ],
+    "verdict": "Amlodipine 5 mg：药品标签所示时间为早间。最近 7 天应服 7 次，已服 5 次。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "med",
+      "ref": "med med-amlodipine",
+      "name": "Amlodipine 5 mg"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "想问问：Amlodipine 5 mg",
+      "for": "doctor"
+    }
+  },
+  "med med-amlodipine | en": {
+    "checked": [
+      "From the doctor.",
+      "Label: dispensed 9 Sep.",
+      "When: morning (from the label).",
+      "Your doctor spoke about it on 9 Sep.",
+      "Last 7 days: 7 due, 5 taken, 2 not taken."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-amlodipine",
+        "span": "Take ONE tablet every MORNING",
+        "slots": {},
+        "cite": {
+          "medId": "med-amlodipine",
+          "date": "2026-09-09"
+        },
+        "en": "Take ONE tablet every MORNING",
+        "zh": "药品标签：每天早上服用一片。",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "hh-amlodipine:amlodipine.purpose",
+        "span": "The leaflet describes amlodipine as a medicine that brings blood pressure down; it does this by letting the blood vessels loosen and open wider. Lowering blood pressure is the only purpose the page gives - chest pain (angina) is not mentioned, and the words 'high blood pressure' or 'hypertension' do not appear in the leaflet text itself.",
+        "slots": {},
+        "cite": {
+          "kbSourceId": "hh-amlodipine",
+          "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/amlodipine",
+          "title": "HealthHub medication leaflet: amlodipine",
+          "pageDate": "Article last reviewed 02 March 2026 (visible on page; the page's JSON-LD dateModified is 2026-03-02, which agrees)",
+          "reviewStatus": "draft"
+        },
+        "en": "Amlodipine lowers blood pressure. It relaxes and widens the blood vessels.",
+        "zh": "氨氯地平用来降血压，它让血管放松、变宽。",
+        "attribution": "leaflet",
+        "origin": "patient_text"
+      }
+    ],
+    "verdict": "Amlodipine 5 mg: the label says morning. Last 7 days: 5 of 7 taken.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "med",
+      "ref": "med med-amlodipine",
+      "name": "Amlodipine 5 mg"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "I want to ask about: Amlodipine 5 mg",
+      "for": "doctor"
+    }
+  },
+  "med med-ibuprofen | zh-Hans": {
+    "checked": [
+      "自己买的。",
+      "药袋已核对。",
+      "尚未设定服药时间。",
+      "医生 9月9日 说过这个药。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u11",
+        "span": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u11",
+          "tStartMs": 64246,
+          "tEndMs": 71169,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "哪一种？下次带来给我看。现在先尽量不要每天吃。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-ibuprofen",
+        "span": "Ibuprofen 200 mg tablets",
+        "slots": {},
+        "cite": {
+          "medId": "med-ibuprofen"
+        },
+        "en": "Ibuprofen 200 mg tablets",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "hh-ibuprofen:ibuprofen.purpose",
+        "span": "The leaflet describes ibuprofen as an NSAID (non-steroidal anti-inflammatory drug) in common use for pain and inflammation. It also lists lowering the temperature in a fever and easing headaches, pain or inflammation in joints and muscles, gout attacks, toothache and period pain.",
+        "slots": {},
+        "cite": {
+          "kbSourceId": "hh-ibuprofen",
+          "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/ibuprofen-oral",
+          "title": "HealthHub medication leaflet: ibuprofen",
+          "pageDate": "Article last reviewed 07 July 2026 (as shown on the page; accessed 2026-10-01)",
+          "reviewStatus": "draft"
+        },
+        "en": "Ibuprofen is an anti-inflammatory painkiller (an NSAID). It is used for pain, swelling and fever, including joint and muscle pain.",
+        "zh": "布洛芬是一种消炎止痛药（NSAID），用于疼痛、肿胀和发烧，包括关节和肌肉痛。",
+        "attribution": "leaflet",
+        "origin": "patient_text"
+      }
+    ],
+    "verdict": "记录里关于 Ibuprofen 200 mg 的内容还不多，可以问医生或药剂师。",
+    "abstain": true,
+    "fixed": false,
+    "subject": {
+      "type": "med",
+      "ref": "med med-ibuprofen",
+      "name": "Ibuprofen 200 mg"
+    },
+    "meds": [
+      "Ibuprofen 200 mg"
+    ],
+    "ask": {
+      "text": "想问问：Ibuprofen 200 mg",
+      "for": "pharmacist"
+    }
+  },
+  "med med-ibuprofen | en": {
+    "checked": [
+      "Bought myself.",
+      "The label has been checked.",
+      "No time of day set yet.",
+      "Your doctor spoke about it on 9 Sep."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u11",
+        "span": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u11",
+          "tStartMs": 64246,
+          "tEndMs": 71169,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "label:med-ibuprofen",
+        "span": "Ibuprofen 200 mg tablets",
+        "slots": {},
+        "cite": {
+          "medId": "med-ibuprofen"
+        },
+        "en": "Ibuprofen 200 mg tablets",
+        "attribution": "label",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "hh-ibuprofen:ibuprofen.purpose",
+        "span": "The leaflet describes ibuprofen as an NSAID (non-steroidal anti-inflammatory drug) in common use for pain and inflammation. It also lists lowering the temperature in a fever and easing headaches, pain or inflammation in joints and muscles, gout attacks, toothache and period pain.",
+        "slots": {},
+        "cite": {
+          "kbSourceId": "hh-ibuprofen",
+          "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/ibuprofen-oral",
+          "title": "HealthHub medication leaflet: ibuprofen",
+          "pageDate": "Article last reviewed 07 July 2026 (as shown on the page; accessed 2026-10-01)",
+          "reviewStatus": "draft"
+        },
+        "en": "Ibuprofen is an anti-inflammatory painkiller (an NSAID). It is used for pain, swelling and fever, including joint and muscle pain.",
+        "zh": "布洛芬是一种消炎止痛药（NSAID），用于疼痛、肿胀和发烧，包括关节和肌肉痛。",
+        "attribution": "leaflet",
+        "origin": "patient_text"
+      }
+    ],
+    "verdict": "Your records do not say much about Ibuprofen 200 mg yet; you can ask your doctor or pharmacist.",
+    "abstain": true,
+    "fixed": false,
+    "subject": {
+      "type": "med",
+      "ref": "med med-ibuprofen",
+      "name": "Ibuprofen 200 mg"
+    },
+    "meds": [
+      "Ibuprofen 200 mg"
+    ],
+    "ask": {
+      "text": "I want to ask about: Ibuprofen 200 mg",
+      "for": "pharmacist"
+    }
+  },
+  "med med-relative-box | zh-Hans": {
+    "checked": [
+      "亲戚带的。",
+      "这盒药尚未被识别。",
+      "药剂师 9月13日 说过这个药。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "标签上只有中文，我没办法确认里面是什么。请先不要吃。下次看诊时带去给你的医生看。"
+        }
+      }
+    ],
+    "verdict": "我认不出这个药，请拿去问药剂师。",
+    "abstain": true,
+    "fixed": true,
+    "subject": {
+      "type": "med",
+      "ref": "med med-relative-box",
+      "name": "Ripple 认不出的药"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：Ripple 认不出的药",
+      "for": "pharmacist"
+    }
+  },
+  "med med-relative-box | en": {
+    "checked": [
+      "From a relative.",
+      "Nobody has identified this medicine yet.",
+      "The pharmacist spoke about it on 13 Sep."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span"
+      }
+    ],
+    "verdict": "I'm not able to identify that medication, please check with your pharmacist.",
+    "abstain": true,
+    "fixed": true,
+    "subject": {
+      "type": "med",
+      "ref": "med med-relative-box",
+      "name": "A medicine Ripple can't identify"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: A medicine Ripple can't identify",
+      "for": "pharmacist"
+    }
+  },
+  "bp seeded 0 | zh-Hans": {
+    "checked": [
+      "本次：137/93，9月2日 早间 记录。",
+      "那一周（8月31日到9月6日）测量 9 次，平均 144/93。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 9 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这次 137/93，不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 0",
+      "name": "血压 137/93 · 9月2日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 137/93 · 9月2日",
+      "for": "doctor"
+    }
+  },
+  "bp seeded 0 | en": {
+    "checked": [
+      "This reading: 137/93, recorded 2 Sep, morning.",
+      "That week (31 Aug to 6 Sep): 9 readings, average 144/93.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "9 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "This reading, 137/93, is not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 0",
+      "name": "Blood pressure 137/93, 2 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure 137/93, 2 Sep",
+      "for": "doctor"
+    }
+  },
+  "bp seeded 1 | zh-Hans": {
+    "checked": [
+      "本次：141/94，9月2日 晚间 记录。",
+      "那一周（8月31日到9月6日）测量 9 次，平均 144/93。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 9 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这次 141/94，不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 1",
+      "name": "血压 141/94 · 9月2日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 141/94 · 9月2日",
+      "for": "doctor"
+    }
+  },
+  "bp seeded 1 | en": {
+    "checked": [
+      "This reading: 141/94, recorded 2 Sep, evening.",
+      "That week (31 Aug to 6 Sep): 9 readings, average 144/93.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "9 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "This reading, 141/94, is not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 1",
+      "name": "Blood pressure 141/94, 2 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure 141/94, 2 Sep",
+      "for": "doctor"
+    }
+  },
+  "bp seeded 2 | zh-Hans": {
+    "checked": [
+      "本次：147/91，9月3日 早间 记录。",
+      "那一周（8月31日到9月6日）测量 9 次，平均 144/93。",
+      "有 1 次未测量。",
+      "医生的数字：低于 135/85（9月1日 就诊时说的）。",
+      "其中 9 次不低于医生的数字。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "代录音",
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这次 147/91，不低于医生说的 135/85。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 2",
+      "name": "血压 147/91 · 9月3日"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：血压 147/91 · 9月3日",
+      "for": "doctor"
+    }
+  },
+  "bp seeded 2 | en": {
+    "checked": [
+      "This reading: 147/91, recorded 3 Sep, morning.",
+      "That week (31 Aug to 6 Sep): 9 readings, average 144/93.",
+      "1 time not measured.",
+      "Your doctor's number: below 135/85 (said at the visit on 1 Sep).",
+      "9 of them were not below your doctor's number."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08",
+          "clipLabel": "stand-in recording",
+          "role": "doctor",
+          "roleState": "confirmed"
+        }
+      }
+    ],
+    "verdict": "This reading, 147/91, is not below the 135/85 your doctor said.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "bp",
+      "ref": "bp seeded 2",
+      "name": "Blood pressure 147/91, 3 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Blood pressure 147/91, 3 Sep",
+      "for": "doctor"
+    }
+  },
+  "visit v1 | zh-Hans": {
+    "checked": [
+      "9月1日，在 Blossom Family Clinic (fictional)。",
+      "确认过的话：8 句。",
+      "回答了你 1 个问题。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "tEndMs": 52981,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08"
+        },
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u06",
+        "span": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u06",
+          "tStartMs": 28506,
+          "tEndMs": 41967,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "先坐下，休息五分钟。手臂放在桌上，和心脏一样高。量之前半小时不要喝咖啡，也不要抽烟。每次量两次，把平均数写下来。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u07",
+        "span": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u07",
+          "tStartMs": 42667,
+          "tEndMs": 48820,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "少吃盐。酱汁少一点，汤不要喝完。早上的散步要继续。"
+        }
+      }
+    ],
+    "verdict": "9月1日 这次就诊，确认过的话有 8 句。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v1",
+      "name": "9月1日 就诊"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：9月1日 就诊",
+      "for": "doctor"
+    }
+  },
+  "visit v1 | en": {
+    "checked": [
+      "1 Sep, at Blossom Family Clinic (fictional).",
+      "Confirmed lines: 8.",
+      "1 of your questions answered."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "tEndMs": 52981,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08"
+        },
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u06",
+        "span": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u06",
+          "tStartMs": 28506,
+          "tEndMs": 41967,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u07",
+        "span": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u07",
+          "tStartMs": 42667,
+          "tEndMs": 48820,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "The visit on 1 Sep has 8 confirmed lines.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v1",
+      "name": "Visit, 1 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Visit, 1 Sep",
+      "for": "doctor"
+    }
+  },
+  "visit v2 | zh-Hans": {
+    "checked": [
+      "9月9日，在 Blossom Family Clinic (fictional)。",
+      "确认过的话：12 句。",
+      "这次开的药：Amlodipine 5 mg。",
+      "回答了你 1 个问题。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "请不要自己改药量。如果读数高，把它们写下来，下次看诊时告诉我。"
+        }
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "继续量，现在一个星期两次就够了。五个星期后回来。"
+        }
+      }
+    ],
+    "verdict": "9月9日 这次就诊，确认过的话有 12 句。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v2",
+      "name": "9月9日 就诊"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "想问问：9月9日 就诊",
+      "for": "doctor"
+    }
+  },
+  "visit v2 | en": {
+    "checked": [
+      "9 Sep, at Blossom Family Clinic (fictional).",
+      "Confirmed lines: 12.",
+      "Medicines from this visit: Amlodipine 5 mg.",
+      "1 of your questions answered."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span"
+      },
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "The visit on 9 Sep has 12 confirmed lines.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v2",
+      "name": "Visit, 9 Sep"
+    },
+    "meds": [
+      "Amlodipine 5 mg"
+    ],
+    "ask": {
+      "text": "I want to ask about: Visit, 9 Sep",
+      "for": "doctor"
+    }
+  },
+  "visit p1 | zh-Hans": {
+    "checked": [
+      "9月13日，在 Neighbourhood pharmacy (fictional)。",
+      "确认过的话：2 句。",
+      "回答了你 1 个问题。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "标签上只有中文，我没办法确认里面是什么。请先不要吃。下次看诊时带去给你的医生看。"
+        }
+      }
+    ],
+    "verdict": "9月13日 这次就诊，确认过的话有 2 句。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit p1",
+      "name": "9月13日 就诊"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：9月13日 就诊",
+      "for": "pharmacist"
+    }
+  },
+  "visit p1 | en": {
+    "checked": [
+      "13 Sep, at Neighbourhood pharmacy (fictional).",
+      "Confirmed lines: 2.",
+      "1 of your questions answered."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span"
+      }
+    ],
+    "verdict": "The visit on 13 Sep has 2 confirmed lines.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit p1",
+      "name": "Visit, 13 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Visit, 13 Sep",
+      "for": "pharmacist"
+    }
+  },
+  "visit v3 | zh-Hans": {
+    "checked": [
+      "就是今天。",
+      "地点：Blossom Family Clinic (fictional)。",
+      "问题单里有 4 个问题等着问。",
+      "上次就诊：9月13日。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "继续量，现在一个星期两次就够了。五个星期后回来。"
+        }
+      }
+    ],
+    "verdict": "这次就诊就在今天。问题单里有 4 个问题等着问。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v3",
+      "name": "10月13日 就诊（计划）"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：10月13日 就诊（计划）",
+      "for": "doctor"
+    }
+  },
+  "visit v3 | en": {
+    "checked": [
+      "It is today.",
+      "Where: Blossom Family Clinic (fictional).",
+      "4 questions wait on your list.",
+      "Last visit: 13 Sep."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u09",
+        "span": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u09",
+          "tStartMs": 52096,
+          "tEndMs": 57096,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "This visit is today. 4 questions wait on your list.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit",
+      "ref": "visit v3",
+      "name": "Planned visit, 13 Oct"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: Planned visit, 13 Oct",
+      "for": "doctor"
+    }
+  },
+  "line v1:item-R1 | zh-Hans": {
+    "checked": [
+      "9月1日 就诊，录音 0:49。",
+      "你确认过这句。",
+      "有录音，可以听原声。",
+      "这是医生给的血压数字：低于 135/85。",
+      "这周（10月12日到10月18日）测量 2 次，平均 167/97。",
+      "有 1 次未测量。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "tEndMs": 52981,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08"
+        },
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "在家里，我们希望血压低于 135/85。"
+        }
+      }
+    ],
+    "verdict": "这是医生 9月1日 就诊时的原话，你确认过。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v1:item-R1",
+      "name": "医生 9月1日 说的话"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：医生 9月1日 说的话",
+      "for": "doctor"
+    }
+  },
+  "line v1:item-R1 | en": {
+    "checked": [
+      "Visit on 1 Sep, 0:49 into the recording.",
+      "You confirmed this line.",
+      "The recording of it can be played.",
+      "This is your doctor's blood-pressure number: below 135/85.",
+      "This week (12 Oct to 18 Oct): 2 readings, average 167/97.",
+      "1 time not measured."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R1",
+        "span": "At home, we want it below 135 over 85.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R1",
+          "utteranceId": "v1-u08",
+          "tStartMs": 49520,
+          "tEndMs": 52981,
+          "clipPath": "visits/clips/v1-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u08"
+        },
+        "en": "At home, we want it below 135 over 85.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "These are your doctor's own words from the visit on 1 Sep; you confirmed them.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v1:item-R1",
+      "name": "What your doctor said on 1 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: What your doctor said on 1 Sep",
+      "for": "doctor"
+    }
+  },
+  "line v1:item-R2 | zh-Hans": {
+    "checked": [
+      "9月1日 就诊，录音 0:53。",
+      "你确认过这句。",
+      "有录音，可以听原声。",
+      "这是医生的警示线：上面的数字超过 180。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R2",
+        "span": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R2",
+          "utteranceId": "v1-u09",
+          "tStartMs": 53681,
+          "tEndMs": 65604,
+          "clipPath": "visits/clips/v1-u09.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u09"
+        },
+        "en": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "如果你在家量的血压，上面的数超过 180，或者胸口痛、一边身体没力、说话不清楚，就去急诊，或者打 995。"
+        }
+      }
+    ],
+    "verdict": "这是医生 9月1日 就诊时的原话，你确认过。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v1:item-R2",
+      "name": "医生 9月1日 说的话"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：医生 9月1日 说的话",
+      "for": "doctor"
+    }
+  },
+  "line v1:item-R2 | en": {
+    "checked": [
+      "Visit on 1 Sep, 0:53 into the recording.",
+      "You confirmed this line.",
+      "The recording of it can be played.",
+      "This is your doctor's warning line: a top number above 180."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:R2",
+        "span": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "requiredLine": "R2",
+          "utteranceId": "v1-u09",
+          "tStartMs": 53681,
+          "tEndMs": 65604,
+          "clipPath": "visits/clips/v1-u09.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v1/clip?u=v1-u09"
+        },
+        "en": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "These are your doctor's own words from the visit on 1 Sep; you confirmed them.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v1:item-R2",
+      "name": "What your doctor said on 1 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: What your doctor said on 1 Sep",
+      "for": "doctor"
+    }
+  },
+  "line v2:item-R3 | zh-Hans": {
+    "checked": [
+      "9月9日 就诊，录音 0:20。",
+      "你确认过这句。",
+      "有录音，可以听原声。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。"
+        }
+      }
+    ],
+    "verdict": "这是医生 9月9日 就诊时的原话，你确认过。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v2:item-R3",
+      "name": "医生 9月9日 说的话"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：医生 9月9日 说的话",
+      "for": "doctor"
+    }
+  },
+  "line v2:item-R3 | en": {
+    "checked": [
+      "Visit on 9 Sep, 0:20 into the recording.",
+      "You confirmed this line.",
+      "The recording of it can be played."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R3",
+        "span": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R3",
+          "utteranceId": "v2-u06",
+          "tStartMs": 20767,
+          "tEndMs": 36536,
+          "clipPath": "visits/clips/v2-u06.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u06"
+        },
+        "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "These are your doctor's own words from the visit on 9 Sep; you confirmed them.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v2:item-R3",
+      "name": "What your doctor said on 9 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: What your doctor said on 9 Sep",
+      "for": "doctor"
+    }
+  },
+  "line v2:item-R4 | zh-Hans": {
+    "checked": [
+      "9月9日 就诊，录音 0:43。",
+      "你确认过这句。",
+      "有录音，可以听原声。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "请不要自己改药量。如果读数高，把它们写下来，下次看诊时告诉我。"
+        }
+      }
+    ],
+    "verdict": "这是医生 9月9日 就诊时的原话，你确认过。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v2:item-R4",
+      "name": "医生 9月9日 说的话"
+    },
+    "meds": [],
+    "ask": {
+      "text": "想问问：医生 9月9日 说的话",
+      "for": "doctor"
+    }
+  },
+  "line v2:item-R4 | en": {
+    "checked": [
+      "Visit on 9 Sep, 0:43 into the recording.",
+      "You confirmed this line.",
+      "The recording of it can be played."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:R4",
+        "span": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "requiredLine": "R4",
+          "utteranceId": "v2-u08",
+          "tStartMs": 43320,
+          "tEndMs": 51396,
+          "clipPath": "visits/clips/v2-u08.wav",
+          "standInVoice": true,
+          "role": "doctor",
+          "roleState": "confirmed",
+          "clipUrl": "/api/visits/v2/clip?u=v2-u08"
+        },
+        "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "These are your doctor's own words from the visit on 9 Sep; you confirmed them.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "visit_line",
+      "ref": "line v2:item-R4",
+      "name": "What your doctor said on 9 Sep"
+    },
+    "meds": [],
+    "ask": {
+      "text": "I want to ask about: What your doctor said on 9 Sep",
+      "for": "doctor"
+    }
+  },
+  "question 0 answered before_you_go | zh-Hans": {
+    "checked": [
+      "9月1日 加入问题单，问医生。",
+      "医生 9月1日 回答过。",
+      "这句没有录音。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u12",
+        "span": "手腕的不太准。买一个绑手臂的，upper arm 的。",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u12",
+          "tStartMs": 75665,
+          "tEndMs": 79934,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "手腕的不太准。买一个绑手臂的，upper arm 的。",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "这个问题医生 9月1日 回答过，原话在下面。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 0 answered before_you_go",
+      "name": "家里那个机器是绑手腕的，可以用吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 0 answered before_you_go | en": {
+    "checked": [
+      "Put on your list on 1 Sep, for your doctor.",
+      "Answered by your doctor on 1 Sep.",
+      "No recording of this line."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v1:v1-u12",
+        "span": "手腕的不太准。买一个绑手臂的，upper arm 的。",
+        "slots": {},
+        "cite": {
+          "visitId": "v1",
+          "day": 0,
+          "date": "2026-09-01",
+          "utteranceId": "v1-u12",
+          "tStartMs": 75665,
+          "tEndMs": 79934,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "手腕的不太准。买一个绑手臂的，upper arm 的。",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "Your doctor answered this on 1 Sep; the words are below.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 0 answered before_you_go",
+      "name": "家里那个机器是绑手腕的，可以用吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 1 answered own | zh-Hans": {
+    "checked": [
+      "9月9日 加入问题单，问医生。",
+      "医生 9月9日 回答过。",
+      "这句没有录音。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u11",
+        "span": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u11",
+          "tStartMs": 64246,
+          "tEndMs": 71169,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "attribution": "doctor",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "哪一种？下次带来给我看。现在先尽量不要每天吃。"
+        }
+      }
+    ],
+    "verdict": "这个问题医生 9月9日 回答过，原话在下面。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 1 answered own",
+      "name": "膝盖痛吃药房买的止痛药，可以一起吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 1 answered own | en": {
+    "checked": [
+      "Put on your list on 9 Sep, for your doctor.",
+      "Answered by your doctor on 9 Sep.",
+      "No recording of this line."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:v2:v2-u11",
+        "span": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "slots": {},
+        "cite": {
+          "visitId": "v2",
+          "day": 8,
+          "date": "2026-09-09",
+          "utteranceId": "v2-u11",
+          "tStartMs": 64246,
+          "tEndMs": 71169,
+          "role": "doctor",
+          "roleState": "confirmed"
+        },
+        "en": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+        "attribution": "doctor",
+        "origin": "span"
+      }
+    ],
+    "verdict": "Your doctor answered this on 9 Sep; the words are below.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 1 answered own",
+      "name": "膝盖痛吃药房买的止痛药，可以一起吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 2 answered unidentified_medicine | zh-Hans": {
+    "checked": [
+      "9月9日 加入问题单，问药剂师。",
+      "药剂师 9月13日 回答过。",
+      "这句没有录音。"
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span",
+        "translation": {
+          "lang": "zh-Hans",
+          "text": "标签上只有中文，我没办法确认里面是什么。请先不要吃。下次看诊时带去给你的医生看。"
+        }
+      }
+    ],
+    "verdict": "这个问题药剂师 9月13日 回答过，原话在下面。",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 2 answered unidentified_medicine",
+      "name": "亲戚带来的那盒药是什么？可以一起吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 2 answered unidentified_medicine | en": {
+    "checked": [
+      "Put on your list on 9 Sep, for the pharmacist.",
+      "Answered by the pharmacist on 13 Sep.",
+      "No recording of this line."
+    ],
+    "sources": [
+      {
+        "speechAct": "restate",
+        "sourceId": "visit:p1:p1-u03",
+        "span": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "slots": {},
+        "cite": {
+          "visitId": "p1",
+          "day": 12,
+          "date": "2026-09-13",
+          "utteranceId": "p1-u03",
+          "tStartMs": 8284,
+          "tEndMs": 18668,
+          "role": "pharmacist",
+          "roleState": "confirmed"
+        },
+        "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+        "attribution": "pharmacist",
+        "origin": "span"
+      }
+    ],
+    "verdict": "The pharmacist answered this on 13 Sep; the words are below.",
+    "abstain": false,
+    "fixed": false,
+    "subject": {
+      "type": "question",
+      "ref": "question 2 answered unidentified_medicine",
+      "name": "亲戚带来的那盒药是什么？可以一起吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 3 open refused_question | zh-Hans": {
+    "checked": [
+      "9月30日 加入问题单，问医生。",
+      "这是 Ripple 不能回答的问题。",
+      "尚未询问。",
+      "下次就诊：10月13日。"
+    ],
+    "sources": [],
+    "verdict": "这个问题在问题单里，等 10月13日 就诊时问医生。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 3 open refused_question",
+      "name": "读数高的时候（例如 150/95）可以多吃一粒吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 3 open refused_question | en": {
+    "checked": [
+      "Put on your list on 30 Sep, for your doctor.",
+      "Ripple could not answer this one.",
+      "Not asked yet.",
+      "Next visit: 13 Oct."
+    ],
+    "sources": [],
+    "verdict": "This question is on your list for your doctor, for the visit on 13 Oct.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 3 open refused_question",
+      "name": "读数高的时候（例如 150/95）可以多吃一粒吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 4 open pattern | zh-Hans": {
+    "checked": [
+      "9月26日 加入问题单，问医生。",
+      "这是 Ripple 从你的记录里看到的规律。",
+      "尚未询问。",
+      "下次就诊：10月13日。"
+    ],
+    "sources": [],
+    "verdict": "这个问题在问题单里，等 10月13日 就诊时问医生。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 4 open pattern",
+      "name": "我漏吃的 5 个早上里，有 4 个在打太极的日子（周三、周五）：9月16日、9月18日、9月25…"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 4 open pattern | en": {
+    "checked": [
+      "Put on your list on 26 Sep, for your doctor.",
+      "A pattern Ripple saw in your records.",
+      "Not asked yet.",
+      "Next visit: 13 Oct."
+    ],
+    "sources": [],
+    "verdict": "This question is on your list for your doctor, for the visit on 13 Oct.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 4 open pattern",
+      "name": "4 of the 5 mornings I missed were tai chi days (…"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 5 open own | zh-Hans": {
+    "checked": [
+      "10月1日 加入问题单，问医生。",
+      "尚未询问。",
+      "下次就诊：10月13日。"
+    ],
+    "sources": [],
+    "verdict": "这个问题在问题单里，等 10月13日 就诊时问医生。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 5 open own",
+      "name": "膝盖止痛药还可以吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 5 open own | en": {
+    "checked": [
+      "Put on your list on 1 Oct, for your doctor.",
+      "Not asked yet.",
+      "Next visit: 13 Oct."
+    ],
+    "sources": [],
+    "verdict": "This question is on your list for your doctor, for the visit on 13 Oct.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 5 open own",
+      "name": "膝盖止痛药还可以吃吗？"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 6 open own | zh-Hans": {
+    "checked": [
+      "10月13日 加入问题单，问医生。",
+      "尚未询问。",
+      "下次就诊：10月13日。"
+    ],
+    "sources": [],
+    "verdict": "这个问题在问题单里，等 10月13日 就诊时问医生。",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 6 open own",
+      "name": "早上头晕的时候要不要先量血压再吃药"
+    },
+    "meds": [],
+    "ask": null
+  },
+  "question 6 open own | en": {
+    "checked": [
+      "Put on your list on 13 Oct, for your doctor.",
+      "Not asked yet.",
+      "Next visit: 13 Oct."
+    ],
+    "sources": [],
+    "verdict": "This question is on your list for your doctor, for the visit on 13 Oct.",
+    "abstain": false,
+    "fixed": true,
+    "subject": {
+      "type": "question",
+      "ref": "question 6 open own",
+      "name": "早上头晕的时候要不要先量血压再吃药"
+    },
+    "meds": [],
+    "ask": null
+  }
+}

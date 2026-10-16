@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "generated_from": [
+      "Ripple 规则库资料 · 新加坡药物单张转述与差异 v1.1（2026-10-01）.json",
+      "Ripple 规则库资料出处表 v1.1 新加坡版（2026-10-01）.md"
+    ],
+    "author_of_research": "Zicheng (v1.1, 2026-10-01)",
+    "rules": [
+      "Patient-facing text is our paraphrase with a citation; never copy HealthHub/HPB/MOH sentences.",
+      "US label text is reference only and never shown to the patient.",
+      "Numbers marked do-not-display in the B4 notes must never appear in output.",
+      "zh fields must be human-reviewed before zh_status becomes 'reviewed'."
+    ]
+  },
+  "sources": {
+    "hh-amlodipine": {
+      "id": "hh-amlodipine",
+      "title": "HealthHub medication leaflet: amlodipine",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/amlodipine",
+      "page_date": "Article last reviewed 02 March 2026 (visible on page; the page's JSON-LD dateModified is 2026-03-02, which agrees)",
+      "contributor": "Contributed by: Pharmaceutical Society of Singapore (also the JSON-LD author). The page also states it was jointly developed by the National Medication Information workgroup (NHG Health, National University Health System, SingHealth; community pharmacies Guardian, Unity and Watsons; and the Pharmaceutical Society of Singapore).",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-losartan": {
+      "id": "hh-losartan",
+      "title": "HealthHub medication leaflet: losartan",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/losartan",
+      "page_date": "Article last reviewed 08 May 2026 (visible on page; matches JSON-LD dateModified 2026-05-08)",
+      "contributor": "Pharmaceutical Society of Singapore (\"Contributed By\"; also the JSON-LD author); page states it was jointly developed by the National Medication Information workgroup (NHG Health, National University Health System, SingHealth; Guardian, Unity, Watsons; Pharmaceutical Society of Singapore)",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-metformin": {
+      "id": "hh-metformin",
+      "title": "HealthHub medication leaflet: metformin",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/metformin",
+      "page_date": "Article last reviewed 27 July 2026 (visible on page; the page's structured data also carries dateModified 2026-07-27). Accessed 2026-10-01.",
+      "contributor": "Pharmaceutical Society of Singapore (shown under \"Contributed By\"; also the author organisation in the page's structured data). The page text also says the article was developed jointly by the National Medication Information workgroup, whose members are three healthcare clusters (SingHealth, NHG Health and the National University Health System), three community pharmacies (Watsons, Unity and Guardian) and the Pharmaceutical Society of Singapore itself.",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-atorvastatin": {
+      "id": "hh-atorvastatin",
+      "title": "HealthHub medication leaflet: atorvastatin",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/atorvastatin",
+      "page_date": "Article last reviewed 22 May 2026 (visible on page; the page's structured data also gives dateModified 2026-05-22). Accessed 2026-10-01.",
+      "contributor": "Contributed By: Pharmaceutical Society of Singapore (also the author named in the page's structured data). The page also says the leaflet was produced jointly by the National Medication Information workgroup (three healthcare clusters: SingHealth, NHG Health and the National University Health System; three community pharmacies: Watsons, Guardian and Unity; plus the Pharmaceutical Society of Singapore).",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-aspirin": {
+      "id": "hh-aspirin",
+      "title": "HealthHub medication leaflet: aspirin",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/aspirin",
+      "page_date": "Article last reviewed 30 June 2026 (visible on page; the page's JSON-LD dateModified is also 2026-06-30). Accessed 2026-10-01.",
+      "contributor": "Contributed by: Pharmaceutical Society of Singapore. The page footer adds that the article was jointly developed by the National Medication Information workgroup (NHG Health, National University Health System, SingHealth; community pharmacies Guardian, Unity, Watsons; and the Pharmaceutical Society of Singapore).",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-paracetamol": {
+      "id": "hh-paracetamol",
+      "title": "HealthHub medication leaflet: paracetamol",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/paracetamol-oral",
+      "page_date": "Article last reviewed 08 July 2026 (the page's structured data gives dateModified 2026-07-08, which agrees)",
+      "contributor": "Pharmaceutical Society of Singapore (shown under \"Contributed By\" and as the author in the page's structured data). The page body adds that the National Medication Information workgroup developed it jointly; members listed are NHG Health, SingHealth, National University Health System, the pharmacies Watsons, Guardian and Unity, and the Pharmaceutical Society of Singapore.",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    },
+    "hh-ibuprofen": {
+      "id": "hh-ibuprofen",
+      "title": "HealthHub medication leaflet: ibuprofen",
+      "url": "https://www.healthhub.sg/medication-devices-and-treatment/medications/ibuprofen-oral",
+      "page_date": "Article last reviewed 07 July 2026 (as shown on the page; accessed 2026-10-01)",
+      "contributor": "Pharmaceutical Society of Singapore (the only entry under \"Contributed By\"). The body text separately credits the National Medication Information workgroup: NHG Health, National University Health System, SingHealth, the pharmacy chains Guardian, Unity and Watsons, and the Pharmaceutical Society of Singapore.",
+      "license": "L4",
+      "license_note": "Singapore government content: our own paraphrase with citation only; never copy sentences."
+    }
+  }
+}

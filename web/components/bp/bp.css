@@ -1,0 +1,176 @@
+/*
+ * Blood pressure in the timeline design (design group 03: the week view, recording, what he sees after saving, a reading
+ * above the doctor's warning line, changing and deleting, yesterday's reading, Today's cell). Almost all of it is
+ * components/ui (the page header, the timeline, list cards, boxes, buttons, the keypad); here are the few pieces it does
+ * not have. Plain global CSS with the .rp03- prefix (this app's CSS pipeline turns every *.css into global CSS:
+ * components/visit/visit.css says why). Only --rp-* tokens (app/ripple-ui.css), sizes in calc(N * var(--rp-u)), no text
+ * under 18px. These rules sit outside any @layer, so they win over the foundation's.
+ */
+
+/* ---------- the week's heading: 「9月14日–9月20日」 over 「这周量了 2 次」 (the draft's `h` at 26) ---------- */
+.rp03-week { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rp03-week-t { margin: 0; font-size: calc(26 * var(--rp-u)); font-weight: 900; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.rp03-week-s { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }
+
+/* the two week buttons: 「‹ 上一周」 has its mark before the words, 「下一周 ›」 after them, on their middle line */
+.rp03-weeknav .rpu-btn { gap: 6px; }
+.rp03-weeknav .rpu-btn svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+.rp03-icon-after { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- the week's picture: the foundation's chart frame with a gutter on the right for the doctor's numbers ---------- */
+.rp03-plot .rpu-chart-days { right: calc(42 * var(--rp-u)); }
+.rp03-plot .rpu-chart-x { margin: 0 4px; padding-right: calc(42 * var(--rp-u)); }
+/* a reading over its bar often stands on one of the dashed lines: the line stops behind the numbers */
+.rp03-plot .rpu-chart-v { z-index: 1; padding: 0 3px; border-radius: 4px; background: var(--rp-white); line-height: 1.25; }
+
+/* today's rows of the week's list, kept together for the page's hooks: no box of its own, and the line between rows
+   goes on across it (the foundation draws that line between rows that are neighbours) */
+.rp03-today { display: contents; }
+.rp03-today + .rpu-li { border-top: 1px solid var(--rp-tint); }
+
+/* ---------- a reading as the words of his own entry: 「记下了：」 at the title's size, the numbers at 44 ---------- */
+.rp03-num { font-size: var(--rp-fs-reading); line-height: 1.15; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- a quote and the checked Chinese under it, as one block of an entry ---------- */
+.rp03-words { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp03-words > * { margin: 0; }
+.rp03-words .rpu-listen { margin-top: 0; }
+
+/* a date or a time point in an entry's head line, 「（录音 0:49）」 in the chart's caption: it wraps as one piece */
+.rp03-whole { white-space: nowrap; }
+
+/* the one line that matters under a quote: 「今天：早上量过了；晚上 8:00 起」 */
+.rp03-fact { margin: 0; font-size: var(--rp-fs-body); font-weight: 800; line-height: 1.5; color: var(--rp-ink); }
+
+/* a muted how-to line (the draft's grey `p`) */
+.rp03-note { margin: 0; font-size: var(--rp-fs-body); line-height: 1.55; color: var(--rp-ink-3); text-wrap: pretty; }
+
+/* a section: its title with the rule, then what belongs to it */
+.rp03-sec { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.rp03-sec > * { margin-top: 0; }
+
+/* ---------- Today's cell: the week's count as the entry's own words, then the doctor's sentence in a card ---------- */
+.rp03-cell { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp03-cell > * { margin: 0; }
+.rp03-cell-week {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: var(--rp-hit);
+  margin: -6px 0;
+  color: var(--rp-ink);
+  text-decoration: none;
+}
+.rp03-cell-week-t { font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.rp03-cell-week svg { flex: none; width: calc(26 * var(--rp-u)); height: calc(26 * var(--rp-u)); color: var(--rp-edge); }
+.rp03-cell-days { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }
+.rp03-cell-doc { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp03-cell-doc > * { margin: 0; }
+.rp03-cell-doc .rpu-listen { margin-top: 0; }
+
+/* (the screen after a reading no longer has 「改」 「删掉」 under the round tick's words, so their row's rules are gone:
+   owner's tidy of 10-13) */
+
+/* ---------- owner 10-15: the card after a reading outside the target his doctor set (components/bp/BpOutsideTarget.tsx).
+   Calm: a white card with one hairline, the small mark in the doctor's colour that his and her calendars use for the
+   same day (an upward triangle: shape, not only colour), and one big button to hold while he speaks ---------- */
+.rp03-out {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 18px;
+  border: 1px solid var(--rp-line);
+  border-radius: var(--rp-radius-card);
+  background: var(--rp-white);
+  min-width: 0;
+}
+.rp03-out > * { margin: 0; }
+.rp03-out-head { display: flex; align-items: flex-start; gap: 10px; }
+.rp03-out-mark {
+  flex: none;
+  width: calc(20 * var(--rp-u));
+  height: calc(17 * var(--rp-u));
+  margin-top: calc(6 * var(--rp-u));
+  background: var(--rp-doctor);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.rp03-out-title { margin: 0; font-size: var(--rp-fs-node); font-weight: 900; line-height: 1.35; color: var(--rp-ink); font-variant-numeric: tabular-nums; }
+.rp03-out-src { font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-ink-2); font-variant-numeric: tabular-nums; }
+.rp03-out-label { font-size: var(--rp-fs-sub); font-weight: 700; line-height: 1.5; color: var(--rp-ink-3); }
+.rp03-out-noted { font-size: var(--rp-fs-body); line-height: 1.5; color: var(--rp-ink); }
+.rp03-out-words { font-weight: 700; }
+.rp03-out-wait { font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-ink-3); }
+.rp03-out-note { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+.rp03-out-error { font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-urgent); }
+.rp03-out-q { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--rp-accent-soft); }
+.rp03-out-q > * { margin: 0; }
+.rp03-out-qtext { font-size: var(--rp-fs-body); font-weight: 700; line-height: 1.5; color: var(--rp-ink); overflow-wrap: anywhere; }
+.rp03-out-link {
+  align-self: flex-start;
+  min-height: var(--rp-hit);
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  color: var(--rp-accent-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* the button he holds while he speaks (the ask button's hold, made big: 72 high, the whole width) */
+.rp03-out-hold {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--rp-h-primary);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  border-radius: var(--rp-radius-btn);
+  background: var(--rp-accent);
+  color: var(--rp-on-accent);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: scale 120ms ease-out, background-color 120ms ease-out;
+}
+.rp03-out-hold svg { flex: none; width: calc(28 * var(--rp-u)); height: calc(28 * var(--rp-u)); }
+.rp03-out-hold[data-holding="true"] { background: var(--rp-accent-press); scale: 0.98; box-shadow: 0 0 0 6px var(--rp-accent-halo); }
+.rp03-out-hold[data-quiet="true"] { min-height: var(--rp-h-source); background: var(--rp-white); color: var(--rp-accent-ink); box-shadow: inset 0 0 0 2px var(--rp-accent); }
+.rp03-out-hold:focus-visible { outline: 3px solid var(--rp-ink); outline-offset: 3px; }
+.rp03-out-hold-words { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; text-align: left; }
+.rp03-out-hold-t { font-size: var(--rp-fs-secondary); font-weight: 800; line-height: 1.3; }
+
+/* while he speaks: bars that move with his voice */
+.rp03-out-listen { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.rp03-out-listen > p { margin: 0; text-align: center; }
+.rp03-out-listen[data-cancel="true"] .rp03-out-wait { color: var(--rp-urgent); }
+.rp03-out-bars { display: inline-flex; align-items: flex-end; gap: 7px; height: 40px; }
+.rp03-out-bar { width: 12px; border-radius: 4px; background: var(--rp-line); transition: background-color 90ms linear; }
+.rp03-out-bar:nth-child(1) { height: 14px; }
+.rp03-out-bar:nth-child(2) { height: 21px; }
+.rp03-out-bar:nth-child(3) { height: 28px; }
+.rp03-out-bar:nth-child(4) { height: 34px; }
+.rp03-out-bar:nth-child(5) { height: 40px; }
+.rp03-out-bar[data-on="true"] { background: var(--rp-accent); }
+
+/* typing instead */
+.rp03-out-form { display: flex; flex-direction: column; gap: 10px; }
+.rp03-out-field { box-sizing: border-box; width: 100%; min-height: 72px; padding: 12px 14px; border: 2px solid var(--rp-edge); border-radius: 14px; font: inherit; font-size: var(--rp-fs-body); line-height: 1.45; color: var(--rp-ink); background: var(--rp-white); resize: none; }
+.rp03-out-field:focus { outline: none; border-color: var(--rp-accent); }
+.rp03-out-save { min-height: var(--rp-h-secondary); border: 0; border-radius: var(--rp-radius-btn); background: var(--rp-accent); color: var(--rp-on-accent); font: inherit; font-size: var(--rp-fs-secondary); font-weight: 800; cursor: pointer; }
+.rp03-out-save:disabled { background: var(--rp-line); color: var(--rp-off); cursor: default; }
+@media (prefers-reduced-motion: reduce) {
+  .rp03-out-hold, .rp03-out-bar { transition: none; }
+}

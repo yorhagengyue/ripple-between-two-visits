@@ -1,0 +1,10 @@
+# /etc/systemd/system/ripple-backup-check.timer (C2 track P): every day at 04:00 Singapore time, after the backup.
+[Unit]
+Description=Ripple backup check, daily at 04:00 Singapore time
+
+[Timer]
+OnCalendar=*-*-* 04:00:00 Asia/Singapore
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,488 @@
+{
+  "meta": {
+    "title": "Diet lines for the diet screen (journey 13, M16)",
+    "reviewed": "2026-10-10",
+    "rules": [
+      "Patient-facing text is our paraphrase of the official page with its citation; never copy HPB/HealthHub/MOH sentences.",
+      "No numbers in the text (no grams, milligrams, teaspoons, calories), no claim that a food lowers, controls or prevents anything, no 'you should' / 你应该 / 你需要 / 建议.",
+      "zh fields are drafts until a Mandarin reader reviews them (zh_status).",
+      "Grapefruit is never here: it comes only from the medicine's leaflet (kb/patient_text.json)."
+    ],
+    "note": "Lines written 10-10 from the official pages listed under sources (fetched and read that day; every line was checked against a short excerpt of its page). Three lines (hk-01, hk-04, hk-09) come from HPB's 'Reduce Your Salt And Sugar Intake' page, a campaign page shown 22 Sep - 30 Nov 2026 with no review date: check it again after 30 Nov 2026."
+  },
+  "sources": {
+    "hh-eating-for-healthy-ageing": {
+      "publisher": "Health Promotion Board",
+      "title": "Eating for Healthy Ageing",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/eating-for-healthy-ageing",
+      "page_date": "Article last reviewed 03 October 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-to-lower-blood-pressure": {
+      "publisher": "Health Promotion Board",
+      "title": "Eat to Lower Blood Pressure",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/what-to-eat-to-lower-blood-pressure",
+      "page_date": "Article last reviewed 04 July 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-hub-healthy-eating-tips": {
+      "publisher": "Ministry of Health",
+      "title": "Healthy eating | Diabetes Hub",
+      "url": "https://www.healthhub.sg/programmes/diabetes-hub/healthy-eating-tips/",
+      "page_date": null,
+      "reviewed": "2026-10-10"
+    },
+    "hh-practical-tips-and-advice": {
+      "publisher": "Ministry of Health",
+      "title": "Practical tips and advice | Diabetes Hub",
+      "url": "https://www.healthhub.sg/programmes/diabetes-hub/practical-tips-and-advice/",
+      "page_date": null,
+      "reviewed": "2026-10-10"
+    },
+    "hh-health-conditions-hyperlipidemia": {
+      "publisher": "HealthHub",
+      "contributor": "NHG Health",
+      "title": "Hyperlipidemia",
+      "url": "https://www.healthhub.sg/health-conditions/hyperlipidemia",
+      "page_date": "Article last reviewed 23 December 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-getting-the-fats-right": {
+      "publisher": "Health Promotion Board",
+      "title": "Unlocking the Truth About Fats: How to Choose the Right Ones for Your Health",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/getting-the-fats-right",
+      "page_date": "Article last reviewed 04 July 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-nutrition-hub-eat-less": {
+      "publisher": "Health Promotion Board",
+      "title": "Reduce Your Salt And Sugar Intake",
+      "url": "https://www.healthhub.sg/programmes/nutrition-hub/eat-less",
+      "page_date": null,
+      "reviewed": "2026-10-10"
+    },
+    "hh-nutrition-survive-hawker-paradise": {
+      "publisher": "Health Promotion Board",
+      "title": "Healthy Tips at Hawker Centres to Survive the Hawker Paradise",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/survive_hawker_paradise",
+      "page_date": "Article last reviewed 27 June 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-food-court-at-lunchtime": {
+      "publisher": "Health Promotion Board",
+      "title": "7 Tricks for Surviving the Food Court at Lunchtime",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/7-tricks-for-surviving-the-food-court-at-lunchtime",
+      "page_date": "Article last reviewed 27 June 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-hawker-centre-is-possible": {
+      "publisher": "Health Promotion Board",
+      "title": "Eating Light At A Hawker Centre Is Possible",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/eating-light-at-a-hawker-centre-is-possible",
+      "page_date": "Article last reviewed 04 July 2025",
+      "reviewed": "2026-10-10"
+    },
+    "hh-diet-and-nutrition-healthyhawkerfood": {
+      "publisher": "Health Promotion Board",
+      "title": "Healthy Hawker Food",
+      "url": "https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/healthyhawkerfood",
+      "page_date": "Article last reviewed 28 October 2025",
+      "reviewed": "2026-10-10"
+    }
+  },
+  "foods": [
+    {
+      "id": "chicken_rice",
+      "zh": "鸡饭",
+      "en": "Chicken rice"
+    },
+    {
+      "id": "nasi_lemak",
+      "zh": "椰浆饭",
+      "en": "Nasi lemak"
+    },
+    {
+      "id": "noodle_soup",
+      "zh": "汤面（鱼圆面等）",
+      "en": "Noodle soup"
+    },
+    {
+      "id": "fried_noodles",
+      "zh": "炒面、炒粿条",
+      "en": "Fried noodles"
+    },
+    {
+      "id": "laksa",
+      "zh": "叻沙",
+      "en": "Laksa"
+    },
+    {
+      "id": "economy_rice",
+      "zh": "经济饭（杂菜饭）",
+      "en": "Economy rice"
+    },
+    {
+      "id": "porridge",
+      "zh": "粥",
+      "en": "Porridge"
+    },
+    {
+      "id": "roti_prata",
+      "zh": "印度煎饼",
+      "en": "Roti prata"
+    },
+    {
+      "id": "wanton_mee",
+      "zh": "云吞面",
+      "en": "Wanton mee"
+    },
+    {
+      "id": "gravy_noodles",
+      "zh": "卤面、马来面",
+      "en": "Lor mee, mee rebus"
+    },
+    {
+      "id": "kopi_teh",
+      "zh": "咖啡、茶",
+      "en": "Kopi, teh"
+    }
+  ],
+  "lines": [
+    {
+      "id": "ht-01",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [],
+      "en": "You can use less salt and sauce, and flavour food with herbs, spices or lemon juice instead.",
+      "zh": "可以少用盐和酱料，改用香草、香料或柠檬汁调味。",
+      "source": "hh-eating-for-healthy-ageing",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ht-02",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [],
+      "en": "You can cut back on salty preserved foods such as salted fish, salted egg, ikan bilis and luncheon meat.",
+      "zh": "咸鱼、咸蛋、江鱼仔、午餐肉等高盐腌制食物，可以少吃。",
+      "source": "hh-to-lower-blood-pressure",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ht-03",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [],
+      "en": "When eating out, you can ask for sauce on the side, and taste first before adding salt or sauce.",
+      "zh": "外出用餐时，可以要求酱料分开放，先尝味道再考虑加盐或酱料。",
+      "source": "hh-to-lower-blood-pressure",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ht-04",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [
+        "noodle_soup",
+        "laksa",
+        "gravy_noodles"
+      ],
+      "en": "You can leave some of the soup and gravy instead of finishing all of it.",
+      "zh": "汤和汁可以留下一些，不必全部喝完。",
+      "source": "hh-to-lower-blood-pressure",
+      "zh_status": "draft",
+      "mapping": "dish type only"
+    },
+    {
+      "id": "ht-05",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [],
+      "en": "When buying food, you can choose fresh over processed food, and products with the Healthier Choice Symbol.",
+      "zh": "购物时可选新鲜而非加工的食物，及有“较健康选择”标志的产品。",
+      "source": "hh-to-lower-blood-pressure",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ht-06",
+      "conditions": [
+        "hypertension"
+      ],
+      "foods": [],
+      "en": "Following My Healthy Plate, your meals can include wholegrains, lean meat or other protein, and vegetables and fruit.",
+      "zh": "可参照“我的健康餐盘”，饮食包括全谷类、瘦肉等蛋白质和蔬果。",
+      "source": "hh-to-lower-blood-pressure",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-01",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [],
+      "en": "On My Healthy Plate, fruit and vegetables fill the biggest part; wholegrains and protein share the rest equally.",
+      "zh": "“我的健康餐盘”：蔬果占最大部分，全谷类和蛋白质平分其余。",
+      "source": "hh-hub-healthy-eating-tips",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-02",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [],
+      "en": "You can pick wholegrain foods, such as brown rice, rather than refined ones like white rice.",
+      "zh": "可以用全谷类代替精制谷类，例如用糙米代替白米。",
+      "source": "hh-practical-tips-and-advice",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-03",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [],
+      "en": "You can make plain water your usual drink, in place of sugary drinks.",
+      "zh": "平时可以选白开水，代替含糖饮料。",
+      "source": "hh-hub-healthy-eating-tips",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-04",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [],
+      "en": "You can have fruit whole, rather than as fruit juice.",
+      "zh": "可以吃整个水果，代替喝果汁。",
+      "source": "hh-hub-healthy-eating-tips",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-05",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [],
+      "en": "You can keep to regular mealtimes each day.",
+      "zh": "可以每天定时吃饭。",
+      "source": "hh-practical-tips-and-advice",
+      "zh_status": "draft"
+    },
+    {
+      "id": "dm-06",
+      "conditions": [
+        "diabetes"
+      ],
+      "foods": [
+        "economy_rice"
+      ],
+      "en": "For economy rice, you can choose brown rice, more vegetables, and steamed, braised or stir-fried dishes over deep-fried ones.",
+      "zh": "吃经济饭可选糙米、多点蔬菜，以蒸焖炒的菜代替油炸菜。",
+      "source": "hh-practical-tips-and-advice",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "ch-01",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "You can cut down on fatty meat, poultry skin, full-cream milk, butter, ghee, coconut milk and palm oil.",
+      "zh": "可以减少肥肉、鸡鸭皮、全脂奶、牛油、酥油、椰浆和棕榈油。",
+      "source": "hh-health-conditions-hyperlipidemia",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ch-02",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "You can choose fish, lean meat, low-fat dairy, and poultry with the skin removed.",
+      "zh": "可以选择鱼、瘦肉、低脂奶制品和去皮的鸡鸭。",
+      "source": "hh-health-conditions-hyperlipidemia",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ch-03",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "For cooking, you can use oils such as olive, canola, peanut, corn, sunflower or soybean oil.",
+      "zh": "煮食可选橄榄油、芥花籽油、花生油、玉米油、葵花籽油等。",
+      "source": "hh-health-conditions-hyperlipidemia",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ch-04",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "At home, you can use less oil and steam or bake food more often.",
+      "zh": "在家可以少用油，多用蒸或烤的方式煮食。",
+      "source": "hh-getting-the-fats-right",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ch-05",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "You can limit how often you eat deep-fried food.",
+      "zh": "可以减少吃油炸食物的次数。",
+      "source": "hh-getting-the-fats-right",
+      "zh_status": "draft"
+    },
+    {
+      "id": "ch-06",
+      "conditions": [
+        "high_cholesterol"
+      ],
+      "foods": [],
+      "en": "Fruit, vegetables, grains like oats and barley, and beans and peas can feature more in your meals.",
+      "zh": "可以多吃蔬果、燕麦和大麦等谷类，以及豆类。",
+      "source": "hh-health-conditions-hyperlipidemia",
+      "zh_status": "draft"
+    },
+    {
+      "id": "hk-01",
+      "conditions": [],
+      "foods": [
+        "noodle_soup",
+        "gravy_noodles",
+        "laksa"
+      ],
+      "en": "You can ask for less sauce and gravy, and leave some of the soup in soup dishes.",
+      "zh": "可以要求少酱少汁；吃带汤的食物时，汤可以不喝完。",
+      "source": "hh-nutrition-hub-eat-less",
+      "zh_status": "draft",
+      "mapping": "dish type only"
+    },
+    {
+      "id": "hk-02",
+      "conditions": [],
+      "foods": [
+        "noodle_soup",
+        "fried_noodles",
+        "gravy_noodles"
+      ],
+      "en": "When having noodles, you can pick soup versions more often than fried ones or those in thick gravy.",
+      "zh": "吃面时，可以多选汤面，少选炒面或浓汁面。",
+      "source": "hh-nutrition-survive-hawker-paradise",
+      "zh_status": "draft",
+      "mapping": "dish type only"
+    },
+    {
+      "id": "hk-03",
+      "conditions": [],
+      "foods": [
+        "chicken_rice"
+      ],
+      "en": "For chicken rice, you can ask for plain white rice in place of the flavoured rice.",
+      "zh": "吃鸡饭时，可以要白饭，代替油饭。",
+      "source": "hh-food-court-at-lunchtime",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-04",
+      "conditions": [],
+      "foods": [
+        "nasi_lemak"
+      ],
+      "en": "For nasi lemak, you can take less gravy and less coconut rice, and pick vegetables over deep-fried items.",
+      "zh": "吃椰浆饭时，可以少汁、少饭，以蔬菜代替油炸配菜。",
+      "source": "hh-nutrition-hub-eat-less",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-05",
+      "conditions": [],
+      "foods": [
+        "economy_rice"
+      ],
+      "en": "At the economy rice stall, you can go for meat dishes cooked together with vegetables.",
+      "zh": "吃经济饭时，可以选和蔬菜一起煮的肉类菜。",
+      "source": "hh-food-court-at-lunchtime",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-06",
+      "conditions": [],
+      "foods": [
+        "porridge"
+      ],
+      "en": "With chicken or fish porridge, you can skip the fried dough fritters (you tiao).",
+      "zh": "吃鸡肉粥或鱼片粥时，可以不加油条。",
+      "source": "hh-food-court-at-lunchtime",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-07",
+      "conditions": [],
+      "foods": [
+        "roti_prata"
+      ],
+      "en": "In place of roti prata, you can choose chapati or thosai.",
+      "zh": "可以选印度麦饼或thosai，代替印度煎饼。",
+      "source": "hh-food-court-at-lunchtime",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-08",
+      "conditions": [],
+      "foods": [
+        "wanton_mee"
+      ],
+      "en": "For wanton noodles, you can skip the deep-fried wontons and look for stalls using leaner meat.",
+      "zh": "吃云吞面时，可以不要炸云吞，找用瘦肉的摊位。",
+      "source": "hh-hawker-centre-is-possible",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-09",
+      "conditions": [],
+      "foods": [
+        "kopi_teh"
+      ],
+      "en": "When ordering kopi or teh, you can say siu dai for less sugar or kosong for none.",
+      "zh": "咖啡或茶可点siu dai（少糖）或kosong（无糖）。",
+      "source": "hh-nutrition-hub-eat-less",
+      "zh_status": "draft",
+      "mapping": "named dish"
+    },
+    {
+      "id": "hk-10",
+      "conditions": [],
+      "foods": [],
+      "en": "At hawker centres, you can look for stalls that display the Healthier Choice Symbol.",
+      "zh": "在小贩中心，可以留意挂有“较健康选择”标志的摊位。",
+      "source": "hh-hawker-centre-is-possible",
+      "zh_status": "draft"
+    },
+    {
+      "id": "hk-11",
+      "conditions": [],
+      "foods": [],
+      "en": "When choosing a stall, you can look for the Healthier Dining identifier shown at the front.",
+      "zh": "可以留意摊位前的“Healthier Dining”标识。",
+      "source": "hh-diet-and-nutrition-healthyhawkerfood",
+      "zh_status": "draft"
+    }
+  ]
+}

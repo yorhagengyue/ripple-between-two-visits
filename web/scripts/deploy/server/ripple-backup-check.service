@@ -1,0 +1,19 @@
+# /etc/systemd/system/ripple-backup-check.service (C2 track P; docs/plan/hosting.md 5.14 item 3). Installed by
+# provision.sh. Decrypts nothing: it lists the bucket, compares sizes, reads each object's first bytes and looks for
+# overwritten objects; only when everything is right does it ping the outside heartbeat.
+[Unit]
+Description=Ripple backup check: objects present, sizes, format, nothing overwritten
+# when both are due at once (the machine was off at 03:00 and 04:00), the check waits for the backup to finish
+After=network-online.target ripple-backup.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/ripple/backup.env
+Environment=TZ=Asia/Singapore
+ExecStart=/usr/local/bin/node /usr/local/lib/ripple/backup-check.mjs
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+TimeoutStartSec=30min

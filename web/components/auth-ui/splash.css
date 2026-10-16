@@ -1,0 +1,62 @@
+/*
+ * The cold start (line fe-entry): the iOS app's SplashView over the welcome screen. There it is Color.black under
+ * RippleAnimatedLogo(size: 210) and nothing else, shown while the app starts; here it is drawn by
+ * components/auth-ui/AuthSplash.tsx on the front door, plays for as long as the mark takes to draw itself, and then
+ * lets the welcome through in a short cross-fade. How it behaves is in web/progress/fe-entry.md.
+ *
+ * For anyone editing:
+ * - The layer is only ever drawn BY its animation. At rest it is hidden (visibility: hidden, opacity: 0); the one
+ *   animation holds it visible from the first frame (its fill is `backwards`, over its delay), fades it, and ends. So
+ *   it ends by itself whether or not any script runs, a browser that plays no animation never shows it, and once it
+ *   has ended nothing invisible lies over a control (a hidden box takes no taps).
+ * - Someone who asked the phone for less motion gets no splash and no drawing: every rule that draws it is inside
+ *   (prefers-reduced-motion: no-preference).
+ * - Once in a browser session: the small script inside the layer (AuthSplash.tsx) marks it data-seen when this session
+ *   has played it before, and a marked layer is not drawn.
+ * - Its two colours are its own, pure black and white, whatever set of colours the door is drawn in (AUTH_SPLASH in
+ *   lib/ui/auth-tokens.ts; tests/unit/ui/auth-entry.test.ts compares). They are given to the mark through the screen's
+ *   own variables, so the mark's rules in app/ripple-auth.css draw it: white paths, and the counters of p, p and e in
+ *   the ground's colour.
+ * - It covers the screen it is in and no more: position: absolute inside the screen's root, so on a computer it is the
+ *   430px column that goes black, like the phone it stands for. Nothing here is position: fixed, no size is in vw or
+ *   vh, and no query asks the window's width (app/desktop.css).
+ * - The two times come from the component as variables (the mark's own length is worked out from the SVG's numbers in
+ *   logo-paths.ts; the fade is AUTH_SPLASH.fadeSeconds); the fallbacks here are the same numbers.
+ */
+
+/* the layer's box is its screen's: the phone, or the column */
+.rpa-ios-screen:has(.rpa-ios-splash) { position: relative; }
+
+/* not drawn, unless the rules below say so */
+.rpa-ios-splash { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rpa-ios-splash {
+    --rpa-bg: #000000;
+    --rpa-logo: #FFFFFF;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    background: var(--rpa-bg);
+    animation: rpa-ios-splash-out var(--rpa-splash-fade, .35s) ease var(--rpa-splash-draw, 3.25s) backwards;
+  }
+  /* this browser session has seen it: straight to the welcome */
+  .rpa-ios-splash[data-seen="true"] { display: none; }
+}
+
+/* the mark in the middle of the phone's screen, also when the page under it is longer than the screen */
+.rpa-ios-splash-stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+}
+
+@keyframes rpa-ios-splash-out {
+  from { visibility: visible; opacity: 1; }
+  to { visibility: hidden; opacity: 0; }
+}

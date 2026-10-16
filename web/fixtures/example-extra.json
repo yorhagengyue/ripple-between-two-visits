@@ -1,0 +1,362 @@
+{
+  "meta": {
+    "about": "More of Mr Tan's everyday record, laid out only on an example account (owner 10-15: 「顺手多塞一点数据」). The story template (timeline.seed.json) stays as the demo and the tests read it. Story days as in the template (v1 day 0, v2 day 8 starts amlodipine, p1 day 12, the four missed mornings on tai chi days 15, 17, 24, 36; today is day 42). Fictional: no doctor's words, no medicine, no diagnosis; readings in the story's own range, notes in his own words.",
+    "time_zone": "+08:00",
+    "readings": "10-15: after the tablet started (day 9) his readings sit within Dr Lim's target 135/85, higher only on the four tai chi mornings he missed it (15, 17, 24, 36); bp_overrides puts the template's own readings of those weeks within it too (the evening of day 29, 150/95, stays: his question quotes it), so a reading above the target stands out on the calendar."
+  },
+  "doctors": {
+    "about": "The example's doctor (fictional, like the clinic): the name each visit row and the blood pressure page show. A short form for sentences (「林医生 9月3日 定的目标」), the full one where a visit is listed.",
+    "lim": {
+      "name": "Dr Lim Wei Ming (fictional)",
+      "short": "Dr Lim",
+      "name_zh": "林伟明医生（虚构）",
+      "short_zh": "林医生"
+    }
+  },
+  "visit_details": {
+    "about": "What the visit rows carry no column for, written into the example scope's settings (visit_details): the clinic visits' doctor, and today's planned follow-up (v3) its time (Singapore). The pharmacy (p1) has no doctor.",
+    "v1": {
+      "doctor": "lim"
+    },
+    "v2": {
+      "doctor": "lim"
+    },
+    "v3": {
+      "time": "10:30",
+      "doctor": "lim"
+    }
+  },
+  "bp_readings": [
+    {
+      "day": 9,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 134,
+      "diastolic": 84
+    },
+    {
+      "day": 10,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 132,
+      "diastolic": 83
+    },
+    {
+      "day": 12,
+      "slot": "morning",
+      "time": "07:20",
+      "systolic": 131,
+      "diastolic": 82
+    },
+    {
+      "day": 13,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 130,
+      "diastolic": 82
+    },
+    {
+      "day": 13,
+      "slot": "evening",
+      "time": "20:30",
+      "systolic": 133,
+      "diastolic": 84
+    },
+    {
+      "day": 15,
+      "slot": "morning",
+      "time": "09:40",
+      "systolic": 147,
+      "diastolic": 93
+    },
+    {
+      "day": 16,
+      "slot": "morning",
+      "time": "07:15",
+      "systolic": 129,
+      "diastolic": 81
+    },
+    {
+      "day": 17,
+      "slot": "morning",
+      "time": "09:35",
+      "systolic": 148,
+      "diastolic": 94
+    },
+    {
+      "day": 19,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 128,
+      "diastolic": 80
+    },
+    {
+      "day": 20,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 130,
+      "diastolic": 81
+    },
+    {
+      "day": 20,
+      "slot": "evening",
+      "time": "20:45",
+      "systolic": 132,
+      "diastolic": 83
+    },
+    {
+      "day": 22,
+      "slot": "morning",
+      "time": "07:00",
+      "systolic": 127,
+      "diastolic": 80
+    },
+    {
+      "day": 23,
+      "slot": "morning",
+      "time": "07:15",
+      "systolic": 129,
+      "diastolic": 81
+    },
+    {
+      "day": 24,
+      "slot": "morning",
+      "time": "09:45",
+      "systolic": 146,
+      "diastolic": 92
+    },
+    {
+      "day": 26,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 128,
+      "diastolic": 79
+    },
+    {
+      "day": 27,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 130,
+      "diastolic": 80
+    },
+    {
+      "day": 27,
+      "slot": "evening",
+      "time": "20:20",
+      "systolic": 133,
+      "diastolic": 82
+    },
+    {
+      "day": 30,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 127,
+      "diastolic": 79
+    },
+    {
+      "day": 31,
+      "slot": "morning",
+      "time": "07:15",
+      "systolic": 126,
+      "diastolic": 78
+    },
+    {
+      "day": 33,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 129,
+      "diastolic": 80
+    },
+    {
+      "day": 34,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 128,
+      "diastolic": 79
+    },
+    {
+      "day": 34,
+      "slot": "evening",
+      "time": "20:40",
+      "systolic": 131,
+      "diastolic": 81
+    },
+    {
+      "day": 36,
+      "slot": "morning",
+      "time": "09:50",
+      "systolic": 147,
+      "diastolic": 93
+    },
+    {
+      "day": 37,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 128,
+      "diastolic": 80
+    },
+    {
+      "day": 38,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 127,
+      "diastolic": 79
+    },
+    {
+      "day": 40,
+      "slot": "morning",
+      "time": "07:10",
+      "systolic": 126,
+      "diastolic": 78
+    },
+    {
+      "day": 40,
+      "slot": "evening",
+      "time": "20:30",
+      "systolic": 130,
+      "diastolic": 80
+    },
+    {
+      "day": 41,
+      "slot": "morning",
+      "time": "07:05",
+      "systolic": 125,
+      "diastolic": 78
+    }
+  ],
+  "notes": [
+    {
+      "day": 3,
+      "time": "09:20",
+      "text_zh": "早上量完血压去买菜，走了二十分钟。",
+      "source": "typed"
+    },
+    {
+      "day": 10,
+      "time": "08:05",
+      "text_zh": "昨晚睡得不太好，半夜醒了两次。",
+      "source": "voice_note"
+    },
+    {
+      "day": 13,
+      "time": "13:10",
+      "text_zh": "中午吃了一碗叻沙，有点咸。",
+      "source": "typed"
+    },
+    {
+      "day": 16,
+      "time": "10:30",
+      "text_zh": "今天下雨，没去公园，在家做了操。",
+      "source": "typed"
+    },
+    {
+      "day": 23,
+      "time": "09:15",
+      "text_zh": "打完太极回来吃早饭，有点累。",
+      "source": "voice_note"
+    },
+    {
+      "day": 27,
+      "time": "17:40",
+      "text_zh": "下楼梯的时候膝盖有点痛。",
+      "source": "typed"
+    },
+    {
+      "day": 31,
+      "time": "11:20",
+      "text_zh": "女儿陪我去买菜。",
+      "source": "typed"
+    },
+    {
+      "day": 34,
+      "time": "15:00",
+      "text_zh": "这几天天气热，水喝得多一点。",
+      "source": "voice_note"
+    },
+    {
+      "day": 38,
+      "time": "19:10",
+      "text_zh": "傍晚胸口闷了一下，坐下休息十分钟就好了。",
+      "source": "typed",
+      "signal": "chest"
+    },
+    {
+      "day": 40,
+      "time": "07:00",
+      "text_zh": "早上量血压前喝了一杯咖啡。",
+      "source": "typed"
+    },
+    {
+      "day": 41,
+      "time": "07:50",
+      "text_zh": "今天早上散步四十分钟，感觉还不错。",
+      "source": "voice_note"
+    }
+  ],
+  "questions": [
+    {
+      "id": "x-q-night",
+      "for": "doctor",
+      "origin": "own",
+      "created_day": 36,
+      "text_zh": "晚上起夜两三次，和吃的药有关系吗？"
+    },
+    {
+      "id": "x-q-travel",
+      "for": "pharmacist",
+      "origin": "own",
+      "created_day": 39,
+      "text_zh": "下个月去马来西亚玩三天，药要怎么带？"
+    }
+  ],
+  "bp_overrides": [
+    {
+      "day": 11,
+      "slot": "morning",
+      "systolic": 133,
+      "diastolic": 84
+    },
+    {
+      "day": 14,
+      "slot": "morning",
+      "systolic": 131,
+      "diastolic": 82
+    },
+    {
+      "day": 18,
+      "slot": "morning",
+      "systolic": 130,
+      "diastolic": 81
+    },
+    {
+      "day": 25,
+      "slot": "morning",
+      "systolic": 129,
+      "diastolic": 80
+    },
+    {
+      "day": 28,
+      "slot": "morning",
+      "systolic": 128,
+      "diastolic": 80
+    },
+    {
+      "day": 32,
+      "slot": "morning",
+      "systolic": 127,
+      "diastolic": 79
+    },
+    {
+      "day": 35,
+      "slot": "morning",
+      "systolic": 129,
+      "diastolic": 81
+    },
+    {
+      "day": 39,
+      "slot": "morning",
+      "systolic": 128,
+      "diastolic": 80
+    }
+  ]
+}

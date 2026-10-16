@@ -1,0 +1,17 @@
+{
+  "drug_text": "LOSARTAN 50MG TABLET",
+  "drug_id": "losartan",
+  "strength": "50 mg",
+  "directions": "Take ONE tablet every MORNING",
+  "slots": {
+    "quantity": "1",
+    "unit": "tablet",
+    "time": "morning",
+    "frequency": "once_daily"
+  },
+  "indication_on_label": "high blood pressure",
+  "dispensed": "2026-10-05",
+  "clinic": "Blossom Family Clinic (fictional)",
+  "prescribed_at": "v3",
+  "expected_status_after_confirm": "label_confirmed"
+}

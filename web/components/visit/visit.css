@@ -1,0 +1,697 @@
+/*
+ * The demo's visit screens (M2): the live transcript with the doctor's-note cards, the check cards and Ripple's
+ * question list; the start step; the review. The structure is the first design's (docs/design/visit-transcript/
+ * v3-light.html); the look is the timeline design's, like the rest of the demo phone
+ * (components/patient/demo-phone.css, front-end line fe-demo 2026-10-11): paper, white cards with a line, ink, one
+ * accent, nothing under 18px, nothing to tap under 48px, someone else's words in the serif at weight 400.
+ *   - who speaks is a shape next to the words (the foundation's node): he himself a filled ink circle, anyone else the
+ *     accent ring, dashed while the speaker is only inferred. The old letter avatars are those shapes.
+ *   - a doctor's note is a white card (dashed while it waits for him to confirm); a check, his own record next to what
+ *     he said, the grey box; Ripple's question list the white card with the accent frame.
+ *   - no colour on a reading: the bars of his readings are all ink, the doctor's own number a dashed line.
+ *   - red is only the dot of a recording in progress.
+ *
+ * Plain global CSS with an "rpv-" prefix, not a CSS module: next.config.ts sends every *.css (modules included)
+ * through the Tailwind loader as plain CSS, so a module's class map comes back empty. Components use the names through
+ * ./styles.ts. Every rule starts with .rp-patient (these screens are only drawn inside the demo phone): that keeps them
+ * above the phone's general rules for the old classes (.rp-tag, .rp-src, .rp-count, .rp-btn) whatever the order the
+ * two stylesheets load in. The colours are the theme variables the phone's scope maps (--t1, --accent, --hair ...).
+ */
+
+/* ---------- header ---------- */
+.rp-patient .rpv-hdr {
+  padding: 2px 0 14px;
+  border-bottom: 1px solid var(--hair);
+  margin-bottom: 4px;
+}
+.rp-patient .rpv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rp-patient .rpv-hdr .rpv-rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--t1);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+}
+/* the dot while lines are coming in: the accent for a replay, the recording red while this phone listens */
+.rp-patient .rpv-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--rp-accent-halo);
+}
+.rp-patient .rpv-rec[data-mic="on"] .rpv-dot {
+  background: var(--rp-rec);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rp-rec) 30%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rp-patient .rpv-dot { animation: rpv-pulse 1.6s ease-in-out infinite; }
+}
+.rp-patient .rpv-dotOff {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rp-edge);
+}
+@keyframes rpv-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+.rp-patient .rpv-h1 {
+  font-size: var(--rp-fs-headline);
+  font-weight: 900;
+  margin-top: 6px;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+.rp-patient .rpv-sub {
+  color: var(--t2);
+  margin-top: 4px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: var(--rp-fs-sub);
+  line-height: 1.4;
+}
+.rp-patient .rpv-sub svg { flex: none; width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); color: var(--t1); }
+.rp-patient .rpv-counts {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+/* the three counts: square tags, the words say which is which (the old coloured dots are not drawn) */
+.rp-patient .rpv-counts .rpv-cnt { font-size: var(--rp-fs-min); }
+.rp-patient .rpv-counts .rpv-cnt > i { display: none; }
+.rp-patient .rpv-notice {
+  margin-top: 10px;
+  color: var(--t2);
+}
+
+/* ---------- feed ---------- */
+.rp-patient .rpv-feed {
+  padding: 16px 0 24px;
+}
+.rp-patient .rpv-line {
+  margin-bottom: 18px;
+}
+.rp-patient .rpv-line .rpv-who {
+  margin-top: 0;
+  margin-bottom: 4px;
+  font-size: var(--rp-fs-min);
+  font-weight: 800;
+  line-height: 1.45;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  color: var(--t1);
+}
+.rp-patient .rpv-line .rpv-whoMe {
+  color: var(--t1);
+}
+.rp-patient .rpv-ts {
+  font-weight: 400;
+  color: var(--t2);
+  font-variant-numeric: tabular-nums;
+}
+/* who speaks, as a shape: the accent ring (dashed while only inferred), he himself the filled ink circle.
+   The letter the old avatar carried is not drawn: the words next to it say who. */
+.rp-patient .rpv-av {
+  box-sizing: border-box;
+  width: calc(22 * var(--rp-u));
+  height: calc(22 * var(--rp-u));
+  border-radius: 50%;
+  display: inline-block;
+  font-size: 0;
+  background: none;
+  border: 3px solid var(--accent);
+  color: transparent;
+  flex: none;
+}
+.rp-patient .rpv-line:is([data-display="inferred"], [data-display="unknown"]) .rpv-av { border-style: dashed; }
+.rp-patient .rpv-line[data-role="unknown"] .rpv-av { border: 2px dashed var(--rp-edge); }
+.rp-patient .rpv-whoMe .rpv-av,
+.rp-patient .rpv-line[data-role="patient"] .rpv-av {
+  background: var(--t1);
+  border: 0;
+  color: transparent;
+}
+.rp-patient .rpv-line[data-role="family"] .rpv-av { border-color: var(--t1); }
+/* a small word tag next to the speaker */
+.rp-patient .rpv-state {
+  font-weight: 400;
+  color: var(--t2);
+  border: 1.5px solid var(--t2);
+  border-radius: 6px;
+  padding: 0 calc(8 * var(--rp-u));
+}
+.rp-patient .rpv-stateOk {
+  color: var(--t1);
+  border-color: var(--t1);
+}
+/* a sentence as it was said: someone else's in the serif, his own in the sans */
+.rp-patient .rpv-txt {
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-row);
+  line-height: 1.5;
+}
+.rp-patient .rpv-mine .rpv-txt,
+.rp-patient .rpv-line[data-role="patient"] .rpv-txt,
+.rp-patient .rpv-partial .rpv-txt {
+  font-family: var(--rp-font-sans);
+}
+.rp-patient .rpv-mine {
+  padding-left: 12px;
+  border-left: 3px solid var(--hair);
+}
+.rp-patient .rpv-partial .rpv-txt {
+  color: var(--t2);
+}
+.rp-patient .rpv-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
+  vertical-align: -3px;
+  margin-left: 2px;
+  animation: rpv-blink 1s steps(1) infinite;
+}
+@keyframes rpv-blink {
+  50% { opacity: 0; }
+}
+/* the words a card refers to: underlined, the accent for a doctor's note, ink for a check */
+.rp-patient .rpv-markDoc {
+  background: none;
+  color: inherit;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 1px;
+}
+.rp-patient .rpv-markChk {
+  background: none;
+  color: inherit;
+  border-bottom: 2px solid var(--t1);
+  padding-bottom: 1px;
+}
+.rp-patient .rpv-fallbackTag {
+  font-weight: 400;
+  color: var(--t2);
+}
+.rp-patient .rpv-waiting {
+  color: var(--t2);
+  padding: 8px 0 16px;
+}
+
+/* ---------- event cards ---------- */
+.rp-patient .rpv-card {
+  margin: -6px 0 18px calc(28 * var(--rp-u));
+  position: relative;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rp-patient .rpv-card, .rp-patient .rpv-qlist { animation: rpv-rise 0.45s ease both; }
+}
+/* the short line from the sentence to its card: the timeline's rule */
+.rp-patient .rpv-card::before {
+  content: "";
+  position: absolute;
+  left: calc(-17 * var(--rp-u));
+  top: -12px;
+  width: calc(14 * var(--rp-u));
+  height: 34px;
+  border-left: 2px solid var(--hair2);
+  border-bottom: 2px solid var(--hair2);
+  border-bottom-left-radius: 10px;
+}
+.rp-patient .rpv-cardDoc::before,
+.rp-patient .rpv-cardChk::before {
+  border-color: var(--hair2);
+}
+/* in the review the notes stand on their own, under their title: no line to a sentence above, no indent */
+.rp-patient [data-testid="review-items"] .rpv-card { margin: 0 0 18px; }
+.rp-patient [data-testid="review-items"] .rpv-card::before { display: none; }
+.rp-patient [data-testid="review-items"] > h2 { margin-bottom: 10px; }
+/* a doctor's note he has not confirmed yet: the dashed frame; a check: the grey box */
+.rp-patient .rp-card.rpv-cardDoc[data-display="inferred"],
+.rp-patient .rp-card.rpv-cardDoc[data-display="unknown"] { border: 2px dashed var(--rp-edge); }
+.rp-patient .rp-card.rpv-cardChk { background: var(--surface2); border: 1px solid var(--surface2); }
+@keyframes rpv-rise {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+.rp-patient .rpv-cardBody {
+  font-size: var(--rp-fs-body);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+/* the sentence a card keeps, word for word */
+.rp-patient .rpv-quote {
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-said-zh);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+/* in a check card: the doctor's number is his words (serif); the label as printed is mono; his own note is the sans */
+.rp-patient .rpv-quoteChk {
+  color: var(--t1);
+  font-weight: 400;
+  padding-left: 12px;
+  border-left: 3px solid var(--hair2);
+}
+.rp-patient .rpv-quoteChk[data-testid$="-label"] {
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-orig);
+  padding: 10px 12px;
+  border: 1.5px dashed var(--rp-edge);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.rp-patient .rpv-quoteChk[data-testid$="-note-text"] {
+  font-family: var(--rp-font-sans);
+  font-size: var(--rp-fs-row);
+}
+.rp-patient .rpv-num {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* a row on a doctor's note: the medicine named, the date of 「五周后」 */
+.rp-patient .rpv-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface2);
+}
+.rp-patient .rpv-ic {
+  width: calc(36 * var(--rp-u));
+  height: calc(36 * var(--rp-u));
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--t1);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.rp-patient .rpv-ic svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); }
+.rp-patient .rpv-nm {
+  font-size: var(--rp-fs-row);
+  font-weight: 700;
+  line-height: 1.35;
+}
+.rp-patient .rpv-item .rpv-ds {
+  margin-top: 2px;
+}
+/* 「新」: a square tag */
+.rp-patient .rpv-item .rp-tag.rpv-newBadge {
+  display: inline-flex;
+  font-size: var(--rp-fs-min);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--t1);
+  background: none;
+  border: 1.5px solid var(--t1);
+  border-radius: 6px;
+  padding: 0 calc(8 * var(--rp-u));
+  margin-left: 8px;
+  vertical-align: 2px;
+  letter-spacing: 0;
+}
+.rp-patient .rpv-src {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+.rp-patient .rpv-acts {
+  display: flex;
+  gap: var(--rp-gap);
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.rp-patient .rpv-acts > .rp-btn { flex: 1 1 auto; }
+.rp-patient .rpv-clipRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+/* 「代录音」 next to the play pill: a square tag */
+.rp-patient .rpv-clipRow .rp-src.rpv-standIn {
+  margin-top: 0;
+  padding: 3px calc(10 * var(--rp-u));
+  border: 1.5px solid var(--t2);
+  border-radius: 6px;
+  color: var(--t2);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* his readings, one bar each, all the same ink; the dashed line is the doctor's own number, and only when he gave one */
+.rp-patient .rpv-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: calc(64 * var(--rp-u));
+  margin-top: calc(34 * var(--rp-u));
+  position: relative;
+}
+.rp-patient .rpv-bars i {
+  flex: 1;
+  border-radius: 3px;
+  background: var(--t1);
+}
+.rp-patient .rpv-bars .rpv-hi {
+  background: var(--t1);
+}
+.rp-patient .rpv-ref {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--accent);
+}
+.rp-patient .rpv-bars .rp-src.rpv-reflab {
+  position: absolute;
+  right: 0;
+  margin-top: 0;
+  font-size: var(--rp-fs-min);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--accentL);
+  transform: translateY(calc(-100% - 2px));
+  background: transparent;
+}
+
+/* ---------- Ripple's question list ---------- */
+.rp-patient .rp-qlist.rpv-qlist {
+  margin: 2px 0 18px;
+  border: 2.5px solid var(--accent);
+  overflow: hidden;
+}
+.rp-patient .rpv-qhead {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--surface2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 10px;
+}
+.rp-patient .rpv-qhead .rp-tag { color: var(--accentL); }
+.rp-patient .rpv-qhead .rp-count.rpv-prog {
+  border: none;
+  background: none;
+  padding: 0;
+}
+.rp-patient .rpv-qintro {
+  color: var(--t2);
+  padding: 10px 16px 0;
+}
+.rp-patient .rpv-q {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--surface2);
+}
+.rp-patient .rpv-q:last-child {
+  border-bottom: none;
+}
+.rp-patient .rpv-qtop {
+  display: flex;
+  gap: 12px;
+}
+/* the question's number: the grey mark; the accent ring while he asks it; filled ink once it is answered */
+.rp-patient .rpv-qtop .rp-tag.rpv-qn {
+  box-sizing: border-box;
+  letter-spacing: 0;
+  width: calc(30 * var(--rp-u));
+  height: calc(30 * var(--rp-u));
+  border-radius: 50%;
+  border: 0;
+  background: var(--surface2);
+  display: grid;
+  place-items: center;
+  font-size: var(--rp-fs-min);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--t1);
+  flex: none;
+  margin-top: 2px;
+  transition: background-color 0.35s, color 0.35s;
+}
+.rp-patient .rpv-qDone .rpv-qtop .rp-tag.rpv-qn {
+  background: var(--t1);
+  color: var(--bg);
+}
+.rp-patient .rpv-qNow .rpv-qtop .rp-tag.rpv-qn {
+  background: var(--surface);
+  border: 3px solid var(--accent);
+  color: var(--accentL);
+}
+.rp-patient .rpv-q .rpv-qwhy {
+  margin-top: 3px;
+}
+/* 「还没问」 「正在问」 「答了」: a square tag */
+.rp-patient .rpv-q .rp-tag.rpv-qst {
+  display: inline-flex;
+  font-size: var(--rp-fs-min);
+  font-weight: 400;
+  line-height: 1.3;
+  padding: 2px calc(10 * var(--rp-u));
+  border: 1.5px solid var(--t2);
+  border-radius: 6px;
+  margin-top: 8px;
+  background: none;
+  color: var(--t2);
+}
+.rp-patient .rpv-qNow .rp-tag.rpv-qst,
+.rp-patient .rpv-qDone .rp-tag.rpv-qst {
+  background: none;
+  border-color: var(--t1);
+  color: var(--t1);
+}
+.rp-patient .rpv-qa {
+  margin: 12px 0 0 calc(42 * var(--rp-u));
+}
+.rp-patient .rpv-qa .rpv-line {
+  margin-bottom: 10px;
+}
+/* 「回答已存」: the tinted box, the answer word for word */
+.rp-patient .rpv-recAns {
+  margin: 8px 0 0 calc(42 * var(--rp-u));
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--accentM);
+  line-height: 1.5;
+  display: flex;
+  gap: 10px;
+}
+.rp-patient .rpv-recAns svg {
+  flex: none;
+  width: calc(20 * var(--rp-u));
+  height: calc(20 * var(--rp-u));
+  margin-top: 4px;
+  color: var(--accentL);
+}
+.rp-patient .rpv-recAns .rp-tag.rpv-lab {
+  display: inline-flex;
+  color: var(--accentL);
+  margin-bottom: 2px;
+}
+.rp-patient .rpv-recAns [data-testid$="-answer"] {
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-row);
+}
+.rp-patient .rpv-askbtn {
+  margin: 10px 0 0 calc(42 * var(--rp-u));
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rp-gap);
+}
+.rp-patient .rpv-askbtn > .rp-btn { flex: 1 1 auto; }
+
+/* ---------- controls: pause, the waveform, 「结束看诊」, above the tab bar ---------- */
+.rp-patient .rpv-ctrl {
+  position: sticky;
+  bottom: calc(var(--rp-tabbar-h) + env(safe-area-inset-bottom) + 8px);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--rp-gap);
+  padding: 14px 0 8px;
+  background: linear-gradient(transparent, var(--bg) 30%);
+}
+.rp-patient .rpv-round {
+  box-sizing: border-box;
+  width: var(--rp-h-source);
+  height: var(--rp-h-source);
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--t1);
+  color: var(--t1);
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+.rp-patient .rpv-round svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); }
+.rp-patient .rpv-wave {
+  flex: 1;
+  min-width: 0;
+  height: var(--rp-h-source);
+  border-radius: calc(28 * var(--rp-u));
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 14px;
+  box-shadow: none;
+  overflow: hidden;
+}
+.rp-patient .rpv-wave i {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: rpv-w 1.1s ease-in-out infinite;
+}
+.rp-patient .rpv-waveIdle i {
+  animation: none;
+  height: 6px;
+  background: var(--rp-edge);
+}
+@keyframes rpv-w {
+  0%, 100% { height: 6px; opacity: 0.5; }
+  50% { height: 24px; opacity: 1; }
+}
+/* 「结束看诊」: the ink button, as an account ends a recording */
+.rp-patient .rp-btn.rpv-end {
+  min-height: var(--rp-h-source);
+  padding: 0 calc(18 * var(--rp-u));
+  border-radius: var(--rp-radius-btn);
+  background: var(--t1);
+  border-color: var(--t1);
+  color: var(--bg);
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  flex: none;
+}
+
+/* ---------- start, review ---------- */
+.rp-patient .rpv-block {
+  margin-top: 16px;
+}
+/* what he can say to the doctor: the card the doctor reads */
+.rp-patient .rpv-say {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 3px solid var(--t1);
+  border-radius: var(--rp-radius-btn);
+  background: var(--surface);
+  font-size: var(--rp-fs-row);
+  font-weight: 700;
+  line-height: 1.4;
+}
+.rp-patient .rpv-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rp-gap);
+  margin-top: 14px;
+}
+.rp-patient .rpv-fullBtn {
+  width: 100%;
+}
+.rp-patient .rpv-replayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--surface2);
+}
+.rp-patient .rpv-replayRow:first-of-type {
+  border-top: none;
+}
+.rp-patient .rpv-replayRow > .rp-btn { flex: none; }
+.rp-patient .rpv-toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--rp-radius-src);
+  border: 2px dashed var(--rp-edge);
+  font-size: var(--rp-fs-min);
+}
+.rp-patient form.rpv-toggleRow {
+  flex-wrap: wrap;
+}
+.rp-patient .rpv-toggleRow .rpv-keyInput {
+  flex: 1 1 140px;
+  min-width: 0;
+  min-height: var(--rp-h-source);
+  font-size: var(--rp-fs-small);
+}
+.rp-patient .rpv-reviewLine {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--surface2);
+}
+.rp-patient .rpv-reviewLine:last-child {
+  border-bottom: none;
+}
+.rp-patient .rpv-reviewLine .rpv-txt {
+  flex: 1;
+  min-width: 0;
+}
+.rp-patient .rpv-reviewLine[data-role="patient"] .rpv-txt > div:first-child { font-family: var(--rp-font-sans); }
+.rp-patient .rpv-pressed {
+  box-shadow: inset 0 0 0 2px var(--accentL);
+}
+.rp-patient .rpv-verdict {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rp-gap);
+  margin-top: 12px;
+}
+.rp-patient .rpv-verdict > .rp-btn { flex: 1 1 0; min-width: calc(96 * var(--rp-u)); }
+
+/* "Show the doctor": the card full screen, inside the phone's column */
+.rp-patient .rpv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  width: 100%;
+  max-width: 430px;
+  margin-inline: auto;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding: 24px var(--rp-gutter);
+  overflow-y: auto;
+  font-size: var(--rp-fs-row);
+}
+.rp-patient .rpv-overlay .rpv-card {
+  margin: 0;
+}
+.rp-patient .rpv-overlay .rpv-card::before {
+  display: none;
+}

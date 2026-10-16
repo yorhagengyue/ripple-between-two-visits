@@ -1,0 +1,13 @@
+{
+  "drug_text": "IBUPROFEN 200 mg",
+  "drug_id": "ibuprofen",
+  "strength": "200 mg",
+  "directions": null,
+  "origin": "self_bought",
+  "expected_status_after_confirm": "label_confirmed",
+  "card_must_not_include": [
+    "blood pressure",
+    "血压",
+    "amlodipine"
+  ]
+}

@@ -1,0 +1,654 @@
+{
+  "schema": "ripple/real-dataset-manifest@1",
+  "dataset": {
+    "name": "PriMock57",
+    "title": "PriMock57: A Dataset Of Primary Care Mock Consultations",
+    "creator": "Babylon Health",
+    "authors": [
+      "Alex Papadopoulos Korfiatis",
+      "Francesco Moramarco",
+      "Radmila Sarac",
+      "Aleksandar Savkov"
+    ],
+    "year": 2022,
+    "venue": "Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (ACL 2022)",
+    "paper": "https://arxiv.org/abs/2204.00333",
+    "related_paper": "https://arxiv.org/abs/2204.00447",
+    "repository": "https://github.com/babylonhealth/primock57",
+    "nature": "Mock primary-care consultations: Babylon clinicians consulting Babylon employees who acted as patients from case cards. Not real patient data.",
+    "ref": "main",
+    "commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5"
+  },
+  "licence": {
+    "id": "CC-BY-4.0",
+    "name": "Creative Commons Attribution 4.0 International",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "legalcode": "https://creativecommons.org/licenses/by/4.0/legalcode",
+    "dataset_licence_file": "https://github.com/babylonhealth/primock57/blob/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/LICENSE.md"
+  },
+  "credit": {
+    "short_citation": "Papadopoulos Korfiatis et al., 2022",
+    "source_url": "https://github.com/babylonhealth/primock57",
+    "licence_name": "CC BY 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+    "en": "Recording: PriMock57 (Babylon Health; Papadopoulos Korfiatis et al., 2022), https://github.com/babylonhealth/primock57, licensed under CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. A mock consultation, not a real patient. Doctor and patient channels mixed into one track by Ripple.",
+    "zh": "录音：PriMock57（Babylon Health；Papadopoulos Korfiatis 等，2022），https://github.com/babylonhealth/primock57 ，许可证 CC BY 4.0，https://creativecommons.org/licenses/by/4.0/ 。这是门诊模拟，不是真病人。医生和病人两条声道由 Ripple 混成一条。"
+  },
+  "attribution_file": "fixtures/real/PRIMOCK57-ATTRIBUTION.md",
+  "generator": "scripts/data/fetch_primock57.mjs",
+  "local_root": ".data/real/primock57",
+  "audio_in_repo": false,
+  "retrieved_on": "2026-10-09",
+  "changes": [
+    "Selected 5 of the 57 consultations (one per recording day); the other 52 are not used.",
+    "Mixed the separate doctor and patient channel WAVs of each consultation into one mono 16 kHz 16-bit WAV: the shorter channel is zero-padded at the end, the two are summed, and one gain for the whole file (listed per consultation in this manifest, 1 when the sum already fits) keeps every sample inside the 16-bit range, so no sample is clipped. The original channel files are kept unchanged.",
+    "Converted the two Praat TextGrid transcripts of each consultation into one JSON list of utterances (start and end in milliseconds, speaker from the file name, transcriber tags removed in `text` and kept in `text_raw`, intervals with no words left out). The original TextGrid files are kept unchanged."
+  ],
+  "consultations": [
+    {
+      "id": "day1_consultation06",
+      "day": 1,
+      "consultation": 6,
+      "presenting_complaint": "hard to breathe",
+      "why_selected": "Long-term condition on several regular medicines; the clinician changes a dose, orders tests and books a review.",
+      "duration_s": 662.52,
+      "mix": {
+        "gain": 0.9732675914099861,
+        "peak_in": 33667,
+        "peak_out": 32767,
+        "clipped_samples": 0,
+        "padded_samples": {
+          "doctor": 0,
+          "patient": 0
+        }
+      },
+      "utterances": {
+        "doctor": 85,
+        "patient": 72
+      },
+      "files": [
+        {
+          "role": "audio_doctor",
+          "path": "audio/day1_consultation06_doctor.wav",
+          "bytes": 21200684,
+          "sha256": "36c2bdb1d8e42bdb42d5a69cfda091ff1a0d2554179ae5a14ef4f674388b2d2c",
+          "source": {
+            "path": "audio/day1_consultation06_doctor.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day1_consultation06_doctor.wav",
+            "lfs_oid": "sha256:36c2bdb1d8e42bdb42d5a69cfda091ff1a0d2554179ae5a14ef4f674388b2d2c"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 662.52
+          }
+        },
+        {
+          "role": "audio_patient",
+          "path": "audio/day1_consultation06_patient.wav",
+          "bytes": 21200684,
+          "sha256": "495077d1786bb2272d41b144e4118853964b5abae9caab1e758e6b9b045b888f",
+          "source": {
+            "path": "audio/day1_consultation06_patient.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day1_consultation06_patient.wav",
+            "lfs_oid": "sha256:495077d1786bb2272d41b144e4118853964b5abae9caab1e758e6b9b045b888f"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 662.52
+          }
+        },
+        {
+          "role": "transcript_doctor",
+          "path": "transcripts/day1_consultation06_doctor.TextGrid",
+          "bytes": 21788,
+          "sha256": "73203b4bce1ccd96b57632186933a3f81baa3d2e7fea46da25f297c01364c7d7",
+          "source": {
+            "path": "transcripts/day1_consultation06_doctor.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day1_consultation06_doctor.TextGrid",
+            "git_blob_sha1": "e5792d0ed5e7ec21a4a0f6cc7eeda4d4d0386fe8"
+          }
+        },
+        {
+          "role": "transcript_patient",
+          "path": "transcripts/day1_consultation06_patient.TextGrid",
+          "bytes": 16133,
+          "sha256": "59c6411e37bd4b2366293ef9881c037af7138d4e58d34ab060114a3187e0ab08",
+          "source": {
+            "path": "transcripts/day1_consultation06_patient.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day1_consultation06_patient.TextGrid",
+            "git_blob_sha1": "6f2d1a36a645e5ae52214fe9858fb9097fbedfef"
+          }
+        },
+        {
+          "role": "note",
+          "path": "notes/day1_consultation06.json",
+          "bytes": 1052,
+          "sha256": "1899806079f35a28e593f7198c0bff7d2a49b687016ed03fa6419d24f667c913",
+          "source": {
+            "path": "notes/day1_consultation06.json",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/notes/day1_consultation06.json",
+            "git_blob_sha1": "4f92b882598276839285d3c4ec02601ce9c14f04"
+          }
+        },
+        {
+          "role": "audio_mixed",
+          "path": "mixed/day1_consultation06.wav",
+          "bytes": 21200684,
+          "sha256": "35d20c7339ce12fffa564ec237a9afaf1399aced8d96beb06404f1a56c08375b",
+          "derived": true,
+          "derived_from": [
+            "audio_doctor",
+            "audio_patient"
+          ],
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 662.52
+          }
+        },
+        {
+          "role": "utterances",
+          "path": "transcripts/day1_consultation06.utterances.json",
+          "bytes": 55528,
+          "sha256": "6fe39886d6539fd47adb1c8b041c425cd50a291f4d793cfb7e2adaa16970a1ef",
+          "derived": true,
+          "derived_from": [
+            "transcript_doctor",
+            "transcript_patient"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day2_consultation02",
+      "day": 2,
+      "consultation": 2,
+      "presenting_complaint": "I have a strange swelling on my elbow",
+      "why_selected": "New problem; the clinician plans a medicine, blood tests and a review, and says when to get in touch sooner.",
+      "duration_s": 541.56,
+      "mix": {
+        "gain": 0.8898272865522485,
+        "peak_in": 36824,
+        "peak_out": 32767,
+        "clipped_samples": 0,
+        "padded_samples": {
+          "doctor": 0,
+          "patient": 960
+        }
+      },
+      "utterances": {
+        "doctor": 57,
+        "patient": 49
+      },
+      "files": [
+        {
+          "role": "audio_doctor",
+          "path": "audio/day2_consultation02_doctor.wav",
+          "bytes": 17329964,
+          "sha256": "1363f8a876b40cd980fd56bfb6e343dd803056f33a166535fc9fc33a14481b67",
+          "source": {
+            "path": "audio/day2_consultation02_doctor.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day2_consultation02_doctor.wav",
+            "lfs_oid": "sha256:1363f8a876b40cd980fd56bfb6e343dd803056f33a166535fc9fc33a14481b67"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 541.56
+          }
+        },
+        {
+          "role": "audio_patient",
+          "path": "audio/day2_consultation02_patient.wav",
+          "bytes": 17328044,
+          "sha256": "4f6fff057ff86c3f3e19a7c34dc0dd62996f7105480ec2e87273a9f79d5da745",
+          "source": {
+            "path": "audio/day2_consultation02_patient.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day2_consultation02_patient.wav",
+            "lfs_oid": "sha256:4f6fff057ff86c3f3e19a7c34dc0dd62996f7105480ec2e87273a9f79d5da745"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 541.5
+          }
+        },
+        {
+          "role": "transcript_doctor",
+          "path": "transcripts/day2_consultation02_doctor.TextGrid",
+          "bytes": 15627,
+          "sha256": "66aa5caaf88646cb637bde510919b86fc4d67584529b8dc0d892a81a3eb02120",
+          "source": {
+            "path": "transcripts/day2_consultation02_doctor.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day2_consultation02_doctor.TextGrid",
+            "git_blob_sha1": "ca60f0fc18b340b6d1492e27c1e7f2c8ca165ccb"
+          }
+        },
+        {
+          "role": "transcript_patient",
+          "path": "transcripts/day2_consultation02_patient.TextGrid",
+          "bytes": 11670,
+          "sha256": "289fba3dcbb9ce74e832a4e96eba5be7104c219178b9413c23ea596ab3155faa",
+          "source": {
+            "path": "transcripts/day2_consultation02_patient.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day2_consultation02_patient.TextGrid",
+            "git_blob_sha1": "b22d3976f8b985c52988dcbf77e7f43fb5a665c1"
+          }
+        },
+        {
+          "role": "note",
+          "path": "notes/day2_consultation02.json",
+          "bytes": 985,
+          "sha256": "d6f2876af9113a0d75a1c25cca073530f8267679b5fb6ba8f273824c99a4c542",
+          "source": {
+            "path": "notes/day2_consultation02.json",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/notes/day2_consultation02.json",
+            "git_blob_sha1": "8a477f418ffb71bd1268b70689b3cff5d16a0b70"
+          }
+        },
+        {
+          "role": "audio_mixed",
+          "path": "mixed/day2_consultation02.wav",
+          "bytes": 17329964,
+          "sha256": "e06838393b50fb53096f082625682c2b9cca2540bad310bdfa70eeb312ceae31",
+          "derived": true,
+          "derived_from": [
+            "audio_doctor",
+            "audio_patient"
+          ],
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 541.56
+          }
+        },
+        {
+          "role": "utterances",
+          "path": "transcripts/day2_consultation02.utterances.json",
+          "bytes": 42357,
+          "sha256": "6a0e7b83fbf8f366c72a6150a0354e82b572c55a5cdac2b99d9cf35bcea0d9fd",
+          "derived": true,
+          "derived_from": [
+            "transcript_doctor",
+            "transcript_patient"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day3_consultation08",
+      "day": 3,
+      "consultation": 8,
+      "presenting_complaint": "I have a cough and a cold",
+      "why_selected": "Patient with diabetes and high blood pressure on regular medicines, seen for a cough; closest to Ripple's own patient.",
+      "duration_s": 344.46,
+      "mix": {
+        "gain": 1,
+        "peak_in": 30621,
+        "peak_out": 30621,
+        "clipped_samples": 0,
+        "padded_samples": {
+          "doctor": 0,
+          "patient": 0
+        }
+      },
+      "utterances": {
+        "doctor": 42,
+        "patient": 31
+      },
+      "files": [
+        {
+          "role": "audio_doctor",
+          "path": "audio/day3_consultation08_doctor.wav",
+          "bytes": 11022764,
+          "sha256": "df97f113621ebdf15b2cbf4fd976b6189304c6a74e5e5e8e3f0fd64e7beb961c",
+          "source": {
+            "path": "audio/day3_consultation08_doctor.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day3_consultation08_doctor.wav",
+            "lfs_oid": "sha256:df97f113621ebdf15b2cbf4fd976b6189304c6a74e5e5e8e3f0fd64e7beb961c"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 344.46
+          }
+        },
+        {
+          "role": "audio_patient",
+          "path": "audio/day3_consultation08_patient.wav",
+          "bytes": 11022764,
+          "sha256": "18ad55c44c4bfd272cc148169eada4f8fa6b298189106e9aca2b8a07316930a3",
+          "source": {
+            "path": "audio/day3_consultation08_patient.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day3_consultation08_patient.wav",
+            "lfs_oid": "sha256:18ad55c44c4bfd272cc148169eada4f8fa6b298189106e9aca2b8a07316930a3"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 344.46
+          }
+        },
+        {
+          "role": "transcript_doctor",
+          "path": "transcripts/day3_consultation08_doctor.TextGrid",
+          "bytes": 10914,
+          "sha256": "4b3e6e55e6bdb666bd474e83d8e31d4c13052218c48bef4040a542d6f2ab33cb",
+          "source": {
+            "path": "transcripts/day3_consultation08_doctor.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day3_consultation08_doctor.TextGrid",
+            "git_blob_sha1": "38666c28a43770c8044d3126cf670b06d6738d66"
+          }
+        },
+        {
+          "role": "transcript_patient",
+          "path": "transcripts/day3_consultation08_patient.TextGrid",
+          "bytes": 8064,
+          "sha256": "35263c83dcadd600dbc3472b37840a57a20cc6fb3a9a7100dd75549b7981320f",
+          "source": {
+            "path": "transcripts/day3_consultation08_patient.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day3_consultation08_patient.TextGrid",
+            "git_blob_sha1": "c17c4a26f2d2f437cf4304d2062fb588400b5d04"
+          }
+        },
+        {
+          "role": "note",
+          "path": "notes/day3_consultation08.json",
+          "bytes": 601,
+          "sha256": "052e9db928bebb49c6fc409848d8ed22d15b4a38ff81760831d17cdf3a28a704",
+          "source": {
+            "path": "notes/day3_consultation08.json",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/notes/day3_consultation08.json",
+            "git_blob_sha1": "eb6709cff449b6cb62ca5bf61d82715032fdc4f2"
+          }
+        },
+        {
+          "role": "audio_mixed",
+          "path": "mixed/day3_consultation08.wav",
+          "bytes": 11022764,
+          "sha256": "c95cf071e1273c673c3b4962e15ee8babc10997820ac897b45e44bebb23abac3",
+          "derived": true,
+          "derived_from": [
+            "audio_doctor",
+            "audio_patient"
+          ],
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 344.46
+          }
+        },
+        {
+          "role": "utterances",
+          "path": "transcripts/day3_consultation08.utterances.json",
+          "bytes": 27111,
+          "sha256": "e02273d142f9d67bb93e6a38f1c7a56f6661dcfdfab11840fece727561f89b54",
+          "derived": true,
+          "derived_from": [
+            "transcript_doctor",
+            "transcript_patient"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day4_consultation07",
+      "day": 4,
+      "consultation": 7,
+      "presenting_complaint": "I have a cold",
+      "why_selected": "Viral illness; safety-netting advice and when to come back for review.",
+      "duration_s": 626.7,
+      "mix": {
+        "gain": 0.9441034949721958,
+        "peak_in": 34707,
+        "peak_out": 32767,
+        "clipped_samples": 0,
+        "padded_samples": {
+          "doctor": 0,
+          "patient": 960
+        }
+      },
+      "utterances": {
+        "doctor": 63,
+        "patient": 55
+      },
+      "files": [
+        {
+          "role": "audio_doctor",
+          "path": "audio/day4_consultation07_doctor.wav",
+          "bytes": 20054444,
+          "sha256": "bce759d27c4e6ffdd229a73fc0458792d3fbdfd4677323bba2404645baaedd24",
+          "source": {
+            "path": "audio/day4_consultation07_doctor.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day4_consultation07_doctor.wav",
+            "lfs_oid": "sha256:bce759d27c4e6ffdd229a73fc0458792d3fbdfd4677323bba2404645baaedd24"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 626.7
+          }
+        },
+        {
+          "role": "audio_patient",
+          "path": "audio/day4_consultation07_patient.wav",
+          "bytes": 20052524,
+          "sha256": "8f195b51fdefa7f9364eb093011d3647e27706c30bff5330f01163cc68717aeb",
+          "source": {
+            "path": "audio/day4_consultation07_patient.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day4_consultation07_patient.wav",
+            "lfs_oid": "sha256:8f195b51fdefa7f9364eb093011d3647e27706c30bff5330f01163cc68717aeb"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 626.64
+          }
+        },
+        {
+          "role": "transcript_doctor",
+          "path": "transcripts/day4_consultation07_doctor.TextGrid",
+          "bytes": 16029,
+          "sha256": "6bf2f5917facf771a3afa96da422c1d9e2ca6da17c0b9073399b3d8ea0d76b13",
+          "source": {
+            "path": "transcripts/day4_consultation07_doctor.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day4_consultation07_doctor.TextGrid",
+            "git_blob_sha1": "1123d3cf7eba7dfac1f761f77c34c4d91dc6f882"
+          }
+        },
+        {
+          "role": "transcript_patient",
+          "path": "transcripts/day4_consultation07_patient.TextGrid",
+          "bytes": 14472,
+          "sha256": "ee4aea5e6edffe595365476935788b5ec796985f54ef76f4048f58d6cd6460e3",
+          "source": {
+            "path": "transcripts/day4_consultation07_patient.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day4_consultation07_patient.TextGrid",
+            "git_blob_sha1": "aba040313940f3baa4be0caf03b4d0a7a8696a51"
+          }
+        },
+        {
+          "role": "note",
+          "path": "notes/day4_consultation07.json",
+          "bytes": 819,
+          "sha256": "b68b85336148014955dfe5238700db95ad1733af61b3a7712ad933e19995c16e",
+          "source": {
+            "path": "notes/day4_consultation07.json",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/notes/day4_consultation07.json",
+            "git_blob_sha1": "fb426ae47c50eca582bd920d218c9783f9f19491"
+          }
+        },
+        {
+          "role": "audio_mixed",
+          "path": "mixed/day4_consultation07.wav",
+          "bytes": 20054444,
+          "sha256": "3017d2ba49e3c661680f5927310bbb451609bebb81137cb6e348da629d88a677",
+          "derived": true,
+          "derived_from": [
+            "audio_doctor",
+            "audio_patient"
+          ],
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 626.7
+          }
+        },
+        {
+          "role": "utterances",
+          "path": "transcripts/day4_consultation07.utterances.json",
+          "bytes": 46223,
+          "sha256": "e8273bc1ca65d0836d3936c2ade7a1452a806d901f33cb976263ed3ad6c09e05",
+          "derived": true,
+          "derived_from": [
+            "transcript_doctor",
+            "transcript_patient"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day5_consultation08",
+      "day": 5,
+      "consultation": 8,
+      "presenting_complaint": "I'm wheezy",
+      "why_selected": "Asthma flare; the clinician gives inhaler, peak-flow and review instructions with numbers.",
+      "duration_s": 563.34,
+      "mix": {
+        "gain": 0.796069094531231,
+        "peak_in": 41161,
+        "peak_out": 32767,
+        "clipped_samples": 0,
+        "padded_samples": {
+          "doctor": 0,
+          "patient": 960
+        }
+      },
+      "utterances": {
+        "doctor": 67,
+        "patient": 73
+      },
+      "files": [
+        {
+          "role": "audio_doctor",
+          "path": "audio/day5_consultation08_doctor.wav",
+          "bytes": 18026924,
+          "sha256": "e7418e5082f8c3b7b43189c7033d0612380f6714bfc957ffb258d626fcd93b01",
+          "source": {
+            "path": "audio/day5_consultation08_doctor.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day5_consultation08_doctor.wav",
+            "lfs_oid": "sha256:e7418e5082f8c3b7b43189c7033d0612380f6714bfc957ffb258d626fcd93b01"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 563.34
+          }
+        },
+        {
+          "role": "audio_patient",
+          "path": "audio/day5_consultation08_patient.wav",
+          "bytes": 18025004,
+          "sha256": "b2a4aff2bc7cbc5e8100d841373723a62355dcc0a9dfd796e54700ee2cc01dd1",
+          "source": {
+            "path": "audio/day5_consultation08_patient.wav",
+            "url": "https://media.githubusercontent.com/media/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/audio/day5_consultation08_patient.wav",
+            "lfs_oid": "sha256:b2a4aff2bc7cbc5e8100d841373723a62355dcc0a9dfd796e54700ee2cc01dd1"
+          },
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 563.28
+          }
+        },
+        {
+          "role": "transcript_doctor",
+          "path": "transcripts/day5_consultation08_doctor.TextGrid",
+          "bytes": 17072,
+          "sha256": "2de7b95950d33d4860d359c11b1c927ee7385aa2250f82c5b5c3214b88ba6611",
+          "source": {
+            "path": "transcripts/day5_consultation08_doctor.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day5_consultation08_doctor.TextGrid",
+            "git_blob_sha1": "a9f974e009f4cad0170f56bdb21f1e52137425d4"
+          }
+        },
+        {
+          "role": "transcript_patient",
+          "path": "transcripts/day5_consultation08_patient.TextGrid",
+          "bytes": 15870,
+          "sha256": "2be5579f81b3669355a4c280f15df98d2ceaaa068b73d259373da1d6b2df6a88",
+          "source": {
+            "path": "transcripts/day5_consultation08_patient.TextGrid",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/transcripts/day5_consultation08_patient.TextGrid",
+            "git_blob_sha1": "9cc32a4406888981c354e74a958800c709dfcaf1"
+          }
+        },
+        {
+          "role": "note",
+          "path": "notes/day5_consultation08.json",
+          "bytes": 1466,
+          "sha256": "b84cdb77d2dcd324da62f3974ad996a5e3502adb8aafedd4182ef65c58989dbd",
+          "source": {
+            "path": "notes/day5_consultation08.json",
+            "url": "https://raw.githubusercontent.com/babylonhealth/primock57/cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5/notes/day5_consultation08.json",
+            "git_blob_sha1": "6031a68afdb220c227b1ae7eafb4a614d438a93d"
+          }
+        },
+        {
+          "role": "audio_mixed",
+          "path": "mixed/day5_consultation08.wav",
+          "bytes": 18026924,
+          "sha256": "8c3a5061e8ae67c8d303dcb857b5310d329c7be32a301c05b705028c1243da04",
+          "derived": true,
+          "derived_from": [
+            "audio_doctor",
+            "audio_patient"
+          ],
+          "audio": {
+            "sample_rate": 16000,
+            "channels": 1,
+            "bits_per_sample": 16,
+            "duration_s": 563.34
+          }
+        },
+        {
+          "role": "utterances",
+          "path": "transcripts/day5_consultation08.utterances.json",
+          "bytes": 45215,
+          "sha256": "3f4b46498e982707b08d4fbe44c0029f2eefa1b0a8ab50c6e09704677f62a5c0",
+          "derived": true,
+          "derived_from": [
+            "transcript_doctor",
+            "transcript_patient"
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "consultations": 5,
+    "files": 35,
+    "source_files": 25,
+    "source_bytes": 175416362,
+    "source_audio_bytes": 175263800,
+    "derived_files": 10,
+    "derived_bytes": 87851214,
+    "bytes_on_disk": 263267576
+  }
+}

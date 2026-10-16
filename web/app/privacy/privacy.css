@@ -1,0 +1,41 @@
+/*
+ * /privacy (line fe-me; web/progress/fe-me.md): what the public notice needs on top of the foundation (app/ripple-ui.css
+ * Part A) and components/me/me.css. Only --rp-* tokens; text 18px and up, targets 48px and up.
+ */
+
+/* a page anyone may open on a wide window: the column stays a readable width. (No width media query and no vw: the
+   desktop layout, app/desktop.css, turns the screen into the phone's column there, and this never asks for more.) */
+.rpm-privacy > .rpu-page { width: 100%; max-width: 720px; margin-inline: auto; box-sizing: border-box; }
+
+/* a list of sentences: each hangs under its dot */
+.rpm-items { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.rpm-items > li { position: relative; margin: 0; padding-left: 1.2em; font-size: var(--rp-fs-body); line-height: 1.6; }
+.rpm-items > li::before { content: "·"; position: absolute; left: 0.3em; font-weight: 900; }
+
+.rpm-officer { font-weight: 800; }
+
+/* a published consent text in its box: the version, the words, the fingerprint behind a worded line */
+.rpm-version { display: block; font-size: var(--rp-fs-min); color: var(--rp-ink-3); margin-bottom: 8px; }
+.rpm-details { margin-top: 6px; }
+.rpm-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--rp-hit);
+  list-style: none;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  color: var(--rp-accent);
+  cursor: pointer;
+}
+.rpm-details > summary::-webkit-details-marker { display: none; }
+.rpm-details > summary svg { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); transition: transform .15s; }
+.rpm-details[open] > summary svg { transform: rotate(90deg); }
+.rpm-hash {
+  display: block;
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-min);
+  line-height: 1.5;
+  word-break: break-all;
+  color: var(--rp-ink-2);
+}

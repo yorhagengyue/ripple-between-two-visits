@@ -1,0 +1,136 @@
+/*
+ * The visit screens on Mr Tan's phone (web/progress/fe-05.md): the few pieces the timeline draft draws for this group
+ * that the foundation (app/ripple-ui.css) has no class for. Only .rpu-visit-* classes, only the foundation's --rp-*
+ * variables, every size calc(N * var(--rp-u)) like the rest of the elder side. Plain global CSS in the components
+ * layer, loaded by components/visit/elder/parts.tsx.
+ */
+@layer components {
+  /* ---------- the page under a header: blocks 18px apart, then the dock ---------- */
+  .rpu-visit-body { padding-bottom: 18px; }
+  /* under a header that ends in a hairline */
+  .rpu-visit-body[data-lined="true"] { padding-top: 16px; }
+  /* a group of entries that must stay one flex child of its parent (a test hook around several blocks) */
+  .rpu-visit-group { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rp-block-gap); }
+  .rpu-visit-group > * { margin-top: 0; }
+
+  /*
+   * The dock (the draft's `dk`): a white strip across the foot of the screen with the question and its buttons. It is
+   * the last block of the page and sticks to the bottom of the phone (above the tab bar when there is one), so the
+   * line above scrolls under it and nothing is ever hidden behind it at the end of the page.
+   */
+  .rpu-visit-dock {
+    position: sticky;
+    bottom: var(--rpu-bottom, 0px);
+    z-index: 20;
+    margin: auto calc(-1 * var(--rp-gutter)) -18px;
+    padding: 14px var(--rp-gutter);
+    background: var(--rp-white);
+    border-top: 1px solid var(--rp-line);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--rp-gap);
+  }
+  .rpu-visit-dock > * { margin-top: 0; }
+  /* no tab bar under it (recording): the draft leaves 34px under the buttons there (the phone's own bottom edge), as
+     the foundation's own bar does (.rpu-dock[data-bar]) */
+  .rpu-screen:not([data-tabbar]) .rpu-visit-dock { padding-bottom: max(34px, env(safe-area-inset-bottom)); }
+  /* the question the dock asks: 「这句是医生说的吗？」 */
+  .rpu-visit-ask { margin: 0; font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.5; }
+  .rpu-visit-ask-sub { margin: 0; font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+
+  /* ---------- a heading inside the page (the draft's `h`): 28px, a grey line under it ---------- */
+  .rpu-visit-h { display: flex; flex-direction: column; gap: 6px; }
+  .rpu-visit-h-t { margin: 0; font-size: var(--rp-fs-ask); font-weight: 900; line-height: 1.25; }
+  .rpu-visit-h-s { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-ink-3); }
+  /* a bold line that names what follows: 「最近两句」 */
+  .rpu-visit-lead { margin: 0; font-size: var(--rp-fs-body); font-weight: 800; line-height: 1.55; }
+  /* a quiet explanation: the consent card's note */
+  .rpu-visit-note { margin: 0; font-size: var(--rp-fs-min); line-height: 1.55; color: var(--rp-ink-3); }
+  /* Ripple's notes of a visit (./RippleNotes.tsx: live while he records, at the top of the review): a quiet bullet each,
+     then the line that says whose words they are */
+  .rpu-visit-notes { margin: 0; padding: 0 0 0 calc(20 * var(--rp-u)); display: grid; gap: calc(6 * var(--rp-u)); font-size: var(--rp-fs-body); line-height: 1.55; }
+  .rpu-visit-notes > li::marker { color: var(--rp-ink-3); }
+  .rpu-visit-notes + .rpu-visit-note { margin-top: calc(10 * var(--rp-u)); }
+
+  /* ---------- a row of a list card inside its own element (the hook around the row's one link) ---------- */
+  .rpu-visit-row + .rpu-visit-row { border-top: 1px solid var(--rp-tint); }
+  /* what a tap on the row does, under the row's words: 「我约的日子」 */
+  .rpu-visit-row-act { font-weight: 800; color: var(--rp-accent); }
+
+  /* ---------- a field (components/ui Field): its input is itself a full tap target (the foundation's is 46 high) ---------- */
+  .rpu-visit-field .rpu-f-input { min-height: var(--rp-hit); }
+
+  /* ---------- the header's way back as a button (a step inside the flow, not another address) ---------- */
+  .rpu-visit-back { background: none; border: 0; padding-left: 0; font-family: inherit; cursor: pointer; }
+
+  /* ---------- recording: 「正在录」 with a second line under it ---------- */
+  .rpu-visit-rec-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rpu-visit-rec-sub { font-size: var(--rp-fs-min); font-weight: 400; color: var(--rp-on-ink-2); }
+
+  /* ---------- one line at a time ---------- */
+  /* a line he already answered, above the one being asked: the same words, quieter (ink-3 keeps AA; no opacity) */
+  .rpu-visit-said { font-family: var(--rp-font-serif); font-weight: 400; font-size: var(--rp-fs-said-zh); line-height: 1.5; margin: 0; quotes: none; white-space: pre-line; }
+  .rpu-visit-said[data-lang="en"] { font-size: var(--rp-fs-said-en); line-height: 1.45; }
+  .rpu-visit-said[data-size="sub"] { font-size: var(--rp-fs-row); }
+  .rpu-visit-quiet .rpu-tl-who { color: var(--rp-ink-3); }
+  .rpu-visit-quiet .rpu-visit-said,
+  .rpu-visit-quiet .rpu-visit-said[data-lang="en"] { font-size: var(--rp-fs-small); color: var(--rp-ink-3); }
+  /* 「下一件，等你认」 */
+  .rpu-visit-waiting { font-size: var(--rp-fs-small); color: var(--rp-ink-3); }
+  /* his question that a line answers: 「你问：」 and the words */
+  .rpu-visit-asked { margin: 0; font-size: var(--rp-fs-body); line-height: 1.5; font-weight: 500; }
+  .rpu-visit-asked b { font-size: var(--rp-fs-min); font-weight: 800; color: var(--rp-ink-3); }
+  /* the small bordered button at the end of a row of controls: 「改一下」 */
+  .rpu-visit-change { margin-left: auto; }
+
+  /* ---------- a record's entry whose text is his own records (the check cards) ---------- */
+  .rpu-visit-fact { margin: 0; font-size: var(--rp-fs-body); line-height: 1.55; }
+  .rpu-visit-fact[data-strong="true"] { font-weight: 800; }
+  .rpu-visit-printed { margin: 0; font-family: var(--rp-font-mono); font-size: var(--rp-fs-orig); line-height: 1.5; overflow-wrap: anywhere; }
+
+  /* ---------- how long the recording is kept: the sentence and its button in one card ---------- */
+  .rpu-visit-keep { background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .rpu-visit-keep-t { margin: 0; font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+
+  /* ---------- the visit tab (./VisitHub.tsx): an earlier visit's row opens it in place, as the foundation's .rpu-fold
+     does (the row is a button here, so it can still be held); the chevron turns down while it is open ---------- */
+  .rpu-visit-fold[aria-expanded="true"] > svg[data-icon="chevron"] { transform: rotate(90deg); }
+}
+
+/* ux pass 10-12 (round 5): starting and ending a recording are red, with a white round mark to start and a white square
+   to end (the owner's canvas, 05-1 and 05-2). Outside the layer, so it wins over the button's own colours */
+.rpu-btn.rpu-visit-recbtn { background: var(--rp-urgent); border-color: var(--rp-urgent); color: var(--rp-on-urgent); }
+.rpu-btn.rpu-visit-recbtn:active { background: var(--rp-urgent); }
+.rpu-btn.rpu-visit-recbtn > span { display: inline-flex; align-items: center; gap: calc(12 * var(--rp-u)); }
+.rpu-visit-recbtn-mark { flex: none; width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); border-radius: 50%; background: currentColor; }
+.rpu-visit-recbtn-mark[data-shape="square"] { border-radius: calc(5 * var(--rp-u)); }
+
+/* what the microphone hears while he records (10-15, MicCheck.tsx): a label and five bars that move with his voice */
+.rpu-mic { display: flex; flex-direction: column; gap: 12px; }
+.rpu-mic-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; font-size: 18px; color: var(--rp-ink-2); }
+.rpu-mic-label { min-width: 0; overflow-wrap: anywhere; }
+.rpu-mic-bars { display: inline-flex; align-items: flex-end; gap: 5px; height: 22px; }
+.rpu-mic-bar { width: 8px; border-radius: 3px; background: var(--rp-line); transition: background-color 90ms linear; }
+.rpu-mic-bar:nth-child(1) { height: 8px; }
+.rpu-mic-bar:nth-child(2) { height: 11px; }
+.rpu-mic-bar:nth-child(3) { height: 14px; }
+.rpu-mic-bar:nth-child(4) { height: 18px; }
+.rpu-mic-bar:nth-child(5) { height: 22px; }
+.rpu-mic-bar[data-on="true"] { background: var(--rp-accent); }
+.rpu-mic-sub { margin: 0 0 12px; font-size: 18px; line-height: 1.5; }
+.rpu-mic-choices { display: flex; flex-direction: column; gap: 10px; }
+@media (prefers-reduced-motion: reduce) { .rpu-mic-bar { transition: none; } }
+
+/* every microphone with its own bars (MicCheck's 换一个; 10-15) */
+.rpu-mic-list { display: flex; flex-direction: column; gap: 10px; }
+.rpu-mic-pick { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; width: 100%; padding: 10px 14px; border-radius: 14px; border: 2px solid var(--rp-line); background: var(--rp-paper); color: var(--rp-ink); font: inherit; font-size: 18px; text-align: left; cursor: pointer; }
+.rpu-mic-pick[data-in-use="true"] { border-color: var(--rp-accent); }
+.rpu-mic-pick:disabled { cursor: default; }
+.rpu-mic-pick[data-silent="true"] .rpu-mic-pick-name { color: var(--rp-ink-3); }
+.rpu-mic-pick-name { min-width: 0; overflow-wrap: anywhere; }
+.rpu-mic-pick-end { display: inline-flex; align-items: center; gap: 10px; flex: none; }
+.rpu-mic-pick-tag { font-size: 18px; font-weight: 700; color: var(--rp-accent); }
+
+/* the microphone row: its name on one line, the bars and 换一个 / 收起 together under it (the link keeps its 48px) */
+.rpu-mic-row .rpu-mic-label { flex-basis: 100%; }
+.rpu-mic-row > .rpu-btn[data-variant="link"] { width: auto; min-width: 0; margin: 0 0 0 auto; padding-inline: 8px; }

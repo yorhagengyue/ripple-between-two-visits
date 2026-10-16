@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "purpose": "Short sentences the patient actually sees. Each one restates a field in drugs.json (the evidence text the verifier checks against) in plain words. Doses and times never come from here: they come from the confirmed medicine label.",
+    "status_values": {
+      "draft": "Drafted with an AI model from drugs.json; needs a pharmacist or doctor to review the English and a Chinese reader to review the Mandarin before the demo.",
+      "reviewed": "Checked by a human; record who and when in reviewed_by / reviewed_on."
+    },
+    "rules": [
+      "Every entry names the drugs.json field it restates (evidence_field). The slot check compares drug, number, unit and frequency against that field.",
+      "Directive sentences from the leaflet (stop, see a doctor) are shown with attribution: 'The leaflet says ...'.",
+      "Never add facts that are not in the evidence field."
+    ]
+  },
+  "entries": [
+    {
+      "id": "amlodipine.purpose",
+      "drug": "amlodipine",
+      "evidence_field": "indication",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "Amlodipine lowers blood pressure. It relaxes and widens the blood vessels.",
+      "zh": "氨氯地平用来降血压，它让血管放松、变宽。"
+    },
+    {
+      "id": "amlodipine.food",
+      "drug": "amlodipine",
+      "evidence_field": "how_to_take",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "The leaflet says you can take it alongside a meal or on an empty stomach.",
+      "zh": "单张写着：随餐吃或空腹吃都可以。",
+      "note_2026_10_09": "Reworded to the leaflet wording so the slot check passes (no number or timing the leaflet does not state)."
+    },
+    {
+      "id": "amlodipine.stopping",
+      "drug": "amlodipine",
+      "evidence_field": "how_to_take",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "The leaflet says to check with your doctor or pharmacist before you stop taking it.",
+      "zh": "单张写着：要停药之前，先问医生或药剂师。"
+    },
+    {
+      "id": "amlodipine.missed",
+      "drug": "amlodipine",
+      "evidence_field": "missed_dose",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "The leaflet says: if you forget a dose, take it when you remember, then take the next one at the usual time. Do not double up to make up for the missed one.",
+      "zh": "单张写着：忘了吃，想起来就补上，下一次照平常的时间吃。不要为了补漏掉的那次而加倍。",
+      "note_2026_10_09": "Reworded to the leaflet wording so the slot check passes (no number or timing the leaflet does not state)."
+    },
+    {
+      "id": "amlodipine.common_side_effects",
+      "drug": "amlodipine",
+      "evidence_field": "other_points:Common side effects (no action attached)",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "Common side effects listed in the leaflet: swollen legs, headache, a face that feels flushed and warm, and feeling dizzy or light-headed when you stand up.",
+      "zh": "单张列出的常见副作用：腿脚肿、头痛、脸发红发热，坐着或躺着站起来时头晕。"
+    },
+    {
+      "id": "amlodipine.grapefruit",
+      "drug": "amlodipine",
+      "evidence_field": "other_points:Food/drink to avoid",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "The leaflet says to avoid grapefruit while you are on amlodipine.",
+      "zh": "单张写着：吃氨氯地平期间不要吃西柚。"
+    },
+    {
+      "id": "amlodipine.tell_other_meds",
+      "drug": "amlodipine",
+      "evidence_field": "other_points:Other medicines to tell the doctor about",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "Tell your doctor or pharmacist about every other medicine you take, including supplements, traditional medicines and herbal products.",
+      "zh": "要告诉医生或药剂师你在吃的所有其他药，包括保健品、传统药和草药。"
+    },
+    {
+      "id": "amlodipine.allergy",
+      "drug": "amlodipine",
+      "evidence_field": "stop_or_see_doctor",
+      "source_id": "hh-amlodipine",
+      "status": "draft",
+      "en": "The leaflet says: if your face, eyes, lips or tongue swell, you have trouble breathing, or you get an itchy rash all over your body, stop the medicine and see a doctor straight away.",
+      "zh": "单张写着：如果脸、眼睛、嘴唇或舌头肿起来，呼吸困难，或者全身发痒起疹子，要停药并马上看医生。"
+    },
+    {
+      "id": "losartan.purpose",
+      "drug": "losartan",
+      "evidence_field": "indication",
+      "source_id": "hh-losartan",
+      "status": "draft",
+      "en": "Losartan lowers blood pressure. It stops a substance in the body from narrowing the blood vessels.",
+      "zh": "氯沙坦用来降血压，它阻止体内一种让血管变窄的物质起作用。"
+    },
+    {
+      "id": "losartan.food",
+      "drug": "losartan",
+      "evidence_field": "how_to_take",
+      "source_id": "hh-losartan",
+      "status": "draft",
+      "en": "The leaflet says you can take it together with a meal or on an empty stomach.",
+      "zh": "单张写着：随餐吃或空腹吃都可以。",
+      "note_2026_10_09": "Reworded to the leaflet wording so the slot check passes (no number or timing the leaflet does not state)."
+    },
+    {
+      "id": "losartan.stopping",
+      "drug": "losartan",
+      "evidence_field": "how_to_take",
+      "source_id": "hh-losartan",
+      "status": "draft",
+      "en": "The leaflet says not to stop it on your own: check with your doctor first.",
+      "zh": "单张写着：不要自己停药，先问医生。"
+    },
+    {
+      "id": "losartan.missed",
+      "drug": "losartan",
+      "evidence_field": "missed_dose",
+      "source_id": "hh-losartan",
+      "status": "draft",
+      "en": "The leaflet says: take a forgotten dose when you remember. If the next dose is nearly due, just take that one as usual. Never take a double dose to catch up.",
+      "zh": "单张写着：忘了吃，想起来就补上；如果快到下一次了，就照常吃下一次。不要加倍，也不要多吃来补。",
+      "note_2026_10_09": "Reworded to the leaflet wording so the slot check passes (no number or timing the leaflet does not state)."
+    },
+    {
+      "id": "losartan.monitoring",
+      "drug": "losartan",
+      "evidence_field": "other_points:Monitoring",
+      "source_id": "hh-losartan",
+      "status": "draft",
+      "en": "The leaflet says your doctor may check your blood potassium and how your kidneys are working while you take losartan.",
+      "zh": "单张写着：吃氯沙坦期间，医生可能会检查你血里的钾和肾功能。"
+    },
+    {
+      "id": "ibuprofen.purpose",
+      "drug": "ibuprofen",
+      "evidence_field": "indication",
+      "source_id": "hh-ibuprofen",
+      "status": "draft",
+      "en": "Ibuprofen is an anti-inflammatory painkiller (an NSAID). It is used for pain, swelling and fever, including joint and muscle pain.",
+      "zh": "布洛芬是一种消炎止痛药（NSAID），用于疼痛、肿胀和发烧，包括关节和肌肉痛。"
+    },
+    {
+      "id": "ibuprofen.food",
+      "drug": "ibuprofen",
+      "evidence_field": "how_to_take",
+      "source_id": "hh-ibuprofen",
+      "status": "draft",
+      "en": "The leaflet says to take it with food where possible, to reduce stomach upset.",
+      "zh": "单张写着：尽量随餐吃，可以减少胃不舒服。",
+      "note_2026_10_09": "Reworded to the leaflet wording so the slot check passes (no number or timing the leaflet does not state)."
+    },
+    {
+      "id": "ibuprofen.tell_first",
+      "drug": "ibuprofen",
+      "evidence_field": "stop_or_see_doctor",
+      "source_id": "hh-ibuprofen",
+      "status": "draft",
+      "en": "The leaflet says to tell a healthcare professional before taking it if you have had stomach ulcers or bleeding, asthma, kidney or heart problems, or a stroke, and about every other medicine you take.",
+      "zh": "单张写着：如果你有过胃溃疡或出血、哮喘、肾脏或心脏问题、中风，吃之前要先告诉医护人员，也要告诉他们你在吃的所有其他药。"
+    },
+    {
+      "id": "ibuprofen.long_use",
+      "drug": "ibuprofen",
+      "evidence_field": "stop_or_see_doctor",
+      "source_id": "hh-ibuprofen",
+      "status": "draft",
+      "en": "The leaflet says to avoid long use that a doctor is not supervising, because it may raise the chance of heart attack, stroke, stomach ulcers and kidney problems.",
+      "zh": "单张写着：没有医生监督时不要长期吃，因为可能增加心脏病发作、中风、胃溃疡和肾脏问题的风险。"
+    },
+    {
+      "id": "ibuprofen.no_second_nsaid",
+      "drug": "ibuprofen",
+      "evidence_field": "other_points:Other medicines and alcohol",
+      "source_id": "hh-ibuprofen",
+      "status": "draft",
+      "en": "The leaflet says not to combine it with another NSAID such as naproxen or diclofenac.",
+      "zh": "单张写着：不要和其他同类止痛药（例如 naproxen、diclofenac）一起吃。"
+    },
+    {
+      "id": "paracetamol.purpose",
+      "drug": "paracetamol",
+      "evidence_field": "indication",
+      "source_id": "hh-paracetamol",
+      "status": "draft",
+      "en": "Paracetamol (also called acetaminophen) brings down fever and eases headache, body aches and pain.",
+      "zh": "扑热息痛（也叫 acetaminophen）用来退烧，缓解头痛、身体酸痛和疼痛。"
+    },
+    {
+      "id": "paracetamol.no_double",
+      "drug": "paracetamol",
+      "evidence_field": "other_points:Two paracetamol products together",
+      "source_id": "hh-paracetamol",
+      "status": "draft",
+      "en": "The leaflet says not to use two products that both contain paracetamol at the same time.",
+      "zh": "单张写着：不要同时吃两种都含扑热息痛的药。"
+    }
+  ]
+}

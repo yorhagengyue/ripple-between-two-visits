@@ -1,0 +1,154 @@
+/*
+ * His visit as it is recorded, on her phone (scene 1 of the owner's video, 10-15): the banner on her home
+ * (components/family/LiveBanner.tsx) and the live view (components/family/HerVisitLive.tsx). Only --rpf-* tokens (no new
+ * colour, no shadow), classes with the .rpfl- prefix, sizes in calc(N * var(--rp-u)) so they follow the phone's text
+ * size; no text under --rpf-fs-min; what a finger taps is 48px tall or more. Teal is for what is live and for the one way
+ * in; everything else is the two inks. Every line of words may wrap anywhere (390px and under). Plain (unlayered) CSS.
+ */
+
+/* ---- the banner on her home: one hairline row, a breathing teal dot, what is happening, and the way in */
+.rpfl-banner {
+  margin-top: 16px;
+  min-height: calc(64 * var(--rp-u));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid var(--rpf-teal-line);
+  border-radius: 16px;
+  color: var(--rpf-ink);
+  text-decoration: none;
+  background: var(--rpf-bg);
+}
+.rpfl-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rpf-teal);
+  box-shadow: 0 0 0 4px var(--rpf-teal-22);
+  animation: rpfl-breathe 1.6s ease-in-out infinite;
+}
+.rpfl-banner-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rpfl-banner-title {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.35;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.rpfl-banner-sub {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.4;
+  color: var(--rpf-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.rpfl-banner-go {
+  font-size: var(--rpf-fs-body);
+  font-weight: 600;
+  color: var(--rpf-teal);
+  white-space: nowrap;
+}
+
+/* ---- the live view */
+.rpfl-state {
+  margin: 12px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--rpf-hit);
+  font-size: var(--rpf-fs-body);
+  color: var(--rpf-ink);
+  font-variant-numeric: tabular-nums;
+}
+.rpfl-state[data-state="ended"] .rpfl-dot {
+  background: var(--rpf-dim);
+  box-shadow: none;
+  animation: none;
+}
+.rpfl-ended {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rpfl-section {
+  margin-top: 22px;
+  min-width: 0;
+}
+.rpfl-summary {
+  border: 1px solid var(--rpf-hair-2);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  min-width: 0;
+}
+.rpfl-summary-title {
+  margin: 0 0 10px;
+  font-size: var(--rpf-fs-body);
+  font-weight: 600;
+}
+.rpfl-points {
+  margin: 0;
+  padding: 0 0 0 calc(20 * var(--rp-u));
+  display: grid;
+  gap: 8px;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.rpfl-points > li::marker {
+  color: var(--rpf-ink-2);
+}
+.rpfl-points + .rpf-note {
+  margin-top: 10px;
+}
+.rpfl-earlier {
+  margin: 8px 0 0;
+  font-size: var(--rpf-fs-min);
+  color: var(--rpf-ink-2);
+}
+.rpfl-partial .rpf-quote-words {
+  color: var(--rpf-ink-2);
+}
+.rpfl-who {
+  margin-top: 16px;
+}
+
+/* what arrives rises a little as it fades in; with less motion only the fade, and the dot holds still */
+.rpfl-captions .rpf-quote,
+.rpfl-points > li {
+  animation: rpfl-rise 250ms ease-out backwards;
+}
+@keyframes rpfl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes rpfl-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rpfl-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rpfl-captions .rpf-quote,
+  .rpfl-points > li {
+    animation: rpfl-fade 150ms ease-out backwards;
+  }
+  .rpfl-dot {
+    animation: none;
+  }
+}

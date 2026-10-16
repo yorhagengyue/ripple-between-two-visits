@@ -1,0 +1,27 @@
+# /etc/caddy/Caddyfile (C2 track P; docs/plan/hosting.md 5.9). Installed by provision.sh; the two host names come from
+# the deploy file. EDGE_SECRET comes from /etc/caddy/edge.env through systemd (caddy.service.d/ripple.conf).
+#
+# Only the origin name is served, and only to requests that carry the origin lock EdgeOne adds (X-Ripple-Edge): anything
+# else gets 403, so the app cannot be reached around the edge. No access log: a URL can carry a sandbox's id.
+# Caddy gets and renews the certificate for the origin name by itself (ports 80 and 443 must be open), and passes a
+# text/event-stream answer on at once, without buffering.
+__GLOBAL__
+__ORIGIN__ {
+	@edge header X-Ripple-Edge {$EDGE_SECRET}
+	handle @edge {
+		reverse_proxy 127.0.0.1:3200 {
+			# the app sees its public name (origin checks, links), whatever name the edge connected to
+			header_up Host __APP__
+			header_up X-Forwarded-Host __APP__
+		}
+	}
+	handle {
+		respond 403
+	}
+}
+
+# Only when EdgeOne itself is broken (hosting.md 10): point the public name's DNS record at this server, remove the
+# three # below and run: sudo systemctl reload caddy. There is no origin lock on this path; put it back afterwards.
+# __APP__ {
+# 	reverse_proxy 127.0.0.1:3200
+# }

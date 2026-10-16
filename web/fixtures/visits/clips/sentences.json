@@ -1,0 +1,55 @@
+{
+  "v2-u06": [
+    {
+      "text": "This tablet works quietly.",
+      "startMs": 5,
+      "endMs": 1960
+    },
+    {
+      "text": "You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys.",
+      "startMs": 2668,
+      "endMs": 11245
+    },
+    {
+      "text": "So you take it every day, even when you feel fine.",
+      "startMs": 11951,
+      "endMs": 15441
+    }
+  ],
+  "v2-u08": [
+    {
+      "text": "Please don't change the dose yourself.",
+      "startMs": 0,
+      "endMs": 2448
+    },
+    {
+      "text": "If your readings are high, write them down and tell me at your next visit.",
+      "startMs": 3151,
+      "endMs": 7565
+    }
+  ],
+  "v3-u19": [
+    {
+      "text": "No, please don't take an extra tablet on your own.",
+      "startMs": 0,
+      "endMs": 3247
+    },
+    {
+      "text": "One high reading doesn't mean the dose is wrong; I look at all your readings together, and that's why we're adding losartan today.",
+      "startMs": 3863,
+      "endMs": 10911
+    }
+  ],
+  "v3-u20": [
+    {
+      "text": "If it's high, sit down, rest five minutes and measure again, then write it down for me.",
+      "startMs": 0,
+      "endMs": 5858
+    },
+    {
+      "text": "If it's above 180 on top, or you have chest pain, weakness on one side or slurred speech, call 995.",
+      "startMs": 6456,
+      "endMs": 15453
+    }
+  ]
+}

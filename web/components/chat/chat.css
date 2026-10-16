@@ -1,0 +1,34 @@
+/*
+ * The day's record 「随时说一句」 (design group 04; web/progress/fe-04.md): the few rules its own layout needs on top of
+ * the foundation (app/ripple-ui.css, which this file never repeats or edits). Plain global CSS with the "fe04-" prefix,
+ * only --rp-* tokens and sizes the foundation already uses. Unlayered on purpose: the foundation's rules sit in
+ * @layer components, so the rules here win without out-weighing them.
+ */
+
+/*
+ * One rule for the whole day. Each turn is its own timeline inside its own box (the turn is one element: chat-turn),
+ * so the foundation ends the rule at a turn's last node and starts it at the next turn's first one. Here it runs on:
+ * a turn that is not the day's last keeps the 22px under its last entry (its timeline is `open`, so the rule already
+ * reaches the bottom), and a turn that follows another takes the rule in from the top.
+ */
+.fe04-turn:not(:last-child) > .rpu-tl > .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 22px; }
+.fe04-turn + .fe04-turn > .rpu-tl > .rpu-tl-item:first-child > .rpu-tl-rail::before { top: 0; }
+/* (a turn of one entry: the foundation hides an only child's rule) */
+.fe04-turn + .fe04-turn > .rpu-tl > .rpu-tl-item:only-child > .rpu-tl-rail::before { display: block; }
+
+/* one part of an answer inside its entry, and the Chinese under English words: the entry's own rhythm (8px, no margins) */
+.fe04-part,
+.fe04-zh { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fe04-part > *,
+.fe04-zh > * { margin-top: 0; margin-bottom: 0; }
+
+/* what hangs under an entry's words (a row of buttons, then the line that says a tap did not go through); no room
+   of its own while it holds nothing */
+.fe04-under { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fe04-under:empty { display: none; }
+
+/* (a helpline inside an entry needs no rule here any more: the foundation's <Hotlines> draws Ripple's bubble and the
+   buttons under it itself) */
+
+/* a turn brought to the top of the screen (the newest one, after he says something) keeps a little air above it */
+.fe04-turn { scroll-margin-top: 14px; }

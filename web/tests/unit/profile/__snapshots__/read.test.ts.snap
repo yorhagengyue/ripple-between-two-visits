@@ -1,0 +1,223 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`a demo session reads exactly the template > a judge's sandbox: the routine, the clinic, day 0, the zone and the reminder times are the template's (snapshot and the module's own exports) 1`] = `
+{
+  "clinic": "Blossom Family Clinic (fictional)",
+  "d0": "2026-08-24",
+  "morning": {
+    "closes": "09:45",
+    "first": "08:45",
+    "second": "09:15",
+  },
+  "profile": {
+    "breakfast": "08:30",
+    "clinic": "Blossom Family Clinic (fictional)",
+    "habits": [
+      {
+        "days": "daily",
+        "label": "Morning walk in the park",
+        "label_zh": "公园散步",
+        "time": "06:30",
+      },
+      {
+        "days": [
+          "Tue",
+          "Thu",
+        ],
+        "label": "Tai chi",
+        "label_zh": "打太极",
+        "time": "07:30",
+      },
+    ],
+    "reminderAt": "08:45",
+  },
+  "reminder_time": null,
+  "reminders": {
+    "clips": [
+      {
+        "id": "clip-wei-ling-1",
+        "plays_at": "after_breakfast",
+        "text": "爸，早餐吃了吗？药记得吃哦。",
+      },
+    ],
+    "schedule": {
+      "closes": "09:45",
+      "first": "08:45",
+      "second": "09:15",
+    },
+  },
+  "routine": [
+    {
+      "days": "daily",
+      "label": "Morning walk in the park",
+      "label_zh": "公园散步",
+      "time": "06:30",
+    },
+    {
+      "days": [
+        "Tue",
+        "Thu",
+      ],
+      "label": "Tai chi",
+      "label_zh": "打太极",
+      "time": "07:30",
+    },
+    {
+      "days": "daily",
+      "label": "Breakfast",
+      "label_zh": "早饭",
+      "time": "08:30",
+    },
+  ],
+  "today": "2026-09-22",
+  "tz": "Asia/Singapore",
+}
+`;
+
+exports[`a demo session reads exactly the template > a sandbox on another story day: the routine, the clinic, day 0, the zone and the reminder times are the template's (snapshot and the module's own exports) 1`] = `
+{
+  "clinic": "Blossom Family Clinic (fictional)",
+  "d0": "2026-08-24",
+  "morning": {
+    "closes": "09:45",
+    "first": "08:45",
+    "second": "09:15",
+  },
+  "profile": {
+    "breakfast": "08:30",
+    "clinic": "Blossom Family Clinic (fictional)",
+    "habits": [
+      {
+        "days": "daily",
+        "label": "Morning walk in the park",
+        "label_zh": "公园散步",
+        "time": "06:30",
+      },
+      {
+        "days": [
+          "Tue",
+          "Thu",
+        ],
+        "label": "Tai chi",
+        "label_zh": "打太极",
+        "time": "07:30",
+      },
+    ],
+    "reminderAt": "08:45",
+  },
+  "reminder_time": null,
+  "reminders": {
+    "clips": [
+      {
+        "id": "clip-wei-ling-1",
+        "plays_at": "after_breakfast",
+        "text": "爸，早餐吃了吗？药记得吃哦。",
+      },
+    ],
+    "schedule": {
+      "closes": "09:45",
+      "first": "08:45",
+      "second": "09:15",
+    },
+  },
+  "routine": [
+    {
+      "days": "daily",
+      "label": "Morning walk in the park",
+      "label_zh": "公园散步",
+      "time": "06:30",
+    },
+    {
+      "days": [
+        "Tue",
+        "Thu",
+      ],
+      "label": "Tai chi",
+      "label_zh": "打太极",
+      "time": "07:30",
+    },
+    {
+      "days": "daily",
+      "label": "Breakfast",
+      "label_zh": "早饭",
+      "time": "08:30",
+    },
+  ],
+  "today": "2026-10-05",
+  "tz": "Asia/Singapore",
+}
+`;
+
+exports[`a demo session reads exactly the template > the crew's filming session: the routine, the clinic, day 0, the zone and the reminder times are the template's (snapshot and the module's own exports) 1`] = `
+{
+  "clinic": "Blossom Family Clinic (fictional)",
+  "d0": "2026-08-24",
+  "morning": {
+    "closes": "09:45",
+    "first": "08:45",
+    "second": "09:15",
+  },
+  "profile": {
+    "breakfast": "08:30",
+    "clinic": "Blossom Family Clinic (fictional)",
+    "habits": [
+      {
+        "days": "daily",
+        "label": "Morning walk in the park",
+        "label_zh": "公园散步",
+        "time": "06:30",
+      },
+      {
+        "days": [
+          "Tue",
+          "Thu",
+        ],
+        "label": "Tai chi",
+        "label_zh": "打太极",
+        "time": "07:30",
+      },
+    ],
+    "reminderAt": "08:45",
+  },
+  "reminder_time": null,
+  "reminders": {
+    "clips": [
+      {
+        "id": "clip-wei-ling-1",
+        "plays_at": "after_breakfast",
+        "text": "爸，早餐吃了吗？药记得吃哦。",
+      },
+    ],
+    "schedule": {
+      "closes": "09:45",
+      "first": "08:45",
+      "second": "09:15",
+    },
+  },
+  "routine": [
+    {
+      "days": "daily",
+      "label": "Morning walk in the park",
+      "label_zh": "公园散步",
+      "time": "06:30",
+    },
+    {
+      "days": [
+        "Tue",
+        "Thu",
+      ],
+      "label": "Tai chi",
+      "label_zh": "打太极",
+      "time": "07:30",
+    },
+    {
+      "days": "daily",
+      "label": "Breakfast",
+      "label_zh": "早饭",
+      "time": "08:30",
+    },
+  ],
+  "today": "2026-09-22",
+  "tz": "Asia/Singapore",
+}
+`;

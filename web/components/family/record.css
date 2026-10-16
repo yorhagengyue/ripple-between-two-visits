@@ -1,0 +1,242 @@
+/*
+ * 「留意」 on her phone (components/family/RecordFeed.tsx; owner 10-14): the next visit as one hairline row, the items
+ * that need attention as cards (when, the fact, his reason, the follow-up), and one line for everything else. Only
+ * --rpf-* tokens (no new colour, no shadow), classes with the .rpfr- prefix, sizes in calc(N * var(--rp-u)) so they
+ * follow the phone's text size; no text under --rpf-fs-min (16px); what a finger taps is 48px tall or more. Teal is for
+ * the one thing she can do on a card (「加入问题单」) and the tick that says it is done; everything else is the two inks.
+ * Every line of words may wrap anywhere: a long medicine name or a long reason never widens the card (390px and under).
+ * Plain (unlayered) CSS: it wins over the foundation's @layer rules where both say something.
+ */
+
+.rpfr-feed {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+
+/* ---- the next planned visit: one row, above the sections and under no heading */
+.rpfr-next {
+  margin-top: 18px;
+  border-top: 1px solid var(--rpf-hair);
+  border-bottom: 1px solid var(--rpf-hair);
+}
+.rpfr-next-cells {
+  min-height: calc(56 * var(--rp-u));
+  padding: 10px 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(56%);
+  column-gap: 12px;
+  align-items: start;
+  align-content: center;
+}
+.rpfr-next-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rpfr-next-title {
+  font-size: var(--rpf-fs-body);
+  line-height: calc(26 * var(--rp-u));
+  color: var(--rpf-ink);
+  overflow-wrap: anywhere;
+}
+.rpfr-next-value {
+  min-width: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: calc(26 * var(--rp-u));
+  font-variant-numeric: tabular-nums;
+  color: var(--rpf-ink);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ---- a section's name: 需要留意, 其余记录 */
+.rpfr-section {
+  min-width: 0;
+}
+.rpfr-head {
+  margin: 26px 0 10px;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--rpf-ink-2);
+}
+
+/* ---- the items that need attention: one card each */
+.rpfr-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rpfr-item {
+  min-width: 0;
+}
+.rpfr-card {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px 16px 16px;
+  border-radius: 14px;
+  background: var(--rpf-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* when: 今天 早间 */
+.rpfr-when {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  color: var(--rpf-ink-2);
+}
+/* the fact: Amlodipine 未服药 */
+.rpfr-title {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.4;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--rpf-ink);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+/* the lines under it: his reason in his words, the medicines' names, the place */
+.rpfr-line {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.5;
+  color: var(--rpf-ink-2);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* ---- the follow-up of a card: a hairline, its name, then the question or the call button. Its words can be selected
+   (she may pass the question on herself); the card around it is held for Ripple's read, this part is not */
+.rpfr-follow {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rpf-hair-2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.rpfr-follow-head {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.4;
+  color: var(--rpf-ink-2);
+}
+/* the suggested question */
+.rpfr-ask {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  color: var(--rpf-ink);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+/* why there is no button, or that the tap did not go through */
+.rpfr-follow-note {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.5;
+  color: var(--rpf-ink-2);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+/* 已加入问题单: the small teal tick and the quiet words */
+.rpfr-added {
+  margin: 0;
+  min-height: calc(28 * var(--rp-u));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.4;
+  color: var(--rpf-ink-2);
+}
+.rpfr-added > svg {
+  flex: none;
+  width: calc(16 * var(--rp-u));
+  height: calc(16 * var(--rp-u));
+  color: var(--rpf-teal-ink);
+}
+/* 加入问题单: the card's one action, outlined in teal, 48px and up */
+.rpfr-follow .rpf-btn {
+  min-height: calc(48 * var(--rp-u));
+  margin-top: 2px;
+}
+.rpfr-add.rpf-btn {
+  box-shadow: inset 0 0 0 1px var(--rpf-teal-50);
+  color: var(--rpf-teal-ink);
+  font-weight: 600;
+}
+.rpfr-add.rpf-btn:disabled {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--rpf-hair-2);
+  color: var(--rpf-ink-2);
+}
+
+/* nothing needs attention: one quiet sentence */
+.rpfr-none {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  color: var(--rpf-ink-2);
+  text-wrap: pretty;
+}
+
+/* ---- everything else: one line, then the way to her calendar (a row that opens a screen, 48px and up) */
+.rpfr-rest {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  color: var(--rpf-ink);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.rpfr-restlink {
+  margin-top: 10px;
+  min-height: calc(52 * var(--rp-u));
+  padding: 6px 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--rpf-hair);
+  border-bottom: 1px solid var(--rpf-hair);
+  font-size: var(--rpf-fs-body);
+  line-height: 1.4;
+  color: var(--rpf-ink);
+  text-decoration: none;
+}
+.rpfr-restlink > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rpfr-restlink > svg {
+  flex: none;
+  width: calc(16 * var(--rp-u));
+  height: calc(16 * var(--rp-u));
+  color: var(--rpf-ink-2);
+}
+
+/* he shares nothing yet: one quiet sentence */
+.rpfr-empty {
+  margin: 30px 0 14px;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  color: var(--rpf-ink-2);
+  text-wrap: pretty;
+}

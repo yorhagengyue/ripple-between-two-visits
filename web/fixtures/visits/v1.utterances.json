@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "visit": "v1",
+    "source": "docs/plan/visits-script.md",
+    "timing": "synthetic reading speed, not measured",
+    "use": "SPEECH_PROVIDER=mock returns exactly these fields"
+  },
+  "utterances": [
+    {
+      "id": "v1-u01",
+      "t_start_ms": 1500,
+      "t_end_ms": 6115,
+      "speaker_cluster": 0,
+      "lang": "en-SG",
+      "text": "Doctor, can I record? My daughter wants me to use this app."
+    },
+    {
+      "id": "v1-u02",
+      "t_start_ms": 6815,
+      "t_end_ms": 8015,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Sure, no problem."
+    },
+    {
+      "id": "v1-u03",
+      "t_start_ms": 8715,
+      "t_end_ms": 14868,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Mr Tan, your blood pressure today is 152 over 94. I took it twice, still high."
+    },
+    {
+      "id": "v1-u04",
+      "t_start_ms": 15568,
+      "t_end_ms": 17491,
+      "speaker_cluster": 0,
+      "lang": "en-SG",
+      "text": "But I feel okay leh."
+    },
+    {
+      "id": "v1-u05",
+      "t_start_ms": 18191,
+      "t_end_ms": 27806,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Many people feel fine. One reading in the clinic is not enough. I want you to measure at home for one week, morning and evening."
+    },
+    {
+      "id": "v1-u06",
+      "t_start_ms": 28506,
+      "t_end_ms": 41967,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average."
+    },
+    {
+      "id": "v1-u07",
+      "t_start_ms": 42667,
+      "t_end_ms": 48820,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks."
+    },
+    {
+      "id": "v1-u08",
+      "t_start_ms": 49520,
+      "t_end_ms": 52981,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "At home, we want it below 135 over 85."
+    },
+    {
+      "id": "v1-u09",
+      "t_start_ms": 53681,
+      "t_end_ms": 65604,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995."
+    },
+    {
+      "id": "v1-u10",
+      "t_start_ms": 66304,
+      "t_end_ms": 69765,
+      "speaker_cluster": 1,
+      "lang": "en",
+      "text": "Come back in about a week with your readings."
+    },
+    {
+      "id": "v1-u11",
+      "t_start_ms": 70465,
+      "t_end_ms": 74965,
+      "speaker_cluster": 0,
+      "lang": "zh",
+      "text": "医生，我家里那个机器是绑手腕的，可以用吗？"
+    },
+    {
+      "id": "v1-u12",
+      "t_start_ms": 75665,
+      "t_end_ms": 79934,
+      "speaker_cluster": 1,
+      "lang": "zh-en",
+      "text": "手腕的不太准。买一个绑手臂的，upper arm 的。"
+    }
+  ]
+}

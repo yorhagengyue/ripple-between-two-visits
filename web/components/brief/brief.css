@@ -1,0 +1,38 @@
+/*
+ * The visit brief in the timeline design (design group 14: his own page, the page he hands to the doctor, the page kept
+ * as it was shown). Almost all of it is components/ui (the page header, section titles, list cards, the timeline); here
+ * are the few pieces it does not have. Plain global CSS with the .rp14b- prefix (this app's CSS pipeline turns every
+ * *.css into global CSS: components/visit/visit.css says why). Only --rp-* tokens (app/ripple-ui.css), sizes in
+ * calc(N * var(--rp-u)), no text under 18px. These rules sit outside any @layer, so they win over the foundation's.
+ */
+
+/* his own words, quoted on a page someone else reads: the serif at weight 400, like every quote (the draft's `q`) */
+.rp14b-words { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp14b-words > * { margin: 0; }
+.rp14b-own {
+  margin: 0;
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-said-zh);
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.rp14b-own[lang="en"] { font-size: var(--rp-fs-said-en); line-height: 1.45; }
+
+/* the checked Chinese under a doctor's English line, with its label (components/ui SaidTranslation), as one block */
+.rp14b-zh { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp14b-zh > * { margin: 0; }
+
+/* lines under a list row's title: the checked English of his question (ink, the row's size), then the grey lines */
+.rp14b-li-line { display: block; }
+.rp14b-li-en { display: block; font-size: var(--rp-fs-row); line-height: 1.4; color: var(--rp-ink); overflow-wrap: anywhere; }
+
+/* a list row whose words on the right are a long sentence (「上次看诊后新出现」): they may take more of the row */
+.rp14b-meds .rpu-li-r { max-width: 46%; }
+
+/* the brief's period in a header: two pieces that each stay whole (it breaks after 「…之后：」, never inside a date) */
+.rp14b-piece { display: inline-block; max-width: 100%; }
+
+/* the two languages of the page for the doctor: the foundation's segmented control, two buttons */
+.rp14b-seg { --rpu-cols: 2; }

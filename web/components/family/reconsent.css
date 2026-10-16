@@ -1,0 +1,43 @@
+/*
+ * The family texts asked again, on her screens (components/family/Reconsent.tsx; owner 10-14): one quiet line above
+ * what she sees of him, and on her home the card with her text in force between two hairlines, its one button under it.
+ * Only --rpf-* tokens (no new colour, no shadow), classes with the .rpfrc- prefix, no text under --rpf-fs-min.
+ * Plain (unlayered) CSS, as the other component files.
+ */
+
+.rpfrc-line {
+  margin: 12px 0 0;
+}
+
+.rpfrc-card {
+  margin: 18px 0 4px;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--rpf-hair);
+  border-bottom: 1px solid var(--rpf-hair);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rpfrc-title {
+  margin: 0;
+  font-size: var(--rpf-fs-body);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--rpf-ink);
+  overflow-wrap: anywhere;
+}
+
+.rpfrc-p {
+  margin: 0;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.6;
+  color: var(--rpf-ink-2);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.rpfrc-card .rpf-btn {
+  margin: 8px 0 12px;
+}

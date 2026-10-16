@@ -1,0 +1,710 @@
+/*
+ * The demo sandbox phone in the timeline design's look (front-end line fe-demo, 2026-10-11; web/progress/fe-demo.md).
+ *
+ * Owner, 2026-10-11: the judges mostly open /demo, and the phone in its frame must not look like another product. That
+ * phone is the demo scope's own set of screens (judge sandbox, crew filming session: docs/plan/real-app.md 5), which
+ * keeps its structure, its sentences, its data and its test hooks. Here it takes the account screens' look: cool paper,
+ * white cards with a 1px line, ink text, one accent (purple, white words on it), Noto Sans, someone else's words in
+ * Noto Serif at weight 400, nothing under 18px, nothing to tap under 48px.
+ *
+ * How it is done:
+ *   1. The old screens read their colours from the theme variables of app/globals.css (--bg, --surface, --t1, --accent
+ *      ...) through utility classes (bg-bg, text-ink-2, border-hair, bg-accent ...). Inside the phone's own scope,
+ *      .rp-patient (components/PhoneShell.tsx, /join, the "not signed in" phone), those variables point at the
+ *      foundation's tokens (--rp-*, app/ripple-ui.css). One place re-colours every demo screen, and it follows the
+ *      foundation. Her demo phone (data-rp-demo="family") points them at the daughter's dark tokens (--rpf-*).
+ *   2. The shapes (cards, buttons, fields, tags, the header, the tab bar, type sizes) are rules on the old classes
+ *      (.rp-card, .rp-btn, .rp-tag ...) and on a few hooks added to the frame (.rps-*), all inside the same scope.
+ *      components/visit/visit.css carries the visit screens' own part.
+ *
+ * For anyone editing:
+ * - Everything is scoped to .rp-patient: an account's screens (.rpu-screen outside it) never match, and app/globals.css
+ *   keeps its own values for whatever else reads them.
+ * - Unlayered on purpose. Tailwind's utilities sit in @layer utilities and the old .rp-btn in @layer components, so an
+ *   unlayered rule here wins whatever its specificity: that is how a hard-coded text-[13px] or px-3 on an old
+ *   component is brought to the new sizes without touching the component. app/globals.css's own unlayered rules
+ *   (.rp-card, .rp-tag ...) are beaten by specificity: every rule here starts with .rp-patient.
+ * - A foundation Screen drawn inside the frame (/p/ask, /p/chat, /p/diet, /p/prevent, /p/watch in a demo scope) keeps
+ *   the foundation's own rules: the element rules below leave out everything inside .rpu-screen.
+ * - Sizes are the foundation's tokens (calc(N * var(--rp-u))), so the demo phone follows the phone's text size as the
+ *   account screens do. Filming mode: the foundation lifts --rp-fs-body from 21 to 23 on [data-filming="true"].
+ * - Red is only 995 (the emergency answer's card, and the 995 button wherever a fixed line offers the number) and the
+ *   recording dot (components/visit/visit.css). No colour on a reading.
+ * - Only .rps-* classes are declared here (the sandbox phone's hooks). No variable of the foundation is redefined,
+ *   with one exception said where it stands: --rpu-bottom on a foundation Screen drawn inside the frame.
+ */
+
+/* =================================================================== 1. the palette, in the phone's own scope */
+
+.rp-patient {
+  --page: var(--rp-tint);            /* outside the column, in a window wider than the phone */
+  --bg: var(--rp-paper);
+  --surface: var(--rp-white);
+  --surface2: var(--rp-tint);        /* the grey box */
+  --hair: var(--rp-line);
+  --hair2: var(--rp-line-2);
+  --t1: var(--rp-ink);
+  --t2: var(--rp-ink-3);             /* second lines, source lines: never lighter than this */
+  --t3: var(--rp-ink-3);             /* the old weak grey (#8A969A) failed AA as text */
+
+  --accent: var(--rp-accent);
+  --accentL: var(--rp-accent);
+  --accentM: var(--rp-accent-soft);
+  --onAccent: var(--rp-on-accent);   /* white: the old teal carried dark words */
+
+  /* there are no speaker colours: what was said at the clinic shares the accent (lib/ui/tokens.ts SOURCE_COLOUR) */
+  --doc: var(--rp-accent);
+  --docL: var(--rp-accent);
+  --docM: var(--rp-accent-soft);
+  --onDoc: var(--rp-on-accent);
+
+  /* "check" (his own record next to what he said, a medicine waiting for its label) was amber: ink on the grey box */
+  --chk: var(--rp-ink);
+  --chkT: var(--rp-ink);
+  --chkM: var(--rp-tint);
+  --onChk: var(--rp-on-ink);
+
+  --shadow-card: none;
+  --shadow-list: none;
+}
+
+/* her demo phone: the daughter's dark look (app/ripple-ui.css Part B). Text steps and fills are her tokens. */
+.rp-patient[data-rp-demo="family"] {
+  --page: var(--rpf-page);
+  --bg: var(--rpf-bg);
+  --surface: var(--rpf-surface);
+  --surface2: var(--rpf-surface-2);
+  --hair: var(--rpf-hair);
+  --hair2: var(--rpf-hair-2);
+  --t1: var(--rpf-ink);
+  --t2: var(--rpf-ink-2);
+  --t3: var(--rpf-ink-2);
+  --accent: var(--rpf-teal);
+  --accentL: var(--rpf-teal-ink);
+  --accentM: var(--rpf-surface);
+  --onAccent: var(--rpf-on-teal);
+  --doc: var(--rpf-teal);
+  --docL: var(--rpf-teal-ink);
+  --docM: var(--rpf-surface);
+  --onDoc: var(--rpf-on-teal);
+  --chk: var(--rpf-chk);             /* amber: only "no reply" */
+  --chkT: var(--rpf-chk);
+  --chkM: var(--rpf-surface);
+  --onChk: var(--rpf-on-chk);
+  color-scheme: dark;
+}
+
+/* the ground behind the column (a computer's window, the overscroll on a phone): the account pages' stage */
+html:has(.rp-patient) body { background: var(--rp-tint); }
+html:has(.rp-patient[data-rp-demo="family"]) body { background: var(--rpf-page); }
+
+/* =================================================================== 2. the frame */
+
+div.rp-patient {
+  font-family: var(--rp-font-sans);
+  font-size: var(--rp-fs-body);
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: var(--t1);
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+div.rp-patient[data-filming="true"] { font-size: var(--rp-fs-body); }
+div.rp-patient[data-rp-demo="family"] { font-family: var(--rpf-font); }
+
+/* on a computer the column stands on the stage with a line down each side, like an account's screen */
+@media screen and (min-width: 720px) {
+  div.rp-patient { box-shadow: 0 0 0 1px var(--hair); }
+}
+
+.rp-patient :is(a, button, input, summary, [role="switch"]):focus-visible { outline: 3px solid var(--accentL); outline-offset: 2px; }
+
+/* the header: the story day where an account's header has its date, the language switch as the small bordered button */
+.rp-patient .rps-head {
+  box-sizing: border-box;
+  min-height: calc(64 * var(--rp-u));
+  padding: 8px var(--rp-gutter);
+  background: var(--bg);
+  border-bottom: 1px solid var(--hair);
+  /* the frame's two bars stand where the foundation's tab bar stands (30): over a foundation screen's own stacked
+     pieces (its dock is 20, also when it is not pinned), under its undo bar and sheets (40) */
+  z-index: 30;
+}
+.rp-patient .rps-day {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--rp-fs-sub);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--t2);
+}
+.rp-patient .rps-body { padding: 14px var(--rp-gutter) 28px; }
+
+/* the tab bar: white, words only; the current one bold, purple and under a 4px bar */
+.rp-patient .rps-tabs {
+  margin: 0;
+  padding: 0 0 env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--hair);
+  z-index: 30;
+}
+.rp-patient .rps-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--rp-tabbar-h);
+  min-width: 0;
+  padding: 14px 2px 10px;
+  /* 18 at the default size, capped at 26 so five items still fit when the phone's text is very large */
+  font-size: min(var(--rp-fs-min), 26px);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--t2);
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.rp-patient .rps-tab[aria-current="page"] { font-weight: 800; color: var(--accentL); box-shadow: inset 0 4px 0 var(--accent); }
+
+/* a foundation Screen inside the frame: one ground, one gutter, as tall as the frame leaves it */
+.rp-patient .rps-body:has(.rpu-screen) { display: flex; flex-direction: column; padding: 0; }
+.rp-patient .rps-body .rpu-screen { flex: 1; min-height: 0; background: none; }
+.rp-patient .rps-body:has(.rpu-screen) > .rp-card { margin: 14px var(--rp-gutter) 0; }
+/*
+ * What that screen fixes at its foot (the dock with the field to ask again on /p/ask, an undo bar) stands above the
+ * frame's tab bar, not over it. The screen has no tab bar of its own here, so its measure of "what is fixed below"
+ * (--rpu-bottom, which its dock and its undo bar read) would be 0: in the frame it is the frame's tab bar (its
+ * height and its 1px line). The one place this file sets a variable of the foundation, and only on a screen inside
+ * the frame. The frame's tab bar is in the flow under the screen, so the page keeps no room of its own for it, and
+ * the dock leaves the 14px it leaves above an account's tab bar.
+ */
+.rp-patient:has(> .rps-tabs) .rps-body .rpu-screen { --rpu-bottom: calc(var(--rp-tabbar-h) + 1px + env(safe-area-inset-bottom)); }
+.rp-patient:has(> .rps-tabs) .rps-body .rpu-screen:has(.rpu-dock[data-bar="true"]) > .rpu-page { padding-bottom: 0; }
+.rp-patient:has(> .rps-tabs) .rps-body .rpu-screen .rpu-dock[data-bar="true"] { padding-bottom: 14px; }
+
+/* =================================================================== 3. type */
+
+/* a screen's title (the tab pages carry the large one, as 「今天」 does on an account) and a title inside a screen */
+.rp-patient :where(h1):not(.rpu-screen *) { margin: 0; font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.2; letter-spacing: 0; }
+.rp-patient :is([data-testid="page-today"], [data-testid="page-visit"], [data-testid="page-meds"], [data-testid="page-bp"], [data-testid="page-questions"], [data-testid="page-family"]) > :where(h1) { font-size: var(--rp-fs-title); }
+/* a group's name above its cards (the foundation's group label); a card's own title */
+.rp-patient :where(h2):not(.rpu-screen *) { margin: 0; font-size: var(--rp-fs-min); font-weight: 800; line-height: 1.4; color: var(--t2); }
+.rp-patient :is(.rp-card, .rp-qlist, form) :where(h2):not(.rpu-screen *),
+.rp-patient :where(h2):is(.text-\[22px\]) { font-size: var(--rp-fs-row); font-weight: 800; line-height: 1.35; color: var(--t1); }
+
+/* running text: the old 18px body is the foundation's 21 (23 when filming); the old in-between sizes follow */
+.rp-patient .text-body:not(.rpu-screen *) { font-size: var(--rp-fs-body); line-height: 1.5; }
+.rp-patient :is(.text-\[20px\], .text-\[22px\]):not(h1, h2, .rpu-screen *) { font-size: var(--rp-fs-node); line-height: 1.3; }
+.rp-patient :is(.text-\[13px\], .text-\[14px\], .text-\[15px\], .text-sm, .text-xs):not(.rpu-screen *) { font-size: var(--rp-fs-min); line-height: 1.45; }
+.rp-patient :is(a.underline, .underline):not(.rpu-screen *) { text-decoration-color: currentColor; text-underline-offset: 4px; }
+
+/* the small labels of the old look (12 and 13px, upper case): 18px, as the foundation's source lines and tags */
+.rp-patient .rp-src { margin-top: 6px; font-family: var(--rp-font-sans); font-size: var(--rp-fs-min); font-weight: 400; line-height: 1.45; color: var(--t2); }
+.rp-patient .rp-kicker { font-size: var(--rp-fs-min); font-weight: 800; line-height: 1.4; letter-spacing: 0; text-transform: none; color: var(--t2); }
+.rp-patient :is(.rp-card, .rp-qlist, .rps-body) .rp-tag {
+  font-family: var(--rp-font-sans);
+  font-size: var(--rp-fs-min);
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--t1);
+}
+/* a square tag in place of the old counter pill: 「已确认」, 「回答了 1 个」 */
+.rp-patient .rp-count {
+  padding: 3px calc(10 * var(--rp-u));
+  border: 1.5px solid var(--t2);
+  border-radius: 6px;
+  background: none;
+  font-size: var(--rp-fs-min);
+  line-height: 1.3;
+  color: var(--t2);
+}
+.rp-patient .rp-count b { font-weight: 800; color: var(--t1); }
+.rp-patient .rp-qt { font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+.rp-patient .rp-card-body { font-size: var(--rp-fs-body); line-height: 1.5; }
+
+/* someone else's exact words: serif, regular weight (the doctor, the counter, the pharmacist, his daughter, a recording) */
+.rp-patient :is(.rps-said, [data-verbatim="doctor"], [data-verbatim="visit"]):not(.rpu-screen *),
+.rp-patient .rp-card:is([data-chip="doctor"], [data-chip="dispenser"], [data-chip="pharmacist"], [data-chip="family"], [data-chip="recording"]) > .rp-tag + p,
+.rp-patient .rp-card-doc > .rp-tag + p {
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-said-zh);
+  line-height: 1.5;
+}
+/* the answer a question got at the visit, kept word for word (the review) */
+.rp-patient .rp-qlist[data-testid^="review-answer-"] > p.mt-2:not([data-testid]) { font-family: var(--rp-font-serif); font-weight: 400; font-size: var(--rp-fs-said-zh); line-height: 1.5; }
+/* the label as printed: mono, exact case, in a dashed frame */
+.rp-patient :is(.rps-orig, [data-testid$="answer-label-original"], [data-testid="card-line-second"][data-original="true"]) {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1.5px dashed var(--rp-edge);
+  border-radius: 10px;
+  background: var(--surface);
+  font-family: var(--rp-font-mono);
+  font-weight: 400;
+  font-size: var(--rp-fs-orig);
+  line-height: 1.5;
+  color: var(--t1);
+  overflow-wrap: anywhere;
+}
+
+/* =================================================================== 4. cards */
+
+.rp-patient .rp-card {
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--rp-radius-card);
+  background: var(--surface);
+  box-shadow: none;
+}
+/* a card of rows: the rows reach its edges (the old p-0 lost to the card's own padding) */
+.rp-patient .rp-card.p-0 { padding: 0; overflow: hidden; }
+.rp-patient .rp-card.p-0 > :is(li, div) { padding: 14px 16px; border-color: var(--surface2); }
+/* a link that is a whole card: one row of a list */
+.rp-patient a.rp-card { display: flex; align-items: center; gap: 12px; min-height: calc(68 * var(--rp-u)); box-sizing: border-box; color: var(--t1); text-decoration: none; }
+/* the old emphasis (a 2px grey border): the accent frame of the design's highlighted card */
+.rp-patient .rp-card.border-2 { border: 2.5px solid var(--accent); }
+
+/* what the doctor said, confirmed: a white card like the rest (there are no speaker colours) */
+.rp-patient .rp-card-doc { background: var(--surface); border-color: var(--hair); }
+/* not confirmed yet (「推断：医生」, a medicine waiting for its label): the dashed frame */
+.rp-patient .rp-card[data-inferred="true"],
+.rp-patient .rp-card-chk { background: var(--surface); border: 2px dashed var(--rp-edge); }
+/* Ripple's own fixed sentence: the tinted bubble, its name in the accent */
+.rp-patient .rp-card[data-chip="ripple"] { background: var(--accentM); border-color: var(--accentM); }
+.rp-patient .rp-card[data-chip="ripple"] > .rp-tag { color: var(--accentL); }
+
+/*
+ * Who said it, as a shape in front of the words (the foundation's node), where the old look had a bullet. The tag's
+ * text still starts with 「● 」 (tests read it): the bullet takes no room (::first-letter) and the shape is drawn in its
+ * place. Every <div class="rp-tag"> starts with that bullet; the <span> tags (「问题单」, a question's origin) do not
+ * and are left alone.
+ *   the doctor, the counter, the pharmacist  the accent ring, dashed while only inferred
+ *   the label, the leaflet                   the ink square
+ *   Ripple                                   the accent square
+ *   his daughter                             the ink ring          he himself, his own records: the filled ink circle
+ *   anything else (a check, a recording)     the dashed grey ring
+ */
+.rp-patient div.rp-tag { display: block; position: relative; padding-left: calc(32 * var(--rp-u)); text-indent: -0.26em; }
+/* the bullet takes no room; the space after it is taken back by the indent above (a space of this face is 0.26em),
+   so the words start 10px after the shape, as the foundation's source tag, and a second line starts under the first */
+.rp-patient div.rp-tag::first-letter { font-size: 0; }
+.rp-patient div.rp-tag::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc((1.4em - 22 * var(--rp-u)) / 2);
+  box-sizing: border-box;
+  width: calc(22 * var(--rp-u));
+  height: calc(22 * var(--rp-u));
+  border-radius: 50%;
+  border: 2px dashed var(--rp-edge);
+}
+.rp-patient :is(.rp-card-doc, .rp-card:is([data-chip="doctor"], [data-chip="dispenser"], [data-chip="pharmacist"])) > div.rp-tag::before { border: 3px solid var(--accent); }
+.rp-patient .rp-card:is([data-inferred="true"], [data-display="inferred"], [data-display="unknown"]) > div.rp-tag::before { border: 3px dashed var(--accent); }
+.rp-patient .rp-card:is([data-chip="label"], [data-chip="leaflet"]) > div.rp-tag::before { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); margin: 1px; border: 3px solid var(--t1); border-radius: 3px; }
+.rp-patient .rp-card[data-chip="ripple"] > div.rp-tag::before { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); margin: 1px; border: 0; border-radius: 4px; background: var(--accent); }
+.rp-patient .rp-card[data-chip="family"] > div.rp-tag::before { border: 3px solid var(--t1); }
+.rp-patient .rp-card:is([data-chip="self"], [data-chip="records"]) > div.rp-tag::before { border: 0; background: var(--t1); }
+
+/* a quoted line inside a card (an answer in Today's box, the doctor's number on the brief): no frame of its own, a line above it */
+.rp-patient :is(.rp-card, .rp-qlist) .rp-card { padding: 14px 0 0; border: 0; border-top: 1px solid var(--surface2); border-radius: 0; background: none; }
+.rp-patient :is(.rp-card, .rp-qlist) .rp-card[data-chip="ripple"] { padding: 12px 14px; border: 0; border-radius: 14px; background: var(--accentM); }
+.rp-patient :is(.rp-card, .rp-qlist) .rp-card[data-inferred="true"] { padding: 12px 14px; border: 2px dashed var(--rp-edge); border-radius: 14px; background: var(--surface); }
+
+/*
+ * The fixed lines whose numbers are links (lib/safety's templates; components/daily/AnswerView.tsx draws the links,
+ * and every answer says its route on its wrapper).
+ *   an emergency answer (data-route="emergency": chest pain, an overdose, a reading above the doctor's warning line)
+ *     the red card with 995 one tap away, as the foundation's emergency block: the only place red fills a card
+ *   anywhere else (the line under a note, the helplines of the self-harm answer)
+ *     calm: Ripple's tinted bubble, each number a button inside the sentence, as the foundation's helpline row has
+ *     them: 995 red, a number to call filled with the accent, the WhatsApp one outlined
+ */
+.rp-patient .rp-card a[data-dial] {
+  box-sizing: border-box;
+  min-height: var(--rp-h-source);
+  margin: 4px 2px;
+  padding: 4px calc(14 * var(--rp-u));
+  border: 2px solid var(--accent);
+  border-radius: var(--rp-radius-src);
+  background: var(--accent);
+  color: var(--onAccent);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  /* still underlined inside its button: the safety chains ask that every number on an answer looks like a link
+     (e2e/chains/emergency.spec.ts, self-harm.spec.ts: design 7.1, 8.1), and the shape alone says less to him */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.rp-patient .rp-card a[data-dial="whatsapp"] { border-color: var(--t1); background: var(--surface); color: var(--t1); }
+.rp-patient .rp-card a[href="tel:995"] { border-color: var(--rp-urgent); background: var(--rp-urgent); color: var(--rp-on-urgent); }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"]:has(a[href="tel:995"]) { background: var(--rp-urgent); border-color: var(--rp-urgent); color: var(--rp-on-urgent); }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"]:has(a[href="tel:995"]) > .rp-tag { color: var(--rp-on-urgent); }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"]:has(a[href="tel:995"]) > div.rp-tag::before { background: var(--rp-on-urgent); }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"]:has(a[href="tel:995"]) > p { font-weight: 700; }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"] a[href="tel:995"] { border-color: var(--rp-on-urgent); background: var(--rp-on-urgent); color: var(--rp-urgent); font-size: var(--rp-fs-ask); font-weight: 900; }
+.rp-patient [data-route="emergency"] .rp-card[data-chip="ripple"]:has(a[href="tel:995"]) a:focus-visible { outline-color: var(--rp-on-urgent); }
+
+/* Ripple's question list: a white card; as a link (Today's 「有 2 个问题」, 「已在问题单里」) the accent frame */
+.rp-patient .rp-qlist { border: 1px solid var(--hair); border-radius: var(--rp-radius-card); background: var(--surface); box-shadow: none; }
+.rp-patient a.rp-qlist { border: 2.5px solid var(--accent); color: var(--t1); text-decoration: none; }
+.rp-patient :is(.rp-qlist, .rp-q) > .rp-tag { color: var(--t2); }
+.rp-patient .rp-q { padding: 14px 16px; border-bottom: 1px solid var(--surface2); }
+.rp-patient .rp-q:last-child { border-bottom: 0; }
+
+/* a small rounded box inside a card (the reasons, an earlier answer, the brief's counts) */
+.rp-patient :is(.rounded-xl, .rounded-2xl):not(input, textarea, select, .rp-btn, .rpu-screen *) { border-radius: var(--rp-radius-src); }
+
+/* =================================================================== 5. buttons */
+
+/* the default: a button in a row of actions (56 high, the ink border) */
+.rp-patient .rp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: var(--rp-h-source);
+  padding: 6px calc(16 * var(--rp-u));
+  border: 2px solid var(--t1);
+  border-radius: var(--rp-radius-src);
+  background: var(--surface);
+  color: var(--t1);
+  font-family: inherit;
+  font-size: var(--rp-fs-small);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+.rp-patient .rp-btn.text-left { justify-content: flex-start; text-align: left; }
+.rp-patient .rp-btn-accent { background: var(--accent); border-color: var(--accent); color: var(--onAccent); font-weight: 800; }
+.rp-patient .rp-btn-accent:active { background: var(--rp-accent-press); border-color: var(--rp-accent-press); }
+/* the one of a row that is chosen, and the old amber buttons (「不对」, 「给医生看」): ink */
+.rp-patient .rp-btn-chk,
+.rp-patient .rp-btn-ghost[aria-pressed="true"],
+.rp-patient .rp-btn[aria-pressed="true"]:not(.rp-btn-accent, .rp-btn-chk) { background: var(--t1); border-color: var(--t1); color: var(--bg); font-weight: 800; }
+/* 「吃了」 is the accent whether or not it is the answer he gave: the one he gave carries the halo of "now" */
+.rp-patient .grid > .rp-btn-accent[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--rp-accent-halo); }
+
+/* the screen's own buttons: primary 72 high, secondary 64, the corners of the design */
+.rp-patient .rp-btn:is(.min-h-14, .rpv-fullBtn) {
+  min-height: var(--rp-h-secondary);
+  border-radius: var(--rp-radius-btn);
+  font-size: var(--rp-fs-secondary);
+}
+.rp-patient .rp-btn-accent:is(.min-h-14, .rpv-fullBtn) { min-height: var(--rp-h-primary); font-size: var(--rp-fs-action); }
+
+/* 「拍药袋」 on a medicine that waits for its label is what that card is for: the action colour */
+.rp-patient .rp-btn-chk[data-testid="awaiting-photograph"] { background: var(--accent); border-color: var(--accent); color: var(--onAccent); min-height: var(--rp-h-primary); font-size: var(--rp-fs-action); }
+/* a short answer among a few (why he did not take it): a pill, filled when it is the one he gave */
+.rp-patient .rp-btn[data-testid^="dose-reason-chip-"] { padding: 6px calc(18 * var(--rp-u)); border-color: var(--rp-edge); border-radius: calc(28 * var(--rp-u)); font-size: var(--rp-fs-body); }
+.rp-patient .rp-btn[data-testid^="dose-reason-chip-"][aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--onAccent); }
+
+/* three answers side by side: the words wrap inside a narrow one */
+.rp-patient .grid > .rp-btn { padding-inline: 8px; }
+
+/* the play pill: 「▶ 播放」 on a quoted line and on her reminder; filled while it plays */
+.rp-patient .rp-btn:is([data-src], [data-clip-url]) {
+  padding: 4px calc(22 * var(--rp-u));
+  border-color: var(--accent);
+  border-radius: calc(28 * var(--rp-u));
+  background: var(--surface);
+  color: var(--accentL);
+  font-size: var(--rp-fs-row);
+  font-weight: 700;
+  flex-wrap: wrap;
+  gap: 0 6px;
+}
+.rp-patient .rp-btn:is([data-src], [data-clip-url]) > span { margin-left: 0; color: inherit; }
+.rp-patient .rp-btn:is([data-src][data-playing="true"], [data-clip-url][aria-pressed="true"]) { background: var(--accent); border-color: var(--accent); color: var(--onAccent); }
+
+/* the small bordered button: the language switch, 「关闭」 */
+.rp-patient .rp-btn:is(.rps-chip, [data-testid="reminder-close"]) {
+  min-height: var(--rp-hit);
+  min-width: var(--rp-hit);
+  padding: 0 calc(14 * var(--rp-u));
+  border-color: var(--hair2);
+  font-size: var(--rp-fs-min);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* a button that waits for his words: grey until there is something to send */
+.rp-patient .rp-btn[type="submit"]:disabled { background: var(--hair); border-color: var(--hair); color: var(--rp-off); cursor: default; }
+.rp-patient .rp-btn:disabled { cursor: default; }
+
+/* =================================================================== 6. fields */
+
+.rp-patient :where(input:not([type="hidden"], [type="file"], [type="checkbox"], [type="radio"]), textarea, select):not(.rpu-screen *) {
+  box-sizing: border-box;
+  min-height: var(--rp-h-secondary);
+  padding: 8px 16px;
+  border: 1.5px solid var(--rp-edge);
+  border-radius: var(--rp-radius-src);
+  background: var(--surface);
+  color: var(--t1);
+  font-family: inherit;
+  font-size: var(--rp-fs-node);
+  font-weight: 500;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+.rp-patient :where(input, textarea):not(.rpu-screen *)::placeholder { color: var(--t2); opacity: 1; }
+/* English hints are long and a field that shares its row with a button is narrow: the hint is set at the smallest
+   size, so it is never cut ("Type your question" at 360px). What he types keeps the field's own size */
+.rp-patient:lang(en) :where(input, textarea):not(.rpu-screen *)::placeholder { font-size: var(--rp-fs-min); }
+/* the field he is typing in: the accent border, 2.5px (the border is the focus mark) */
+.rp-patient :where(input:not([type="hidden"], [type="file"], [type="checkbox"], [type="radio"]), textarea, select):not(.rpu-screen *):is(:focus, :focus-visible) {
+  border: 2.5px solid var(--accentL);
+  padding: 7px 15px;
+  outline: 0;
+}
+/* a button next to a field in one row is as tall as the field */
+.rp-patient form.flex > .rp-btn { align-self: stretch; }
+/* why he did not take it, in his own words: the field takes the whole row and its button stands under it, as on the
+   foundation's forms (side by side, its hint was cut at 360px in both languages) */
+.rp-patient form:has(> [data-testid="dose-reason-input"]) { flex-wrap: wrap; }
+.rp-patient form:has(> [data-testid="dose-reason-input"]) > :is(input, .rp-btn) { flex: 1 1 100%; }
+/* the two numbers of a reading stand side by side with a slash between them. In English "Top number" and "Bottom
+   number" do not fit two fields of half a row: one field under the other, and no slash */
+.rp-patient:lang(en) div:has(> [data-testid="bp-input-top"]) { flex-wrap: wrap; }
+.rp-patient:lang(en) div:has(> [data-testid="bp-input-top"]) > input { flex: 1 1 100%; }
+.rp-patient:lang(en) div:has(> [data-testid="bp-input-top"]) > span { display: none; }
+
+/* =================================================================== 7. the pieces of the old screens */
+
+/* a plain link in a sentence or on its own line (「← 我的药」, 「已在问题单里 →」): the accent word, a full target */
+.rp-patient .rps-body a:not(.rp-btn, .rp-card, .rp-qlist, [data-dial], .rpu-screen *) {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--rp-hit);
+  min-width: var(--rp-hit);
+  font-weight: 800;
+  color: var(--accentL);
+  text-decoration: none;
+}
+.rp-patient [data-testid="med-back"] { align-self: flex-start; margin: -8px 0; font-size: var(--rp-fs-small); }
+
+/* a medicine on the list: its name, and under it the Chinese name and the strength; on its card the same in the title */
+.rp-patient [data-testid^="med-row-"] > span:first-child > span:first-child { display: block; font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; }
+.rp-patient [data-testid^="med-row-"] > span:first-child > span:not(:first-child) { margin-left: 0; margin-right: 8px; font-size: var(--rp-fs-min); font-weight: 400; line-height: 1.5; color: var(--t2); }
+/* a name is never broken inside a word: its state tag takes two lines first ("Label confirmed" at 360px) */
+.rp-patient [data-testid^="med-row-"] > span:first-child { min-width: min-content; }
+.rp-patient [data-testid^="med-row-"] > [data-testid="med-status"] { flex: 0 1 auto; text-align: center; }
+.rp-patient [data-testid="med-name"] > span { margin-left: 0; margin-right: 10px; font-size: var(--rp-fs-body); font-weight: 700; color: var(--t2); }
+.rp-patient [data-testid="med-name"] > span:first-child::before { content: "\A"; white-space: pre; }
+
+/* the explain card: the doctor's own words play from their source line (a pill with who said it and 「▶」) */
+.rp-patient [data-testid="explain-clip-chip"] {
+  box-sizing: border-box;
+  min-height: var(--rp-h-source);
+  padding: 4px calc(18 * var(--rp-u));
+  border: 2px solid var(--accent);
+  border-radius: calc(28 * var(--rp-u));
+  background: var(--surface);
+  color: var(--accentL);
+  cursor: pointer;
+}
+.rp-patient [data-testid="explain-clip-chip"] .rp-tag { color: var(--t1); }
+.rp-patient [data-testid="explain-clip-chip"] .rp-src { margin-top: 0; font-size: var(--rp-fs-row); font-weight: 700; color: var(--accentL); }
+.rp-patient [data-testid="explain-clip-chip"][data-playing="true"] { background: var(--accent); }
+.rp-patient [data-testid="explain-clip-chip"][data-playing="true"] :is(.rp-tag, .rp-src) { color: var(--onAccent); }
+.rp-patient .rp-card:is([data-chip="doctor"], [data-chip="dispenser"], [data-chip="pharmacist"], [data-chip="family"], [data-chip="recording"]) > [data-testid="explain-line-text"] {
+  font-family: var(--rp-font-serif);
+  font-weight: 400;
+  font-size: var(--rp-fs-said-zh);
+  line-height: 1.5;
+}
+/* the <span> tags that start with the bullet too: the bullet is not drawn; the words carry it, or the node does */
+.rp-patient span.rp-tag:is([data-testid="explain-chip"], [data-testid="brief-changed-tag"]),
+.rp-patient :is([data-testid="card-question"], [data-testid="add-questions"]) .rp-q > span.rp-tag,
+.rp-patient [data-testid$="-disputed"] > span.rp-tag,
+.rp-patient .rpv-qhead > span.rp-tag { display: inline-block; text-indent: -0.26em; }
+.rp-patient span.rp-tag:is([data-testid="explain-chip"], [data-testid="brief-changed-tag"])::first-letter,
+.rp-patient :is([data-testid="card-question"], [data-testid="add-questions"]) .rp-q > span.rp-tag::first-letter,
+.rp-patient [data-testid$="-disputed"] > span.rp-tag::first-letter,
+.rp-patient .rpv-qhead > span.rp-tag::first-letter { font-size: 0; }
+/* the doctor's ring on the explain card's source line, Ripple's square on its question list */
+.rp-patient span.rp-tag[data-testid="explain-chip"], .rp-patient .rpv-qhead > span.rp-tag { position: relative; padding-left: calc(32 * var(--rp-u)); }
+.rp-patient span.rp-tag[data-testid="explain-chip"]::before, .rp-patient .rpv-qhead > span.rp-tag::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc((1.4em - 22 * var(--rp-u)) / 2);
+  box-sizing: border-box;
+  width: calc(22 * var(--rp-u));
+  height: calc(22 * var(--rp-u));
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+}
+.rp-patient [data-inferred="true"] span.rp-tag[data-testid="explain-chip"]::before { border-style: dashed; }
+.rp-patient [data-playing="true"] span.rp-tag[data-testid="explain-chip"]::before { border-color: var(--onAccent); }
+.rp-patient .rpv-qhead > span.rp-tag::before { width: calc(20 * var(--rp-u)); height: calc(20 * var(--rp-u)); margin: 1px; border: 0; border-radius: 4px; background: var(--accent); }
+
+/* the brief's four counts: each name is a small label over its number; in English two to a row, so that "Missed"
+   and "Not confirmed" are not broken inside a word */
+.rp-patient [data-testid="brief-doses-counts"] dt.text-body { font-size: var(--rp-fs-min); line-height: 1.4; }
+.rp-patient:lang(en) [data-testid="brief-doses-counts"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* the brief: what is new since the last visit carries the accent rule (components/brief/BriefSheet.tsx) and this square tag */
+.rp-patient span.rp-tag[data-testid="brief-changed-tag"] {
+  padding: 2px calc(10 * var(--rp-u));
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--accentL);
+}
+
+/* one of several on the crew's join page: the whole row is the target, the ring fills when it is chosen */
+.rp-patient label:has(> input[type="radio"]) {
+  position: relative;
+  box-sizing: border-box;
+  min-height: calc(68 * var(--rp-u));
+  padding: 12px 16px 12px calc(60 * var(--rp-u));
+  border: 1.5px solid var(--hair2);
+  border-radius: var(--rp-radius-btn);
+  background: var(--surface);
+  font-size: var(--rp-fs-secondary);
+  font-weight: 700;
+}
+.rp-patient label:has(> input[type="radio"]:checked) { border: 2.5px solid var(--accent); }
+.rp-patient label > input[type="radio"] { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.rp-patient label:has(> input[type="radio"])::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  box-sizing: border-box;
+  width: calc(30 * var(--rp-u));
+  height: calc(30 * var(--rp-u));
+  margin-top: calc(-15 * var(--rp-u));
+  border: 2.5px solid var(--rp-edge);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.rp-patient label:has(> input[type="radio"]:checked)::before { border: calc(9 * var(--rp-u)) solid var(--accent); }
+.rp-patient label:has(> input[type="radio"]:focus-visible) { outline: 3px solid var(--accentL); outline-offset: 2px; }
+
+/* Today: the way to the brief and to the family switches, two rows */
+.rp-patient [data-testid="today-links"] { margin-top: var(--rp-block-gap); gap: 10px; }
+
+/* the undo bar: an ink bar above the tab bar, 12 s, no confirm dialog */
+.rp-patient [data-testid="undo-bar"] { padding: 12px 12px 12px 18px; border-radius: var(--rp-radius-btn); box-shadow: none; font-size: var(--rp-fs-row); font-weight: 800; }
+.rp-patient [data-testid="undo-bar"] > span { font-size: var(--rp-fs-row); line-height: 1.35; }
+.rp-patient [data-testid="undo-btn"] { border: 0; border-radius: 12px; font-size: var(--rp-fs-row); font-weight: 800; }
+.rp-patient div.fixed:has(> [data-testid="undo-bar"]) { bottom: calc(var(--rp-tabbar-h) + env(safe-area-inset-bottom) + 14px); padding-inline: var(--rp-gutter); }
+
+/* the switches of 「家人能看到什么」: the accent track when on, the word in the same colour */
+.rp-patient [role="switch"] { min-height: var(--rp-hit); min-width: var(--rp-hit); color: var(--t2); }
+.rp-patient [role="switch"][aria-checked="true"] { color: var(--accentL); }
+.rp-patient [role="switch"] > span:first-child { width: calc(64 * var(--rp-u)); height: calc(38 * var(--rp-u)); border-radius: calc(19 * var(--rp-u)); background: var(--hair2); }
+.rp-patient [role="switch"][aria-checked="true"] > span:first-child { background: var(--accent); }
+.rp-patient [role="switch"] > span:first-child > span { top: 3px; left: 3px; width: calc(32 * var(--rp-u)); height: calc(32 * var(--rp-u)); background: var(--rp-white); box-shadow: 0 1px 3px rgba(0, 0, 0, .3); }
+.rp-patient [role="switch"][aria-checked="true"] > span:first-child > span { left: calc(100% - 32 * var(--rp-u) - 3px); }
+.rp-patient [role="switch"] > span:last-child { width: auto; min-width: 1.6em; font-size: var(--rp-fs-min); font-weight: 800; }
+
+/* a medicine's state on its row and its card: a square tag, never a colour of its own */
+.rp-patient .rps-body [data-testid="med-status"] {
+  padding: 3px calc(10 * var(--rp-u));
+  border: 1.5px solid var(--t2);
+  border-radius: 6px;
+  background: none;
+  font-size: var(--rp-fs-min);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--t2);
+}
+.rp-patient .rps-body [data-testid="med-status"][data-check="true"] { border-color: var(--t1); color: var(--t1); }
+
+/* a folded part (an earlier answer): the row that opens it is a full target, and keeps its own marker */
+.rp-patient :where(summary):not(.rpu-screen *) { box-sizing: border-box; min-height: var(--rp-hit); padding-block: 9px; cursor: pointer; }
+
+/* the crew's chrome on the phone (the jump menu, the debug line): legible, in the same palette; never in filming mode */
+.rp-patient [data-testid="jump-menu"] { border-radius: var(--rp-radius-src); border-color: var(--rp-edge); }
+.rp-patient [data-testid="jump-menu"] :is(summary, p, a, li) { font-size: var(--rp-fs-min); letter-spacing: 0; text-transform: none; }
+.rp-patient [data-testid="jump-menu"] ul { grid-template-columns: minmax(0, 1fr); }
+.rp-patient [data-testid="jump-menu"] a:not(.rp-btn) { display: inline-flex; align-items: center; min-height: var(--rp-hit); overflow-wrap: anywhere; }
+.rp-patient [data-testid="jump-menu"] .rp-btn { min-height: var(--rp-hit); padding: 4px calc(12 * var(--rp-u)); border-color: var(--hair2); font-size: var(--rp-fs-min); }
+.rp-patient [data-testid="debug-info"] { font-size: var(--rp-fs-min); color: var(--t2); }
+
+/* =================================================================== 8. her demo phone: the daughter's look */
+
+/*
+ * Wei Ling's phone in a demo scope (/f: her view of what he switched on, her reminder recorder). The palette is the
+ * daughter's (section 1); here the shapes follow her design: hairlines and space where his phone has cards, one large
+ * sentence as the title, pill buttons (one solid, the rest outlined), amber only for "no reply". Her account's pages
+ * set text at 16 and 17px; the demo's tests hold every phone page to 18, so her demo phone stays at 18.
+ */
+div.rp-patient[data-rp-demo="family"] { font-size: calc(18 * var(--rp-u)); line-height: 1.5; }
+.rp-patient[data-rp-demo="family"] .rps-head { border-bottom-color: var(--hair); }
+.rp-patient[data-rp-demo="family"] .rps-day { font-size: calc(18 * var(--rp-u)); }
+.rp-patient[data-rp-demo="family"] .rps-body { padding: 10px 24px 28px; }
+.rp-patient[data-rp-demo="family"] :where(h1) { font-size: var(--rpf-fs-hero); font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
+.rp-patient[data-rp-demo="family"] :where(h2) { font-size: calc(18 * var(--rp-u)); font-weight: 400; color: var(--t2); }
+.rp-patient[data-rp-demo="family"] .text-body { font-size: calc(18 * var(--rp-u)); line-height: 1.5; }
+.rp-patient[data-rp-demo="family"] :is(.text-\[20px\], .text-\[22px\]):not(h1, h2) { font-size: var(--rpf-fs-value); font-weight: 600; line-height: 1.3; }
+.rp-patient[data-rp-demo="family"] :is(.font-bold, .font-semibold) { font-weight: 600; }
+.rp-patient[data-rp-demo="family"] .rp-src { color: var(--t2); }
+
+/* sections: a hairline above each, no ground, no frame */
+.rp-patient[data-rp-demo="family"] .rp-card { padding: 18px 0 4px; border: 0; border-top: 1px solid var(--hair); border-radius: 0; background: none; }
+.rp-patient[data-rp-demo="family"] .rp-card.border-2 { border: 0; border-top: 1px solid var(--hair); }
+/* "no reply after two reminders": the one amber on her phone */
+.rp-patient[data-rp-demo="family"] [data-testid="family-alerts"] > p { color: var(--chkT); }
+/* a name and its value on one hairline row */
+.rp-patient[data-rp-demo="family"] [data-testid^="family-allowed-"] { align-items: center; min-height: calc(48 * var(--rp-u)); border-bottom: 1px solid var(--hair); color: var(--t2); }
+.rp-patient[data-rp-demo="family"] [data-testid^="family-allowed-"] > span:last-child { font-weight: 400; color: var(--accentL); }
+.rp-patient[data-rp-demo="family"] [data-testid^="family-allowed-"][data-on="false"] > span:last-child { color: var(--t2); }
+/* someone's own words: a thin rule on the left */
+.rp-patient[data-rp-demo="family"] :is([data-verbatim="visit"], [data-verbatim="note"]) {
+  margin-top: 4px;
+  padding: 1px 0 1px 12px;
+  border-left: 2px solid var(--rpf-w22);
+  font-family: inherit;
+  font-size: calc(18 * var(--rp-u));
+  font-weight: 400;
+}
+
+/* buttons: pills; one solid (teal) for what the screen is for, the rest outlined */
+.rp-patient[data-rp-demo="family"] .rp-btn {
+  min-height: var(--rpf-h-btn-2);
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--rpf-w20);
+  color: var(--t1);
+  font-size: calc(18 * var(--rp-u));
+  font-weight: 500;
+}
+.rp-patient[data-rp-demo="family"] .rp-btn:is(.rp-btn-accent, [data-testid="reminder-rec-start"], [data-testid="reminder-rec-save"]) {
+  min-height: var(--rpf-h-btn);
+  background: var(--accent);
+  box-shadow: none;
+  color: var(--onAccent);
+  font-weight: 600;
+}
+.rp-patient[data-rp-demo="family"] .rp-btn:is(.rps-chip) { min-height: var(--rp-hit); padding: 0 16px; box-shadow: inset 0 0 0 1px var(--hair2); font-size: calc(18 * var(--rp-u)); font-weight: 600; }
+.rp-patient[data-rp-demo="family"] .rp-btn:disabled { background: var(--surface); box-shadow: none; color: var(--rpf-ink-3); }
+.rp-patient[data-rp-demo="family"] :where(input:not([type="hidden"], [type="file"], [type="checkbox"], [type="radio"]), textarea) {
+  min-height: calc(54 * var(--rp-u));
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--rpf-w10);
+  background: var(--surface);
+  font-size: calc(18 * var(--rp-u));
+  font-weight: 400;
+  caret-color: var(--accentL);
+}
+.rp-patient[data-rp-demo="family"] :where(input, textarea):is(:focus, :focus-visible) { border: 0; padding: 0 16px; box-shadow: inset 0 0 0 1.5px var(--accentL); }
+

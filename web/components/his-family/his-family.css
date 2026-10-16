@@ -1,0 +1,88 @@
+/*
+ * His family screens (the timeline draft's 16-20; front-end line fe-fam): the few rules the foundation has no piece
+ * for. Everything else on these screens is components/ui as it is (app/ripple-ui.css Part A). Only --rp-* tokens, sizes
+ * in calc(N * var(--rp-u)) like the foundation, classes with the .rph- prefix. Plain (unlayered) CSS: it wins over the
+ * foundation's @layer components rules where both say something.
+ */
+
+/*
+ * A screen with nothing fixed at the bottom (the draft's 16-20 have no tab bar and no say bar): the draft leaves 34px
+ * under the last button, and a phone's home indicator must not sit on it.
+ */
+.rph-screen > .rpu-page {
+  padding-bottom: max(34px, calc(18px + env(safe-area-inset-bottom)));
+}
+
+/* the draft's large paragraph (`p` with z:'l'): the one sentence a screen opens with, 24px, ink */
+.rph-lead {
+  margin: 0;
+  font-size: var(--rp-fs-node);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* 「Wei Ling 接受了邀请，是她吗？」: the draft sets this entry's title at 28 */
+.rph-confirm .rpu-tl-title {
+  font-size: var(--rp-fs-ask);
+}
+
+/* a form inside a screen: the fields scroll, the button sits in the lower part like any dock */
+.rph-fill {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.rph-fill > * {
+  flex-shrink: 0;
+}
+
+/*
+ * The foundation's field (components/ui Field) draws a 64px box around an input that is itself 46px high, and the page
+ * checks measure the input: 46 is under the 48px floor. Here the input takes the floor (the box grows by 2px).
+ */
+.rph-screen .rpu-f-input {
+  min-height: var(--rp-hit);
+}
+
+/* a group of options with its name above (the name looks like a field's) */
+.rph-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rph-group > p {
+  margin: 0;
+}
+
+/* the invitation link as text: mono, as long as it is, never cut */
+.rph-url {
+  display: block;
+  font-family: var(--rp-font-mono);
+  font-size: var(--rp-fs-orig);
+  line-height: 1.5;
+  color: var(--rp-ink);
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+/* the link as a QR code on its own white card: the code in the middle, large enough for a camera at arm's length */
+.rph-qr {
+  align-items: center;
+  gap: 12px;
+}
+.rph-qr > p {
+  align-self: stretch;
+}
+.rph-qr > svg {
+  display: block;
+  width: calc(200 * var(--rp-u));
+  height: calc(200 * var(--rp-u));
+  max-width: 100%;
+  background: #FFFFFF;
+  border-radius: 8px;
+}
+
+/* a message that something did not work: the red-bordered box, read out at once */
+.rph-alert {
+  display: block;
+}

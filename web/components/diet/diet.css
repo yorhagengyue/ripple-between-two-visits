@@ -1,0 +1,23 @@
+/*
+ * The diet screens and the prevention screen (design groups 13 and 11; web/progress/fe-1113.md): the few rules their
+ * own layout needs on top of the foundation (app/ripple-ui.css, which this file never repeats or edits). Plain global
+ * CSS with the "fe13-" prefix, only --rp-* tokens and sizes the foundation already uses. Unlayered on purpose: the
+ * foundation's rules sit in @layer components, so the rules here win without out-weighing them. No viewport units, no
+ * width media queries, nothing fixed (the desktop column, app/desktop.css, relies on that).
+ */
+
+/* a group inside a timeline entry (it carries a test hook, or holds a pair the foundation hands over as two elements):
+   the entry's own rhythm, 8px and no margins of its own */
+.fe13-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fe13-col > * { margin-top: 0; margin-bottom: 0; }
+
+/* a box with the button that belongs to it (the referral and 「问医生」) */
+.fe13-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--rp-gap); }
+
+/* a section: its title and what stands under it, the page's own 18px apart */
+.fe13-section { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; gap: var(--rp-block-gap); min-width: 0; }
+
+/* a quoted line that opens its entry (the tables' last word has no name of its own to stand first): the foundation
+   sets a node to the middle of a head line (13 from the entry's top); the serif line is taller (24 at 1.5: its middle
+   is 18 down), so it moves up by the difference and the node stands at the middle of its first line */
+.fe13-lead-said.rpu-said { margin-top: calc(-5 * var(--rp-u)); }

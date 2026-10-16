@@ -1,0 +1,384 @@
+{
+  "about": "Chinese translations of the fixed English lines the doctor and the pharmacist say in the four sample visits (web/fixtures/visits/*.utterances.json), for example accounts. Written once by hand; lib/translate/example-set.ts shows a line only when both checks of lib/translate hold for it: the deterministic facts check (recomputed when the file is loaded; tests/unit/translate/example-set.test.ts keeps every line passing) and the checker model's same-meaning check, stamped into `meaning` by scripts/translate/check-example-set.ts. A line with meaning null has not been to the checker model and is never shown.",
+  "version": "2026-10-10",
+  "direction": "en>zh-Hans",
+  "lines": [
+    {
+      "id": "v1-u02",
+      "visit": "v1",
+      "en": "Sure, no problem.",
+      "zh": "好，没问题。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:45:56.220Z",
+        "pair": "30136d8079e51e54de87d802af9a956482cfed12f19bff4f69d4dd98cab7c4e6"
+      }
+    },
+    {
+      "id": "v1-u03",
+      "visit": "v1",
+      "en": "Mr Tan, your blood pressure today is 152 over 94. I took it twice, still high.",
+      "zh": "陈先生，你今天的血压是 152/94。我量了两次，还是高。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:45:57.062Z",
+        "pair": "771694fee73cc7dca730928079b45c45e43b3e1f30aca33ffd542538f47ba996"
+      }
+    },
+    {
+      "id": "v1-u05",
+      "visit": "v1",
+      "en": "Many people feel fine. One reading in the clinic is not enough. I want you to measure at home for one week, morning and evening.",
+      "zh": "很多人都没有感觉。在诊所量一次是不够的。我要你在家量一个星期，早上和傍晚都量。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:45:57.854Z",
+        "pair": "ef8dad6038465c356c6d4d27db84aa2c7d58778af91e1de61ef5546b1750a777"
+      }
+    },
+    {
+      "id": "v1-u06",
+      "visit": "v1",
+      "en": "Sit down, rest five minutes first. Arm on the table, at the level of your heart. No coffee or smoking for half an hour before. Take two readings each time and write down the average.",
+      "zh": "先坐下，休息五分钟。手臂放在桌上，和心脏一样高。量之前半小时不要喝咖啡，也不要抽烟。每次量两次，把平均数写下来。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:45:58.627Z",
+        "pair": "775473f3eab598471f0376f7e8f41634be17f751bf129bae3449d85a8d3f6351"
+      }
+    },
+    {
+      "id": "v1-u07",
+      "visit": "v1",
+      "en": "Cut down on salt. Less gravy, don't finish the soup. And keep up your morning walks.",
+      "zh": "少吃盐。酱汁少一点，汤不要喝完。早上的散步要继续。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:45:59.612Z",
+        "pair": "5294e9ac34c33be3e2c7bcb8dcd9ac4f2b52e661c1bfc9be7faecfd85103f21d"
+      }
+    },
+    {
+      "id": "v1-u08",
+      "visit": "v1",
+      "en": "At home, we want it below 135 over 85.",
+      "zh": "在家里，我们希望血压低于 135/85。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:00.433Z",
+        "pair": "88afe935e96c02806bc0137bc16bb409b54a32010d7f196442e75a0acb7fe76c"
+      }
+    },
+    {
+      "id": "v1-u09",
+      "visit": "v1",
+      "en": "If your reading at home is above 180 on top, or you get chest pain, weakness on one side, or your speech becomes slurred, go to A&E or call 995.",
+      "zh": "如果你在家量的血压，上面的数超过 180，或者胸口痛、一边身体没力、说话不清楚，就去急诊，或者打 995。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:00.907Z",
+        "pair": "0f40f8d862fc068336236a4b442c4e746ca40f06c08ee65213fef1c569d719d8"
+      }
+    },
+    {
+      "id": "v1-u10",
+      "visit": "v1",
+      "en": "Come back in about a week with your readings.",
+      "zh": "大约一个星期后，带着你的读数回来。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:01.644Z",
+        "pair": "ff64cd2a4002e1e1f91e0bcdfed855bfe00610946b3aeca655c652a8efe9cf6e"
+      }
+    },
+    {
+      "id": "v2-u01",
+      "visit": "v2",
+      "en": "So, how were the readings at home?",
+      "zh": "在家量的读数怎么样？",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:02.622Z",
+        "pair": "782924faf1f825e1c1dbc6621d585ea3cb253231a86cf2873e411aebe00f9d02"
+      }
+    },
+    {
+      "id": "v2-u04",
+      "visit": "v2",
+      "en": "Yes, these confirm it. Your blood pressure is high. We'll start a tablet.",
+      "zh": "是的，这些读数确认了。你的血压高。我们开始吃一粒药。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:03.913Z",
+        "pair": "5b081571e715ef00de013e86b789e873b7b1471e31bb0f516833d1562410da9a"
+      }
+    },
+    {
+      "id": "v2-u05",
+      "visit": "v2",
+      "en": "Amlodipine, 5 milligrams, one tablet every morning.",
+      "zh": "Amlodipine，5 毫克，每天早上一粒。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:04.692Z",
+        "pair": "01c4f4903a03ee45c81b8ae21e5ac68fed08bb61763eace24e2018a4b87b6db8"
+      }
+    },
+    {
+      "id": "v2-u06",
+      "visit": "v2",
+      "en": "This tablet works quietly. You won't feel it, and you don't feel the high pressure either, but over the years high pressure damages the heart, the brain and the kidneys. So you take it every day, even when you feel fine.",
+      "zh": "这种药片悄悄地起作用。你感觉不到它，也感觉不到血压高，但是时间长了，高血压会伤害心脏、大脑和肾脏。所以你要每天吃，没有不舒服的时候也要吃。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:05.552Z",
+        "pair": "3c306d097a239521a1a6a6bffde1652fcf36dc388cc50d0ccf399b1fb624c629"
+      }
+    },
+    {
+      "id": "v2-u07",
+      "visit": "v2",
+      "en": "Some people get ankle swelling with this one. If you notice it, tell me.",
+      "zh": "有些人吃这个药，脚踝会肿。如果你发现了，告诉我。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:06.391Z",
+        "pair": "89e2a69fd4cb2d52c926cb03ebbd8b9137e5faa352b14c8a77555d118cfc757c"
+      }
+    },
+    {
+      "id": "v2-u08",
+      "visit": "v2",
+      "en": "Please don't change the dose yourself. If your readings are high, write them down and tell me at your next visit.",
+      "zh": "请不要自己改药量。如果读数高，把它们写下来，下次看诊时告诉我。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:07.268Z",
+        "pair": "dcf43b798d1837533acca399685f6de3a76d40ac728276d2cd92e7115848691e"
+      }
+    },
+    {
+      "id": "v2-u09",
+      "visit": "v2",
+      "en": "Keep measuring, twice a week is enough now. Come back in five weeks.",
+      "zh": "继续量，现在一个星期两次就够了。五个星期后回来。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:08.192Z",
+        "pair": "9a713d68b13c6fc060679e2bf36a7f35783dac116fc2f9f3cf4889bd6d2e8bce"
+      }
+    },
+    {
+      "id": "v2-u11",
+      "visit": "v2",
+      "en": "Which one? Bring it next time and show me. For now, try not to take it every day.",
+      "zh": "哪一种？下次带来给我看。现在先尽量不要每天吃。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:08.792Z",
+        "pair": "603397dd86b24481dfc476f38d782cef78f18b3d8ca336900020088d864b770b"
+      }
+    },
+    {
+      "id": "p1-u02",
+      "visit": "p1",
+      "en": "Sure. Let me see.",
+      "zh": "好，我看看。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:09.700Z",
+        "pair": "c9d936fc718db8e2d6c5fbdb2ea4cdaab4d5304da46baaeb69082124fd1533de"
+      }
+    },
+    {
+      "id": "p1-u03",
+      "visit": "p1",
+      "en": "The label is only in Chinese and I can't confirm what's inside. Please don't take it for now. Bring it to your doctor at your next visit.",
+      "zh": "标签上只有中文，我没办法确认里面是什么。请先不要吃。下次看诊时带去给你的医生看。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:10.577Z",
+        "pair": "7e03f0b9b665f960f58137897b87ed90b36dbbff7e10210ddca8c63b6b26e8bc"
+      }
+    },
+    {
+      "id": "v3-u01",
+      "visit": "v3",
+      "en": "So Mr Tan, how has your blood pressure been at home?",
+      "zh": "陈先生，你在家的血压怎么样？",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:11.405Z",
+        "pair": "e12542fc59ed4dba6473b82591a5fcec46c2cd0a4456aa903f4431d483aec3f9"
+      }
+    },
+    {
+      "id": "v3-u03",
+      "visit": "v3",
+      "en": "And your medicine, you take it every day?",
+      "zh": "你的药，每天都有吃吗？",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:12.032Z",
+        "pair": "bcfe4ea4861e91bf2c2c6998fffcea4f099278c6f8ac755804d2f665588275de"
+      }
+    },
+    {
+      "id": "v3-u05",
+      "visit": "v3",
+      "en": "Any ankle swelling?",
+      "zh": "脚踝有没有肿？",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:12.921Z",
+        "pair": "7bf111697e60b6a6057b0f56853696fc31e9cb82e117c9d2606f28863668bdcf"
+      }
+    },
+    {
+      "id": "v3-u07",
+      "visit": "v3",
+      "en": "Okay. We keep amlodipine at 5 milligrams, and I'll add losartan 50 milligrams, once in the morning.",
+      "zh": "好。amlodipine 保持 5 毫克，我再加 losartan 50 毫克，早上吃一次。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:13.831Z",
+        "pair": "bd7f2ba8339e446dd811a161f4c22c9e0dda8e292d87c45308002a9f9ffd3a99"
+      }
+    },
+    {
+      "id": "v3-u08",
+      "visit": "v3",
+      "en": "Do a blood test for the kidneys in two weeks, and come back to see me in six weeks.",
+      "zh": "两个星期后验血查肾脏，六个星期后回来看我。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:14.765Z",
+        "pair": "e10c26937dc4007e6b20d5cbc6eba41da5456c34e28a26a6e94b70fdd507823b"
+      }
+    },
+    {
+      "id": "v3-u09",
+      "visit": "v3",
+      "en": "Anything else you want to ask?",
+      "zh": "还有什么想问的吗？",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:15.669Z",
+        "pair": "fd8806851495adecc1cfa6426281284d1081bd4559fd10f10f8b7f6bb5b4a61c"
+      }
+    },
+    {
+      "id": "v3-u11",
+      "visit": "v3",
+      "en": "Yes, both together after breakfast is fine.",
+      "zh": "可以，两种在早饭后一起吃，没问题。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:16.510Z",
+        "pair": "1afb1030b50aeea6a6d784563501b3164cc3b2e9e7f2f54ed79b140df34df92c"
+      }
+    },
+    {
+      "id": "v3-u13",
+      "visit": "v3",
+      "en": "No need to fast for this one. Just take your medicine as usual and come in.",
+      "zh": "这次不用空腹。照常吃药，然后过来就可以。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:17.401Z",
+        "pair": "fcad21a71710db24153731a952db4b41122ed1765c9ebe8b4f6b51a0192e59bd"
+      }
+    },
+    {
+      "id": "v3-u17",
+      "visit": "v3",
+      "en": "Try not to take ibuprofen regularly. It can push your blood pressure up. For the knee, paracetamol is the safer one, and we'll look at the knee properly next time.",
+      "zh": "尽量不要经常吃 ibuprofen。它会让血压升高。膝盖的话，paracetamol 比较安全，下次我们再好好看一下膝盖。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:18.360Z",
+        "pair": "871c5f4b778891992f8aa2df2ef80e246c8b99f380840e7d941fe40650454c3b"
+      }
+    },
+    {
+      "id": "v3-u19",
+      "visit": "v3",
+      "en": "No, please don't take an extra tablet on your own. One high reading doesn't mean the dose is wrong; I look at all your readings together, and that's why we're adding losartan today.",
+      "zh": "不，请不要自己多吃药片。一次读数高，不表示药量不对；我是把你所有的读数放在一起看的，所以今天我们加 losartan。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:19.694Z",
+        "pair": "c9ba5ef670ac5b1abab847d43478682aa32796be89fc0c2e0bd09031eec0e3bd"
+      }
+    },
+    {
+      "id": "v3-u20",
+      "visit": "v3",
+      "en": "If it's high, sit down, rest five minutes and measure again, then write it down for me. If it's above 180 on top, or you have chest pain, weakness on one side or slurred speech, call 995.",
+      "zh": "如果高，先坐下，休息五分钟再量一次，然后写下来给我看。如果上面的数超过 180，或者胸口痛、一边身体没力、说话不清楚，就打 995。",
+      "meaning": {
+        "pass": true,
+        "checker": "deepseek",
+        "model": "deepseek-v4-pro",
+        "at": "2026-10-10T16:46:20.328Z",
+        "pair": "53c82cc803cad13c65902e0adb45f25c5da1aafa505c11265bb2fadfabbdccf8"
+      }
+    }
+  ]
+}

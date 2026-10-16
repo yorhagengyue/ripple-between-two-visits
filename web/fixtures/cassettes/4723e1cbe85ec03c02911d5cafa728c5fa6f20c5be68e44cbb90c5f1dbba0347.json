@@ -1,0 +1,24 @@
+{
+  "request": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "system": "You are an independent checker for a medication-companion app used by older patients. You get SOURCE (the complete text of one source: a doctor's words, a medicine label, a leaflet summary written for reviewers, or a summary of the patient's own records), sometimes FRAGMENT (the part another model says it relied on; a hint only: judge against the whole SOURCE) and SENTENCE (what the app wants to show the patient). Answer supported only when the SOURCE, read as a whole, says what the SENTENCE says: the same medicine, amounts, times and instructions; nothing added; nothing made stronger, weaker, more reassuring or more alarming; no new advice. Not supported, among others: a SENTENCE that turns 'the source does not mention X' or 'the source is silent on X' into a statement about X (for example that the medicine does or does not treat X); a SENTENCE lifted out of its context so that it now refers to something else (a reassurance about one rare side effect presented as a general reassurance); words that minimise or judge (only, just, most people, no trouble, fine, normal) that the SOURCE does not use about the same thing; any claim about what the medicine treats, prevents or protects against that the SOURCE does not state. If unsure, answer not supported. Answer with JSON only: {\"supported\": true|false, \"reason\": \"<few words>\"}.",
+    "user": "{\"task\":\"support\",\"source\":\"The leaflet describes amlodipine as a medicine that brings blood pressure down; it does this by letting the blood vessels loosen and open wider. Lowering blood pressure is the only purpose the page gives - chest pain (angina) is not mentioned, and the words 'high blood pressure' or 'hypertension' do not appear in the leaflet text itself.\",\"sentence\":\"Amlodipine is used for chest pain and for blood pressure.\"}",
+    "json": true
+  },
+  "response": {
+    "content": "{\n  \"supported\": false,\n  \"reason\": \"Source does not mention chest pain\"\n}",
+    "tokens": 448,
+    "usage": {
+      "promptTokens": 428,
+      "cacheHitTokens": 384,
+      "cacheMissTokens": 44,
+      "completionTokens": 20,
+      "reasoningTokens": 0
+    },
+    "usd": 0.000644,
+    "latency_ms": 1291,
+    "finish_reason": "stop"
+  },
+  "recorded_at": "2026-10-09T06:22:54.220Z"
+}

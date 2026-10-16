@@ -1,0 +1,123 @@
+/*
+ * 「拍药盒，看怎么吃」 / "Scan a medicine box" (ScanBox.tsx; scene 3 of the owner's film, 10-15): a sheet over the foot of
+ * the phone, the way Ripple's read of a held thing opens (components/explain/explain.css .rpx-sheet), with its own
+ * classes. On a computer data-rp-phone-fixed keeps it inside the phone's column (app/desktop.css).
+ *
+ * For anyone editing:
+ * - Only .rps-* classes are declared here; colours and sizes are the elder side's tokens (--rp-*, app/ripple-ui.css).
+ * - Elder rules hold inside the sheet (it is drawn inside .rpu-screen): no text under 18px, every target at least
+ *   48x48 (the sheet's own buttons 64), no shadow.
+ * - Unlayered, as explain.css: the foundation's rules sit in @layer components.
+ * - With less motion the sheet does not slide: it is simply there.
+ */
+.rps-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-family: var(--rp-font-sans);
+  color: var(--rp-ink);
+}
+/* the dimmed ground: a finger on it does not scroll the page under the sheet */
+.rps-ground { position: absolute; inset: 0; background: rgba(24, 32, 44, .55); touch-action: none; }
+.rps-sheet {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 44px);
+  max-height: calc(100dvh - 44px);
+  background: var(--rp-paper);
+  border-top: 1px solid var(--rp-line);
+  border-radius: var(--rp-radius-block) var(--rp-radius-block) 0 0;
+  outline: none;
+}
+.rps-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 8px 0 var(--rp-gutter); }
+.rps-bar-t { margin: 0; font-size: var(--rp-fs-min); font-weight: 800; line-height: 1.3; color: var(--rp-accent); }
+.rps-close {
+  flex: none;
+  min-width: var(--rp-h-secondary);
+  min-height: var(--rp-h-secondary);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--rp-radius-src);
+  background: none;
+  font: inherit;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  color: var(--rp-ink);
+  cursor: pointer;
+}
+.rps-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--rp-block-gap);
+  padding: 4px var(--rp-gutter) 22px;
+  overflow-wrap: break-word;
+}
+.rps-body > * { margin: 0; }
+.rps-foot {
+  flex: none;
+  display: grid;
+  gap: var(--rp-gap);
+  padding: 14px var(--rp-gutter) calc(14px + env(safe-area-inset-bottom));
+  background: var(--rp-white);
+  border-top: 1px solid var(--rp-line);
+}
+.rps-foot > * { margin: 0; }
+
+/* the medicine: its name (and the Chinese generic name), with his photo beside it */
+.rps-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.rps-head > * { margin: 0; }
+.rps-name { margin: 0; font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.2; }
+.rps-zh { margin: 4px 0 0; font-size: var(--rp-fs-sub); line-height: 1.4; color: var(--rp-ink-2); }
+.rps-thumb {
+  display: block;
+  width: calc(76 * var(--rp-u));
+  height: calc(76 * var(--rp-u));
+  object-fit: cover;
+  border-radius: var(--rp-radius-src);
+  border: 1px solid var(--rp-line);
+  background: var(--rp-white);
+}
+/* the photo while it is read: larger, under the words that say so */
+.rps-photo { display: block; width: 100%; max-height: calc(260 * var(--rp-u)); object-fit: contain; border-radius: var(--rp-radius-card); background: var(--rp-white); border: 1px solid var(--rp-line); }
+.rps-wait { margin: 0; font-size: var(--rp-fs-body); line-height: 1.5; color: var(--rp-ink-2); }
+
+/* a part of the sheet under its small title */
+.rps-sec { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.rps-sec > * { margin: 0; }
+.rps-sec-t { margin: 0; font-size: var(--rp-fs-min); font-weight: 800; line-height: 1.3; color: var(--rp-ink-3); letter-spacing: .02em; }
+
+/* how to take it: the label's own words, big; the words the label printed in capitals in bold */
+.rps-big {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: var(--rp-radius-card);
+  background: var(--rp-white);
+  border: 2px solid var(--rp-ink);
+  font-size: var(--rp-fs-headline);
+  font-weight: 500;
+  line-height: 1.3;
+}
+/* the words the label printed in capitals */
+.rps-big strong { font-weight: 900; }
+.rps-line { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.45; color: var(--rp-ink-2); }
+.rps-line[data-quiet="true"] { color: var(--rp-ink-3); }
+
+/* what it is for: the leaflet's sentence */
+.rps-say { margin: 0; font-size: var(--rp-fs-body); line-height: 1.5; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rps-ground { animation: rps-fade .25s ease-out backwards; }
+  .rps-sheet { animation: rps-up .3s cubic-bezier(.32, .72, 0, 1) backwards; }
+}
+@keyframes rps-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rps-up { from { transform: translateY(100%); } to { transform: none; } }

@@ -1,0 +1,52 @@
+/*
+ * Her home's detail (the owner's decision of 2026-10-14: each of his six switches shows its kind in full while it is
+ * on): the reason he gave for a dose he did not take, under today's sentence; and small lines under a row of the week
+ * (when his latest reading was taken, the words of his questions, where the next visit is). Everything else on the
+ * screen is components/family-ui as it is (app/ripple-ui.css Part B). Only --rpf-* tokens: the two inks and the two
+ * text sizes that are there already (16 and 17), no new colour, no shadow. Plain (unlayered) CSS: it wins over the
+ * foundation's @layer rules where both say something.
+ */
+
+/* the quiet line under the large sentence and its lede: 「他说的原因：太极课」 */
+.rpf-home-reason {
+  margin: 6px 0 0;
+  font-size: var(--rpf-fs-body);
+  line-height: 1.5;
+  color: var(--rpf-ink-2);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* a row with lines under it: the name and the value stay on the first line, the lines take the whole width below */
+.rpf-stat[data-lines="true"] {
+  flex-wrap: wrap;
+  row-gap: 2px;
+  padding-bottom: 10px;
+}
+.rpf-stat-lines {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* a day of the week that can be held (the long press on her side, owner 10-14): the wrap is the day's own column, so
+   the weekday, the mark and the word stand where they stood (.rpf-day in app/ripple-ui.css). Two classes: it has to
+   win over .rpx's own display, whichever stylesheet comes later */
+.rpx.rpf-day-hold {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+.rpf-stat-line {
+  display: block;
+  font-size: var(--rpf-fs-min);
+  line-height: 1.45;
+  color: var(--rpf-ink-2);
+  text-align: left;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}

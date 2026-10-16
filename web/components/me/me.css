@@ -1,0 +1,120 @@
+/*
+ * 「我」 and the screens under it (line fe-me; web/progress/fe-me.md): the few rules these screens need on top of the
+ * foundation (app/ripple-ui.css Part A). Only --rp-* tokens and calc(N * var(--rp-u)) sizes, text 18px and up, targets
+ * 48px and up. Prefix .rpm- (the foundation's .rpu-* classes are used as they are, never redefined here).
+ */
+
+/* ---------- 「我」: cards of rows, 18px apart (the draft's two `list` blocks) ---------- */
+.rpm-menu {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: max-content;
+  gap: var(--rp-block-gap);
+}
+/* a screen without a dock or a tab bar ends 40px above the edge (the draft's bottom padding) */
+.rpm-screen > .rpu-page { padding-bottom: 40px; }
+
+/* 「删除账号」: the one red row */
+.rpm-row[data-tone="danger"] .rpu-li-t { color: var(--rp-urgent); }
+/* the tag of an entry that is not built yet wraps instead of widening the page */
+.rpm-row .rpu-tag { white-space: normal; }
+
+/* what a row can do right there (「开提醒」 under 「提醒和通知」): inside the card, under its row */
+.rpm-more {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rp-gap);
+  padding: 0 16px 14px;
+}
+.rpm-more > * { margin-top: 0; margin-bottom: 0; }
+.rpm-more + .rpu-li { border-top: 1px solid var(--rp-tint); }
+
+/* 「退出登录」 under the cards: the button, the grey line that says what it does, a refusal */
+.rpm-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: var(--rp-block-gap);
+}
+.rpm-foot > .rpu-btn-note { margin-top: 0; }
+
+/* ---------- pieces shared by the screens under 「我」 ---------- */
+
+/* a paragraph of the screen itself: the draft's `p` (21; 24 when it is the screen's first sentence; grey when quiet) */
+.rpm-p { margin-top: 0; margin-bottom: 0; font-size: var(--rp-fs-body); line-height: 1.55; text-wrap: pretty; white-space: pre-line; }
+.rpm-p[data-size="large"] { font-size: var(--rp-fs-node); }
+.rpm-p[data-quiet="true"] { color: var(--rp-ink-3); }
+.rpm-p[data-strong="true"] { font-weight: 800; }
+.rpm-p[data-size="small"] { font-size: var(--rp-fs-min); line-height: 1.5; }
+
+/* a consent text as published: plain paragraphs, the ones that start with 「· 」 hang under their dot */
+.rpm-text { display: grid; gap: 12px; }
+.rpm-text > p { margin: 0; font-size: var(--rp-fs-body); line-height: 1.6; }
+.rpm-text > p[data-item="true"] { padding-left: 1.2em; text-indent: -1.2em; }
+.rpm-text > p[data-strong="true"] { font-weight: 800; }
+
+/* a header whose way back is a button (the second screen of a two-step flow goes back to its first, in place):
+   the foundation's .rpu-back on a <button>, without the button's own frame */
+.rpm-back-btn { border: 0; background: none; font-family: inherit; cursor: pointer; padding-top: 0; padding-bottom: 0; padding-left: 0; }
+
+/* a field of these screens (the foundation's <Field> with this class): the input fills its box. The box is 64px with
+   8px of padding, which leaves the input itself 46px, under the 48px a target needs; here the input reaches over that
+   padding, so the tap lands on it wherever he touches the box, and the box keeps its size. */
+.rpm-f .rpu-f-input { align-self: stretch; min-height: var(--rp-hit); margin-top: -8px; margin-bottom: -8px; }
+
+/* a device on 「登录和设备」: a row that is not a link; its name, its state, and under them 「退出这台」 */
+.rpm-device { flex-direction: column; align-items: stretch; gap: 10px; }
+.rpm-li-action { align-self: flex-start; width: auto; padding-left: calc(18 * var(--rp-u)); padding-right: calc(18 * var(--rp-u)); }
+
+/* a visit on 「看诊录音留多久」: its switch row, then the play pill, inside one card */
+.rpm-rec + .rpm-rec { border-top: 1px solid var(--rp-tint); }
+.rpm-rec > .rpu-toggle-row { border-bottom: 0; }
+.rpm-rec-extra { display: grid; gap: 8px; padding: 0 16px 14px; }
+.rpm-rec-extra > * { margin-top: 0; }
+.rpm-rec-extra .rpu-listen { margin-top: 0; }
+.rpm-rec-gone { padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+
+/* the three pictured steps to the iPhone's Home Screen, each a node of one line */
+.rpm-step { display: flex; align-items: center; gap: calc(14 * var(--rp-u)); }
+.rpm-step-picture {
+  flex: none;
+  width: calc(64 * var(--rp-u));
+  height: calc(64 * var(--rp-u));
+  border-radius: calc(16 * var(--rp-u));
+  background: var(--rp-white);
+  border: 1px solid var(--rp-line);
+  color: var(--rp-ink);
+  display: grid;
+  place-items: center;
+}
+.rpm-step-picture svg { width: calc(36 * var(--rp-u)); height: calc(36 * var(--rp-u)); }
+.rpm-step-picture img { width: calc(48 * var(--rp-u)); height: calc(48 * var(--rp-u)); border-radius: calc(11 * var(--rp-u)); display: block; }
+.rpm-step-text { flex: 1; min-width: 0; margin: 0; font-size: var(--rp-fs-body); line-height: 1.5; font-weight: 700; }
+
+/* 「读给我听」 next to 「打印这张卡」, as the draft's row of two (01-4c): a bordered button like its neighbour, ink while
+   it reads (the button itself is track A's ReadAloud, with its own logic; only its frame is drawn here) */
+.rpm-read { display: flex; flex-direction: column; min-width: 0; }
+.rpm-read > .rpa-no-print { display: flex; flex-direction: column; flex: 1; }
+.rpm-read .rpa-read {
+  flex: 1;
+  width: 100%;
+  min-height: var(--rp-h-secondary);
+  margin-top: 0;
+  padding: 6px 8px;
+  border: 2px solid var(--rp-ink);
+  border-radius: var(--rp-radius-btn);
+  background: var(--rp-white);
+  color: var(--rp-ink);
+  font-size: var(--rp-fs-secondary);
+  font-weight: 700;
+  line-height: 1.25;
+  justify-content: center;
+}
+.rpm-read .rpa-read[aria-pressed="true"] { background: var(--rp-ink); border-color: var(--rp-ink); color: var(--rp-on-ink); }
+
+/* the recovery code, in the draft's frame, selectable in one tap */
+.rpm-code .rpu-code-t { user-select: all; }
+
+@media print {
+  .rpm-no-print { display: none !important; }
+}

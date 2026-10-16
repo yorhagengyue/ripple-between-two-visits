@@ -1,0 +1,136 @@
+/*
+ * Ripple's summary, large (components/visit/SummaryFocus.tsx; scene 1 of the owner's video, 10-15): the card the screen
+ * draws becomes tappable, and the large view sits over a dimmed screen with the same points in big type, the new one
+ * marked. His light phone and her dark one, each in its own tokens (app/ripple-ui.css --rp-*, --rpf-*: read, never
+ * redefined); classes with the .rpsf- prefix. The motion is in the component (300 ms, or a fade with less motion); at
+ * rest nothing here moves. Every line of words may wrap anywhere (390px and under).
+ */
+
+.rpsf-card {
+  cursor: pointer;
+  border-radius: 18px;
+  -webkit-tap-highlight-color: transparent;
+}
+.rpsf-card:focus-visible {
+  outline: 3px solid var(--rp-accent);
+  outline-offset: 3px;
+}
+.rpsf-card[data-variant="family"]:focus-visible {
+  outline-color: var(--rpf-teal);
+}
+
+/* compact: the card keeps to a few lines, the last fading out, with the way to the large view under it */
+.rpsf-clip {
+  max-height: calc(176 * var(--rp-u));
+  overflow: hidden;
+}
+.rpsf-card[data-variant="family"] .rpsf-clip {
+  max-height: calc(196 * var(--rp-u));
+}
+.rpsf-clip[data-over="true"] {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+.rpsf-more {
+  margin: 6px 0 0;
+  font-size: calc(18 * var(--rp-u));
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--rp-accent);
+}
+.rpsf-card[data-variant="family"] .rpsf-more {
+  font-size: var(--rpf-fs-min);
+  font-weight: 600;
+  color: var(--rpf-teal);
+}
+
+.rpsf-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.rpsf-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 32, 44, 0.42);
+}
+.rpsf-layer[data-variant="family"] .rpsf-scrim {
+  background: var(--rpf-scrim);
+}
+
+.rpsf-view {
+  position: relative;
+  width: min(100%, 560px);
+  max-height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 22px 20px 18px;
+  transform-origin: top left;
+  background: var(--rp-white);
+  color: var(--rp-ink);
+  box-shadow: 0 18px 48px rgba(24, 32, 44, 0.28);
+  min-width: 0;
+}
+.rpsf-layer[data-variant="family"] .rpsf-view {
+  background: var(--rpf-surface);
+  color: var(--rpf-ink);
+  border: 1px solid var(--rpf-hair-2);
+  box-shadow: none;
+}
+
+.rpsf-title {
+  margin: 0 0 14px;
+  font-size: calc(22 * var(--rp-u));
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.rpsf-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.rpsf-points > li {
+  font-size: calc(30 * var(--rp-u));
+  line-height: 1.38;
+  padding: 10px 12px 10px 14px;
+  border-radius: 14px;
+  border-left: 5px solid var(--rp-line);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.rpsf-layer[data-variant="family"] .rpsf-points > li {
+  font-size: calc(26 * var(--rp-u));
+  border-left-color: var(--rpf-hair-2);
+}
+/* the point that just arrived or changed */
+.rpsf-points > li[data-fresh="true"] {
+  background: var(--rp-accent-soft);
+  border-left-color: var(--rp-accent);
+}
+.rpsf-layer[data-variant="family"] .rpsf-points > li[data-fresh="true"] {
+  background: var(--rpf-teal-22);
+  border-left-color: var(--rpf-teal);
+}
+
+.rpsf-note {
+  margin: 14px 0 0;
+  font-size: calc(18 * var(--rp-u));
+  line-height: 1.45;
+  color: var(--rp-ink-3);
+  overflow-wrap: anywhere;
+}
+.rpsf-layer[data-variant="family"] .rpsf-note {
+  font-size: var(--rpf-fs-min);
+  color: var(--rpf-ink-2);
+}

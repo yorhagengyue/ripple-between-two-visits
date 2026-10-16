@@ -1,0 +1,483 @@
+{
+  "schema": "ripple/primock-wer@1",
+  "made_at": "2026-10-09T11:42:23.809Z",
+  "command": "npx tsx scripts/asr/primock-wer.ts",
+  "dataset": {
+    "name": "PriMock57",
+    "repository": "https://github.com/babylonhealth/primock57",
+    "commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "licence": "CC-BY-4.0",
+    "credit": "Recording: PriMock57 (Babylon Health; Papadopoulos Korfiatis et al., 2022), https://github.com/babylonhealth/primock57, licensed under CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. A mock consultation, not a real patient. Doctor and patient channels mixed into one track by Ripple.",
+    "audio": "the mixed mono track of each consultation (doctor + patient channels summed, 16 kHz 16-bit)",
+    "reference": "the dataset's human transcripts of both speakers, utterances in time order, transcriber tags removed"
+  },
+  "whisper": {
+    "endpoint": "/v1/file (the app's whole-recording path)",
+    "model": "large-v3",
+    "device": "cuda",
+    "built_in_hotwords": false,
+    "no_diarisation": true
+  },
+  "scoring": {
+    "unit": "words of the whole consultation as one sequence (lib/asr/wer.ts tokensEn: lower case, punctuation is a word break)",
+    "raw": "tokens as they are",
+    "numbers": "raw + written numbers spelled out on both sides (22nd -> twenty second, 1990 -> nineteen ninety, 2.5 -> two point five)",
+    "full": "numbers + hesitation sounds dropped on both sides (um, uh, er, erm, hmm, mm, mmm, mhm) + okay written ok",
+    "pooled_wer": "all errors / all reference words over the consultations",
+    "mean_wer": "simple mean of the per-consultation WERs"
+  },
+  "consultations": [
+    {
+      "id": "day1_consultation06",
+      "duration_s": 662.52,
+      "reference_words": 1853,
+      "whisper_segments": 166,
+      "transcribe_s": 102.3,
+      "real_time_factor": 6.5,
+      "from_saved_transcript": false,
+      "wer": {
+        "raw": {
+          "wer": 0.2045,
+          "substitutions": 177,
+          "deletions": 183,
+          "insertions": 19,
+          "ref_words": 1853,
+          "hyp_words": 1689
+        },
+        "numbers": {
+          "wer": 0.2035,
+          "substitutions": 176,
+          "deletions": 182,
+          "insertions": 19,
+          "ref_words": 1853,
+          "hyp_words": 1690
+        },
+        "full": {
+          "wer": 0.1514,
+          "substitutions": 109,
+          "deletions": 124,
+          "insertions": 29,
+          "ref_words": 1730,
+          "hyp_words": 1635
+        }
+      },
+      "top_errors_full": [
+        {
+          "error": "-and",
+          "count": 12
+        },
+        {
+          "error": "-i",
+          "count": 10
+        },
+        {
+          "error": "-ok",
+          "count": 9
+        },
+        {
+          "error": "-you",
+          "count": 7
+        },
+        {
+          "error": "-a",
+          "count": 6
+        },
+        {
+          "error": "alright -> right",
+          "count": 5
+        },
+        {
+          "error": "-that",
+          "count": 4
+        },
+        {
+          "error": "+all",
+          "count": 3
+        },
+        {
+          "error": "-it's",
+          "count": 3
+        },
+        {
+          "error": "-of",
+          "count": 3
+        },
+        {
+          "error": "+and",
+          "count": 2
+        },
+        {
+          "error": "+but",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "day2_consultation02",
+      "duration_s": 541.56,
+      "reference_words": 1699,
+      "whisper_segments": 140,
+      "transcribe_s": 83.1,
+      "real_time_factor": 6.5,
+      "from_saved_transcript": false,
+      "wer": {
+        "raw": {
+          "wer": 0.186,
+          "substitutions": 113,
+          "deletions": 182,
+          "insertions": 21,
+          "ref_words": 1699,
+          "hyp_words": 1538
+        },
+        "numbers": {
+          "wer": 0.1813,
+          "substitutions": 109,
+          "deletions": 178,
+          "insertions": 21,
+          "ref_words": 1699,
+          "hyp_words": 1542
+        },
+        "full": {
+          "wer": 0.1369,
+          "substitutions": 62,
+          "deletions": 131,
+          "insertions": 28,
+          "ref_words": 1614,
+          "hyp_words": 1511
+        }
+      },
+      "top_errors_full": [
+        {
+          "error": "-ok",
+          "count": 14
+        },
+        {
+          "error": "-i",
+          "count": 9
+        },
+        {
+          "error": "-yeah",
+          "count": 8
+        },
+        {
+          "error": "-you",
+          "count": 7
+        },
+        {
+          "error": "-a",
+          "count": 5
+        },
+        {
+          "error": "-do",
+          "count": 5
+        },
+        {
+          "error": "-it",
+          "count": 4
+        },
+        {
+          "error": "-the",
+          "count": 4
+        },
+        {
+          "error": "+at",
+          "count": 3
+        },
+        {
+          "error": "-and",
+          "count": 3
+        },
+        {
+          "error": "-bye",
+          "count": 3
+        },
+        {
+          "error": "-is",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "day3_consultation08",
+      "duration_s": 344.46,
+      "reference_words": 904,
+      "whisper_segments": 77,
+      "transcribe_s": 46.7,
+      "real_time_factor": 7.4,
+      "from_saved_transcript": false,
+      "wer": {
+        "raw": {
+          "wer": 0.1637,
+          "substitutions": 57,
+          "deletions": 79,
+          "insertions": 12,
+          "ref_words": 904,
+          "hyp_words": 837
+        },
+        "numbers": {
+          "wer": 0.1593,
+          "substitutions": 55,
+          "deletions": 77,
+          "insertions": 12,
+          "ref_words": 904,
+          "hyp_words": 839
+        },
+        "full": {
+          "wer": 0.116,
+          "substitutions": 32,
+          "deletions": 56,
+          "insertions": 13,
+          "ref_words": 871,
+          "hyp_words": 828
+        }
+      },
+      "top_errors_full": [
+        {
+          "error": "-ok",
+          "count": 6
+        },
+        {
+          "error": "-like",
+          "count": 5
+        },
+        {
+          "error": "-bye",
+          "count": 4
+        },
+        {
+          "error": "-fine",
+          "count": 3
+        },
+        {
+          "error": "-it",
+          "count": 3
+        },
+        {
+          "error": "-no",
+          "count": 3
+        },
+        {
+          "error": "-so",
+          "count": 3
+        },
+        {
+          "error": "-that",
+          "count": 3
+        },
+        {
+          "error": "+of",
+          "count": 2
+        },
+        {
+          "error": "-i'm",
+          "count": 2
+        },
+        {
+          "error": "-it's",
+          "count": 2
+        },
+        {
+          "error": "-john",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "day4_consultation07",
+      "duration_s": 626.7,
+      "reference_words": 1771,
+      "whisper_segments": 147,
+      "transcribe_s": 94.2,
+      "real_time_factor": 6.7,
+      "from_saved_transcript": false,
+      "wer": {
+        "raw": {
+          "wer": 0.1897,
+          "substitutions": 108,
+          "deletions": 195,
+          "insertions": 33,
+          "ref_words": 1771,
+          "hyp_words": 1609
+        },
+        "numbers": {
+          "wer": 0.188,
+          "substitutions": 106,
+          "deletions": 194,
+          "insertions": 33,
+          "ref_words": 1771,
+          "hyp_words": 1610
+        },
+        "full": {
+          "wer": 0.143,
+          "substitutions": 76,
+          "deletions": 126,
+          "insertions": 38,
+          "ref_words": 1678,
+          "hyp_words": 1590
+        }
+      },
+      "top_errors_full": [
+        {
+          "error": "-no",
+          "count": 8
+        },
+        {
+          "error": "-you",
+          "count": 8
+        },
+        {
+          "error": "-it",
+          "count": 7
+        },
+        {
+          "error": "-yeah",
+          "count": 6
+        },
+        {
+          "error": "-i",
+          "count": 5
+        },
+        {
+          "error": "-and",
+          "count": 4
+        },
+        {
+          "error": "-or",
+          "count": 4
+        },
+        {
+          "error": "-so",
+          "count": 4
+        },
+        {
+          "error": "-that",
+          "count": 4
+        },
+        {
+          "error": "ohh -> oh",
+          "count": 4
+        },
+        {
+          "error": "-like",
+          "count": 3
+        },
+        {
+          "error": "-not",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "day5_consultation08",
+      "duration_s": 563.34,
+      "reference_words": 1295,
+      "whisper_segments": 148,
+      "transcribe_s": 95.1,
+      "real_time_factor": 5.9,
+      "from_saved_transcript": false,
+      "wer": {
+        "raw": {
+          "wer": 0.1375,
+          "substitutions": 86,
+          "deletions": 76,
+          "insertions": 16,
+          "ref_words": 1295,
+          "hyp_words": 1235
+        },
+        "numbers": {
+          "wer": 0.1336,
+          "substitutions": 77,
+          "deletions": 77,
+          "insertions": 19,
+          "ref_words": 1295,
+          "hyp_words": 1237
+        },
+        "full": {
+          "wer": 0.0907,
+          "substitutions": 42,
+          "deletions": 45,
+          "insertions": 26,
+          "ref_words": 1246,
+          "hyp_words": 1227
+        }
+      },
+      "top_errors_full": [
+        {
+          "error": "-i",
+          "count": 5
+        },
+        {
+          "error": "+a",
+          "count": 4
+        },
+        {
+          "error": "-yeah",
+          "count": 4
+        },
+        {
+          "error": "-you",
+          "count": 3
+        },
+        {
+          "error": "+as",
+          "count": 2
+        },
+        {
+          "error": "-and",
+          "count": 2
+        },
+        {
+          "error": "-as",
+          "count": 2
+        },
+        {
+          "error": "-if",
+          "count": 2
+        },
+        {
+          "error": "-the",
+          "count": 2
+        },
+        {
+          "error": "-when",
+          "count": 2
+        },
+        {
+          "error": "can -> could",
+          "count": 2
+        },
+        {
+          "error": "+3dt",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "average": {
+    "raw": {
+      "pooled_wer": 0.1804,
+      "mean_wer": 0.1763,
+      "substitutions": 541,
+      "deletions": 715,
+      "insertions": 101,
+      "ref_words": 7522
+    },
+    "numbers": {
+      "pooled_wer": 0.1775,
+      "mean_wer": 0.1731,
+      "substitutions": 523,
+      "deletions": 708,
+      "insertions": 104,
+      "ref_words": 7522
+    },
+    "full": {
+      "pooled_wer": 0.1313,
+      "mean_wer": 0.1276,
+      "substitutions": 321,
+      "deletions": 482,
+      "insertions": 134,
+      "ref_words": 7139
+    }
+  },
+  "failed": 0
+}

@@ -1,0 +1,102 @@
+/*
+ * The setting-up screens (/onboard/<step>) and 「我 › 我的档案」 as the timeline draft lays them out (screens 01-5a to
+ * 01-5f and 01-6; web/progress/fe-01.md). Global CSS with the .rpo- prefix (this app's pipeline has no CSS modules).
+ * Only what app/ripple-ui.css does not already give: the column of blocks with the dock at its foot, the white dock
+ * strip, a screen's title with its grey line, chips in equal columns, the small groups of a form. Elder side: only
+ * --rp-* tokens, sizes in calc(N * var(--rp-u)), text 18px and up, targets 48px and up, no red but for an error.
+ */
+
+/* ---------- the body of a screen: blocks 18px apart, the dock pushed to the foot ---------- */
+.rpo-stack {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rp-block-gap);
+  min-width: 0;
+  padding-top: 4px;
+}
+.rpo-stack > * { margin-top: 0; margin-bottom: 0; flex-shrink: 0; }
+/* a screen without a header line (the first and the last of setting up) starts lower */
+.rpo-stack[data-top="none"] { padding-top: 28px; }
+
+/*
+ * A field's <input> is itself a target the page checks measure (48px and up). The foundation's is 46px high inside its
+ * 64px box (app/ripple-ui.css .rpu-f-input); here the input is 48 and the box gives up the two pixels of padding, so
+ * the box keeps its 64px in every state (idle 1.5px border, typing 2.5px, an error 2px).
+ */
+.rpo-stack .rpu-f-input { min-height: var(--rp-hit); }
+.rpo-stack .rpu-f-box { padding-top: 6.5px; padding-bottom: 6.5px; }
+.rpo-stack .rpu-f-box:focus-within { padding-top: 5.5px; padding-bottom: 5.5px; }
+.rpo-stack .rpu-f[data-error="true"] .rpu-f-box { padding-top: 6px; padding-bottom: 6px; }
+
+/* ---------- a screen's title and the grey line under it (the draft's `h`) ---------- */
+.rpo-h { display: flex; flex-direction: column; gap: 6px; }
+.rpo-h > * { margin: 0; }
+.rpo-h > .rpu-text[data-variant="lede"] { font-size: var(--rp-fs-sub); line-height: 1.5; }
+
+/* ---------- the dock (the draft's `dk`): a white strip at the foot, edge to edge, always in reach ---------- */
+.rpo-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  /* out to the screen's edges and down over the page's own bottom padding */
+  margin: auto calc(-1 * var(--rp-gutter)) -18px;
+  padding: 14px var(--rp-gutter) max(34px, calc(14px + env(safe-area-inset-bottom)));
+  background: var(--rp-white);
+  border-top: 1px solid var(--rp-line);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rp-gap);
+}
+.rpo-stack > .rpo-dock { margin-top: auto; margin-bottom: -18px; }
+/* over the tab bar on a page that has one */
+.rpu-screen[data-tabbar="fixed"] .rpo-dock { bottom: var(--rpu-bottom); padding-bottom: 14px; }
+.rpo-dock > * { margin-top: 0; margin-bottom: 0; }
+
+/* ---------- chips in equal columns: times two a row, weekdays four a row ---------- */
+.rpo-chipgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rp-gap); }
+.rpo-chipgrid[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rpo-chipgrid > .rpu-chip { justify-content: center; text-align: center; padding-left: 6px; padding-right: 6px; min-width: 0; }
+
+/* the usual times and, under them, the field for any other time */
+.rpo-times { display: flex; flex-direction: column; gap: var(--rp-gap); margin-top: 10px; min-width: 0; }
+.rpo-times > * { margin-top: 0; }
+.rpo-stack > .rpo-times,
+.rpo-group > .rpo-times,
+.rpo-form > .rpo-times { margin-top: 0; }
+
+/* ---------- a form inside a screen: its question, then small groups (a bold name over its control) ---------- */
+.rpo-form { display: flex; flex-direction: column; gap: var(--rp-block-gap); min-width: 0; }
+.rpo-form > * { margin-top: 0; margin-bottom: 0; }
+.rpo-group { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rpo-group > * { margin-top: 0; margin-bottom: 0; }
+/* a question asked inside a screen, under its title (24/800) */
+.rpo-q { margin: 0; font-size: var(--rp-fs-node); font-weight: 800; line-height: 1.35; }
+.rpo-muted { margin: 0; font-size: var(--rp-fs-sub); line-height: 1.5; color: var(--rp-ink-3); }
+
+/* a field and the button that adds what is typed in it, on one line */
+.rpo-own { display: flex; align-items: flex-end; gap: var(--rp-gap); }
+.rpo-own > .rpu-f { flex: 1; min-width: 0; }
+.rpo-own > .rpu-btn { width: auto; flex: none; min-width: calc(88 * var(--rp-u)); min-height: var(--rp-h-secondary); }
+
+/* a list row that carries a square tag under its words (what a family member wrote and waits for him) */
+.rpo-li-tag { align-self: flex-start; margin-top: 6px; }
+/* a row that ends in a small bordered button (「删掉」) */
+.rpo-li-end { flex: none; }
+
+/* ---------- 我的档案: a fact as a row of the list card: what it is, his words, who wrote them ---------- */
+.rpo-fact { align-items: center; }
+.rpo-fact-l { font-size: var(--rp-fs-min); font-weight: 700; line-height: 1.4; color: var(--rp-ink-3); }
+.rpo-fact-v { display: block; font-size: var(--rp-fs-row); font-weight: 700; line-height: 1.4; color: var(--rp-ink); overflow-wrap: anywhere; }
+.rpo-fact-v + .rpo-fact-v { margin-top: 8px; }
+.rpo-fact-v[data-empty="true"] { font-weight: 400; color: var(--rp-ink-3); }
+.rpo-fact-s { display: block; font-size: var(--rp-fs-min); font-weight: 400; line-height: 1.5; color: var(--rp-ink-3); }
+.rpo-fact-go { flex: none; display: inline-flex; align-items: center; gap: 2px; font-size: var(--rp-fs-sub); font-weight: 800; color: var(--rp-accent); }
+.rpo-fact-go svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); color: var(--rp-edge); }
+
+/* ---------- 01-6: one fact a family member wrote, and 「对吗？」 ---------- */
+.rpo-confirm { flex: 1 0 auto; display: flex; flex-direction: column; gap: var(--rp-block-gap); min-width: 0; }
+.rpo-confirm > * { margin-top: 0; margin-bottom: 0; flex-shrink: 0; }
+.rpo-confirm > .rpo-dock { margin-top: auto; margin-bottom: -18px; }
+.rpo-count { margin: 0; font-size: var(--rp-fs-body); line-height: 1.55; color: var(--rp-ink-3); font-variant-numeric: tabular-nums; }

@@ -1,0 +1,29 @@
+/*
+ * 「中 EN」 in the header of an account's screens (components/ui/AccountHeader.tsx HeaderLang; owner's decision of
+ * 2026-10-14: the language can be switched on every screen). The few rules it needs on top of the foundation
+ * (app/ripple-ui.css Part A, which is not edited for it): only --rp-* tokens and calc(N * var(--rp-u)) sizes, text 18px,
+ * one round target of 48px beside the 「我」 circle.
+ *
+ * It shows one word: the language a tap changes to (「EN」 on a Chinese screen, 「中」 on an English one). The two-half
+ * 「中 EN」 was 90px wide and broke Today's date line in two on a 375px phone.
+ */
+.rpu-lang {
+  flex: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(48 * var(--rp-u));
+  height: calc(48 * var(--rp-u));
+  min-width: var(--rp-hit);
+  min-height: var(--rp-hit);
+  border: 1.5px solid var(--rp-line-2);
+  border-radius: 50%;
+  background: var(--rp-white);
+  color: var(--rp-ink);
+  font-size: var(--rp-fs-min);
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}

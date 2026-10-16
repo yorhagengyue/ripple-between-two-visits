@@ -1,0 +1,29 @@
+{
+  "request": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "system": "You transcribe the printed text on a photo of a medicine label, box or bag. Copy every line exactly as printed, top to bottom, one printed line per output line, keeping the original language, spelling, capitals and numbers. Do not translate, correct, summarise, explain or add anything. If a word is unreadable, write [?] in its place. Output only the transcribed text, no commentary and no code fences.",
+    "user": "Transcribe the printed text on this label.",
+    "images": [
+      {
+        "mime": "image/png",
+        "sha256": "4a1ea297750a7a643df5b9c70c99b80844bf35b9a573139caabceb80f34b258a"
+      }
+    ]
+  },
+  "response": {
+    "content": "BLOSSOM FAMILY CLINIC (FICTIONAL)\nBlk 000 Demo Ave, Singapore 000000 Tel 6000 0000\nPatient: TAN (DEMO) Date: 01/09/2026\nAMLODIPINE 5MG TABLET\nTake ONE tablet every MORNING\nFor: high blood pressure\nQty: 35 tablets\nKeep out of reach of children. Store in a cool dry place.\nSYNTHETIC DEMO LABEL - NOT A REAL PRESCRIPTION",
+    "tokens": 537,
+    "usage": {
+      "promptTokens": 427,
+      "cacheHitTokens": 256,
+      "cacheMissTokens": 171,
+      "completionTokens": 110,
+      "reasoningTokens": 0
+    },
+    "usd": 0.00026,
+    "latency_ms": 1245,
+    "finish_reason": "stop"
+  },
+  "recorded_at": "2026-10-09T06:22:49.939Z"
+}

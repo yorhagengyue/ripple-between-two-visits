@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "visit": "v2",
+    "use": "tests only; app code must not import this file"
+  },
+  "answers": [
+    {
+      "id": "v2-u01",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v2-u02",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "核对卡：家里记了 13 次，平均 144/92，13 次都高于 Dr Lim 08-24 说的 135/85",
+      "required_line": null
+    },
+    {
+      "id": "v2-u03",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "（他按「给医生看」）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u04",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "病情：血压高（医生原话）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u05",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "用药：amlodipine 5 mg，每天早上一粒（待标签确认）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u06",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "用途和理由（医生原话）",
+      "required_line": "R3"
+    },
+    {
+      "id": "v2-u07",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "指示：脚踝肿要告诉医生",
+      "required_line": null
+    },
+    {
+      "id": "v2-u08",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "指示：不要自己改剂量，高了记下来下次说",
+      "required_line": "R4"
+    },
+    {
+      "id": "v2-u09",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "指示：每周量两次；复诊：五周后",
+      "required_line": null
+    },
+    {
+      "id": "v2-u10",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "问题（他自己问的）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u11",
+      "true_role": "doctor",
+      "speaker_name": "Dr Lim",
+      "expected_item": "回答：下次带来；先别每天吃",
+      "required_line": null
+    },
+    {
+      "id": "v2-u12",
+      "true_role": "dispenser",
+      "speaker_name": "Auntie Mei",
+      "expected_item": "用法（柜台原话；以标签为准）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u13",
+      "true_role": "dispenser",
+      "speaker_name": "Auntie Mei",
+      "expected_item": "漏服（柜台原话）",
+      "required_line": null
+    },
+    {
+      "id": "v2-u14",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "—",
+      "required_line": null
+    },
+    {
+      "id": "v2-u15",
+      "true_role": "dispenser",
+      "speaker_name": "Auntie Mei",
+      "expected_item": "teach-back 已确认",
+      "required_line": null
+    },
+    {
+      "id": "v2-u16",
+      "true_role": "patient",
+      "speaker_name": "Mr Tan",
+      "expected_item": "药单：亲戚带的药，只有中文标签",
+      "required_line": null
+    },
+    {
+      "id": "v2-u17",
+      "true_role": "dispenser",
+      "speaker_name": "Auntie Mei",
+      "expected_item": "app：I'm not able to identify that medication, please check with your pharmacist. → 问药剂师",
+      "required_line": null
+    }
+  ]
+}

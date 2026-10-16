@@ -1,0 +1,30 @@
+/*
+ * Binding by account on his family screens (line bind): the little the foundation and components/his-family have no
+ * rule for. Only --rp-* tokens, classes with the .rphb- prefix. Plain (unlayered) CSS.
+ */
+
+/* the direct way on 「邀请家人」: its own block above the invitation, which follows after a clear gap */
+.rphb-direct {
+  margin-bottom: calc(34 * var(--rp-u));
+}
+
+/* 「知道了」 and 「不认识这个人，解除」 inside a page that goes on below them (her page under 「家人」): one under the other */
+.rphb-answer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rp-gap);
+}
+
+/* the card on her page stands above his switches: the same gap a section has */
+.rphb-card {
+  margin-bottom: calc(10 * var(--rp-u));
+}
+
+/*
+ * 「Wei Ling 绑定了你的账号」 at 28: when it does not fit on one line it breaks after the name, never inside 「绑定了你的
+ * 账号」 (one character alone on the second line, or 「绑」 left behind on the first). A name or a phrase wider than the
+ * column still breaks (the page's overflow-wrap), so nothing runs off the screen at a large text size.
+ */
+.rphb-bound .rpu-tl-title {
+  word-break: keep-all;
+}

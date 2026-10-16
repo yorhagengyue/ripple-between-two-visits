@@ -1,0 +1,319 @@
+/*
+ * The long press on Mr Tan's phone (owner's decision of 10-14, modelled on his iOS app: hold anything for half a
+ * second, the element dips, a ring in the accent charges around it, Ripple's read opens as a sheet). Imported by
+ * Explainable.tsx, ExplainSheet.tsx and ExplainCoach.tsx.
+ *
+ * For anyone editing:
+ * - Only .rpx / .rpx-* classes and --rpx-* variables are declared here. The colours and sizes are the elder side's own
+ *   tokens (--rp-*, app/ripple-ui.css), which this file does not edit.
+ * - Unlayered on purpose: the foundation's rules sit in @layer components, so the few of them restated below (a held
+ *   entry of a timeline, a held row of a list card) win whatever their specificity.
+ * - Elder rules hold inside the sheet and the coach (they stand inside .rpu-screen): no text under 18px, every target
+ *   at least 48x48 (the sheet's own buttons 64), no shadow.
+ * - Everything that moves is CSS: the ring is an SVG <rect pathLength="100"> whose stroke-dashoffset runs from 100 to 0
+ *   in the half second of the hold. prefers-reduced-motion: no dip, and the ring is simply there while he holds.
+ */
+
+/* ---------- an element that can be held (Explainable.tsx) ---------- */
+.rpx {
+  position: relative;
+  display: block;
+  min-width: 0;
+  /* no text selection and no long-press menu on it: the hold is Ripple's */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.rpx a, .rpx img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+/* a field inside a held element is still typed in */
+.rpx input, .rpx textarea, .rpx [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
+.rpx[data-holding="true"] { transform: scale(.97); }
+
+/* what is drawn over it: the ring and the hidden button. One element, the wrapper's last child */
+.rpx-fx { position: absolute; inset: -6px; z-index: 3; pointer-events: none; }
+.rpx-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; }
+.rpx-ring rect {
+  fill: none;
+  stroke: var(--rp-accent, #6A4C93);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+.rpx[data-holding="true"] > .rpx-fx > .rpx-ring { opacity: 1; }
+.rpx[data-holding="true"] > .rpx-fx > .rpx-ring rect { stroke-dashoffset: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .rpx { transition: transform .18s ease-out; }
+  .rpx[data-holding="true"] > .rpx-fx > .rpx-ring rect { transition: stroke-dashoffset .5s linear; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rpx[data-holding="true"] { transform: none; }
+}
+
+/* 「问 Ripple」 for the keyboard and a screen reader: not seen until it has the focus. Its words are its aria-label
+   (data-label draws them when it shows), so no row's text changes because of it */
+.rpx-ask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  background: none;
+  font: inherit;
+  pointer-events: auto;
+}
+.rpx-ask:focus-visible {
+  top: 6px;
+  right: 6px;
+  width: auto;
+  height: auto;
+  min-width: var(--rp-hit);
+  min-height: var(--rp-hit);
+  padding: 0 16px;
+  overflow: visible;
+  clip: auto;
+  border-radius: var(--rp-radius-src);
+  background: var(--rp-accent);
+  color: var(--rp-on-accent);
+  font-family: var(--rp-font-sans);
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  outline: 3px solid var(--rp-accent);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.rpx-ask:focus-visible::after { content: attr(data-label); }
+
+/* ---------- inside a heading: the title itself is what he holds ---------- */
+.rpx-inline { display: inline-block; max-width: 100%; vertical-align: top; }
+.rpx-inline > .rpx-fx { inset: -4px -8px; }
+
+/* ---------- a held row of a list card (.rpu-list-card clips: the ring runs inside the row). The wrapper stands
+   between the rows, so the hairline between two rows (.rpu-li + .rpu-li) is drawn here ---------- */
+.rpx-row > .rpx-fx { inset: 3px; }
+.rpu-list-card > .rpx-row:not(:first-child),
+.rpu-list-card > * > .rpx-row:not(:first-child),
+.rpx-row + .rpu-li { border-top: 1px solid var(--rp-tint); }
+
+/* ---------- a held entry of a line. The wrapper is a group of the line (the foundation's .rpu-tl-group: the rule
+   runs through it), and .rpx-fx is its last child, so the foundation's rules for the line's last entry are restated
+   for the entry in front of that child ---------- */
+.rpx-line > .rpx-fx { inset: -6px -6px 12px -6px; }
+.rpu-tl > .rpx-line:last-child > .rpx-fx { bottom: -6px; }
+.rpu-tl > .rpx-line:last-child > .rpu-tl-item:nth-last-child(2) > .rpu-tl-rail::before { bottom: auto; height: calc(14 * var(--rp-u)); }
+.rpu-tl > .rpx-line:last-child > .rpu-tl-item:nth-last-child(2) > .rpu-tl-main { padding-bottom: 0; }
+.rpu-tl > .rpx-line:only-child > .rpu-tl-item:first-child:nth-last-child(2) > .rpu-tl-rail::before { display: none; }
+.rpu-tl[data-open="true"] > .rpx-line:last-child > .rpu-tl-item:nth-last-child(2) > .rpu-tl-rail::before,
+.rpu-tl[data-join-next="true"] > .rpx-line:last-child > .rpu-tl-item:nth-last-child(2) > .rpu-tl-rail::before { display: block; bottom: 0; height: auto; }
+.rpu-tl[data-join-next="true"] > .rpx-line:last-child > .rpu-tl-item:nth-last-child(2) > .rpu-tl-main { padding-bottom: 22px; }
+.rpu-tl[data-join-prev="true"] > .rpx-line:first-child > .rpu-tl-item:first-child > .rpu-tl-rail::before { display: block; top: 0; }
+
+/* ---------- the sheet (ExplainSheet.tsx): over the phone, from its foot. On a computer data-rp-phone-fixed keeps it
+   inside the column (app/desktop.css) ---------- */
+.rpx-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-family: var(--rp-font-sans);
+  color: var(--rp-ink);
+  /* the words in the sheet can be selected again (it may stand inside a held element's tree) */
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* the dimmed ground: the ink at 55%; a finger on it does not scroll the page under the sheet */
+.rpx-ground { position: absolute; inset: 0; background: rgba(24, 32, 44, .55); touch-action: none; }
+.rpx-sheet {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 44px);
+  max-height: calc(100dvh - 44px);
+  background: var(--rp-paper);
+  border-top: 1px solid var(--rp-line);
+  border-radius: var(--rp-radius-block) var(--rp-radius-block) 0 0;
+  outline: none;
+}
+.rpx-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 8px 0 var(--rp-gutter); }
+.rpx-bar-t { margin: 0; font-size: var(--rp-fs-min); font-weight: 800; line-height: 1.3; color: var(--rp-accent); }
+.rpx-close {
+  flex: none;
+  min-width: var(--rp-h-secondary);
+  min-height: var(--rp-h-secondary);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--rp-radius-src);
+  background: none;
+  font: inherit;
+  font-size: var(--rp-fs-small);
+  font-weight: 800;
+  color: var(--rp-ink);
+  cursor: pointer;
+}
+.rpx-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--rp-block-gap);
+  padding: 4px var(--rp-gutter) 22px;
+  overflow-wrap: break-word;
+}
+.rpx-body > * { margin: 0; }
+.rpx-name { font-size: var(--rp-fs-headline); font-weight: 900; line-height: 1.25; }
+.rpx-wait { font-size: var(--rp-fs-body); line-height: 1.5; color: var(--rp-ink-3); }
+.rpx-sec { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.rpx-sec > * { margin: 0; }
+.rpx-checked { list-style: none; padding: 0; display: grid; gap: 10px; }
+.rpx-checked > li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; font-size: var(--rp-fs-sub); line-height: 1.45; }
+.rpx-tick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(24 * var(--rp-u));
+  height: calc(24 * var(--rp-u));
+  margin-top: calc(2 * var(--rp-u));
+  border-radius: 50%;
+  background: var(--rp-ink);
+  color: var(--rp-on-ink);
+}
+.rpx-tick svg { width: 62%; height: 62%; }
+.rpx-note { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+.rpx-foot {
+  flex: none;
+  display: grid;
+  gap: var(--rp-gap);
+  padding: 14px var(--rp-gutter) calc(14px + env(safe-area-inset-bottom));
+  background: var(--rp-white);
+  border-top: 1px solid var(--rp-line);
+}
+.rpx-foot > * { margin: 0; }
+/* a sheet without a foot (a family member's, with nothing to add): the text keeps clear of the phone's home bar */
+.rpx-sheet > .rpx-body:last-child { padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
+
+/* ---------- on a family member's screen (owner 10-14: the same long press and the same sheet on her side) ----------
+   Her screens are components/family-ui's dark column (.rpf-screen, 430px at most), not an .rpu-screen, so app/desktop.css
+   does not hold the sheet to a column there: this does, with the same box as her own bottom sheet (.rpf-sheet). The
+   sheet keeps his layout and sizes; its colours are her side's (the iOS app's sheet is dark, as her screens are): the
+   elder's tokens are given her palette's values here, so every part drawn inside (the line, the quotes, the buttons)
+   follows without a rule of its own. The fallbacks are her palette's numbers: the sheet is drawn on the page, outside
+   the element that carries her tokens. */
+.rpx-root[data-viewer="family"] {
+  left: 0; right: 0; width: auto; max-width: 430px; margin-inline: auto;
+  --rp-paper: var(--rpf-surface, #15181C);
+  --rp-white: var(--rpf-surface-2, #1E2227);
+  --rp-ink: var(--rpf-ink, #F2F5F6);
+  --rp-ink-2: var(--rpf-banner-ink, #D5D9DB);
+  --rp-ink-3: var(--rpf-ink-2, #9AA1A6);
+  --rp-line: var(--rpf-hair-2, #27292C);
+  --rp-line-2: var(--rpf-edge, #5C6368);
+  --rp-accent: var(--rpf-teal, #37C2BA);
+  --rp-accent-ink: var(--rpf-teal-ink, #5FD4CC);
+  --rp-accent-press: var(--rpf-teal-ink, #5FD4CC);
+  --rp-accent-soft: var(--rpf-teal-22, rgba(55, 194, 186, .22));
+  --rp-accent-halo: var(--rpf-teal-22, rgba(55, 194, 186, .22));
+  --rp-on-accent: var(--rpf-on-teal, #06201E);
+  --rp-on-ink: var(--rpf-bg, #0A0C0F);
+  --rp-on-ink-2: var(--rpf-surface-2, #1E2227);
+  --rp-on-ink-3: var(--rpf-surface, #15181C);
+  color: var(--rpf-ink, #F2F5F6);
+  font-family: var(--rpf-font, inherit);
+}
+.rpx-root[data-viewer="family"] .rpx-ground { background: var(--rpf-scrim, rgba(5, 7, 10, .74)); }
+/* the ring around what she holds: her side's accent, which shows on her dark ground (his purple does not) */
+.rpx[data-rpx-viewer="family"] > .rpx-fx > .rpx-ring rect { stroke: var(--rpf-teal, #37C2BA); }
+/* 「问 Ripple」 when the keyboard reaches it on her screen: her accent and her font, dark words on it */
+.rpx[data-rpx-viewer="family"] > .rpx-fx > .rpx-ask:focus-visible {
+  background: var(--rpf-teal, #37C2BA);
+  color: var(--rpf-bg, #0A0C0F);
+  font-family: var(--rpf-font, inherit);
+  outline-color: var(--rpf-teal-ink, #5FD4CC);
+}
+/* a wrapped row of hers inside a link (the week on her home opens the week): no link preview while she holds */
+a:has(.rpx[data-rpx-viewer="family"]) { -webkit-touch-callout: none; -webkit-user-drag: none; }
+
+/* the motion pass (owner 10-14, 「仿 iOS」; app/motion.css): the sheet comes up from the foot of the phone on iOS's
+   curve over a fading ground, and goes down again when it closes (Explainable.tsx keeps it a moment, data-closing,
+   and it takes no taps meanwhile). With less motion: no slide; it is simply there, and gone at once */
+@media (prefers-reduced-motion: no-preference) {
+  .rpx-ground { animation: rpx-fade .25s ease-out backwards; }
+  .rpx-sheet { animation: rpx-up .3s cubic-bezier(.32, .72, 0, 1) backwards; }
+  .rpx-coach-card { animation: rpx-fade .2s ease-out; }
+  .rpx-root[data-closing="true"] .rpx-ground { animation: rpx-fade-out .22s ease-in both; }
+  .rpx-root[data-closing="true"] .rpx-sheet { animation: rpx-down .22s cubic-bezier(.4, 0, 1, 1) both; }
+}
+.rpx-root[data-closing="true"] { pointer-events: none; }
+@keyframes rpx-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rpx-fade-out { to { opacity: 0; } }
+@keyframes rpx-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes rpx-down { to { transform: translateY(100%); } }
+
+/* ---------- the first-time coach (ExplainCoach.tsx): a card in the middle of the phone over the dimmed ground ---------- */
+.rpx-coach {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px var(--rp-gutter);
+  font-family: var(--rp-font-sans);
+  color: var(--rp-ink);
+}
+.rpx-coach-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 22px 20px 20px;
+  background: var(--rp-paper);
+  border: 1px solid var(--rp-line);
+  border-radius: var(--rp-radius-block);
+  outline: none;
+}
+.rpx-coach-card > * { margin: 0; }
+.rpx-coach-t { font-size: var(--rp-fs-action); font-weight: 900; line-height: 1.3; }
+.rpx-coach-b { font-size: var(--rp-fs-body); line-height: 1.5; }
+.rpx-coach-s { font-size: var(--rp-fs-min); line-height: 1.5; color: var(--rp-ink-3); }
+/* the gesture, shown: a row that is being held, over and over */
+.rpx-demo {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: calc(64 * var(--rp-u));
+  margin: 6px 6px;
+  padding: 12px 16px;
+  background: var(--rp-white);
+  border: 1px solid var(--rp-line);
+  border-radius: var(--rp-radius-card);
+  font-size: var(--rp-fs-row);
+  font-weight: 700;
+}
+.rpx-demo > .rpx-fx > .rpx-ring { opacity: 1; }
+.rpx-demo > .rpx-fx > .rpx-ring rect { stroke-dashoffset: 30; }
+@media (prefers-reduced-motion: no-preference) {
+  .rpx-demo { animation: rpx-demo-dip 2.4s ease-in-out infinite; }
+  .rpx-demo > .rpx-fx > .rpx-ring rect { animation: rpx-demo-ring 2.4s linear infinite; }
+}
+@keyframes rpx-demo-dip { 0%, 12% { transform: none; } 20%, 55% { transform: scale(.97); } 63%, 100% { transform: none; } }
+@keyframes rpx-demo-ring { 0%, 18% { stroke-dashoffset: 100; } 50%, 62% { stroke-dashoffset: 0; } 63%, 100% { stroke-dashoffset: 100; } }

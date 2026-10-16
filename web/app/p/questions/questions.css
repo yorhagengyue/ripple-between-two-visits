@@ -1,0 +1,55 @@
+/*
+ * His question list in the timeline design (design group 14: 14-1a 问医生, 14-1b 问药剂师, and the screens behind them:
+ * answered, set aside, adding, changing). Almost all of it is components/ui (the page header, the segmented control,
+ * section titles, the timeline, list cards); here are the few pieces it does not have. Plain global CSS with the .rp14q-
+ * prefix (this app's CSS pipeline turns every *.css into global CSS: components/visit/visit.css says why). Only --rp-*
+ * tokens (app/ripple-ui.css), sizes in calc(N * var(--rp-u)), no text under 18px, no target under 48px. These rules
+ * sit outside any @layer, so they win over the foundation's.
+ */
+
+/* his question in an entry of the line: the entry's own size (24), not the old list row's (the class stays as a hook) */
+.rp14q .rpu-bubble .rpu-q-text { font-size: inherit; font-weight: inherit; line-height: inherit; margin: 0; }
+
+/* the grey sentence under the screen's name is the screen's one sentence (data-rp="headline"): it keeps the header's size */
+.rp14q-headline { font: inherit; color: inherit; margin: 0; }
+
+/* the row of buttons under a question: 「改」 「跳过」 side by side, as buttons (round 3 had made them a row of words;
+   the owner took that back, ux pass 10-12, round 8); 「合并」 and a failure take the whole row */
+.rp14q-acts > [data-wide="true"] { grid-column: 1 / -1; }
+
+/*
+ * A question and its answer are two entries of one line, kept together as one element (a reader, a test and a
+ * highlight take them as one thing). The line tells its first and last entry by :first-child / :last-child, which a
+ * wrapper hides from it, so the rule's ends and the gaps are said again for entries inside a pair. The pair is a plain
+ * block with its own box: it can be seen, measured and scrolled to like any entry.
+ */
+.rp14q-pair { display: block; min-width: 0; }
+.rpu-tl > .rp14q-pair > .rpu-tl-item > .rpu-tl-rail::before { display: block; top: 0; bottom: 0; height: auto; }
+.rpu-tl > .rp14q-pair:first-child > .rpu-tl-item:first-child > .rpu-tl-rail::before { top: calc(14 * var(--rp-u)); }
+.rpu-tl > .rp14q-pair:last-child > .rpu-tl-item:last-child > .rpu-tl-rail::before { bottom: auto; height: calc(14 * var(--rp-u)); }
+.rpu-tl > .rp14q-pair:only-child > .rpu-tl-item:only-child > .rpu-tl-rail::before { display: none; }
+.rpu-tl > .rp14q-pair > .rpu-tl-item > .rpu-tl-main { padding-bottom: 22px; }
+.rpu-tl > .rp14q-pair:last-child > .rpu-tl-item:last-child > .rpu-tl-main { padding-bottom: 0; }
+
+/* the answer: who said it and where (the line's own head line), the words, the checked Chinese, the recording */
+.rp14q-answer { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp14q-answer > * { margin: 0; }
+.rp14q-zh { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rp14q-zh > * { margin: 0; }
+
+/* the field over the answered questions (ux pass 10-12, round 3): one field the width of the page, no gap of its own */
+.rp14q-search { margin: 0; }
+
+/* adding and changing: the form fills the screen so its buttons sit in the lower half; his words in a tall field */
+.rp14q-form { display: flex; flex-direction: column; flex: 1; }
+.rp14q-textarea {
+  display: block;
+  flex: none;
+  width: 100%;
+  min-height: calc(132 * var(--rp-u));
+  padding: 12px 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+/* the foundation's field grows its border by 1px when he types in it and takes that 1px off the padding: the same here */
+.rp14q-textarea:focus, .rp14q-textarea:focus-visible { padding: 11px 15px; }

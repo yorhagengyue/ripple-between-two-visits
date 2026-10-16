@@ -1,0 +1,11 @@
+# /etc/systemd/system/ripple-backup.timer (C2 track P): every day at 03:00 Singapore time; a run missed while the
+# server was off happens at the next start.
+[Unit]
+Description=Ripple backup, daily at 03:00 Singapore time
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Asia/Singapore
+Persistent=true
+
+[Install]
+WantedBy=timers.target
