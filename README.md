@@ -14,10 +14,19 @@ https://github.com/user-attachments/assets/12c3e150-9f8b-4e37-bc89-76b46c30e48d
 
 | | |
 |---|---|
-| **Live demo** | https://app.ripple-health-ai.com — a web demo built for this challenge. Judge log-ins are in the submission form. |
+| **Live demo** | https://app.ripple-health-ai.com — a web demo built for this challenge. Sign up in about a minute: see [How judges get in](#how-judges-get-in) just below. |
 | **Demo video** | 7:56: the player above, or in full quality on YouTube: https://youtu.be/2VmBRCeDO3I. Its source code is in [`videos/`](videos/). |
 | **iOS app** | [Ripple Health AI on the App Store](https://apps.apple.com/sg/app/ripple-health-ai/id6786394791). The product ships as this iOS app. The version on the App Store now (1.1.0, August 2026) is our earlier release; the update with the Challenge 2 features is being submitted for review and **may not be live, or may not be the latest version, when you judge**. |
 | **Source code** | [`web/`](web/) the app · [`videos/`](videos/) the film · [`docs/`](docs/) diagrams, screenshots, submission text |
+
+## How judges get in
+
+There are no ready-made judge log-ins: sign up on the live demo in about a minute, with an account name and a password (no e-mail needed). Each judge gets an account of their own.
+
+1. **Mr Tan's side (the elder).** Open https://app.ripple-health-ai.com → **Sign up** → **I am the elder**, and pick any account name and password. At **Can AI help?** tap **I agree** (otherwise the answers come from the rules only, without Hunyuan). At **Where to start?** choose **Use Mr Tan's example data**. On the recovery code screen tap **I have kept it**. You are now in Mr Tan's app, with his visits, medicines, readings and his doctor's recorded words.
+2. **His daughter's side (optional).** In a private window or another browser: **Sign up** → **I am the son or daughter**, with another account name and password. At **Enter your elder's account** type the account name from step 1 and tap **Link**. Then, in the elder's window, tap **Got it** on the notice.
+
+Next time, **Log in** with the same account name and password. One network can make 5 sign-ups an hour: if several judges share a network and see "Too many sign-ups", try again an hour later; the elder's side alone covers most of the film.
 
 ---
 
@@ -198,7 +207,7 @@ More in [`docs/codebuddy/`](docs/codebuddy/).
 
 ## 8. Try it
 
-**Live demo:** https://app.ripple-health-ai.com (log-ins in the submission form). Mr Tan, Wei Ling and Dr Lim are fictional; the example data and voices are synthetic.
+**Live demo:** https://app.ripple-health-ai.com (sign up yourself: [How judges get in](#how-judges-get-in)). Mr Tan, Wei Ling and Dr Lim are fictional; the example data and voices are synthetic.
 
 **Run it locally.** No keys are needed: with an empty `.env` the app and the tests run offline (the models use a stub, speech uses recorded replays, storage is in memory).
 
