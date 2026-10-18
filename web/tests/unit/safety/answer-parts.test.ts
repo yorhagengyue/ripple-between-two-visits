@@ -22,13 +22,14 @@ describe("answerParts", () => {
   it("the hero: the doctor's words (医生说, date and time point, the clip), the label without a doubled lead-in, Ripple's referral", async () => {
     const r = await answerAt("今天 150/95，我能不能多吃一粒？");
     const parts = answerParts(r.sentences, "zh-Hans");
-    expect(parts.map((p) => p.kind)).toEqual(["quote", "label", "ripple"]);
+    // owner 10-18: Ripple's referral comes before the label line it rests on
+    expect(parts.map((p) => p.kind)).toEqual(["quote", "ripple", "label"]);
     expect(parts[0]).toMatchObject({ kind: "quote", speaker: "doctor", inferred: false, lang: "en", when: "9月1日 · 0:43", ref: "v2-u08", standIn: true });
-    expect(parts[1]).toMatchObject({ kind: "label", printed: "Take ONE tablet every MORNING", restated: "每天早上服用一片。" });
-    expect(parts[2]).toMatchObject({ kind: "ripple", text: TEMPLATES.refer_doctor.zh, lang: "zh-Hans" });
+    expect(parts[1]).toMatchObject({ kind: "ripple", text: TEMPLATES.refer_doctor.zh, lang: "zh-Hans" });
+    expect(parts[2]).toMatchObject({ kind: "label", printed: "Take ONE tablet every MORNING", restated: "每天早上服用一片。" });
     const en = answerParts(r.sentences, "en");
-    expect(en[1]).toMatchObject({ kind: "label", printed: "Take ONE tablet every MORNING" });
-    expect(en[1]).not.toHaveProperty("restated");
+    expect(en[2]).toMatchObject({ kind: "label", printed: "Take ONE tablet every MORNING" });
+    expect(en[2]).not.toHaveProperty("restated");
     expect(en[0]).toMatchObject({ when: "1 Sep · 0:43" });
   });
 

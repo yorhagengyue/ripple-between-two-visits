@@ -46,7 +46,7 @@ describe("an explanation kept with an answer before 10-15 is still drawn", () =>
     expect(glossChip({ ...quote, cite: { date: "2026-09-01", roleState: "inferred" } }, "zh-Hans")).toBe("好像是医生 9月1日");
     expect(glossChip(quote, "en")).toBe("Doctor 1 Sep");
     // no explanation: the parts as they always were
-    expect(answerLine([quote, leaflet, referral], "zh-Hans").map((p) => p.kind)).toEqual(["quote", "leaflet", "ripple"]);
+    expect(answerLine([quote, leaflet, referral], "zh-Hans").map((p) => p.kind)).toEqual(["quote", "ripple", "leaflet"]);
   });
 });
 

@@ -194,6 +194,16 @@ export function answerParts(sentences: readonly Sentence[], locale: UiLocale): A
     }
     parts.push({ kind: "ripple", source: s.sourceId, text, lang: langOf(text) });
   }
+  // owner 10-18: what Ripple says he should do comes before the label and leaflet lines it rests on (he read four
+  // anonymous label blocks before the referral); the crisis lines stay first and the quotes keep their own order
+  const evidence = (p: AnswerPart) => p.kind === "label" || p.kind === "leaflet" || p.kind === "record";
+  const firstEvidence = parts.findIndex(evidence);
+  if (firstEvidence >= 0 && parts.some((p) => p.kind === "ripple")) {
+    const own = parts.filter((p) => p.kind === "ripple");
+    const rest = parts.filter((p) => p.kind !== "ripple");
+    const at = rest.findIndex(evidence);
+    return [...rest.slice(0, at), ...own, ...rest.slice(at)];
+  }
   return parts;
 }
 

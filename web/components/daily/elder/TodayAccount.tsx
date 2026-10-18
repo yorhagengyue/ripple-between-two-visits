@@ -813,7 +813,7 @@ export function TodayAccount({
         {/* C2 track O: no network, and what waits on this phone (「已记下（等连网）」) */}
         <OfflineNote locale={locale} tz={data.tz} />
 
-        {/* his month (owner 10-14), at the top of the day's overview: never while a slot needs him or he is answering */}
+        {/* his month (owner 10-14), at the top of the day's overview; under the slot while one needs him (owner 10-18: it stays all day) */}
         {overview && month ? <section data-today-section="month">{month}</section> : null}
 
         {/* a day he tapped in the month stands where today's line stands, until he taps today again */}
@@ -914,6 +914,9 @@ export function TodayAccount({
         {!dayShown && !empty && data.noSlot.length ? <SlotChooser locale={locale} meds={data.noSlot} /> : null}
         {/* 「拍一下新药的药袋」 for each medicine that waits for its label, on the day's overview */}
         {overview && !dayShown && !empty ? <NewMedLabel locale={locale} meds={data.awaitingLabel} /> : null}
+
+        {/* owner 10-18: the month is on Today whatever the day is doing; while a slot needs him it comes after the slot, so the slot still comes first */}
+        {!overview && month ? <section data-today-section="month">{month}</section> : null}
 
         {/* the undo strip sits over the foot of the page for 12 s: what is there moves up out of its way meanwhile */}
         {undo && !hero ? <div aria-hidden="true" style={{ height: TOAST_ROOM }} /> : null}

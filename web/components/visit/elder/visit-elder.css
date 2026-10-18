@@ -99,8 +99,8 @@
 
 /* ux pass 10-12 (round 5): starting and ending a recording are red, with a white round mark to start and a white square
    to end (the owner's canvas, 05-1 and 05-2). Outside the layer, so it wins over the button's own colours */
-.rpu-btn.rpu-visit-recbtn { background: var(--rp-urgent); border-color: var(--rp-urgent); color: var(--rp-on-urgent); }
-.rpu-btn.rpu-visit-recbtn:active { background: var(--rp-urgent); }
+.rpu-btn.rpu-visit-recbtn { background: var(--rp-accent); border-color: var(--rp-accent); color: var(--rp-on-accent); }
+.rpu-btn.rpu-visit-recbtn:active { background: var(--rp-accent); }
 .rpu-btn.rpu-visit-recbtn > span { display: inline-flex; align-items: center; gap: calc(12 * var(--rp-u)); }
 .rpu-visit-recbtn-mark { flex: none; width: calc(18 * var(--rp-u)); height: calc(18 * var(--rp-u)); border-radius: 50%; background: currentColor; }
 .rpu-visit-recbtn-mark[data-shape="square"] { border-radius: calc(5 * var(--rp-u)); }

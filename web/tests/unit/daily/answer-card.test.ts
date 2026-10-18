@@ -39,7 +39,7 @@ describe("AnswerCard: an answer as one line", () => {
     const question = "今天 150/95，我能不能多吃一粒？";
     const out = html(createElement(AnswerCard, { question, answer: await answerTo(question), locale: "zh-Hans" }));
     expect(out).toMatch(/^<div data-testid="ask-answer" data-complete="true" data-route="refuse_route"><section class="rpu-stack" data-testid="ask-turn" data-route="refuse_route" data-latest="true">/);
-    expect(entries(out)).toEqual(["me", "doc:quote", "lab:label", "rip:ripple", "ok"]);
+    expect(entries(out)).toEqual(["me", "doc:quote", "rip:ripple", "lab:label", "ok"]);
     // his own words: the plain face, as the heading; never a quote
     expect(out).toContain(`<h1 class="rpu-bubble" data-rp="bubble" data-rp-role="say">${question}</h1>`);
     expect(out).toContain('<span class="rpu-tl-who" data-node="me">你问</span>');
@@ -68,7 +68,7 @@ describe("AnswerCard: an answer as one line", () => {
     const out = html(createElement(AnswerCard, { question, answer: await answerTo(question), locale: "zh-Hans", latest: false, showQuestion: false }));
     expect(out).toMatch(/^<section class="rpu-stack" data-testid="ask-turn" data-route="refuse_route" data-latest="false">/);
     expect(out).not.toContain("<h1");
-    expect(entries(out)).toEqual(["doc:quote", "lab:label", "rip:ripple", "ok"]);
+    expect(entries(out)).toEqual(["doc:quote", "rip:ripple", "lab:label", "ok"]);
   });
 
   it("an emergency (09): his words, then the red card by itself with 「Ripple」 and one call button, then the doctor's warning line on the line under it", async () => {
