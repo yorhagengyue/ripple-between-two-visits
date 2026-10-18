@@ -117,6 +117,9 @@
   gap: 8px 12px;
 }
 .rpu-month-legend > li { min-width: 0; display: flex; align-items: center; gap: 8px; font-size: var(--rp-fs-min); line-height: 1.35; color: var(--rp-ink-2); }
+/* the one long line ("Reading outside your doctor's target") takes the whole width and goes first, so the legend is
+   three single-line rows instead of a wrapped cell (2026-10-18) */
+.rpu-month-legend > li[data-legend="outside"] { order: -1; grid-column: 1 / -1; }
 
 /* ---- the chosen day, when it is not today: its date, the way back to today, its records as rows */
 .rpu-month-day { display: flex; flex-direction: column; gap: 10px; }

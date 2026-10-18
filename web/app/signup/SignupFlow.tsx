@@ -249,12 +249,13 @@ export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale
               <button
                 type="button"
                 data-testid="signup-lang-switch"
+                aria-label={locale === "en" ? "Switch to 华语" : "Switch to English"}
                 onClick={() => {
                   const u = new URL(window.location.href);
                   u.searchParams.set("lang", locale === "en" ? "zh-Hans" : "en");
                   window.location.assign(u.toString());
                 }}
-                style={{ display: "flex", alignItems: "center", minHeight: "var(--rp-hit)", background: "none", border: 0, padding: "0 2px", color: "inherit", fontSize: "var(--rp-fs-min)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer", opacity: 0.85 }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "var(--rp-hit)", minWidth: "var(--rp-hit)", background: "none", border: 0, padding: "0 2px", color: "inherit", fontSize: "var(--rp-fs-min)", fontWeight: 600, cursor: "pointer", opacity: 0.7 }}
               >
                 {locale === "en" ? "华语" : "English"}
               </button>
