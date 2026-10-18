@@ -173,6 +173,8 @@ test.describe("log in and out", () => {
     // log out from his devices page: /p/today sends him to the login again
     await page.goto("/p/me/devices");
     await expect(page.getByTestId("page-me-devices")).toBeVisible();
+    // the list and its buttons settle a tick after the page: axe must not read a disabled button mid-swap
+    await page.waitForTimeout(600);
     await expectPageChecks(page, { side: "elder" });
     await page.getByTestId("logout").click();
     await expect(page).toHaveURL(/\/login$/);

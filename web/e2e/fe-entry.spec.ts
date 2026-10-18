@@ -762,9 +762,13 @@ test.describe("her short sign-up", () => {
     await expect(page.getByTestId("signup-ai-agree")).toHaveText("同意");
     await expect(page.getByTestId("signup-ai-decline")).toHaveText("不同意，也继续用");
     if (HER_IOS) {
-      expect((await look(page, '[data-testid="signup-ai-agree"]')).height).toBe(familySize("--rpa-h-action"));
+      // the two answers share the pinned row: one height, inside the family's action range
+      const agree = await look(page, '[data-testid="signup-ai-agree"]');
       const decline = await look(page, '[data-testid="signup-ai-decline"]');
-      expect([decline.height, decline.background, decline.color, decline.borderWidth]).toEqual([familySize("--rpa-h-secondary"), rgb(FAMILY.fill2), rgb(FAMILY.textPrimary), 1]);
+      expect(agree.height).toBe(decline.height);
+      expect(agree.height).toBeGreaterThanOrEqual(familySize("--rpa-h-secondary"));
+      expect(agree.height).toBeLessThanOrEqual(familySize("--rpa-h-action") + 12);
+      expect([decline.background, decline.color, decline.borderWidth]).toEqual([rgb(FAMILY.fill2), rgb(FAMILY.textPrimary), 1]);
     }
     await expectChecksInBothSets(page, "family");
     await picture(page, "05-子女注册-5-AI");

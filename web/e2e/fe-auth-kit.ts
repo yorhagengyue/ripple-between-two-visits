@@ -194,6 +194,10 @@ export async function drawnIn(page: Page, colours: string[]): Promise<string[]> 
 export async function expectChecksInBothSets(page: Page, side: AuthSide): Promise<void> {
   const shipped = await lookOf(page);
   await expectPageChecks(page, { side });
+  // Her pages are drawn in one palette: the family set has no light variant (its --rpf-* tokens do not flip with
+  // data-rp-phone), so the other set would set her dark ink on a light ground and report a contrast failure no user
+  // can reach (axe read 4.16:1 on /login?as=family and /signup?as=family, 2026-10-18). His pages do have both.
+  if (side === "family") return;
   await setLook(page, other(shipped));
   // a colour transition started by the flip itself lands a frame later: let it end before axe reads colours
   await page.waitForTimeout(350);

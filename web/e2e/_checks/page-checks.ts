@@ -186,12 +186,16 @@ export async function contrastViolations(page: Page, options: PageCheckOptions =
  * low contrast. Finite animations jump to their end; endless ones (skeleton breathing) carry no text and stay.
  */
 export async function settleAnimations(page: Page) {
+  // a page's entrance transition starts a frame after navigation: wait for it, then jump it to its end, then let the
+  // style settle one more frame (2026-10-18: axe read a page at half opacity and called every muted line low contrast)
+  await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
   await page.evaluate(() => {
     for (const a of document.getAnimations()) {
       const timing = a.effect?.getComputedTiming();
       if (timing && timing.endTime !== Infinity) a.finish();
     }
   });
+  await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => r())));
 }
 
 /** All four checks; returns the report without asserting. */
