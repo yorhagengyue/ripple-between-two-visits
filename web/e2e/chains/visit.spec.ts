@@ -74,7 +74,7 @@ test("看诊: consent -> recording -> cards and the question list -> End visit -
   await expect(pp.getByTestId("line-v3-u20")).toBeAttached();
   await expect(pp.getByTestId("chk-v3-u02-bars")).toHaveAttribute("data-ref", "135/85");
   await expect(pp.getByTestId("chk-v3-u02-target")).toContainText("10 次里有 9 次不低于");
-  await expect(pp.getByTestId("chk-v3-u04-doses")).toContainText("33 个早上勾了 29 个");
+  await expect(pp.getByTestId("chk-v3-u04-doses")).toContainText("33 次服药中，29 次已服药");
   await expect(pp.getByTestId("chk-v3-u06-note-text")).toHaveText("“今天在大巴窑中心走了一圈，脚踝有点肿。”");
   await expect(pp.getByTestId("qlist-progress")).toHaveText("5 个问题，答了 5 个");
   await expect(pp.getByTestId("card-v3-u07-chip")).toContainText("推断");

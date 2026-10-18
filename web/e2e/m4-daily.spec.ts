@@ -76,7 +76,7 @@ test("hero on /p/today: tap to full answer within 4 s; R4 with its playable stan
 
   // the label's own words under its Mandarin template; the referral; no dose advice; no 180
   const label = page.locator('[data-testid="answer-line"][data-source="label:med-amlodipine"]');
-  await expect(label.getByTestId("answer-chip")).toHaveText("● 药袋");
+  await expect(label.getByTestId("answer-chip")).toHaveText("● 药品标签");
   await expect(label.getByTestId("answer-label-original")).toHaveText("药袋原文：Take ONE tablet every MORNING");
   const answer = page.getByTestId("ask-answer");
   for (const w of ["可以多吃", "180", "没关系", "不要紧"]) await expect(answer).not.toContainText(w);
@@ -125,7 +125,7 @@ test("我今天好累: a note; 吃了吗 only while today's dose has no answer; 
   const a = await openDevice(browser, answered.id, "/p/today");
   await ask(a.page, "我今天好累");
   const outA = a.page.getByTestId("ask-answer");
-  await expect(outA).toContainText("记下了");
+  await expect(outA).toContainText("已记录");
   await expect(outA).not.toContainText("吃了吗");
   // wave B: offline (mock) no crisis screen looked at the note, so the fixed safety line follows it
   await expect(outA).toContainText("如果突然很不舒服，或者觉得可能会伤害自己，请打 995，或者去最近的急诊。");
@@ -163,7 +163,7 @@ test("dose check-in: 没吃 asks why (chips + own words), Undo bar stays >= 10 s
   await expect(panel.getByTestId("dose-reason-chip-tai_chi_morning")).toHaveText("打太极");
   for (const code of ["forgot", "away", "not_with_me"]) await expect(panel.getByTestId(`dose-reason-chip-${code}`)).toBeVisible();
   await expect(panel.getByTestId("dose-reason-input")).toBeVisible();
-  await expect(page.getByTestId("undo-bar")).toContainText("已记下：没吃");
+  await expect(page.getByTestId("undo-bar")).toContainText("未服药撤销");
   await panel.getByTestId("dose-reason-chip-tai_chi_morning").click();
   await expect(page.getByTestId(`dose-reason-shown-${MED}`)).toHaveText("原因：打太极");
   const logged = (await (await request.get(`/api/doses?session=${s.id}&from=43&to=43&medication_id=${MED}`)).json()).doses;
@@ -190,7 +190,7 @@ test("dose check-in: 没吃 asks why (chips + own words), Undo bar stays >= 10 s
   await expect(page.getByTestId("dose-reason-shown-med-losartan")).toHaveText("原因：早上去看朋友");
   await page.getByTestId("dose-btn-med-losartan-later").click();
   await expect(page.getByTestId("dose-state-med-losartan")).toHaveAttribute("data-state", "unconfirmed");
-  await expect(page.getByTestId("dose-state-med-losartan")).toHaveText("等下（还没确认）");
+  await expect(page.getByTestId("dose-state-med-losartan")).toHaveText("稍后服用（尚未确认）");
   await page.getByTestId("undo-btn").click();
   await expect(page.getByTestId("dose-state-med-losartan")).toHaveAttribute("data-state", "missed");
   expect(dialogs).toBe(0);
@@ -203,7 +203,7 @@ test("no answer when the reminder window closes: unconfirmed, no reply after two
   await expect(phone.page.getByTestId(`dose-state-${MED}`)).toHaveAttribute("data-state", "none");
   await api(request, "/api/clock", s.id, { day: 42, time: "09:50" });
   await expect(phone.page.getByTestId(`dose-state-${MED}`)).toHaveAttribute("data-state", "unconfirmed", { timeout: 5000 });
-  await expect(phone.page.getByTestId(`dose-state-${MED}`)).toHaveText("两次提醒都没回（未确认）");
+  await expect(phone.page.getByTestId(`dose-state-${MED}`)).toHaveText("两次提醒均未回应（未确认）");
   await closeAll([phone]);
 });
 
@@ -252,8 +252,8 @@ test("blood pressure: no comparison line on D0; from D1 R1 word for word with da
   await waitLive(page);
   await expect(page.getByTestId("bp-target")).toBeVisible();
   await expect(page.getByTestId("bp-target")).toContainText(R1);
-  await expect(page.getByTestId("bp-target")).toContainText("医生说");
-  await expect(page.getByTestId("bp-target")).toContainText("2026年8月24日 · 0:49 处 · 代录音");
+  await expect(page.getByTestId("bp-target")).toContainText("Doctor said");
+  await expect(page.getByTestId("bp-target")).toContainText("24 Aug 2026 · at 0:49 · stand-in recording");
   await expect(page.getByTestId("bp-chart")).toHaveAttribute("data-ref", "135/85");
   await expect(page.getByTestId("bp-ref-line")).toHaveCount(2);
   await expect(page.getByTestId("bp-reading")).toHaveCount(2);
@@ -264,12 +264,12 @@ test("blood pressure: no comparison line on D0; from D1 R1 word for word with da
   await api(request, "/api/clock", s.id, { day: 29, time: "20:15" });
   await page.reload();
   await waitLive(page);
-  await expect(page.locator('[data-testid="bp-reading"][data-day="3"][data-state="unconfirmed"]')).toContainText("未确认");
+  await expect(page.locator('[data-testid="bp-reading"][data-day="3"][data-state="unconfirmed"]')).toContainText("Not confirmed");
   expect(await page.locator('[data-testid="bp-reading"]').evaluateAll((els) => els.every((e) => Number(e.getAttribute("data-day")) <= 29))).toBe(true);
   await page.getByTestId("bp-input-top").fill("150");
   await page.getByTestId("bp-input-bottom").fill("95");
   await page.getByTestId("bp-save").click();
-  await expect(page.getByTestId("bp-record-note")).toHaveText("记下了。");
+  await expect(page.getByTestId("bp-record-note")).toHaveText("Recorded");
   await expect(page.locator('[data-testid="bp-reading"][data-day="29"]')).toHaveCount(2, { timeout: 5000 });
   await scan();
 

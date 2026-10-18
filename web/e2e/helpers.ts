@@ -48,7 +48,10 @@ export interface Device {
 /** A new device (browser context) in the session, opened on `pathname`, with its event stream open. */
 export async function openDevice(browser: Browser, sessionId: string, pathname: string): Promise<Device> {
   const context = await browser.newContext({ baseURL: BASE_URL });
-  await context.addCookies([{ name: "rp_session", value: sessionId, url: BASE_URL }]);
+  await context.addCookies([
+    { name: "rp_session", value: sessionId, url: BASE_URL },
+    { name: "rp_lang", value: "zh-Hans", url: BASE_URL },
+  ]);
   const page = await context.newPage();
   await page.goto(pathname);
   await waitLive(page);
@@ -197,14 +200,15 @@ export const CHAIN_CREW_KEY = process.env.SCRIPTED_FALLBACK_KEY || "dev-only-reh
 const STAFF_ROLES: JoinRole[] = ["backstage", "director", "judge"];
 
 export interface JoinOptions {
-  /** rp_lang cookie: "en" or "zh-Hans" (default: the app's default, Mandarin) */
+  /** rp_lang cookie: "en" or "zh-Hans" (default: Mandarin, as the e2e phones always were; the app itself defaults to
+   * English since 10-15 and the sign-up no longer writes this cookie, so the phone says it — 2026-10-18) */
   lang?: "en" | "zh-Hans";
   viewport?: { width: number; height: number };
 }
 
 async function newDeviceContext(browser: Browser, opts: JoinOptions): Promise<BrowserContext> {
   const context = await browser.newContext({ baseURL: BASE_URL, ...(opts.viewport ? { viewport: opts.viewport } : {}) });
-  if (opts.lang) await context.addCookies([{ name: "rp_lang", value: opts.lang, url: BASE_URL }]);
+  await context.addCookies([{ name: "rp_lang", value: opts.lang ?? "zh-Hans", url: BASE_URL }]);
   return context;
 }
 
@@ -477,7 +481,7 @@ export async function withCrew(context: BrowserContext): Promise<BrowserContext>
 /** openDevice as the crew: a device in the session that may open /director, /backstage, and shows the jump menu. */
 export async function openCrewDevice(browser: Browser, sessionId: string, pathname: string): Promise<Device> {
   const context = await browser.newContext({ baseURL: BASE_URL });
-  await context.addCookies([{ name: "rp_session", value: sessionId, url: BASE_URL }, crewCookie()]);
+  await context.addCookies([{ name: "rp_session", value: sessionId, url: BASE_URL }, crewCookie(), { name: "rp_lang", value: "zh-Hans", url: BASE_URL }]);
   const page = await context.newPage();
   await page.goto(pathname);
   await waitLive(page);
@@ -492,7 +496,7 @@ export async function joinThroughPageAsCrew(
   opts: JoinOptions = {},
 ): Promise<Device> {
   const context = await browser.newContext({ baseURL: BASE_URL, ...(opts.viewport ? { viewport: opts.viewport } : {}) });
-  await context.addCookies([crewCookie(), ...(opts.lang ? [{ name: "rp_lang", value: opts.lang, url: BASE_URL }] : [])]);
+  await context.addCookies([crewCookie(), { name: "rp_lang", value: opts.lang ?? "zh-Hans", url: BASE_URL }]);
   const page = await context.newPage();
   await page.goto("/join");
   await page.getByTestId("join-code-input").fill(code);
