@@ -179,7 +179,7 @@ function PartItem({
     case "label":
       return (
         <TimelineItem node="lab" {...hooks(part)} actions={after}>
-          <SourceLine kind="label" node="lab" who={ui.sources.label} />
+          <SourceLine kind="label" node="lab" who={ui.sources.label} when={part.medName} />
           {part.restated ? (
             <>
               <p className="rpu-said" data-rp="label-line" lang="zh-Hans" style={{ marginTop: 0 }}>

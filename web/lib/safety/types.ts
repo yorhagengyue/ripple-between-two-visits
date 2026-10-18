@@ -65,6 +65,8 @@ export interface Citation {
   /** visit lines: confirmed / inferred / unknown, the same state the visit screen shows (see LineRoleState) */
   roleState?: LineRoleState;
   medId?: string;
+  /** the medicine on a label line, as the label prints it (「Amlodipine 5 mg」) */
+  medName?: string;
   kbSourceId?: string;
   url?: string;
   title?: string;

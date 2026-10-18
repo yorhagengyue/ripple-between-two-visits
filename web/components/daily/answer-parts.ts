@@ -54,7 +54,7 @@ export type AnswerPart =
       standIn: boolean;
       translation?: string;
     }
-  | { kind: "label"; source: string; restated?: string; printed: string }
+  | { kind: "label"; source: string; restated?: string; printed: string; medName?: string }
   | { kind: "leaflet"; source: string; text: string; lang: UiLocale; from?: string }
   | { kind: "record"; source: string; text: string; lang: UiLocale };
 
@@ -181,7 +181,7 @@ export function answerParts(sentences: readonly Sentence[], locale: UiLocale): A
       continue;
     }
     if (s.sourceId.startsWith("label:")) {
-      parts.push({ kind: "label", source: s.sourceId, printed: s.en, ...(locale === "zh-Hans" && s.zh && s.zh !== s.en ? { restated: withoutLeadIn(s.zh) } : {}) });
+      parts.push({ kind: "label", source: s.sourceId, printed: s.en, ...(s.cite?.medName ? { medName: s.cite.medName } : {}), ...(locale === "zh-Hans" && s.zh && s.zh !== s.en ? { restated: withoutLeadIn(s.zh) } : {}) });
       continue;
     }
     if (s.sourceId.startsWith("log:")) {

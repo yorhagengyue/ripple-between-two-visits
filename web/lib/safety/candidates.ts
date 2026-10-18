@@ -637,7 +637,8 @@ export async function buildCandidates(store: Store, sessionId: string, opts: Can
       about: m.drug_id ? [m.drug_id] : [UNIDENTIFIED_DRUG],
       topics: ["label"],
       instruction: true,
-      cite: { medId: m.id, date: m.label.dispensed ?? undefined },
+      // the medicine as the line names it, for the answer sheet's head line; the label stores it as a slug
+      cite: { medId: m.id, date: m.label.dispensed ?? undefined, medName: [m.label.drug ? m.label.drug.charAt(0).toUpperCase() + m.label.drug.slice(1) : "", m.label.strength].filter(Boolean).join(" ") || undefined },
     });
   }
 
