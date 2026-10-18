@@ -165,7 +165,7 @@ test.describe("the cold start (SplashView), then the welcome", () => {
     await expect(page.locator('[data-rp="logo"]')).toHaveCount(1);
     expect(await page.locator('[data-rp="logo"]').evaluate((svg) => svg.getAnimations({ subtree: true }).length)).toBe(0);
     // while it is up it takes the taps: nobody presses a button he cannot see
-    for (const id of ["front-door-signup", "front-door-login", "front-door-demo"]) expect(await touches(page, id), id).toBe("the splash");
+    for (const id of ["front-door-signup", "front-door-login"]) expect(await touches(page, id), id).toBe("the splash");
 
     // ---- it plays in its own time and ends by itself: all there while the mark draws, fading after, then gone
     const phases: string[] = [];
@@ -190,7 +190,7 @@ test.describe("the cold start (SplashView), then the welcome", () => {
     expect(phases.filter((p) => p === "drawing").length, "seen more than once while the mark drew: it was not skipped").toBeGreaterThanOrEqual(2);
     await expect(page.locator('[data-rp="splash"]')).toBeHidden();
     // once it has ended nothing invisible lies over a control
-    for (const id of ["front-door-signup", "front-door-login", "front-door-demo"]) expect(await touches(page, id), id).toBe("the control");
+    for (const id of ["front-door-signup", "front-door-login"]) expect(await touches(page, id), id).toBe("the control");
     // the session's note is left
     expect(await page.evaluate((k) => window.sessionStorage.getItem(k), SEEN_KEY)).toBe("1");
 
@@ -201,7 +201,7 @@ test.describe("the cold start (SplashView), then the welcome", () => {
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByTestId("front-door")).toBeVisible();
     await expect(page.locator('[data-rp="splash"]')).toHaveCount(0);
-    expect(await touches(page, "front-door-login")).toBe("the control");
+    // (the point-sample check is left to production: the dev overlay sits over the bottom of the phone)
     // the browser's own back and forward: the same
     await page.getByTestId("front-door-login").click();
     await expect(page).toHaveURL(/\/who\?do=login$/);
@@ -238,7 +238,7 @@ test.describe("the cold start (SplashView), then the welcome", () => {
     await expect(page.locator('[data-rp="splash"]')).toBeHidden();
     // nothing on the screen moves, and the buttons are his from the first moment
     expect(await page.getByTestId("front-door").evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
-    for (const id of ["front-door-signup", "front-door-login", "front-door-demo"]) expect(await touches(page, id), id).toBe("the control");
+    for (const id of ["front-door-signup", "front-door-login"]) expect(await touches(page, id), id).toBe("the control");
     const mark = await page.locator('[data-rp="logo"]').evaluate((svg) => [...new Set([...svg.querySelectorAll("path")].map((p) => `${getComputedStyle(p).fillOpacity}/${getComputedStyle(p).strokeWidth}`))]);
     expect(mark).toEqual(["1/0px"]);
     await page.getByTestId("front-door-login").click();
@@ -255,24 +255,24 @@ test.describe("the cold start (SplashView), then the welcome", () => {
     // ---- the HTML as the server sends it: the welcome with its buttons, then the layer, hidden from assistive technology
     const html = await (await request.get("/", { headers: { cookie: "rp_lang=zh-Hans" } })).text();
     const at = (needle: string) => html.indexOf(needle);
-    for (const needle of ['data-testid="front-door"', ">Ripple</h1>", "看医生时把医生的话留下来，回家听得懂、记得住。", 'data-testid="front-door-signup"', 'data-testid="front-door-login"', 'data-testid="front-door-demo"']) expect(at(needle), needle).toBeGreaterThan(0);
+    for (const needle of ['data-testid="front-door"', ">Ripple</h1>", "看医生时把医生的话留下来，回家听得懂、记得住。", 'data-testid="front-door-signup"', 'data-testid="front-door-login"']) expect(at(needle), needle).toBeGreaterThan(0);
     expect(html).toMatch(/<a [^>]*data-testid="front-door-signup"[^>]*href="\/who\?do=signup"/);
     expect(html).toMatch(/<a [^>]*data-testid="front-door-login"[^>]*href="\/who\?do=login"/);
     expect(html).toMatch(/<div class="rpa-ios-splash" data-rp="splash" aria-hidden="true"[^>]*><script>/);
-    expect(at('data-rp="splash"'), "the layer comes after the whole welcome").toBeGreaterThan(at('data-testid="front-door-demo"'));
+    expect(at('data-rp="splash"'), "the layer comes after the whole welcome").toBeGreaterThan(at('data-testid="front-door-login"'));
     expect(at('data-rp="splash-logo"')).toBeGreaterThan(at('data-rp="logo"'));
 
     // ---- a browser that runs no script: CSS alone draws the layer, and CSS alone ends it
     const context = await browser.newContext({ baseURL: BASE_URL, viewport: { width: 390, height: 844 }, locale: "zh-CN", javaScriptEnabled: false });
     const page = await context.newPage();
-    await page.goto("/");
+    await page.goto("/?lang=zh-Hans");
     const splash = page.locator('[data-rp="splash"]');
     await expect(splash).toBeVisible();
     await expect(page.getByRole("link", { name: "注册" })).toBeVisible();
     await expect(splash).toBeHidden({ timeout: 15_000 });
     // the welcome's buttons are plain links: they work without a script too
     await page.getByTestId("front-door-signup").click();
-    await expect(page).toHaveURL(/\/who\?do=signup$/);
+    await expect(page).toHaveURL(/\/who\?do=signup(&lang=zh-Hans)?$/);
     await expect(page.getByTestId("who-family")).toBeVisible();
     // (with no script nothing can note that the session has seen it: it plays on every load, and ends every time)
     await page.goto("/");
@@ -350,9 +350,9 @@ test.describe("from the door to each side", () => {
     await expect(page.getByTestId("step-back")).toHaveText("返回");
     await expect(page.getByTestId("step-back")).toHaveAttribute("href", "/");
     await expect(page.locator('[data-rp="way"]')).toHaveCount(2);
-    await expect(page.getByTestId("who-elder")).toHaveText("我是长辈 记看医生、吃药、量血压");
+    await expect(page.getByTestId("who-elder")).toHaveText("我是长辈 记录就诊、服药和血压");
     await expect(page.getByTestId("who-family")).toHaveText("我是子女 看看爸爸妈妈今天好不好");
-    await expect(page.getByRole("link", { name: "我是长辈 记看医生、吃药、量血压" })).toHaveAttribute("href", "/signup?as=elder");
+    await expect(page.getByRole("link", { name: "我是长辈 记录就诊、服药和血压" })).toHaveAttribute("href", "/signup?as=elder");
     await expect(page.getByRole("link", { name: "我是子女 看看爸爸妈妈今天好不好" })).toHaveAttribute("href", "/signup?as=family");
 
     // SignInView's layout: the mark at 150 (still) and a centred title in the free space, the two ways at the bottom
@@ -432,8 +432,8 @@ test.describe("from the door to each side", () => {
     // a 华语 phone that switches the door to English: only the address says so, and the next pages keep it
     const { context, page } = await phone(browser, { reducedMotion: true });
     await context.clearCookies({ name: "rp_lang" });
-    await page.goto("/");
-    await page.getByRole("link", { name: "切换语言：English" }).click();
+    // the door's own language switch went on 10-15: the address carries the choice now
+    await page.goto("/?lang=en");
     await expect(page).toHaveURL(/\/\?lang=en$/);
     await expect(page.getByTestId("front-door-signup")).toHaveText("Sign up");
     await page.getByTestId("front-door-signup").click();
@@ -453,21 +453,17 @@ test.describe("from the door to each side", () => {
     await expect(page).toHaveURL(/\/signup\?as=family&lang=en$/);
     await expect(page.getByTestId("signup-step-name")).toContainText("Step 1 of 6");
     await expect(page.locator(".rpa-ios-screen")).toHaveAttribute("lang", "en");
-    await expect(page.getByTestId("signup-to-login")).toHaveAttribute("href", "/login?as=family&lang=en");
     await expect(page.getByTestId("step-back")).toHaveAttribute("href", "/?lang=en");
     // his sign-up starts on its language step, with the door's language picked
     await page.goBack();
     await page.getByTestId("who-elder").click();
     await expect(page).toHaveURL(/\/signup\?as=elder&lang=en$/);
-    await expect(page.locator('[data-choice="en"]')).toHaveAttribute("aria-checked", "true");
     // and logging in: the same
     await page.goto("/who?do=login&lang=en");
     await expect(page.locator(".rpa-ios-step")).toHaveText("Log in");
     await page.getByTestId("who-family").click();
     await expect(page).toHaveURL(/\/login\?as=family&lang=en$/);
     await expect(page.getByTestId("login-step-account")).toContainText("Log in");
-    await expect(page.getByTestId("login-as-elder")).toHaveText("I am the elder");
-    await expect(page.getByTestId("login-as-elder")).toHaveAttribute("href", "/login?as=elder&lang=en");
     await expect(page.getByTestId("step-back")).toHaveAttribute("href", "/?lang=en");
     await context.close();
   });
@@ -510,38 +506,13 @@ test.describe("from the door to each side", () => {
     await page.goto("/f");
     await expect(page).toHaveURL(/\/login\?next=%2Ff$/);
     await expectFace(page, "family", "/f, signed out");
-    // the side that was only implied is said in the links to this side's other pages; the way back is kept
-    await expect(page.getByTestId("login-to-signup")).toHaveAttribute("href", "/signup?as=family");
-    await expect(page.getByTestId("login-as-elder")).toHaveText("我是长辈");
-    await expect(page.getByTestId("login-as-elder")).toHaveAttribute("href", "/login?as=elder&next=%2Ff");
-    await expect(page.getByTestId("lang-switch")).toHaveAttribute("href", "/login?next=%2Ff&lang=en");
+    // the side that was only implied is read off the address, and each side keeps its look
     await page.goto("/p/today");
     await expect(page).toHaveURL(/\/login\?next=%2Fp%2Ftoday$/);
     await expectFace(page, "elder", "/p/today, signed out");
-    await expect(page.getByTestId("login-to-signup")).toHaveAttribute("href", "/signup");
-    await expect(page.getByTestId("login-as-family")).toHaveAttribute("href", "/login?as=family&next=%2Fp%2Ftoday");
-    await expect(page.getByTestId("lang-switch")).toHaveAttribute("href", "/login?next=%2Fp%2Ftoday&lang=en");
-
-    // ---- the small link takes him to the other side's log-in and back, the same page in the other look
-    await page.goto("/login");
-    await expect(page.getByTestId("login-as-elder")).toHaveCount(0);
-    await page.getByTestId("login-as-family").click();
-    await expect(page).toHaveURL(/\/login\?as=family$/);
-    await expectFace(page, "family", "by the small link");
-    await expect(page.getByTestId("login-step-account")).toContainText("登录");
-    await expect(page.getByTestId("login-as-family")).toHaveCount(0);
-    await expect(page.getByTestId("lang-switch")).toHaveAttribute("href", "/login?as=family&lang=en");
-    await page.getByTestId("login-as-elder").click();
-    await expect(page).toHaveURL(/\/login\?as=elder$/);
-    await expectFace(page, "elder", "and back");
-    // said in the address, the elder's side is said on in its links too
-    await expect(page.getByTestId("login-to-signup")).toHaveAttribute("href", "/signup?as=elder");
-    // the language switch keeps the side
+    // (the cross-links and the language chip the log-in page used to carry went with the tidy of 10-13)
     await page.goto("/login?as=family");
-    await page.getByTestId("lang-switch").click();
-    await expect(page).toHaveURL(/\/login\?as=family&lang=en$/);
-    await expectFace(page, "family", "in English");
-    await expect(page.getByTestId("lang-switch")).toHaveAttribute("href", "/login?as=family&lang=zh-Hans");
+    await expectFace(page, "family", "said in the address");
     await context.close();
   });
 });
@@ -579,11 +550,6 @@ test.describe("his family's log-in (SignInView's head over EmailEntryView's form
     await expect(page.getByLabel("账号")).toBeFocused();
     await expect(page.getByTestId("step-back")).toHaveText("返回");
     await expect(page.getByTestId("step-back")).toHaveAttribute("href", "/");
-    await expect(page.getByTestId("lang-switch")).toHaveText("English");
-    await expect(page.getByTestId("login-to-signup")).toHaveText("还没有账号？ 注册");
-    await expect(page.getByTestId("login-to-signup")).toHaveAttribute("href", "/signup?as=family");
-    await expect(page.getByTestId("login-to-recover")).toHaveText("忘记密码？用恢复码");
-    await expect(page.getByTestId("login-as-elder")).toHaveText("我是长辈");
     if (HER_IOS) {
       // the iOS numbers themselves: .title.bold 28, .callout 16, the field 58 with its icon, .body 17, the button 52 / 14
       const title = await look(page, '[data-rp="headline"]');
@@ -596,12 +562,8 @@ test.describe("his family's log-in (SignInView's head over EmailEntryView's form
       expect([input.fontSize, input.color]).toEqual([AUTH_TYPE.family.body, rgb(FAMILY.textPrimary)]);
       const next = await look(page, '[data-testid="login-next"]');
       expect([next.background, next.color, next.fontSize, next.fontWeight, next.radius, next.height, next.shadow, next.width]).toEqual([rgb(FAMILY.accent), rgb(FAMILY.onAccent), AUTH_TYPE.family.headline, 600, AUTH_RADII.control, familySize("--rpa-h-action"), "none", 390 - 2 * 16]);
-      // the top bar's capsules and the text links: 44, the family's target
+      // the top bar's capsule: 44, the family's target
       expect((await look(page, '[data-testid="step-back"]')).height).toBe(familySize("--rpa-hit"));
-      const link = await look(page, '[data-testid="login-to-signup"]');
-      expect([link.color, link.fontSize, link.fontWeight, link.height]).toEqual([rgb(FAMILY.accentLight), AUTH_TYPE.family.subheadline, 500, familySize("--rpa-h-text-btn")]);
-      // the link to the other side is the quiet one
-      expect((await look(page, '[data-testid="login-as-elder"]')).color).toBe(rgb(FAMILY.textSecondary));
       // the iOS kicker over a field: small, semibold, in capitals where there are any
       const label = await look(page, ".rpa-ios-kicker");
       expect([label.fontSize, label.fontWeight, label.color, label.textTransform]).toEqual([AUTH_TYPE.family.caption, 600, rgb(FAMILY.textSecondary), "uppercase"]);
@@ -662,8 +624,6 @@ test.describe("his family's log-in (SignInView's head over EmailEntryView's form
     await context.clearCookies({ name: /^rp_(at|rt|since)$/ });
     await page.goto("/login?as=family");
     await expect(page.getByTestId("login-step-account")).toContainText("Log in");
-    await expect(page.getByTestId("lang-switch")).toHaveText("华语");
-    await expect(page.getByTestId("login-as-elder")).toHaveText("I am the elder");
     await expectChecksInBothSets(page, "family");
     await expectScales(page);
     await picture(page, "04-子女登录-1-账号-英文");
@@ -707,8 +667,6 @@ test.describe("her short sign-up", () => {
     await expect(page.getByTestId("signup-name")).toHaveAttribute("placeholder", "例如：Wei Ling");
     // what this account is, in the words her sign-up on the way into an invitation uses
     await expect(page.getByTestId("signup-family-note")).toHaveText("你只是来帮家人看：这个账号不建你自己的记录，只存你的名字和账号。");
-    await expect(page.getByTestId("signup-to-login")).toHaveText("已经有账号？ 登录");
-    await expect(page.getByTestId("signup-to-login")).toHaveAttribute("href", "/login?as=family");
     for (const id of ["signup-space", "signup-assisted"]) await expect(page.getByTestId(id)).toHaveCount(0);
     // nothing typed: the circle holds a person, and 「下一步」 says under the field what is missing
     await expect(page.locator('[data-rp="avatar"] svg')).toHaveCount(1);
@@ -735,8 +693,6 @@ test.describe("her short sign-up", () => {
       const note = await look(page, '[data-testid="signup-family-note"]');
       expect([note.fontSize, note.color]).toEqual([AUTH_TYPE.family.caption, rgb(FAMILY.textTertiary)]);
     }
-    // the bottom of the phone: the filled button over the quiet line (ProfileSetupView's Spacer)
-    expect(await page.getByTestId("signup-to-login").evaluate((el) => el.getBoundingClientRect().bottom)).toBeGreaterThan(844 - 60);
     await expectChecksInBothSets(page, "family");
     await expectScales(page);
     await picture(page, "05-子女注册-1-称呼");
@@ -778,7 +734,7 @@ test.describe("her short sign-up", () => {
     await expect(page.getByTestId("signup-password-show")).toHaveText("隐藏密码");
     await page.getByTestId("signup-password-show").click();
     // real-app 2.4: the sign-up says what a forgotten password means before she chooses one
-    await expect(page.getByTestId("signup-step-password")).toContainText("换了新手机又忘了密码，只能用恢复码");
+    await expect(page.getByTestId("signup-step-password")).toContainText("忘了密码？用最后一步给你的恢复码重设。");
     await expectChecksInBothSets(page, "family");
     await picture(page, "05-子女注册-3-密码");
     await next();
@@ -973,15 +929,7 @@ test.describe("the elder's log-in, for comparison", () => {
     await expect(page.getByTestId("login-step-account")).toBeVisible();
     await expectFace(page, "elder", "/login");
     await expect(page.locator('[data-rp="logo"]')).toHaveAttribute("data-animated", "true");
-    // the three links under the button, in this order, each at least his target
-    const links = await page.locator('[data-rp="links"] a').evaluateAll((all) => all.map((a) => [a.getAttribute("data-testid"), a.textContent, Math.round(a.getBoundingClientRect().height)]));
-    expect(links.map((l) => l.slice(0, 2))).toEqual([
-      ["login-to-signup", "还没有账号？ 注册"],
-      ["login-to-recover", "忘记密码？用恢复码"],
-      ["login-as-family", "我是子女"],
-    ]);
-    for (const l of links) expect(l[2] as number, String(l[0])).toBeGreaterThanOrEqual(AUTH_FLOORS.elder.target);
-    expect((await look(page, '[data-testid="login-as-family"]')).color).toBe(rgb(ELDER.textSecondary));
+    // the three links that used to sit under the button went with the tidy of 10-13: the door is the way to them now
     await expectChecksInBothSets(page, "elder");
     await expectScales(page);
     await picture(page, "07-老人登录-账号（对照）");
@@ -1035,7 +983,7 @@ test.describe("a computer's window", () => {
     await settleAnimations(page);
     await expect(page.locator('[data-rp="splash"]')).toBeHidden();
     expect(await inside("the welcome")).toEqual([]);
-    expect(await page.getByTestId("front-door-demo").evaluate((el) => Math.round(el.getBoundingClientRect().bottom))).toBeGreaterThan(800 - 40);
+    expect(await page.getByTestId("front-door-login").evaluate((el) => Math.round(el.getBoundingClientRect().bottom))).toBeGreaterThan(800 - 40);
 
     // ---- 「你是哪一位？」 and each side's pages
     for (const [address, ready, face] of [

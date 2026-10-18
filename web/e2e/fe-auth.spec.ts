@@ -1,4 +1,4 @@
-/**
+﻿/**
  * The welcome, log-in, sign-up and recovery screens, derived from the owner's iOS app (fe-auth; web/progress/fe-auth.md;
  * components/auth-ui, app/ripple-auth.css). What e2e/account.spec.ts and e2e/a-family-reset.spec.ts already walk (the
  * steps, the refusals) is not repeated here. These files hold what is about the look:
@@ -45,8 +45,6 @@ test.describe("the welcome screen (WelcomeView)", () => {
     // both lead to 「你是哪一位？」, which leads to that side's page
     await expect(page.getByTestId("front-door-signup")).toHaveAttribute("href", "/who?do=signup");
     await expect(page.getByTestId("front-door-login")).toHaveAttribute("href", "/who?do=login");
-    await expect(page.getByTestId("front-door-demo")).toHaveText("评委：并排演示在 /demo");
-    await expect(page.getByRole("link", { name: "切换语言：English" })).toHaveText("中/EN");
     // one page: no page dots; and no rows of what the app does until the owner gives their words
     await expect(page.locator('[data-rp="features"]')).toHaveCount(0);
     // (the cold start's black screen is over the welcome for its first seconds: measured once it has played)
@@ -78,20 +76,15 @@ test.describe("the welcome screen (WelcomeView)", () => {
     // RippleTextButtonStyle(tint: accentLight): .subheadline.weight(.medium), the whole line tappable, 44 -> 48
     const second = await look(page, '[data-testid="front-door-login"]');
     expect([second.color, second.fontSize, second.fontWeight, second.height, second.width]).toEqual([rgb(DOOR.accentLight), 18, DOOR_SHAPE.words.fontWeight, 48, 390 - 2 * DOOR_SHAPE.gutter]);
-    // the judges' line is small print
-    const small = await look(page, '[data-testid="front-door-demo"]');
-    expect([small.color, small.fontSize, small.fontWeight]).toEqual([rgb(DOOR.textTertiary), 18, 400]);
-    expect(small.height).toBeGreaterThanOrEqual(48);
-
     // the bottom area sits at the bottom of the phone, the filled button over the quiet ones (WelcomeView's inset)
     const boxes = await page.evaluate(() => {
       const top = (id: string) => document.querySelector(`[data-testid="${id}"]`)!.getBoundingClientRect();
-      return { signup: top("front-door-signup").top, login: top("front-door-login").top, demo: top("front-door-demo").bottom, logo: document.querySelector('[data-rp="logo"]')!.getBoundingClientRect().bottom };
+      return { signup: top("front-door-signup").top, login: top("front-door-login").top, loginBottom: top("front-door-login").bottom, logo: document.querySelector('[data-rp="logo"]')!.getBoundingClientRect().bottom };
     });
     expect(boxes.logo).toBeLessThan(boxes.signup);
     expect(boxes.signup).toBeLessThan(boxes.login);
-    expect(boxes.demo).toBeLessThanOrEqual(844);
-    expect(boxes.demo).toBeGreaterThan(844 - 40);
+    expect(boxes.loginBottom).toBeLessThanOrEqual(844);
+    expect(boxes.loginBottom).toBeGreaterThan(844 - 40);
 
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-01-欢迎屏");
@@ -108,10 +101,6 @@ test.describe("the welcome screen (WelcomeView)", () => {
     await expect(page.getByTestId("front-door-login")).toHaveText("Log in");
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-01-欢迎屏-英文");
-    // the language link leads to the other language and back
-    await page.getByRole("link", { name: "Switch language: 中文" }).click();
-    await expect(page).toHaveURL(/\/\?lang=zh-Hans$/);
-    await expect(page.getByTestId("front-door-signup")).toHaveText("注册");
     await context.close();
   });
 
@@ -178,10 +167,9 @@ test.describe("the welcome screen (WelcomeView)", () => {
     });
     expect(Math.abs(column.left - column.right)).toBeLessThanOrEqual(1);
     expect(column.height).toBeGreaterThanOrEqual(800);
-    expect(await page.getByTestId("front-door-demo").evaluate((el) => Math.round(el.getBoundingClientRect().bottom))).toBeGreaterThan(800 - 40);
-    // nothing of this group is measured against the window: no sideways scroll, and the judges' line leads to /demo
+    expect(await page.getByTestId("front-door-login").evaluate((el) => Math.round(el.getBoundingClientRect().bottom))).toBeGreaterThan(800 - 40);
+    // nothing of this group is measured against the window: no sideways scroll
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await expect(page.getByTestId("front-door-demo")).toHaveAttribute("href", "/demo");
     await shot(page, "电脑-01-欢迎屏");
     for (const [path, ready, name] of [
       ["/login", "login-step-account", "电脑-02-登录"],
@@ -232,16 +220,10 @@ test.describe("the log-in (SignInView's head over EmailEntryView's form)", () =>
     const next = await look(page, '[data-testid="login-next"]');
     expect([next.background, next.color, next.radius, next.height, next.shadow]).toEqual([rgb(ELDER.accent), rgb(ELDER.onAccent), SHAPE.primary.radius, SHAPE.primary.height, "none"]);
     await expect(page.getByTestId("login-next").locator("svg")).toHaveCount(1);
-    // back and the language are worded capsules in the top bar
+    // back is a worded capsule in the top bar (the language lives in the cookie and 「我」 now)
     await expect(page.getByTestId("step-back")).toHaveText("返回");
-    await expect(page.getByTestId("lang-switch")).toHaveText("English");
-    expect((await look(page, '[data-testid="lang-switch"]')).color).toBe(rgb(ELDER.accentLight));
     expect((await look(page, '[data-testid="step-back"]')).height).toBe(48);
-    // under the two links that were there, one small one to the other side's log-in, quieter than they are
-    await expect(page.getByTestId("login-to-signup")).toHaveAttribute("href", "/signup");
-    await expect(page.getByTestId("login-as-family")).toHaveText("我是子女");
-    await expect(page.getByTestId("login-as-family")).toHaveAttribute("href", "/login?as=family");
-    expect((await look(page, '[data-testid="login-as-family"]')).color).toBe(rgb(ELDER.textSecondary));
+    // the way to the other side and to sign-up lives on 「你是哪一位？」 now, not under the field (tidy of 10-13)
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-02-登录-1-账号");
 
@@ -315,7 +297,6 @@ test.describe("the log-in (SignInView's head over EmailEntryView's form)", () =>
     const { context, page } = await phone(browser, { locale: "en" });
     await page.goto("/login");
     await expect(page.getByTestId("login-step-account")).toContainText("Log in");
-    await expect(page.getByTestId("lang-switch")).toHaveText("华语");
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-02-登录-1-账号-英文");
     await expectScales(page);

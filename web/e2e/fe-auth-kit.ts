@@ -195,6 +195,8 @@ export async function expectChecksInBothSets(page: Page, side: AuthSide): Promis
   const shipped = await lookOf(page);
   await expectPageChecks(page, { side });
   await setLook(page, other(shipped));
+  // a colour transition started by the flip itself lands a frame later: let it end before axe reads colours
+  await page.waitForTimeout(350);
   try {
     await expectPageChecks(page, { side });
   } catch (e) {
