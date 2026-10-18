@@ -17,30 +17,14 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     const next = () => page.getByTestId("signup-next").click();
     await page.goto("/signup");
 
-    // ---- 1 语言: the top bar (back, the step count), a bold title on the left, the choices, the button at the bottom
-    await expect(page.getByTestId("signup-step-lang")).toContainText("第 1 步，共 9 步");
-    const count = await look(page, ".rpa-ios-step");
-    expect([count.fontSize, count.color]).toEqual([18, rgb(ELDER.textSecondary)]);
+    // ---- 1 称呼 (2026-10-18: the language and 「谁在操作」 screens are gone; the front door picks the language, and
+    // the family-helping case is one quiet toggle under the field)
+    await expect(page.getByTestId("signup-step-name")).toContainText("第 1 步，共 7 步");
     await expect(page.getByTestId("step-back")).toHaveAttribute("href", "/");
     const title = await look(page, '[data-rp="headline"]');
     expect([title.fontSize, title.fontWeight, title.textAlign]).toEqual([34, 700, "start"]);
-    await expect(page.getByRole("radiogroup", { name: "用哪种语言？" }).getByRole("radio")).toHaveCount(2);
-    await page.locator('[data-choice="zh-Hans"]').click();
-    await expect(page.locator('[data-choice="zh-Hans"]')).toHaveAttribute("aria-checked", "true");
-    // a row: surface, radius 14, 54 -> 64 tall; the picked one has the tick in its ring, the other an empty ring
-    const row = await look(page, '[data-choice="zh-Hans"]');
-    expect([row.background, row.radius]).toEqual([rgb(ELDER.surface), 14]);
-    expect(row.height).toBeGreaterThanOrEqual(64);
-    await expect(page.locator('[data-choice="zh-Hans"] svg')).toHaveCount(1);
-    await expect(page.locator('[data-choice="en"] svg')).toHaveCount(0);
-    expect(await page.locator('[data-choice="zh-Hans"]').evaluate((el) => getComputedStyle(el).borderTopColor)).toBe(rgb(ELDER.focus));
-    // the button sits at the bottom of the phone (ProfileSetupView's Spacer): 64 tall, radius 14, no glow
-    const go = await look(page, '[data-testid="signup-next"]');
-    expect([go.height, go.radius, go.shadow]).toEqual([SHAPE.primary.height, SHAPE.primary.radius, "none"]);
-    expect(await page.getByTestId("signup-to-login").evaluate((el) => el.getBoundingClientRect().bottom)).toBeGreaterThan(844 - 60);
     await expectChecksInBothSets(page, "elder");
-    await shot(page, "老人版-03-注册-1-语言");
-    await next();
+    await shot(page, "老人版-03-注册-1-称呼-空");
 
     // ---- 2 称呼: ProfileSetupView's circle shows his initial as he types
     await expect(page.getByTestId("signup-step-name")).toBeVisible();
@@ -52,11 +36,11 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     await expect(page.getByTestId("signup-step-name")).toBeVisible();
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-2-称呼-没写");
-    // (the sentence stays until the next tap on 「下一步」; back and on again, so the next picture is the step at rest)
-    await page.getByTestId("step-back").click();
-    await next();
-    await expect(page.getByTestId("signup-name-error")).toHaveCount(0);
+    // (the sentence stays until the next tap on 下一步; a reload gives the step at rest for the next picture)
+    await page.reload();
+    await expect(page.getByTestId("signup-step-name")).toBeVisible();
     await page.getByTestId("signup-name").fill("陈先生");
+    await expect(page.getByTestId("signup-name-error")).toHaveCount(0);
     await expect(avatar).toHaveText("陈");
     const circle = await look(page, '[data-rp="avatar"]');
     expect([circle.width, circle.height, circle.fontSize, circle.color]).toEqual([116, 116, 48, rgb(ELDER.accentLight)]);
@@ -68,6 +52,13 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     expect([label.fontSize, label.fontWeight, label.color, label.textTransform]).toEqual([18, 600, rgb(ELDER.textSecondary), "none"]);
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-2-称呼");
+    // the family-helping case, one quiet toggle (the old 「谁在操作」 screen): on, and the two texts ask his own tap
+    await page.getByTestId("signup-assisted").click();
+    await expect(page.getByTestId("assisted-note")).toHaveText("接下来两页的「同意」，请陈先生本人点。");
+    const hint = await look(page, '[data-testid="assisted-note"]');
+    expect([hint.background, hint.radius, hint.fontSize]).toEqual([rgb(ELDER.surface), 14, 18]);
+    await expectChecksInBothSets(page, "elder");
+    await shot(page, "老人版-03-注册-1-称呼-家人帮忙");
     await next();
 
     // ---- 3 账号: what is wrong is said under the field, in amber
@@ -99,26 +90,11 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     await expect(page.getByTestId("signup-step-password")).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId("signup-password-error")).toHaveCount(0);
     await page.getByTestId("signup-password").fill("plum blossom tea");
-    await expect(page.getByTestId("signup-step-password")).toContainText("换了新手机又忘了密码，只能用恢复码");
+    await expect(page.getByTestId("signup-step-password")).toContainText("忘了密码？用最后一步给你的恢复码重设。");
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-4-密码");
     await next();
 
-    // ---- 5 谁在操作: family helping, so the hint says whose tap the next two pages need
-    await expect(page.getByTestId("signup-step-helper")).toBeVisible();
-    // neither picked: both rings empty, and 「下一步」 asks for one
-    await next();
-    await expect(page.getByTestId("signup-error")).toHaveText("选一个。");
-    await expect(page.locator('[data-testid="signup-helper"] svg')).toHaveCount(0);
-    await expectChecksInBothSets(page, "elder");
-    await shot(page, "老人版-03-注册-5-谁在操作-没选");
-    await page.locator('[data-choice="family"]').click();
-    await expect(page.getByTestId("assisted-note")).toHaveText("接下来两页的「同意」，请陈先生本人点。");
-    const hint = await look(page, '[data-testid="assisted-note"]');
-    expect([hint.background, hint.radius, hint.fontSize]).toEqual([rgb(ELDER.surface), 14, 18]);
-    await expectChecksInBothSets(page, "elder");
-    await shot(page, "老人版-03-注册-5-谁在操作");
-    await next();
 
     // ---- 6 条款: the text as published, in a card (RippleCard: surface, radius 20); the full notice opens beside it
     await expect(page.getByTestId("signup-step-terms")).toBeVisible();
@@ -137,9 +113,13 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     // ---- 7 AI: agree is the filled button, the refusal the second one, both after the text
     await expect(page.getByTestId("signup-step-ai")).toBeVisible();
     await expect(page.getByTestId("signup-ai-text")).toContainText(/腾讯云的混元模型|Tencent Cloud's Hunyuan model/);
-    expect((await look(page, '[data-testid="signup-ai-agree"]')).height).toBe(SHAPE.primary.height);
+    // the filled button and the refusal share the pinned dock's row: same height, inside the side's touch range
+    const agree = await look(page, '[data-testid="signup-ai-agree"]');
     const decline = await look(page, '[data-testid="signup-ai-decline"]');
-    expect([decline.height, decline.background, decline.color]).toEqual([SHAPE.secondary.height, rgb(ELDER.fill2), rgb(ELDER.textPrimary)]);
+    expect(agree.height).toBe(decline.height);
+    expect(agree.height).toBeGreaterThanOrEqual(SHAPE.secondary.height);
+    expect(agree.height).toBeLessThanOrEqual(SHAPE.primary.height + 12);
+    expect([decline.background, decline.color]).toEqual([rgb(ELDER.fill2), rgb(ELDER.textPrimary)]);
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-7-AI");
     await page.getByTestId("signup-ai-agree").click();
@@ -170,7 +150,7 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
 
     // ---- 9 恢复码: one card, large and evenly spaced; no back (the account exists)
     await expect(page.getByTestId("signup-step-code")).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByTestId("signup-step-code")).toContainText("第 9 步，共 9 步");
+    await expect(page.getByTestId("signup-step-code")).toContainText("第 7 步，共 7 步");
     await expect(page.getByTestId("step-back")).toHaveCount(0);
     const code = (await page.getByTestId("recovery-code").innerText()).trim();
     expect(code).toMatch(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/);
@@ -219,16 +199,17 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
   test("in English, and at a 200% text size the screens still do not scroll sideways", async ({ browser }) => {
     const { context, page } = await phone(browser, { locale: "en" });
     await page.goto("/signup");
-    await expect(page.getByTestId("signup-step-lang")).toContainText("Step 1 of 9");
+    await expect(page.getByTestId("signup-step-name")).toContainText("Step 1 of 7");
     await expectChecksInBothSets(page, "elder");
     await expectScales(page);
-    await page.locator('[data-choice="en"]').click();
-    await page.getByTestId("signup-next").click();
     await page.getByTestId("signup-name").fill("Mr Tan");
     await expect(page.locator('[data-rp="avatar"]')).toHaveText("M");
     await expectChecksInBothSets(page, "elder");
-    await shot(page, "老人版-03-注册-2-称呼-英文");
+    await shot(page, "老人版-03-注册-1-称呼-英文");
     await expectScales(page);
+    // the family-helping toggle, and from here the flow is 7 screens rather than 9
+    await page.getByTestId("signup-assisted").click();
+    await expect(page.getByTestId("assisted-note")).toHaveText("On the next two pages, Mr Tan should tap to agree.");
     // on through the two texts he agrees to and the choice of data, in English: the longest lines of the flow
     const next = () => page.getByTestId("signup-next").click();
     await next();
@@ -238,9 +219,6 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     await page.getByTestId("signup-password").fill("plum blossom tea");
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-4-密码-英文");
-    await next();
-    await page.locator('[data-choice="family"]').click();
-    await expect(page.getByTestId("assisted-note")).toHaveText("On the next two pages, Mr Tan should tap to agree.");
     await next();
     await expect(page.getByTestId("signup-terms-text")).toContainText("Tokyo");
     await expectChecksInBothSets(page, "elder");
@@ -257,7 +235,7 @@ test.describe("the sign-up (ProfileSetupView's screen, step after step)", () => 
     await expectScales(page);
     await next();
     await expect(page.getByTestId("signup-step-code")).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByTestId("signup-step-code")).toContainText("Step 9 of 9");
+    await expect(page.getByTestId("signup-step-code")).toContainText("Step 7 of 7");
     await expectChecksInBothSets(page, "elder");
     await shot(page, "老人版-03-注册-9-恢复码-英文");
     await expectScales(page);

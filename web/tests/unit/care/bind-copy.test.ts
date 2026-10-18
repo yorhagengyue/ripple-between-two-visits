@@ -11,6 +11,7 @@ const KEYS: BindKey[] = [
   "herTitle",
   "herBody",
   "herField",
+  "herPlaceholder",
   "herCalls",
   "callsDad",
   "callsMum",
@@ -57,7 +58,7 @@ describe("the words of binding by account", () => {
     expect(zh("herTitle")).toBe("填长辈的账号");
     // the owner's decision of 2026-10-14: what she sees at once is named as the kinds themselves (it named counts:
     // 「这周吃药的天数、量了几次血压、有几个问题要问医生」), here and on his card below
-    expect(zh("herBody")).toBe("填他注册 Ripple 时用的账号。填好就绑定，你马上能看到：每日服药情况、血压读数、待问医生的问题；两次提醒均未回应时会通知你。他那边会收到一条通知，随时可以解除。");
+    expect(zh("herBody")).toBe("填他注册 Ripple 用的账号。绑定后你能看到他的服药、血压和要问医生的问题；两次提醒都没回应时会通知你。他随时可以解除。");
     expect(zh("herField")).toBe("长辈的账号");
     expect(zh("herCalls")).toBe("你怎么称呼他");
     expect([zh("callsDad"), zh("callsMum"), zh("callsName")]).toEqual(["爸爸", "妈妈", "用他的名字"]);
@@ -81,7 +82,7 @@ describe("the words of binding by account", () => {
     expect(bc("en", "boundSees")).toBe(
       "She can now see: your medicine each day (which medicine, when, and the reason when you did not take it), your blood pressure readings, and the questions you want to ask your doctor; and she is told when two reminders get no reply.",
     );
-    expect(bc("en", "herBody")).toContain("you can see at once: his medicine each day, his blood pressure readings, and the questions he wants to ask his doctor; and you are told when two reminders get no reply.");
+    expect(bc("en", "herBody")).toContain("You will see his medicines, readings and questions, and be told when two reminders go unanswered.");
     // no sentence of the binding still says a count
     for (const k of KEYS) expect(`${zh(k)}${bc("en", k)}`, k).not.toMatch(/天数|几次|有几个|how many|the days he|the days you/);
     expect([zh("boundOk"), zh("boundRemove")]).toEqual(["知道了", "不认识这个人，解除"]);

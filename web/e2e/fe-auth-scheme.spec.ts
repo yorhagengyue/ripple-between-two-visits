@@ -38,7 +38,7 @@ test.describe("which set of colours each face's pages are drawn in is one value"
       ["/", "front-door", "door"],
       ["/who?do=signup", "who", "door"],
       ["/login", "login-step-account", "elder"],
-      ["/signup", "signup-step-lang", "elder"],
+      ["/signup", "signup-step-name", "elder"],
       ["/recover", "recover-step-account", "elder"],
       ["/login?as=family", "login-step-account", "family"],
       ["/signup?as=family", "signup-step-name", "family"],
@@ -114,23 +114,20 @@ test.describe("which set of colours each face's pages are drawn in is one value"
     await expect(page.getByTestId("login-login-error")).toBeVisible();
     await expectSwitches(page, "the family's log-in, the account", "family");
 
-    // ---- the sign-up, step after step, to the recovery code and its card
-    await page.goto("/signup");
-    await page.locator('[data-choice="zh-Hans"]').click();
-    await expectSwitches(page, "sign-up, the language");
-    await page.getByTestId("signup-next").click();
-    await page.getByTestId("signup-name").fill("陈先生");
+    // ---- the sign-up, step after step, to the recovery code and its card (?lang= picks the language now)
+    await page.goto("/signup?lang=zh-Hans");
+    await expect(page.getByTestId("signup-step-name")).toBeVisible();
     await expectSwitches(page, "sign-up, the name");
+    // a family member is helping him: the toggle on this screen (the old 「谁在操作」 step)
+    await page.getByTestId("signup-assisted").click();
+    await expect(page.getByTestId("assisted-note")).toBeVisible();
+    await page.getByTestId("signup-name").fill("陈先生");
     await page.getByTestId("signup-next").click();
     await page.getByTestId("signup-login").fill(newLogin());
     await page.getByTestId("signup-next").click();
     await expect(page.getByTestId("signup-step-password")).toBeVisible({ timeout: 30_000 });
     await page.getByTestId("signup-password").fill("plum blossom tea");
     await expectSwitches(page, "sign-up, the password");
-    await page.getByTestId("signup-next").click();
-    await page.locator('[data-choice="family"]').click();
-    await expect(page.getByTestId("assisted-note")).toBeVisible();
-    await expectSwitches(page, "sign-up, who is tapping");
     await page.getByTestId("signup-next").click();
     await expect(page.getByTestId("signup-terms-text")).toBeVisible();
     await expectSwitches(page, "sign-up, the terms");

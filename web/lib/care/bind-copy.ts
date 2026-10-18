@@ -19,8 +19,9 @@ import { fillHer } from "./copy";
 const zh = {
   // ---- her form: /f while she follows nobody
   herTitle: "填长辈的账号",
-  herBody: "填他注册 Ripple 时用的账号。填好就绑定，你马上能看到：每日服药情况、血压读数、待问医生的问题；两次提醒均未回应时会通知你。他那边会收到一条通知，随时可以解除。",
+  herBody: "填他注册 Ripple 用的账号。绑定后你能看到他的服药、血压和要问医生的问题；两次提醒都没回应时会通知你。他随时可以解除。",
   herField: "长辈的账号",
+  herPlaceholder: "例如 chen.tan",
   herCalls: "你怎么称呼他",
   callsDad: "爸爸",
   callsMum: "妈妈",
@@ -76,8 +77,9 @@ export type BindKey = keyof typeof zh;
 
 const en: Record<BindKey, string> = {
   herTitle: "Enter your elder's account",
-  herBody: "Type the account he signed up to Ripple with. Once you link, you can see at once: his medicine each day, his blood pressure readings, and the questions he wants to ask his doctor; and you are told when two reminders get no reply. He gets a notification on his side and can remove you at any time.",
+  herBody: "Type the account he signed up with. You will see his medicines, readings and questions, and be told when two reminders go unanswered. He can remove you any time.",
   herField: "Your elder's account",
+  herPlaceholder: "e.g. chen.tan",
   herCalls: "What you call him",
   callsDad: "Dad",
   callsMum: "Mum",

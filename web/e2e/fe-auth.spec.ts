@@ -185,7 +185,7 @@ test.describe("the welcome screen (WelcomeView)", () => {
     await shot(page, "电脑-01-欢迎屏");
     for (const [path, ready, name] of [
       ["/login", "login-step-account", "电脑-02-登录"],
-      ["/signup", "signup-step-lang", "电脑-03-注册"],
+      ["/signup", "signup-step-name", "电脑-03-注册"],
       ["/recover", "recover-step-account", "电脑-04-找回"],
     ] as const) {
       await page.goto(path);
@@ -337,7 +337,7 @@ test.describe("the phone's text size and zoom", () => {
     // the same on a form screen and on a step with choices: pictures for the owner of what a doubled text size does
     for (const [path, ready, name] of [
       ["/login", "login-step-account", "老人版-02-登录-1-账号-大字"],
-      ["/signup", "signup-step-lang", "老人版-03-注册-1-语言-大字"],
+      ["/signup", "signup-step-name", "老人版-03-注册-1-称呼-大字"],
     ] as const) {
       await page.goto(path);
       await expect(page.getByTestId(ready)).toBeVisible();

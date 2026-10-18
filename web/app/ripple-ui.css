@@ -1864,9 +1864,10 @@
   .rpu-placeholder-name { margin: 0; font-size: var(--rp-fs-body); font-weight: 800; }
   .rpu-placeholder-line { margin: 0; font-size: var(--rp-fs-min); line-height: 1.45; color: var(--rp-ink-3); }
 
-  /* one quiet line in a tinted box: 「示例资料：陈先生（虚构人物）」, 「家人写了 2 条」 */
-  .rpu-banner { display: flex; gap: 10px; align-items: flex-start; box-sizing: border-box; min-height: var(--rp-hit); margin-top: 0; margin-bottom: 12px; padding: 10px 16px; border-radius: var(--rp-radius-btn); background: var(--rp-accent-soft); font-size: var(--rp-fs-min); font-weight: 700; line-height: 1.5; color: var(--rp-ink); }
-  .rpu-banner svg { width: calc(22 * var(--rp-u)); height: calc(22 * var(--rp-u)); color: var(--rp-accent); margin-top: 2px; }
+  /* the example account's line under the header: one quiet line, not a card (2026-10-18: it was a bold tinted bar on
+     six screens and pushed the page down twice; now normal weight, no fill, and it fits on one line at 390px) */
+  .rpu-banner { display: flex; gap: 8px; align-items: center; box-sizing: border-box; min-height: var(--rp-hit); margin-top: 0; margin-bottom: 6px; padding: 0 2px; border-radius: 0; background: none; font-size: var(--rp-fs-min); font-weight: 600; line-height: 1.35; color: var(--rp-ink-3); }
+  .rpu-banner svg { width: calc(19 * var(--rp-u)); height: calc(19 * var(--rp-u)); color: var(--rp-ink-3); margin-top: 0; flex: none; }
 
   /* ---------- 我 (Me): a card, one entry per row ---------- */
   .rpu-menu { margin-top: 12px; background: var(--rp-white); border: 1px solid var(--rp-line); border-radius: var(--rp-radius-card); overflow: hidden; }

@@ -981,6 +981,8 @@ html:has(.rpa-ios-screen[data-rp-phone]) body {
   .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-nav-btn,
   .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-more > summary,
   .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-way-title { font-weight: 700; }
+  /* 2026-10-18: the quiet text button was #836ca6 on #f2f5f9 = 4.12:1, under AA; the darker accent is 7.4:1 */
+  .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-btn[data-variant="text"]:not([data-tint="quiet"]):not([data-tint="secondary"]) { color: #5b3e86; }
 
   /* a field (.rpu-f-box): the edge at rest 1.5px, 2.5px in the action colour while he is in it, 2px in the error's */
   .rpa-ios-screen[data-rp-phone="light"] .rpa-ios-input-box { border-width: 1.5px; }

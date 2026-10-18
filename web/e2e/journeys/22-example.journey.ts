@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 22 评委入口和示例资料 (track C): a judge's account on Mr Tan's example data (real-app 2.2, 4.1-4.8).
  *
  * The account is made the way sign-up's 「用陈先生的示例资料」 makes it (seedAccount; here through the developer helper,
@@ -62,7 +62,7 @@ journey("22 评委入口和示例资料", async ({ kit, request }) => {
   // ---- Today on the example
   await kit.step(page, "评委用「陈先生的示例资料」开了账号：最上面一行写明这是示例资料，下面一张说明卡");
   const line = page.locator('[data-rp="example-line"]');
-  await expect(line).toContainText("示例资料：陈先生（虚构人物）");
+  await expect(line).toContainText("陈先生的示例资料（虚构）");
   const intro = page.locator('[data-rp="example-intro"]');
   await expect(intro).toContainText("他 6 周前第一次看医生，后来开了降压药，今天要去复诊。");
   await kit.show(intro);
@@ -180,7 +180,7 @@ journey("22 评委入口和示例资料", async ({ kit, request }) => {
   await kit.show(kneeAnswer);
 
   // ---- the example's own page
-  await kit.step(page, "每一屏页头下面都有「示例资料：陈先生（虚构人物）」这一行，点开写着从哪天开始、今天是复诊那天");
+  await kit.step(page, "每一屏页头下面都有「陈先生的示例资料（虚构）」这一行，点开写着从哪天开始、今天是复诊那天");
   await openList(page);
   await expect(page.locator('[data-rp="example-line"]')).toHaveCount(1);
   await page.locator('[data-rp="example-line"]').click();

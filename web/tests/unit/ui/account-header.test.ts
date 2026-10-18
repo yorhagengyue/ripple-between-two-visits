@@ -88,7 +88,7 @@ describe("the header of an account's screens", () => {
     const page = createElement("div", null, createElement(MetaBar, { back: { href: "/p/today" }, locale: "zh-Hans" }), createElement(ExampleLine, { locale: "zh-Hans" }), createElement(ExampleBanner, { locale: "zh-Hans", introDismissed: true }));
     const his = html(account(page, true));
     expect(count(his, 'data-rp="example-line"')).toBe(1);
-    expect(his).toContain("示例资料：陈先生（虚构人物）");
+    expect(his).toContain("陈先生的示例资料（虚构）");
     // under the header: the line follows the top line directly
     expect(his.indexOf('data-rp="example-line"')).toBeGreaterThan(his.indexOf('data-rp="meta"'));
     expect(his.indexOf('data-rp="example-line"')).toBeLessThan(his.indexOf('data-rp="example-banner"'));

@@ -106,7 +106,7 @@ export function questionsCopy(locale: CLocale) {
 
 export function exampleCopy(locale: CLocale) {
   return {
-    banner: pick(locale, "示例资料：陈先生（虚构人物）", "Example data: Mr Tan (a made-up person)"),
+    banner: pick(locale, "陈先生的示例资料（虚构）", "Mr Tan's example data (fictional)"),
     bannerMore: pick(locale, "这是什么", "What is this"),
     introTitle: pick(locale, "这是陈先生的示例资料", "This is Mr Tan's example data"),
     introBody: pick(

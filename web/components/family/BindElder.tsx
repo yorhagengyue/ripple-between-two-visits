@@ -109,6 +109,7 @@ export function BindElder({
                 if (error) setError(null);
               }}
               autoComplete="off"
+              placeholder={bc(locale, "herPlaceholder")}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}

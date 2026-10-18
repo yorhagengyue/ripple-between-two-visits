@@ -32,16 +32,17 @@ test.describe("sign-up", () => {
   test("every step, a family member helping, AI refused, the example: the code once, its card, then today", async ({ browser }) => {
     const { context, page } = await phone(browser);
     const name = login();
-    await page.goto("/signup");
-    await expect(page.getByTestId("signup-step-lang")).toBeVisible();
+    await page.goto("/signup?lang=zh-Hans");
+    await expect(page.getByTestId("signup-step-name")).toBeVisible();
     await expectPageChecks(page, { side: "elder" });
-    await page.locator('[data-choice="zh-Hans"]').click();
-    await next(page);
 
     await expect(page.getByTestId("signup-step-name")).toBeVisible();
     await next(page); // empty: told what to write
     await expect(page.getByTestId("signup-name-error")).toBeVisible();
     await page.getByTestId("signup-name").fill("陈先生");
+    // a family member is helping him: the toggle that replaced the old 「谁在操作」 screen
+    await page.getByTestId("signup-assisted").click();
+    await expect(page.getByTestId("assisted-note")).toContainText("陈先生本人");
     await expectPageChecks(page, { side: "elder" });
     await next(page);
 
@@ -61,17 +62,13 @@ test.describe("sign-up", () => {
     await page.getByTestId("signup-password-show").click();
     await expect(page.getByTestId("signup-password")).toHaveAttribute("type", "text");
     // real-app 2.4: the sign-up says what a forgotten password means, before he chooses one
-    await expect(page.getByTestId("signup-step-password")).toContainText("换了新手机又忘了密码，只能用恢复码");
-    await expect(page.getByTestId("signup-step-password")).toContainText("就只能注册一个新账号");
+    await expect(page.getByTestId("signup-step-password")).toContainText("忘了密码？用最后一步给你的恢复码重设。");
+    // the 「显示密码」 button fades between two tints: let the colour settle before the contrast check
+    await page.waitForTimeout(500);
     await expectPageChecks(page, { side: "elder" });
     await next(page);
 
-    await expect(page.getByTestId("signup-step-helper")).toBeVisible();
-    await page.locator('[data-choice="family"]').click();
-    await expect(page.getByTestId("assisted-note")).toContainText("陈先生本人");
-    await expectPageChecks(page, { side: "elder" });
-    await next(page);
-
+    // the old 「谁在操作」 screen is the toggle on the name step now (already on): the two texts still ask his own tap
     await expect(page.getByTestId("signup-step-terms")).toBeVisible();
     await expect(page.getByTestId("signup-terms-text")).toContainText("东京");
     await expect(page.getByTestId("assisted-note")).toBeVisible();
@@ -127,16 +124,12 @@ test.describe("sign-up", () => {
   test("a blank space lands on the onboarding; English all the way", async ({ browser }) => {
     const { context, page } = await phone(browser, { locale: "en-SG" });
     await page.goto("/signup");
-    await expect(page.getByTestId("signup-step-lang")).toContainText("Which language?");
-    await page.locator('[data-choice="en"]').click();
-    await next(page);
+    await expect(page.getByTestId("signup-step-name")).toContainText("What should we call you?");
     await page.getByTestId("signup-name").fill("Mr Tan");
     await next(page);
     await page.getByTestId("signup-login").fill(`${login()}@example.test`);
     await next(page);
     await page.getByTestId("signup-password").fill(PASSWORD);
-    await next(page);
-    await page.locator('[data-choice="self"]').click();
     await next(page);
     await expect(page.getByTestId("signup-terms-text")).toContainText("Tokyo");
     await expectPageChecks(page, { side: "elder" });
@@ -160,6 +153,10 @@ test.describe("log in and out", () => {
     const { context, page } = await phone(browser);
     await page.goto("/p/today");
     await expect(page).toHaveURL(/\/login\?next=%2Fp%2Ftoday$/);
+    await expect(page.getByTestId("login-step-account")).toBeVisible();
+    // the sign-up no longer carries a language step: the cookie is what 「我 › 语言」 and the front door's switch write
+    await page.context().addCookies([{ name: "rp_lang", value: "zh-Hans", url: new URL(page.url()).origin }]);
+    await page.reload();
     await expect(page.getByTestId("login-step-account")).toBeVisible();
     await expectPageChecks(page, { side: "elder" });
     await page.getByTestId("login-login").fill(name);
@@ -207,6 +204,8 @@ test.describe("log in and out", () => {
     const signed = await signUp(tablet.context, { login: name, password: PASSWORD, space: "example" });
     const { context, page } = await phone(browser);
     await page.goto("/login");
+    await page.context().addCookies([{ name: "rp_lang", value: "zh-Hans", url: new URL(page.url()).origin }]);
+    await page.reload();
     await page.getByTestId("login-login").fill(name);
     await page.getByTestId("login-next").click();
     for (let i = 1; i <= 5; i++) {

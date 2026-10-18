@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 24 示例账号整条线：从注册到看诊后的简报 (C2 track G; docs/plan/real-app.md 8.12, lines 1561-1569; section 4).
  * The design names this test `e2e/real/journey-example.spec.ts`. It is written with the recording kit, so that the same
  * walk can be recorded as an mp4, and the kit takes only files named `NN-name.journey.ts`: hence this name and place.
@@ -218,7 +218,7 @@ journey("24 示例账号整条线：从注册到看诊后的简报", async ({ ki
   // 「页头没有『第』『天』连在一起」, and nowhere else on the page either
   await expect(header).not.toContainText(/第\s*\d*\s*天/);
   await expect(pp.locator("body")).not.toContainText(/第\s*\d+\s*天|Day\s?\d+/);
-  await expect(pp.locator('[data-rp="example-line"]')).toContainText("示例资料：陈先生（虚构人物）");
+  await expect(pp.locator('[data-rp="example-line"]')).toContainText("陈先生的示例资料（虚构）");
   const intro = pp.locator('[data-rp="example-intro"]');
   await expect(intro).toContainText("他 6 周前第一次看医生，后来开了降压药，今天要去复诊。");
   await seen();

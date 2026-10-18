@@ -388,7 +388,7 @@ test.describe("from the door to each side", () => {
     // ---- each way leads to that side's sign-up
     await page.getByTestId("who-elder").click();
     await expect(page).toHaveURL(/\/signup\?as=elder$/);
-    await expect(page.getByTestId("signup-step-lang")).toContainText("第 1 步，共 9 步");
+    await expect(page.getByTestId("signup-step-name")).toContainText("第 1 步，共 7 步");
     await expectFace(page, "elder", "/signup?as=elder");
     await page.goBack();
     await expect(page.getByTestId("who")).toBeVisible();
@@ -478,12 +478,12 @@ test.describe("from the door to each side", () => {
     const cases: [string, AuthFace, string][] = [
       // the bare addresses are the elder's pages, as they always were
       ["/login", "elder", "login-step-account"],
-      ["/signup", "elder", "signup-step-lang"],
+      ["/signup", "elder", "signup-step-name"],
       // said in the address
       ["/login?as=family", "family", "login-step-account"],
       ["/login?as=elder", "elder", "login-step-account"],
       ["/signup?as=family", "family", "signup-step-name"],
-      ["/signup?as=elder", "elder", "signup-step-lang"],
+      ["/signup?as=elder", "elder", "signup-step-name"],
       // implied by where he was on his way to: her pages mean family, his own mean the elder
       ["/login?next=%2Ff", "family", "login-step-account"],
       ["/login?next=%2Ff%2Fweek%3Flink%3Dabc", "family", "login-step-account"],
@@ -709,7 +709,7 @@ test.describe("her short sign-up", () => {
     await expect(page.getByTestId("signup-family-note")).toHaveText("你只是来帮家人看：这个账号不建你自己的记录，只存你的名字和账号。");
     await expect(page.getByTestId("signup-to-login")).toHaveText("已经有账号？ 登录");
     await expect(page.getByTestId("signup-to-login")).toHaveAttribute("href", "/login?as=family");
-    for (const id of ["signup-lang", "signup-helper", "signup-space"]) await expect(page.getByTestId(id)).toHaveCount(0);
+    for (const id of ["signup-space", "signup-assisted"]) await expect(page.getByTestId(id)).toHaveCount(0);
     // nothing typed: the circle holds a person, and 「下一步」 says under the field what is missing
     await expect(page.locator('[data-rp="avatar"] svg')).toHaveCount(1);
     await next();

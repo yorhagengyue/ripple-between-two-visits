@@ -42,24 +42,27 @@ import {
   authNoPrint,
 } from "@/components/auth-ui";
 import type { SignupAnswer, SignupBody } from "@/lib/auth/api";
-import { callAccount, rememberLanguage } from "@/lib/auth/client-api";
+import { callAccount } from "@/lib/auth/client-api";
 import { accountCopy, clockTime, errorWords, type AccountLocale } from "@/lib/auth/copy";
 import { parseLoginName } from "@/lib/auth/login-name";
 import { passwordProblem } from "@/lib/auth/passwords";
 import { readAloudLines } from "@/lib/auth/read-aloud-text";
 import { CURRENT_CONSENT_VERSIONS, currentConsentText } from "@/lib/privacy/consent-texts";
 
-type Step = "lang" | "name" | "account" | "password" | "helper" | "terms" | "ai" | "space" | "code" | "card";
-const ORDER: Step[] = ["lang", "name", "account", "password", "helper", "terms", "ai", "space", "code"];
+type Step = "name" | "account" | "password" | "terms" | "ai" | "space" | "code" | "card";
+// 2026-10-18: the language screen and the "who is tapping" screen are gone (the owner's round: the browser's language
+// already picks the first, and asking an elder whether he is helping himself read as a speed bump). The language still
+// follows the front door's switch (/?lang=), and "a family member is helping me" is one quiet toggle on the name screen.
+const ORDER: Step[] = ["name", "account", "password", "terms", "ai", "space", "code"];
 const TOTAL = ORDER.length;
 
 export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale: AccountLocale; readAloud?: boolean }) {
-  const [locale, setLocale] = useState<AccountLocale>(initialLocale);
-  const [step, setStep] = useState<Step>("lang");
+  const locale = initialLocale;
+  const [step, setStep] = useState<Step>("name");
   const [name, setName] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [helper, setHelper] = useState<"self" | "family" | null>(null);
+  const [helper, setHelper] = useState<"self" | "family">("self");
   const [ai, setAi] = useState<"granted" | "declined" | null>(null);
   const [space, setSpace] = useState<"blank" | "example" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -122,8 +125,6 @@ export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale
     ev.preventDefault();
     setError(null);
     switch (step) {
-      case "lang":
-        return go("name");
       case "name":
         if (!name.trim() || name.trim().length > 40) return setError(c.nameMissing);
         return go("account");
@@ -140,11 +141,8 @@ export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale
         const parsed = parseLoginName(login);
         const problem = passwordProblem(password, parsed.ok ? parsed.login : null);
         if (problem) return setError(errorWords(problem, locale));
-        return go("helper");
-      }
-      case "helper":
-        if (!helper) return setError(c.helperMissing);
         return go("terms");
+      }
       case "terms":
         return go("ai");
       case "space":
@@ -227,36 +225,41 @@ export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale
     <AuthScreen locale={locale}>
       <form onSubmit={onNext} className={authFlow} data-testid={`signup-step-${step}`} noValidate>
         {top(step)}
-        {step === "lang" && (
-          <>
-            <AuthHead>
-              {title(c.langTitle)}
-              <AuthText variant="lede">{c.langLede}</AuthText>
-            </AuthHead>
-            <AuthChoiceList
-              label={c.langTitle}
-              value={locale}
-              onChange={(v) => {
-                setLocale(v);
-                rememberLanguage(v);
-              }}
-              options={[
-                { value: "zh-Hans", title: "华语", lang: "zh-Hans" },
-                { value: "en", title: "English", lang: "en" },
-              ]}
-              testId="signup-lang"
-            />
-            {/* no 「已经有账号？ 登录」 here (owner's tidy of 10-13): the log-in is on the welcome screen, one 「返回」 away */}
-            <AuthDock>{nextButton()}</AuthDock>
-          </>
-        )}
-
         {step === "name" && (
           <>
             <AuthHead>{title(c.nameTitle)}</AuthHead>
             {/* ProfileSetupView's circle: his initial as he types */}
             <AuthAvatar name={name} />
             <AuthField label={c.nameLabel} value={name} onChange={setName} placeholder={c.namePlaceholder} autoComplete="nickname" testId="signup-name" error={error} autoFocus />
+            {/* the language step is gone: the same choice is one quiet word on this screen, and it keeps the address's ?as= */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              {/* the one home of the old 「现在是谁在点？」 screen: quiet, and only there for the case it serves */}
+              <button
+                type="button"
+                data-testid="signup-assisted"
+                aria-pressed={helper === "family"}
+                onClick={() => {
+                  setHelper(helper === "family" ? "self" : "family");
+                  setError(null);
+                }}
+                style={{ display: "flex", alignItems: "center", minHeight: "var(--rp-hit)", background: "none", border: 0, padding: "0 2px", color: "inherit", fontSize: "var(--rp-fs-min)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer", opacity: 0.85 }}
+              >
+                {helper === "family" ? c.helperSelf : c.helperFamily}
+              </button>
+              <button
+                type="button"
+                data-testid="signup-lang-switch"
+                onClick={() => {
+                  const u = new URL(window.location.href);
+                  u.searchParams.set("lang", locale === "en" ? "zh-Hans" : "en");
+                  window.location.assign(u.toString());
+                }}
+                style={{ display: "flex", alignItems: "center", minHeight: "var(--rp-hit)", background: "none", border: 0, padding: "0 2px", color: "inherit", fontSize: "var(--rp-fs-min)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer", opacity: 0.85 }}
+              >
+                {locale === "en" ? "华语" : "English"}
+              </button>
+            </div>
+            {helper === "family" && <AuthHint testId="assisted-note">{c.helperFamilyNote(who)}</AuthHint>}
             <AuthDock>{nextButton()}</AuthDock>
           </>
         )}
@@ -292,28 +295,6 @@ export function SignupFlow({ initialLocale, readAloud = false }: { initialLocale
             <AuthPasswordField copy={c} newPassword label={c.passwordLabel} value={password} onChange={setPassword} testId="signup-password" error={error} autoFocus />
             {/* real-app 2.4: the sign-up says what a forgotten password means before he chooses one */}
             <AuthText variant="lede">{c.passwordForgot}</AuthText>
-            <AuthDock>{nextButton()}</AuthDock>
-          </>
-        )}
-
-        {step === "helper" && (
-          <>
-            <AuthHead>{title(c.helperTitle)}</AuthHead>
-            <AuthChoiceList
-              label={c.helperTitle}
-              value={helper}
-              onChange={(v) => {
-                setHelper(v);
-                setError(null);
-              }}
-              options={[
-                { value: "self", title: c.helperSelf },
-                { value: "family", title: c.helperFamily },
-              ]}
-              testId="signup-helper"
-            />
-            {helper === "family" && <AuthHint testId="assisted-note">{c.helperFamilyNote(who)}</AuthHint>}
-            {error && <AuthError testId="signup-error">{error}</AuthError>}
             <AuthDock>{nextButton()}</AuthDock>
           </>
         )}

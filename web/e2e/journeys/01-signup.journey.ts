@@ -46,16 +46,13 @@ journey("01 注册和建档（注册、登录、退出、恢复）", async ({ ki
   await tp.goto("/login");
 
   // ------------------------------------------------------------ sign-up, one step a screen
-  await kit.step(pp, "陈先生第一次打开 Ripple 的注册页，先选用哪种语言");
-  await expect(pp.getByTestId("signup-step-lang")).toBeVisible();
-  await expect(pp.getByTestId("signup-step-lang")).toContainText("第 1 步，共 9 步");
-  await pp.locator('[data-choice="zh-Hans"]').click();
-  await expect(pp.locator('[data-choice="zh-Hans"]')).toHaveAttribute("aria-checked", "true");
-  await pp.getByTestId("signup-next").click();
-
-  await kit.step(pp, "怎么称呼他：写「陈先生」");
+  await kit.step(pp, "陈先生第一次打开 Ripple 的注册页：怎么称呼他，写「陈先生」");
   await expect(pp.getByTestId("signup-step-name")).toBeVisible();
+  await expect(pp.getByTestId("signup-step-name")).toContainText("第 1 步，共 7 步");
   await kit.type(pp.getByTestId("signup-name"), "陈先生");
+  await kit.step(pp, "女儿 Wei Ling 在旁边帮忙，点「家人帮我操作」");
+  await pp.getByTestId("signup-assisted").click();
+  await expect(pp.getByTestId("assisted-note")).toContainText("请陈先生本人点");
   await pp.getByTestId("signup-next").click();
 
   await kit.step(pp, "账号用名字拼音加四个数字，不用邮箱；点下一步时先查有没有人用");
@@ -77,11 +74,6 @@ journey("01 注册和建档（注册、登录、退出、恢复）", async ({ ki
   await kit.pause(800);
   await pp.getByTestId("signup-next").click();
 
-  await kit.step(pp, "女儿 Wei Ling 在旁边帮忙，选「家人帮我操作」");
-  await expect(pp.getByTestId("signup-step-helper")).toBeVisible();
-  await pp.locator('[data-choice="family"]').click();
-  await expect(pp.getByTestId("assisted-note")).toContainText("请陈先生本人点");
-  await pp.getByTestId("signup-next").click();
 
   await kit.step(pp, "条款是白话：资料存在东京、录音留 90 天、谁能看；要陈先生本人点同意");
   await expect(pp.getByTestId("signup-step-terms")).toBeVisible();
