@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/12c3e150-9f8b-4e37-bc89-76b46c30e48d
 There are no ready-made judge log-ins: sign up on the live demo in about a minute, with an account name and a password (no e-mail needed). Each judge gets an account of their own.
 
 1. **Mr Tan's side (the elder).** Open https://app.ripple-health-ai.com → **Sign up** → **I am the elder**, and pick any account name and password. At **Can AI help?** tap **I agree** (otherwise the answers come from the rules only, without Hunyuan). At **Where to start?** choose **Use Mr Tan's example data**. On the recovery code screen tap **I have kept it**. You are now in Mr Tan's app, with his visits, medicines, readings and his doctor's recorded words.
-2. **His daughter's side (optional).** In a private window or another browser: **Sign up** → **I am the son or daughter**, with another account name and password. At **Enter your elder's account** type the account name from step 1 and tap **Link**. Then, in the elder's window, tap **Got it** on the notice.
+2. **His daughter's side (optional).** In a private window or another browser: **Sign up** → **I am the son or daughter**, with another account name and password. At **Enter your elder's account** type the account name from step 1 and tap **Link**. Then, in the elder's window, tap **Got it** on the notice. Her side then opens three short setup steps (the number “Call Dad” uses, notifications, adding it to the Home Screen): tap **Later** on each — none is needed to look around.
 
 Next time, **Log in** with the same account name and password. One network can make 5 sign-ups an hour: if several judges share a network and see "Too many sign-ups", try again an hour later; the elder's side alone covers most of the film.
 

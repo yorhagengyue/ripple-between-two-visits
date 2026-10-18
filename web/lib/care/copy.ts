@@ -307,19 +307,19 @@ export function timelineWords(line: TimelineLine, locale: CareLocale, opts: { yo
     case "reminded_again":
       return "Reminded again";
     case "taken":
-      return meds ? `${He} tapped 「taken」: ${meds}` : `${He} tapped 「taken」`;
+      return meds ? `${He} tapped “taken”: ${meds}` : `${He} tapped “taken”`;
     case "missed":
-      return meds ? `${He} tapped 「not taken」: ${meds}` : `${He} tapped 「not taken」`;
+      return meds ? `${He} tapped “not taken”: ${meds}` : `${He} tapped “not taken”`;
     case "later":
-      return `${He} tapped 「later」`;
+      return `${He} tapped “later”`;
     case "no_reply":
-      return "Logged as 「no reply」";
+      return "Logged as “no reply”";
     case "told_you":
-      return "Logged as 「no reply」, and you were told";
+      return "Logged as “no reply”, and you were told";
     case "late_taken":
-      return meds ? `${He} logged 「taken」 later: ${meds}` : `${He} logged 「taken」 later`;
+      return meds ? `${He} logged “taken” later: ${meds}` : `${He} logged “taken” later`;
     case "late_missed":
-      return meds ? `${He} logged 「not taken」 later: ${meds}` : `${He} logged 「not taken」 later`;
+      return meds ? `${He} logged “not taken” later: ${meds}` : `${He} logged “not taken” later`;
     case "answered":
       return `${He} answered the reminder`;
   }
